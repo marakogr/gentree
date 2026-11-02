@@ -1,8 +1,7 @@
 {
   "title": "Chat",
   "transcript": "Chat transcript",
-  "empty": "Ask a question about the project",
-  "emptyTitle": "Ask about the project",
+  "empty": "Ask about the project or ask for a change",
   "suggestionsLabel": "Example questions",
   "exampleLongevity": "The best-known long-lived person in the family",
   "exampleConflicts": "Find contradictions in the dates",

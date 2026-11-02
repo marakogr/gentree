@@ -30,7 +30,7 @@ import {
 } from "@fluentui/react-icons";
 import type { ProjectInfo } from "./api/types";
 import { projectsApi } from "./api/client";
-import ChatPage, { type ChatSeed } from "./features/chat/ChatPage";
+import ChatPage from "./features/chat/ChatPage";
 import EventsPage from "./features/events/EventsPage";
 import GraphPage from "./features/graph/GraphPage";
 import HelpPage from "./features/help/HelpPage";
@@ -127,9 +127,6 @@ export default function App() {
   const [eventPersonFocus, setEventPersonFocus] = useState<string | null>(null);
   /** One-shot event to reveal in the events list (validation report). */
   const [eventFocus, setEventFocus] = useState<string | null>(null);
-  /** A guide question handed to the chat composer; never sent automatically. */
-  const [chatSeed, setChatSeed] = useState<ChatSeed | null>(null);
-  const chatSeedId = useRef(0);
   /** First-run tour: the overlay is open and the step it stopped at. */
   const [tourOpen, setTourOpen] = useState(false);
   const [tourStepId, setTourStepId] = useState<TourStepId>("welcome");
@@ -318,19 +315,6 @@ export default function App() {
     setTab(target);
     setNavOpen(false);
   };
-
-  // Prefills the composer and switches to chat. Sending stays a separate,
-  // explicit action so no question leaves the machine on its own.
-  const askAssistant = useCallback((text: string) => {
-    const trimmed = text.trim();
-    if (trimmed === "") return;
-    chatSeedId.current += 1;
-    setChatSeed({ id: `help-${chatSeedId.current}`, text: trimmed });
-    setTab("chat");
-    setNavOpen(false);
-  }, []);
-
-  const clearChatSeed = useCallback(() => setChatSeed(null), []);
 
   const startTour = useCallback(() => {
     setTourStepId("welcome");
@@ -594,8 +578,6 @@ export default function App() {
               key={project?.projectId ?? "no-project"}
               active={tab === "chat"}
               projectId={project?.projectId}
-              seed={chatSeed}
-              onSeedHandled={clearChatSeed}
               onOpenSettings={() => selectTab("settings")}
               onOpenPerson={(personId) => openPerson(personId, "chat")}
             />
@@ -605,7 +587,6 @@ export default function App() {
             <HelpPage
               projectOpen={project !== null}
               onNavigate={openFromHelp}
-              onAskAssistant={askAssistant}
               onStartTour={startTour}
             />
           ) : null}

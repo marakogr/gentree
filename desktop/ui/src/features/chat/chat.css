@@ -553,10 +553,6 @@
   text-align: center;
 }
 
-.chat-empty-title {
-  margin: 0;
-}
-
 .chat-suggestions {
   display: flex;
   flex-wrap: wrap;

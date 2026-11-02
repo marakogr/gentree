@@ -15,12 +15,8 @@
   "resultsCount": "Sections found: {{total}}",
   "openScreen": "Open “{{screen}}”",
   "openProjectFirst": "Open a project first",
-  "askAssistant": "Ask the assistant",
-  "askAssistantHint": "The question is placed in the chat input with this section as context. Nothing is sent until you press Send.",
   "stepsLabel": "How to do it",
   "noteLabel": "Note:",
-  "askTopic": "How do I do this in Gentree: {{title}}? Explain it step by step and name the buttons.",
-  "askFree": "How do I do this in Gentree: {{question}}? Answer using the built-in guide.",
   "topics": {
     "start": {
       "title": "Getting started",

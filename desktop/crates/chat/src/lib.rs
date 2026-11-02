@@ -34,7 +34,7 @@ pub use cancel::CancelToken;
 pub use draft::{DraftChange, DraftEvidence, DraftKind};
 pub use error::ChatError;
 pub use openai::OpenAiCompatibleProvider;
-pub use prompt::{push_application_guide, system_prompt, system_prompt_with_skills};
+pub use prompt::{system_prompt, system_prompt_with_skills};
 pub use skills::{route, route_names, Skill, SkillCatalog};
 pub use tool::{ToolCall, ToolSpec, ToolTurn};
 
