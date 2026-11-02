@@ -12,10 +12,11 @@ Setup, commands and layout: `README.md`. Read only relevant sections.
 Priority:
 1. Invariants in this file.
 2. Code and contract tests in `desktop/crates/*/tests/`.
-3. Current documentation in `docs/` and `desktop/docs/`.
-4. `README.md` / `README.ru.md` (keep both in sync).
+3. OpenSpec specs in `openspec/specs/` (once adopted, from milestone 0.4.0; intent and scenarios).
+4. Current documentation in `docs/` and `desktop/docs/`.
+5. `README.md` / `README.ru.md` (keep both in sync).
 
-If behavior contradicts an invariant or contract test, stop and ask a human. Never silently change either side. Generated docs are derived, not authoritative.
+If behavior contradicts an invariant or contract test, stop and ask a human. Never silently change either side. A spec that contradicts a contract test is a spec bug: fix the spec, not the test. Generated docs are derived, not authoritative.
 
 ## Architecture
 
@@ -113,6 +114,7 @@ Additional rules:
   - Remaining work and known failures.
   - Tests and commands already run, with results.
 - Keep the handoff factual and concise. Do not copy full source files or conversation history into it.
+- The GitHub issue and project board carry status and scope; `HANDOFF.md` only adds context that is not already in the issue.
 - In a new session, read the handoff and inspect current git state before continuing. Do not reread the entire previous implementation history.
 
 ## Quality gates
@@ -128,10 +130,65 @@ Use the targets rather than duplicating their commands. Run `make check` before 
 ## Git
 
 - `main` is protected and always green; no direct commits.
-- One change = one branch `change/<name>` from `main`, merged via PR; delete the branch after merge.
+- One change = one branch from `main`, merged via PR; delete the branch after merge.
+  Use `change/<name>` for code/UI and `release/<name>` for release engineering.
 - Conventional Commits: `feat(desktop): ...`, `fix(ui): ...`.
 - Human approval is required for `git reset --hard`, force push, `--no-verify`, `rm -rf` outside build artifacts, `DROP`/`TRUNCATE`, and merging into `main` until the process stabilizes.
 - Never commit `.env`, secrets, `desktop/target/`, `node_modules/`, or AT5 baselines.
+
+## GitHub workflow
+
+Repository: `github.com/marakogr/gentree`. Issues, milestones and the project
+board are the durable work tracker; code still lands only through PRs.
+
+- **Milestones are releases.** Current: `0.2.1 — Update channel`,
+  `0.3.0 — UI consistency`, `0.4.0 — Unified views`, `0.5.0 — Chat history`.
+  Do not create a milestone for a one-off task.
+- **One issue per PR.** An issue may cover several related tasks; its checklist
+  is the agreed scope. Close it with `Closes #<n>` in the PR body.
+- **Decisions are issues.** Open questions carry the `hitl` label and contain
+  options, consequences and a recommendation. Close a decision issue only after
+  the chosen option is recorded in the PR.
+- **Labels:** `priority:P0|P1|P2`,
+  `area:ui|settings|help|events|map|timeline|chat|data|release`,
+  `size:S|M|L`, `hitl`. Do not invent a second label for the same meaning.
+- **Language:** issue and milestone titles in English; issue bodies in Russian.
+  PR titles follow Conventional Commits in English.
+- **Project board:** `Gentree Roadmap`
+  (`https://github.com/users/marakogr/projects/2`). Set `Status` to
+  `In Progress` when starting and `Done` after merge; keep `Priority` and
+  `Size` in sync with labels.
+- **Self-contained issues.** Do not link local-only `docs/research/` notes from
+  issues or PRs; paste the relevant acceptance criteria instead.
+- **Privacy.** Never put AT5 data, real names, dates, places, paths, secrets or
+  connection strings into issues, PRs, project fields or comments.
+- **Releases.** Tag only from green `main`; the tag must match
+  `desktop/apps/desktop/tauri.conf.json`; follow `docs/releases.md`.
+- **CLI.** `gh` is installed at
+  `%LOCALAPPDATA%\Programs\gh-cli\bin\gh.exe`; add it to the session `PATH` when
+  needed.
+
+## Specs (OpenSpec)
+
+OpenSpec is adopted for capability-level work from milestone `0.4.0` onward.
+
+- **Use it for** new capabilities and behavior that spans layers or changes a
+  contract: chat history, import policy, project format, dates, relations.
+- **Do not use it for** bugs, UI polish, copy, layout, dependency bumps, release
+  engineering or any `0.3.0` task. A bug gets a failing regression test, not a
+  spec folder.
+- **One change = one `openspec/changes/<id>/`** with `proposal.md`,
+  `design.md`, `tasks.md` and the spec delta. Link the GitHub issue and the
+  change folder in the PR.
+- **Archive after merge:** `openspec archive` merges the delta into
+  `openspec/specs/`; keep the archived change in git.
+- **Precedence:** invariants > contract tests > specs > docs. If a spec
+  contradicts a test, fix the spec.
+- **Setup:** install the CLI, run `openspec init` once, disable telemetry
+  (`openspec config set telemetry.enabled false`), and review the diff
+  (especially `AGENTS.md` and `.opencode/`) before committing.
+- **Pilot:** `add-chat-history` for CH-2. If the pilot duplicates issues/tests
+  and rots, drop `openspec/` instead of maintaining ceremony.
 
 ## HITL — mandatory stop
 
@@ -145,6 +202,8 @@ Ask a human before changing:
 - Project format.
 
 Record options, consequences, and a recommendation in the PR. Approved changes to the project format, dates, or relations are recorded in the pull request and, once accepted, in the invariants above.
+
+Decisions are tracked as `hitl` issues (`D1`–`D9` in the current roadmap). Close a decision issue only after the chosen option is recorded in the PR and, when it changes an invariant, in this file.
 
 ## Never
 
