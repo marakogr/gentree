@@ -29,7 +29,7 @@ APP_EXE := desktop/target/release/gentree-desktop
 endif
 
 .PHONY: help setup doctor install fmt fmt-check lint test ui-check check ci i18n dev exe run \
-	build rebuild portable clean hooks ux-setup ux-review demo-project demo-screenshots
+	build rebuild portable clean hooks ux-setup ux-review demo-project demo-screenshots release
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -96,6 +96,9 @@ build: ## Build desktop bundles for the current OS (msi/nsis or dmg)
 	cd desktop/apps/desktop && $(TAURI_APP) build
 
 rebuild: clean build ## Clean and rebuild desktop installers
+
+release: ## Tag the version in tauri.conf.json and push it; CI builds a draft
+	$(NODE) scripts/release.mjs
 
 portable: ## Package the portable Windows archive (no installer)
 	cd desktop/apps/desktop && $(TAURI_APP) build --no-bundle --config tauri.portable.conf.json
