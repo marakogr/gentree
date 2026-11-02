@@ -45,7 +45,7 @@ import {
   type FluentIcon,
 } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
-import { eventsApi, mediaApi, personsApi } from "../../api/client";
+import { eventsApi, mediaApi, personsApi, projectsApi } from "../../api/client";
 import type {
   CivilDate,
   DatePrecision,
@@ -54,6 +54,7 @@ import type {
   EventType,
   MediaItem,
   Person,
+  ValidationReport,
   Versioned,
 } from "../../api/types";
 import { FilterBar } from "../../components/filters/FilterBar";
@@ -80,6 +81,7 @@ import type { ViewFilters } from "../../lib/viewState";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
 import PersonSearch from "../persons/PersonSearch";
+import { ValidationSummary } from "../projects/ValidationSummary";
 import EventForm from "./EventForm";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
@@ -241,8 +243,6 @@ type Props = {
   onOpenPerson?: (personId: string) => void;
   /** Shown in the "no people yet" note; the shell wires it later. */
   onRequestNewPerson?: () => void;
-  /** Shown next to the anomaly counter when provided. */
-  onValidateData?: () => void;
 };
 
 export default function EventsPage({
@@ -253,9 +253,14 @@ export default function EventsPage({
   onEventFocusHandled,
   onOpenPerson,
   onRequestNewPerson,
-  onValidateData,
 }: Props) {
-  const { t, i18n } = useTranslation(["event", "common", "enums", "person"]);
+  const { t, i18n } = useTranslation([
+    "event",
+    "common",
+    "enums",
+    "person",
+    "project",
+  ]);
   const formatDate = useDateFormatter();
   const toast = useToast();
   const styles = useStyles();
@@ -271,6 +276,9 @@ export default function EventsPage({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<AppErrorEnvelope | null>(null);
   const [stale, setStale] = useState(false);
+  const [validationReport, setValidationReport] =
+    useState<ValidationReport | null>(null);
+  const [validationBusy, setValidationBusy] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Editing | null>(null);
   const [createDefaults, setCreateDefaults] = useState<{
@@ -724,6 +732,19 @@ export default function EventsPage({
     void load();
   };
 
+  // The badge is the shortcut to the same report the check screen shows; the
+  // popup reuses its body instead of leaving the events screen.
+  const openValidation = async () => {
+    setValidationBusy(true);
+    try {
+      setValidationReport(await projectsApi.validate());
+    } catch (caught) {
+      setError(normalizeError(caught));
+    } finally {
+      setValidationBusy(false);
+    }
+  };
+
   /* ---------- filters ---------- */
 
   const patchFilters = useCallback(
@@ -879,15 +900,17 @@ export default function EventsPage({
 
         <div className="events-head-actions">
           {anomalyCount > 0 ? (
-            <span className="events-anomalies" title={anomalyTitle}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="events-anomalies"
+              onClick={() => void openValidation()}
+              loading={validationBusy}
+              title={anomalyTitle}
+              aria-label={`${t("event:anomaly.check")}. ${anomalyTitle}`}
+            >
               <WarningRegular aria-hidden="true" />
               {t("event:anomaly.count", { count: anomalyCount })}
-              <span className="ui-sr-only">{anomalyTitle}</span>
-            </span>
-          ) : null}
-          {onValidateData && anomalyCount > 0 ? (
-            <Button size="sm" variant="ghost" onClick={onValidateData}>
-              {t("event:anomaly.check")}
             </Button>
           ) : null}
         </div>
@@ -1445,6 +1468,35 @@ export default function EventsPage({
         }
       >
         <p className="bulk-hint">{t("common:bulk.deleteEventsHint")}</p>
+      </Dialog>
+
+      <Dialog
+        open={validationReport !== null}
+        size="md"
+        title={t("project:validate")}
+        onClose={() => setValidationReport(null)}
+        footer={
+          <Button
+            variant="secondary"
+            onClick={() => setValidationReport(null)}
+          >
+            {t("common:actions.close")}
+          </Button>
+        }
+      >
+        {validationReport ? (
+          <ValidationSummary
+            report={validationReport}
+            locale={i18n.language}
+            emptyLabel={t("project:emptyValue")}
+            onOpenEvent={(eventId) => {
+              const target = events.find((row) => row.entity.id === eventId);
+              if (!target) return;
+              setValidationReport(null);
+              startEdit(target);
+            }}
+          />
+        ) : null}
       </Dialog>
     </>
   );

@@ -509,7 +509,6 @@ export default function App() {
                 onEventFocusHandled={() => setEventFocus(null)}
                 onOpenPerson={(personId) => openPerson(personId, "events")}
                 onRequestNewPerson={() => selectTab("persons")}
-                onValidateData={() => selectTab("projects")}
               />
             ) : (
               <section className="panel">
