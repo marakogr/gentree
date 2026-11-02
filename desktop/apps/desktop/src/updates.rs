@@ -24,7 +24,7 @@ use crate::settings::ConfigState;
 
 /// Plugin id in `tauri.conf.json`: `plugins.updater`.
 const PLUGIN_NAME: &str = "updater";
-/// Marker used by the checked-in placeholders in `tauri.conf.json`.
+/// Marker used by config placeholders and by a build that ships without keys.
 const PLACEHOLDER: &str = "REPLACE_WITH";
 
 /// Why the build cannot check for updates. Detailed reasons stay local; the UI
@@ -101,7 +101,7 @@ impl UpdaterConfig {
     }
 
     /// Placeholders are refused before the plugin builds a client, so a build
-    /// that ships without release keys never contacts `updates.invalid`.
+    /// that ships without release keys never contacts a release host.
     pub fn readiness(&self) -> Readiness {
         let Some(endpoint) = self.endpoints.first() else {
             return Readiness::MissingEndpoint;
@@ -385,7 +385,7 @@ mod tests {
     }
 
     #[test]
-    fn the_checked_in_placeholders_are_refused_and_never_echoed() {
+    fn placeholder_configs_are_refused_and_never_echoed() {
         let value = json!({
             "endpoints": [
                 "https://updates.invalid/REPLACE_WITH_RELEASES_HOST/gentree/latest.json"
@@ -473,5 +473,25 @@ mod tests {
 
         assert!(config.endpoints.is_empty());
         assert_eq!(config.readiness(), Readiness::MissingEndpoint);
+    }
+
+    /// The shipped config is the only build users receive, so a regression to a
+    /// placeholder must fail in CI rather than silently disable updates.
+    #[test]
+    fn the_shipped_config_enables_the_update_channel() {
+        let value: Value =
+            serde_json::from_str(include_str!("../tauri.conf.json")).expect("tauri.conf.json");
+        let plugin = value
+            .get("plugins")
+            .and_then(|plugins| plugins.get(PLUGIN_NAME));
+        let config = UpdaterConfig::from_plugin_config(plugin);
+
+        assert_eq!(config.readiness(), Readiness::Ready);
+        assert!(
+            config.endpoints.first().is_some_and(|endpoint| endpoint
+                .ends_with("/marakogr/gentree/releases/latest/download/latest.json")),
+            "{:?}",
+            config.endpoints
+        );
     }
 }

@@ -6,11 +6,11 @@ name: Release
 # The workflow creates a DRAFT GitHub release. Nothing becomes public until a
 # maintainer reviews the artifacts and publishes the draft.
 #
-# This preview pipeline deliberately builds unsigned artifacts without updater
-# signing: the app's updater endpoint is still a placeholder, so no client
-# polls it. Enabling `tauri.release.conf.json`, `includeUpdaterJson` and the
-# TAURI_SIGNING_* secrets is a separate step once the key and endpoint are
-# verified.
+# This pipeline builds update artifacts and publishes `latest.json` next to the
+# installer, so an installed build can update itself from GitHub Releases. The
+# updater endpoint and the matching public key live in tauri.conf.json; the
+# private key is the TAURI_SIGNING_PRIVATE_KEY secret and never leaves the
+# secret store. Without that secret the release fails before the build starts.
 #
 # Every job verifies its artifacts before publishing them:
 #   - code signatures (blocking when WINDOWS_CERTIFICATE is configured),
@@ -33,9 +33,10 @@ name: Release
 # Without the certificate pair the Windows artifacts are still built, but they
 # are unsigned and the signature check only warns. See docs/releases.md.
 #
-# Future updater signing (not used by this preview pipeline):
-#   TAURI_SIGNING_PRIVATE_KEY
-#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+# Updater signing secrets (required):
+#   TAURI_SIGNING_PRIVATE_KEY          full contents of the minisign private key
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD its password, empty when there is none
+# See docs/releases.md.
 
 on:
   push:
@@ -78,7 +79,7 @@ jobs:
           rustup target add ${{ matrix.target }}
 
       - name: Cache Rust artifacts
-        uses: Swatinem/rust-cache@e9d7b9f1e587218970671bac74e5511ed9506e6a # v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
           workspaces: desktop
 
@@ -87,6 +88,27 @@ jobs:
 
       - name: Check that the tag matches the app version
         run: node -e "const fs=require('fs');const tag=process.env.GITHUB_REF_NAME.replace(/^v/,'');const version=JSON.parse(fs.readFileSync('desktop/apps/desktop/tauri.conf.json','utf8')).version;if(version!==tag){console.error('tag '+tag+' does not match tauri.conf.json version '+version);process.exit(1);}console.log('release version '+version);"
+
+      # A release that silently shipped a placeholder endpoint would produce a
+      # `latest.json` nobody can reach, so fail here instead of after the build.
+      - name: Check that the updater is configured
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          $config = Get-Content 'desktop/apps/desktop/tauri.conf.json' -Raw | ConvertFrom-Json
+          $updater = $config.plugins.updater
+          $endpoint = @($updater.endpoints) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -First 1
+          if (-not $endpoint -or $endpoint -match 'REPLACE_WITH|updates\.invalid' -or -not $endpoint.StartsWith('https://')) {
+            throw 'tauri.conf.json has no real https updater endpoint'
+          }
+          if ([string]::IsNullOrWhiteSpace($updater.pubkey) -or $updater.pubkey -match 'REPLACE_WITH') {
+            throw 'tauri.conf.json has no real updater public key'
+          }
+          if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY)) {
+            throw 'TAURI_SIGNING_PRIVATE_KEY is not configured: updater artifacts cannot be signed'
+          }
+          Write-Host "Updater channel is configured for version $($config.version)."
 
       # Writes the signing overlay consumed by tauri-action on every platform:
       # an empty object means "build unsigned". The file always exists, so the
@@ -156,9 +178,11 @@ jobs:
           "CHANGELOG_EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Build and upload the draft release
-        uses: tauri-apps/tauri-action@fce9c6108b31ea247710505d3aaaa893ee6768d4 # v0
+        uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0.6.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: desktop/apps/desktop
           tagName: ${{ github.ref_name }}
@@ -191,12 +215,14 @@ jobs:
             per-app exception; turning it off is a system-wide security change.
             Code signing is planned, and a signed build will not trip either
             gate.
-          # No latest.json while the updater endpoint is a placeholder.
-          includeUpdaterJson: false
+          # `latest.json` points installed builds at the artifact of this release.
+          includeUpdaterJson: true
           # Only NSIS is published. The MSI is a local build for managed
           # deployments and is not part of the release assets.
           updaterJsonPreferNsis: true
-          args: --target ${{ matrix.target }} --bundles nsis --config tauri.signing.conf.json
+          # The first overlay produces the `.sig` files and the updater archive,
+          # the second one adds the optional Authenticode certificate.
+          args: --target ${{ matrix.target }} --bundles nsis --config tauri.release.conf.json --config tauri.signing.conf.json
 
       # The portable executable is a separate build: tauri.portable.conf.json
       # empties the updater endpoint so a portable copy can never install itself

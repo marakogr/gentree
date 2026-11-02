@@ -64,8 +64,8 @@ cd desktop\apps\desktop
 ..\..\ui\node_modules\.bin\tauri.cmd build --config tauri.release.conf.json
 ```
 
-Сценарий проверки обновления через локальный Gitea (http только на loopback)
-описан в [`docs/releases.md`](../../docs/releases.md).
+Сценарий проверки обновления через локальный статический сервер (http только на
+loopback) описан в [`docs/releases.md`](../../docs/releases.md).
 
 ## macOS: .dmg
 
