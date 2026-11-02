@@ -81,6 +81,7 @@ import {
   type PersonNavigationAction,
 } from "./actions";
 import { buildEventTimeline, childrenOf } from "./eventTimeline";
+import { occupationPositions } from "./occupations";
 import {
   ageInCompletedYears,
   ageTone,
@@ -398,6 +399,12 @@ export default function PersonCard({
         personName: (child) => displayName(child, t("person:unknownName")),
       }),
     [detail.events, fieldGroups, formatDate, t, timelineChildren],
+  );
+  // The occupation fact reuses the timeline rows, so its positions follow the
+  // same oldest-first order and open the matching event.
+  const occupations = useMemo(
+    () => occupationPositions(eventRows),
+    [eventRows],
   );
   // The current person is always offered, even while the full list is still
   // loading: "add event" from the card must not depend on that request.
@@ -869,6 +876,19 @@ export default function PersonCard({
                   {age}
                 </Text>
               )}
+            </dd>
+
+            <dt>
+              <Text size={200} weight="semibold" className={styles.mutedText}>
+                {t("enums:eventType.OCCUPATION")}
+              </Text>
+            </dt>
+            <dd data-testid="person-occupation">
+              <Text size={200}>
+                {occupations.length === 0
+                  ? EMPTY_VALUE
+                  : occupations.join(", ")}
+              </Text>
             </dd>
 
             <dt>
