@@ -204,6 +204,7 @@ export function PlaceAutocomplete({
         required={required}
         disabled={disabled}
         positioning={COMBOBOX_POSITIONING}
+        autoComplete="off"
         listbox={{
           className: "place-autocomplete-listbox",
           style: {
