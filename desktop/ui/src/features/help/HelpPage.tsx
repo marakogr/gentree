@@ -15,10 +15,10 @@ import {
   ChatRegular,
   ChevronRightRegular,
   FolderRegular,
+  HatGraduationRegular,
   InfoRegular,
   OrganizationRegular,
   PeopleRegular,
-  PlayRegular,
   SearchRegular,
   type FluentIcon,
 } from "@fluentui/react-icons";
@@ -244,14 +244,9 @@ export default function HelpPage({
   return (
     <section className="panel help-page" aria-labelledby="help-title">
       <header className="help-head">
-        <div className="help-head-text">
-          <Title2 as="h1" id="help-title">
-            {t("help:title")}
-          </Title2>
-          <Text as="p" size={200} className="help-subtitle">
-            {t("help:subtitle")}
-          </Text>
-        </div>
+        <Title2 as="h1" id="help-title">
+          {t("help:title")}
+        </Title2>
         <div className="help-head-actions">
           <Input
             className="help-search"
@@ -264,7 +259,7 @@ export default function HelpPage({
           />
           {onStartTour ? (
             <Button variant="secondary" onClick={onStartTour}>
-              <PlayRegular fontSize={16} aria-hidden="true" />
+              <HatGraduationRegular fontSize={16} aria-hidden="true" />
               {t("help:startTour")}
             </Button>
           ) : null}

@@ -15,7 +15,6 @@ const ARTICLE_KEYS = [
 
 const CHROME_KEYS = [
   "title",
-  "subtitle",
   "searchPlaceholder",
   "searchLabel",
   "topicsLabel",
