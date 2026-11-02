@@ -883,58 +883,61 @@ export default function EventsPage({
       <section className="panel events-page">
         <div className="events-toolbar">
           <div className="events-toolbar-row">
-            <FilterBar
-              inline
-              query={view.query}
-              onQueryChange={handleQueryChange}
-              queryPlaceholder={t("event:searchPlaceholder")}
-              queryLabel={t("event:searchLabel")}
-              clearLabel={t("event:clearSearch")}
-              filtersLabel={t("event:filtersTitle")}
-              activeCount={0}
-              chips={[]}
-              onReset={resetFilters}
-              resetLabel={t("event:resetFilters")}
-              resultLabel={t("common:filters.found", {
-                count: filtered.length,
-                total: events.length,
-              })}
-              loading={loading}
-            >
-          <PersonFilter
-            persons={personEntities}
-            value={filters.personId}
-            onChange={handlePersonFilter}
-            placeholder={t("event:personFilterPlaceholder")}
-            ariaLabel={t("event:person")}
-            clearLabel={t("event:clearPerson")}
-            emptyLabel={t("event:noPersonMatches")}
-            noneLabel={t("event:allPersons")}
-          />
-          <TypeChips
-            options={typeOptions}
-            selected={[...filters.types]}
-            onToggle={toggleType}
-            legend={t("event:type")}
-          />
-          <YearRange
-            from={filters.fromYear}
-            to={filters.toYear}
-            minYear={yearBounds.minYear}
-            maxYear={yearBounds.maxYear}
-            disabled={
-              !yearBounds.hasDated || yearBounds.minYear >= yearBounds.maxYear
-            }
-            disabledHint={
-              yearBounds.hasDated ? undefined : t("event:yearRangeEmpty")
-            }
-            onFromChange={handleFromYear}
-            onToChange={handleToYear}
-            fromLabel={t("event:yearFrom")}
-            toLabel={t("event:yearTo")}
-            groupLabel={t("event:yearRange")}
-          />
-            </FilterBar>
+            <div className="events-filters">
+              <FilterBar
+                query={view.query}
+                onQueryChange={handleQueryChange}
+                queryPlaceholder={t("event:searchPlaceholder")}
+                queryLabel={t("event:searchLabel")}
+                clearLabel={t("event:clearSearch")}
+                filtersLabel={t("event:filtersTitle")}
+                activeCount={0}
+                chips={[]}
+                onReset={resetFilters}
+                resetLabel={t("event:resetFilters")}
+                resultLabel={t("common:filters.found", {
+                  count: filtered.length,
+                  total: events.length,
+                })}
+                loading={loading}
+              />
+              <PersonFilter
+                persons={personEntities}
+                value={filters.personId}
+                onChange={handlePersonFilter}
+                placeholder={t("event:personFilterPlaceholder")}
+                ariaLabel={t("event:person")}
+                clearLabel={t("event:clearPerson")}
+                emptyLabel={t("event:noPersonMatches")}
+                noneLabel={t("event:allPersons")}
+              />
+              <div className="events-filter-row">
+                <TypeChips
+                  options={typeOptions}
+                  selected={[...filters.types]}
+                  onToggle={toggleType}
+                  legend={t("event:type")}
+                />
+                <YearRange
+                  from={filters.fromYear}
+                  to={filters.toYear}
+                  minYear={yearBounds.minYear}
+                  maxYear={yearBounds.maxYear}
+                  disabled={
+                    !yearBounds.hasDated ||
+                    yearBounds.minYear >= yearBounds.maxYear
+                  }
+                  disabledHint={
+                    yearBounds.hasDated ? undefined : t("event:yearRangeEmpty")
+                  }
+                  onFromChange={handleFromYear}
+                  onToChange={handleToYear}
+                  fromLabel={t("event:yearFrom")}
+                  toLabel={t("event:yearTo")}
+                  groupLabel={t("event:yearRange")}
+                />
+              </div>
+            </div>
             <div className="events-toolbar-actions">
               <MenuButton
                 iconOnly

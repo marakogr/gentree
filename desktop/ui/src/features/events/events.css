@@ -22,8 +22,25 @@
   min-width: 0;
 }
 
-.events-toolbar-row > .filter-bar {
+.events-toolbar-row > .events-filters {
   flex: 1;
+  min-width: 0;
+}
+
+/* Search and the person filter are full-width rows; type and years share the
+   next row and wrap on narrow windows. */
+.events-filters {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.events-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 12px;
   min-width: 0;
 }
 
