@@ -227,9 +227,14 @@ own tooling.
 4. Tag and push:
 
    ```bash
-   git tag v0.2.0
-   git push origin v0.2.0
+   make release
    ```
+
+   It reads the version from `tauri.conf.json`, refuses a dirty tree, a branch
+   other than `main`, an out-of-sync `main`, a missing `## [<version>]`
+   changelog section or an existing tag, then creates and pushes the annotated
+   tag. The manual equivalent is `git tag v<version> && git push origin
+   v<version>`.
 
 5. `.github/workflows/release.yml` builds Windows x64 and uploads to one
    **draft** release. Before building, it checks that the tag matches
