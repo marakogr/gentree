@@ -4,7 +4,9 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.2.1] — 2026-11-02
+
+This release connects the in-app update channel to GitHub Releases.
 
 ### Changed
 
@@ -85,4 +87,5 @@ Windows SmartScreen or macOS Gatekeeper may ask for confirmation on first launch
 - The "Show from selected" and "Show siblings" tree buttons. The root picker
   already chooses the person the tree is built from.
 
+[0.2.1]: ../../releases/tag/v0.2.1
 [0.2.0]: ../../releases/tag/v0.2.0
