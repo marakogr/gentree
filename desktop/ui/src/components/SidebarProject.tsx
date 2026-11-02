@@ -9,7 +9,6 @@ import {
   Divider,
   Input,
   Text,
-  Tooltip,
 } from "@fluentui/react-components";
 import {
   CheckmarkRegular,
@@ -36,7 +35,6 @@ export type SidebarProjectProps = {
   children?: React.ReactNode;
   onRenamed: (project: ProjectInfo) => void;
   onClose: () => Promise<void>;
-  onOpen: () => void;
   /** The backend has already opened the restored copy; switch the shell to it. */
   onRestored: (project: ProjectInfo) => void;
 };
@@ -47,7 +45,6 @@ export function SidebarProject({
   children,
   onRenamed,
   onClose,
-  onOpen,
   onRestored,
 }: SidebarProjectProps) {
   const { t, i18n } = useTranslation(["project", "common"]);
@@ -248,19 +245,6 @@ export function SidebarProject({
     return (
       <div className="sidebar-project sidebar-project-collapsed">
         <Divider className="sidebar-project-divider" />
-        <Tooltip content={project.name} relationship="label" withArrow>
-          <Button
-            appearance="subtle"
-            className="sidebar-project-badge"
-            aria-label={project.name}
-            onClick={onOpen}
-            icon={
-              <Text as="span" weight="semibold" aria-hidden="true">
-                {project.name.slice(0, 1).toUpperCase()}
-              </Text>
-            }
-          />
-        </Tooltip>
         {children}
       </div>
     );

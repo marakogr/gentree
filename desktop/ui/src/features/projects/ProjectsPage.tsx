@@ -14,14 +14,12 @@ import {
   MessageBarBody,
   Skeleton,
   SkeletonItem,
-  Subtitle1,
   Table,
   TableBody,
   TableCell,
   TableHeader,
   TableHeaderCell,
   TableRow,
-  Title2,
 } from "@fluentui/react-components";
 import { useTranslation } from "react-i18next";
 import {
@@ -612,9 +610,7 @@ export default function ProjectsPage({
       <div className="projects-panel">
         <header className="projects-header">
           <div className="projects-header-title">
-            <Title2 as="h1" className="projects-page-title">
-              {t("project:title")}
-            </Title2>
+            <h1 className="page-title">{t("project:title")}</h1>
             {!loading && projects.length > 0 ? (
               <Badge appearance="tint" color="subtle" size="small">
                 {t("project:projectCount", { count: projects.length })}
@@ -724,18 +720,11 @@ export default function ProjectsPage({
         {loading || projects.length > 0 ? (
           <section
             className="projects-card"
-            aria-labelledby="projects-recent-title"
+            aria-label={t("project:title")}
             aria-busy={loading || undefined}
           >
             <div className="projects-toolbar">
               <div className="projects-toolbar-main">
-                <Subtitle1
-                  as="h2"
-                  id="projects-recent-title"
-                  className="projects-section-title"
-                >
-                  {t("project:recent")}
-                </Subtitle1>
                 <div className="projects-search">
                   <Input
                     type="search"
@@ -834,7 +823,7 @@ export default function ProjectsPage({
               <div className="projects-table-wrap">
                 <Table
                   size="small"
-                  aria-label={t("project:recent")}
+                  aria-label={t("project:title")}
                   style={{ tableLayout: "auto" }}
                 >
                   <TableHeader>

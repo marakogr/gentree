@@ -63,7 +63,6 @@
   "renameHint": "Нажмите, чтобы переименовать проект",
   "renameLabel": "Новое название проекта",
   "renamed": "Проект переименован: {{name}}",
-  "recent": "Недавние проекты",
   "projectCount_one": "{{count}} проект",
   "projectCount_few": "{{count}} проекта",
   "projectCount_many": "{{count}} проектов",

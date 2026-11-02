@@ -667,7 +667,6 @@ export default function App() {
                 project={project}
                 collapsed={collapsed}
                 onRenamed={(renamed) => setProject(renamed)}
-                onOpen={() => selectTab(DEFAULT_PROJECT_TAB)}
                 onClose={closeProject}
                 onRestored={(restored) => {
                   setProject(restored);

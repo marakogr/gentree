@@ -63,7 +63,6 @@
   "renameHint": "Натисніть, щоб перейменувати проєкт",
   "renameLabel": "Нова назва проєкту",
   "renamed": "Проєкт перейменовано: {{name}}",
-  "recent": "Останні проєкти",
   "projectCount_one": "{{count}} проєкт",
   "projectCount_few": "{{count}} проєкти",
   "projectCount_many": "{{count}} проєктів",
