@@ -1,0 +1,46 @@
+{
+  "title": "Поиск",
+  "placeholder": "Имя, место, событие, источник…",
+  "label": "Поисковый запрос",
+  "hint": "Введите не менее 3 символов — поиск начнётся автоматически после паузы",
+  "idle": "Начните вводить запрос, чтобы найти материалы проекта",
+  "empty": "Ничего не найдено",
+  "noTypeResults": "Среди выбранных типов ничего не найдено",
+  "matchCount": "Найдено: {{count}}",
+  "results": "Результатов: {{count}}",
+  "resultCount": "Найдено {{shown}} из {{total}}",
+  "truncated": "Показаны первые {{shown}} результатов, уточните запрос",
+  "groupCount": "{{count}}",
+  "similarCount": "ещё {{count}}",
+  "groups": {
+    "person": "Люди",
+    "event": "События",
+    "source": "Источники"
+  },
+  "filters": {
+    "title": "Фильтры",
+    "typeLegend": "Тип сущности",
+    "reset": "Сбросить фильтры",
+    "clearSearch": "Очистить запрос"
+  },
+  "chips": {
+    "query": "Запрос: {{value}}",
+    "type": "Тип: {{type}}",
+    "removeQuery": "Убрать фильтр по запросу",
+    "removeType": "Убрать фильтр «{{type}}»"
+  },
+  "rebuild": "Пересобрать индекс",
+  "rebuilding": "Пересборка…",
+  "retry": "Повторить",
+  "openResult": "{{type}}: {{snippet}}",
+  "noSnippet": "нет фрагмента",
+  "sourceDetails": "Детали источника",
+  "fields": {
+    "title": "Название",
+    "author": "Автор",
+    "publication": "Публикация",
+    "repository": "Архив",
+    "url": "Ссылка",
+    "notes": "Заметки"
+  }
+}

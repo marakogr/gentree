@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:3ba4b71a5bc95fc4892c2c1de2a6bbc1cc3ac70fc92dc5d5b549ea314d710304",
+  "claims": [
+    {
+      "id": "claim_13e444ae5af14a88a7bddfe34a1e0b5d",
+      "statement": "The Makefile is the single build entry point: fmt-check, workspace clippy with -D warnings, workspace tests, UI typecheck/test/build/i18n:check, optional ux-setup/ux-review targets, plus dev, exe, run, build, portable, rebuild, clean, hooks and demo targets.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L1-L110",
+          "version": "repo-lines-v1:sha256:64a126a05485c2c1852f50196e4de3e8cc05bfed1e2294163d426b5e3a67d9f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmMjAyZTM2ZTE3NDg1M2MyODYwNGM2N2EzOGVmODJiNDRlNmNlNmRmYWE5OWFkOWI2NzE4ODYwYmQ4MmM3ZmNmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhMGM4OTU5MjFjYjRhNGI5MWIyZTVhNTlhMGEwMTNjZGIwNTMwMjk0MDBmMGYyZWUyYWEwZjY2YzE0ZWUxOWYyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_b098e45a56c34aee93d51b447db53eee",
+      "statement": "make ci runs make check and adds git diff --check; make check covers formatting, clippy, Rust tests and the full UI gate.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L81-L84",
+          "version": "repo-lines-v1:sha256:1f29e9a82f1d090dbdcb11f3beb14178236e78d4cf776acc4a38d6bd478dfd7a:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjA5OTNiOTFhYjNkYTI1NWM2NWQ5ZThkMmQxOGNlYzUxMzc3MzIzMjg2ZWVkZmE5MmE0ZmI3MWVmYzJlNjJhNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzFhMTExMTgwYjA4ZDFhNGQ3Y2M1NWRlNmMxY2ZlODI2NTM4MDYwZjgzNDRiMWU5NTIzMWRkOThlZDdmYzk0NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGM1M2UwMDA3NDZkY2RlOWM5ZTZmNzFmYjI3NjgxZDliMjdkY2UzZmE1MTlmOWM2MDg2OGVmM2RjYjM1ZGQyZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGQ2MTUzZjFhZWYyMTE1ZTI4NjJiYzc3ZmQwZWVhZTE1ZjBlZmY5MzIxODA4NTA0ODM3OGM2MTQ4MWQ5ZTNmZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ef71736163e240f39ca1455abdd92155",
+      "statement": "make setup installs rustup when cargo is missing, installs UI dependencies and enables git hooks; make doctor reports Node, npm, Rust, linker and dependency status and fails when something required is missing.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/doctor.mjs#L1-L30",
+          "version": "repo-lines-v1:sha256:719a38c8433885e17d43d800b942f43373b07c6f3ff6643fa097d601849057d8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OWM0Nzg3MmI3MWYxMjU4OTk0Mjg5MjQ2NGU3NjRjMGRiMzUwYzIwYjcyMjI4NjQ1NjE1Y2MzNmUwYTA3MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0MjFkZWE2MDk2M2U2MGM1ZWIyNjNiNTM2NDNmNGFlMzRjMDM3ZTg4ZGJiNjQzMzMyODUxOGIzZjlmNjM0N2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxNTI4YjgxMTkwMGQxMGI5ODc4MTNhNjdiMzdiNzY0MGViNGRkNzFmYWQ5YzFkNDdiMTMxNjUzZDVhOWRhNjcifQ"
+        },
+        {
+          "resource": "repo://scripts/setup.mjs#L1-L25",
+          "version": "repo-lines-v1:sha256:66f9b0e41aa0c93f9b84432b09ac57470bd3ae7873b9a95ac69ab628f39d2fde:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OWM0Nzg3MmI3MWYxMjU4OTk0Mjg5MjQ2NGU3NjRjMGRiMzUwYzIwYjcyMjI4NjQ1NjE1Y2MzNmUwYTA3MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExNGRmMGQxY2FhYWE5NzA4MWIxMmFiNGQ3ZjliZmI0MTg5MmY5YjgxN2M5NTAzNTBkODA1NmEzOWI1ODBhOGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1MWZkNDMxMTgwNDlkMjBiMWNiNmZmOGY4YTBkMWI4YTIzYTIwNTI2YWNhNjhlYTViNGRmZDQzODBkYjM1YWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5073f9bc8457439db387da540ddde203",
+      "statement": "The pre-commit hook refuses staged .env and .env.* files except .env.example, private keys and key stores, build artifacts, test-fixtures and .at5/.atdb files, internal research, local agent config, handoffs and transient OpenWiki run state.",
+      "evidence": [
+        {
+          "resource": "repo://.githooks/pre-commit#L1-L34",
+          "version": "repo-lines-v1:sha256:a16e50e6e85fc42946ccfd69e9f52b04f12cff6accc90f094032a25b8c24969d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiODZkMTEyZGU4YmVkMTAyNzg2YTRhMWZhOTAxODFiM2YwODQxYTIwYTFhYmNhMjU1ZjgwNDYyMzZiOGIwMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NjlkMjM3Y2Q0MjBiOWQzOGI5ODFhMGE0ZjY3NzAxOTBhNGE4M2RjYTFmZTU2YzRmNWJhMWUyY2JjMGVmNzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_90992c7e29c24e409f2a7287b743286c",
+      "statement": "The commit-msg hook enforces Conventional Commits with an optional scope and optional breaking-change marker, while merge, revert, fixup! and squash! messages are exempt.",
+      "evidence": [
+        {
+          "resource": "repo://.githooks/commit-msg#L1-L16",
+          "version": "repo-lines-v1:sha256:00166eb12b571f45bcfa46ba1f957efde73ce76f68dc13d1110a0e914487f65f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiODZkMTEyZGU4YmVkMTAyNzg2YTRhMWZhOTAxODFiM2YwODQxYTIwYTFhYmNhMjU1ZjgwNDYyMzZiOGIwMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NjlkMjM3Y2Q0MjBiOWQzOGI5ODFhMGE0ZjY3NzAxOTBhNGE4M2RjYTFmZTU2YzRmNWJhMWUyY2JjMGVmNzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f45a48adeb9543d6a0f4cfff6828687e",
+      "statement": "Desktop builds must go through Tauri because a plain cargo build --release omits the tauri/custom-protocol feature and would load the dev URL instead of bundled assets.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/docs/build.md#L39-L47",
+          "version": "repo-lines-v1:sha256:a80699731b9b3d8f4f62dd31cce91c7b5663cc29205afdb36f46d7a22a33de6b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODNmZGMwOGFlMWExMTg0NzdkODY2ZWYzOWYwZWEyMzAxMmEzODVlYWQwMDVkM2MzN2UwN2IzMWE5ZjZmZWJmMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzRiYTY3MzQ4OTFjYzk4NzEzODc0ZGE2ZGFmMzIxMWU5Njk0NDViNjNlZWRiOWMzOTA0MjcxYWI0ZmZjMTMyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDk4ZTQ4MmZlMTEzMTFlMTEyZTQxNTM1NmYzNmZlYzFmNjk1MTMzNzE4YTczNGY1ZDI2NTFkZjg5Zjk0MjgyMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWZhYTNkNzE4YTgxNWM5ODgzZWMyMTg4NzE0MmM3MmZiYjM2OTQyNmUxOGMzODkxMzc4OTFlODU1NzQxNzE2YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2a342caeff848e7bb6e8780e677f097",
+      "statement": "Release outputs are desktop/target/release/gentree-desktop(.exe), bundle/msi and bundle/nsis on Windows or bundle/dmg and bundle/macos on macOS, with UI assets in desktop/ui/dist.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/docs/build.md#L32-L37",
+          "version": "repo-lines-v1:sha256:1e8020a4f15eb717ade32e9083e1beee94bb583d71cb05268b23a25098da3b95:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTg3ZTIzZTRlYTgxMDQ2NGI0N2RjYTllMjY4YTAzMjk0MTYyNWE2ZjIxMjgwNjE3NzAwZmI2MDVmNzQ1ODcxMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzI4MjgzZDUxN2YyN2FlMTExNGNhMDQzNDc2NTA1NzgzNjA3MjViYjQ0ZWMxYzdiZmIzZTVjOTZkZGU4MmJiZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDM2MWFlY2RmMmYwMWFhY2NlOGI2YmYxNjEwOGIxODFhZGFmODcwYTNjMGJlYTFjM2YwNzcwYmM1NjJiMzNiOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_713d518f09c848b39b372ae55cf2f008",
+      "statement": "A scheduled OpenWiki workflow runs openwiki code --update daily and on demand, then commits openwiki/, AGENTS.md and the workflow itself, using an OPENAI_API_KEY secret and full git history.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/openwiki-update.yml#L1-L60",
+          "version": "repo-lines-v1:sha256:f381f3886321205311c890d19e6eeb66d5eca9069188d52151502b4dc957db68:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5NDNlNzZlZDg3Nzg0MGZkMzU2MjZjOTg4NzFmZTg0MzYyMDc0NWQ4MmIxN2U2YzE4NDJjMDcxNjM4YzFkZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBiZTFhZGFkYTE3YWUyZjRmM2Q4ZDQ3OTdkYjM2ZDUyNjc1OGJmNDlhOGM0YTc0OTg5ODY0YTQzY2NiMThlMTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5d4266f7427a4a4783914dad04c77bd5",
+      "statement": "The WebdriverIO UI review harness is optional and outside make check: it builds into desktop/target/ux from a config that renames the bundle identifier to com.gentree.desktop.ux and points WebView2 at e2e/.cache, so review runs start empty and leave the user's project folders untouched.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L65-L75",
+          "version": "repo-lines-v1:sha256:605eca540d1848704e44ad21d59753fc9663e38d68a0c4eb270ac20a444969b5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjYzk0ZjJlYjZjMDY0MmNmMDc2ZDE4MzRhNTg1ZDA2MmQ4NjhhMTRjOTdkOTJhOTc5OTAyMWE2M2ZkMDA3YTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5ODIwYWJlMWQ5ZDBmMTAzY2IwMmRmYjcyZTkzMjkzZDViM2JmYzQ2MjM2MzdiODFjZjY4OGZkYmMzNGJjZDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4M2Q3NGRjYzgwN2QxY2IyZjQ3OTdjZjA1N2UyYTNiOTdjNTRlY2I4ZTkwM2JlZGFjZWI0N2E1MTMwZjExYTEifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/e2e/README.md#L36-L85",
+          "version": "repo-lines-v1:sha256:0ab4965cb801b26043e8fbb6e57f04650161b7880f0c3c22b28e9a1c0565cd2b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkNzYxNDUzMzE5YWVjMjk1MDhjODc5ZDUxM2FmOGI2OGI2ZmFhOTZmNWQwMGI4MjFlMjc5MDZlN2JlNTQ3NDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjZDg0YmNiMTVkYzRmMzg4YWFkY2I0OTBjOWQ3MDk3ZGEzMDE4OTFkZWZmYjJiMTA3YTdiMGU4MDNhM2ZmMjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFjMTNiN2EzZjM2M2I3ZDAwYzEwODk5NTBkZmE5MWM5NGE1NDc2ZjA0OTAwNmQyYzgyMzliYjVlNGUzODlhZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3ZGIwYzJiY2YyYTg4MjM2NmQwYTQwODhkN2FhOTU5ZWViNTJkMjVjMTVhZjBjMDNhMjhlMGIxNDIzMzgxYzQifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/e2e/tauri.ux.conf.json",
+          "version": "repo-file-v1:sha256:fce87b3d30e7694a4e5395593721acfc6c472520d85c5b4785e983f0213f128c"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

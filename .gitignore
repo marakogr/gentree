@@ -1,0 +1,46 @@
+# macOS / IDE
+.DS_Store
+.idea/
+*.iml
+
+# Environment and secrets
+.env
+.env.*
+
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Rust / Tauri
+/desktop/target/
+/desktop/apps/desktop/gen/
+/desktop/apps/desktop/tauri.local.conf.json
+/desktop/apps/desktop/tauri.signing.conf.json
+/desktop/apps/launcher/gen/
+
+# Release assets produced locally (scripts/package-portable.mjs, verify-release.mjs).
+/release-assets/
+
+# Logs
+*.log
+
+# Real AT5 data must never be committed.
+/test-fixtures/
+*.at5
+*.atdb
+
+# Local launcher feed fixtures (scripts/launcher-feed.mjs).
+/.launcher-feed/
+
+# Local code index
+/.gitnexus/
+
+# Optional UI review harness
+/desktop/ui/e2e/.cache/
+/desktop/ui/e2e/artifacts/
+
+# Local-only internal notes and agent configuration
+/docs/research/
+/.opencode/opencode.json

@@ -1,0 +1,19 @@
+{
+  "formatVersion": 5,
+  "schemaVersion": 1,
+  "projectId": "d3e00000-0000-4000-8000-000000000001",
+  "name": "Демо: семья Волковых",
+  "createdAt": "2026-10-01T09:00:00Z",
+  "updatedAt": "2026-10-24T18:30:00Z",
+  "appVersion": "0.2.0",
+  "homePersonId": "00000000-0000-4000-8000-000000000009",
+  "contentHash": "sha256:59934bb30b932f685a4c8ecd877a491e63b5359b78f89b6e32a22ffb441b8438",
+  "counts": {
+    "persons": 20,
+    "events": 51,
+    "relationships": 31,
+    "sources": 2,
+    "citations": 12,
+    "media": 0
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:37ec2f0fd3706bf8bdddba2324c6ffebb1c870ee411f2df343a960b81809b096",
+  "claims": [
+    {
+      "id": "claim_faaee6df05c44fdeafcd743bcd29975f",
+      "statement": "The search index is derived data stored outside the project at <app_data>/indexes/<projectId>; queries rebuild it synchronously when the project contentHash or index schema version differs.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/search.rs#L1-L93",
+          "version": "repo-lines-v1:sha256:c23600f742a0e3a84a2552a72e559c5f98de80af269bcd363fe9a513a2f903cd:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkOWI3MTc2NTNkZWJiOThiN2VhMzhmMGJhZjY1NTUzMzM2MGNiZDY5OWM0Y2M5YjU0ZDYxMjk5NjFhY2JiMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4NWYyZDE5ZWVlOTZiZjdmOGM2OTFlYTM5YjFmZGYyYjI0MWNlODgwZDVmNTJhYTMxMDAyNWJiOTk5NWUyMjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_702d136da02e4506b9fade7a8c07c3a5",
+      "statement": "IndexDoc covers person, event and source entities with entity_type, entity_id, name, place, text and an optional year, and one rebuild is capped at 50000 documents.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/search.rs#L29-L34",
+          "version": "repo-lines-v1:sha256:2ee8d6ad7cdc35e02b15485fa4af39fb5e66a4aab0973646a821d4ff12941f42:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTQ4ZjZlYWEyMWY4MzgzMDY4ZmI5ZWJjMTE3MjBiYjVhMDBkMGIwMGFhYTlkMmFhYzIxMzVkZThlMzJiNjE0OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTgxYWYyM2RiMDliYmNkNDcxNGY4M2IzMTE2MTBkM2M4NWZjNDg5YzFkY2U0M2Y0NzQzMDE2ZTEzZTkwYzJjMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmE2ODc2M2VjMjQyODM3MTA3ZmRjMDU0N2M1ZjRhMGYwNzJjMjRhZTVmNzg1ODc1YzcxNGFhZTYxNTVhOGZlMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2ExOWFhN2FjMjk2NDBlYTcxNGUzOTFiZTBjOTQ1ZmI4NGQ2Nzk2Y2U3MGI3NDkzMDY5NWYyYjVhZWRmOThlZCJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L70-L113",
+          "version": "repo-lines-v1:sha256:eca8c5d0c028fdd8a1852fa3cbd67936634a92afae9f3ff0eb45df9764fa3755:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1M2IwZjMzNTQ0NTg2MjhjNmI1MzE0ZmE5Njg2YmYwMWUzMDc5NWYyMjIxNDE0YzgzY2RjYzY3NzFhNjQ4NTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkZTc3NDVkNGVkMjE2MmMwZWJlOTVkZWY0ZDFhZDQxOTE2NjUxMjgzMDRhYWQ2Yjk1ODU3YmQ0ZTJjNWU2NWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyYWQwMTMwMzQwNzRjOGYxNDQzOWRjNDgwY2MwYzZiYmRkNmE0ZDdmNDM3ZmIwMTEzMjkyMGE4ODA4YjVmZDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a54b767809cd46b99611e155933c6fbf",
+      "statement": "The schema indexes the same value into Russian and English stemmed name/place/text fields, plus a normalized name_exact keyword and a fast stored year.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L437-L502",
+          "version": "repo-lines-v1:sha256:e321e8305acc729bb557fc49650318f6ef7d653b7e612ef1e5b2e0226ad157b0:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjNzFkZTEzOTNiZjg2Nzk2NTI3ZWVmZmQxZjc0NzY3NGY3NzI1OWY1Y2JiOWY1YWQ2YmY3YWU1YTIwMDIyN2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5MTRhYTU2YzVlMDA4NDk5Y2NkNzBkZWEwNWVmOWVjNWY1ZWY3ZjBmNDYwNzE4Yjc4YjgxYjYyZDkzMjc5OTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1MWMxY2ZjZGY0MjRlMjEyYmQwMGJiOTg1YjYwNjk4NDkwZjllMWU1YWZiOGZmN2NjN2JkMmUxZjQyNzllNWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_52cd4dd8c24847bd8395cb7076973223",
+      "statement": "Stemming is a custom rust_stemmers filter applied to a fixed point (max 5 passes) for both indexing and query terms, because Snowball stemming is not idempotent across surname forms.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/src/analyzer.rs#L1-L26",
+          "version": "repo-lines-v1:sha256:3a404fc35d73edd873c7a08a9cea876c1a6307bac0b87f6837c168e6bb401c46:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYWU3OGNiYjg3ZTM0ZGFiYzRjNzdjMTk0YmVlOWM2NjQ1NmJkYTkwZjA1YjA1YjkxNjVmNTM2NTBkNWM5ZDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2MDRiZGY5NDkxYTVmOTk1NjUzNzcwZjNkOTNkYWFlMTYxOWJlMjg0ZGQyM2NjZDljOTc5OTQ3N2JjYTAzYWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5NWM1ODZlMzNiYWI0NmZjN2RlYzVhYjUyYTdkODdhMWVjMTljZmQxNTA1NmRlNTU4NDk1YTQwOGY4MmQxODkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f99e8023101548aa970453400ff19e66",
+      "statement": "Queries are Boolean Should clauses over the six language fields plus a 4x boosted exact-name term, with escaped prefix regex queries for stems of at least three characters, so full words outrank prefixes.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L504-L576",
+          "version": "repo-lines-v1:sha256:f1adb4643e117c5087404f3701be7ba44df824feff141531dc7de6c8baab298d:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjYjc4YjE1ZGQ2MzNlZGFhZmU0NTU4NTJhMTVmNTRmYjUxNzg3MWJhNTZmMGNmMzdjNTBlM2NjMDk2N2FhODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2M2NjNTZjNmY2YjMxMmFhMDEwZDM5ZWE2MjcxNWY1NDY0ZmE5ZmQ3NjM3NmM1YTk2N2NhNmUzNWVkYzRkNTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0YzBkNjMzNmNlOThiNzQ4M2FkMDIxY2U1YTcwNTlkZWRkYmU3NzJjMjU2ZTY4MzQzNzQyNjhmYjhjM2QwMGQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L60-L68",
+          "version": "repo-lines-v1:sha256:744b7649d4c085b5fd69349f70e462b6997745e68098d459bc6e75cec90aaae5:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM5MWIwMmZlYTllNzY3ZGZlODc1NDBjMTViOWFlZjUzN2I5ZGMxYjU3M2EyNjQxMTlhNzgyZTA5ZjBhZjVkOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjJkNWY5M2ExYTA3NzY3OWIzMzczMTRjOGRhNDIzNzc3NGFkNjcxYjNiY2I3ODQ1Y2IwNGQxMGIyY2YxM2MyOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5ODBlYTA3ZjNiMjgzZjgzNzZlZDMwOTYwYTc4ZGMyNmI1YzhmNjZmOTBiODFjZDkwOGQ5NGIyNTRhY2Q1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2M0YWE3N2ViNWNjOTEwZjk0NzU2M2Q0ZTdkY2FjZTVkNjNhZTk2ZmVhYjQ0M2FhNDYwMTQ0YTMxMzk0ZmJkOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c86e6dad6874612bd906a23e113ffe6",
+      "statement": "index-meta.json stores schemaVersion, contentHash and builtAt; a missing, unreadable, schema-mismatched or contentHash-mismatched index is stale.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L204-L215",
+          "version": "repo-lines-v1:sha256:1626cc1f74859e5c7fc2c8e31073da58139f16bad78b04ed25187074d5074d85:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMTIzNTFkYjRlYmZmOTUwMzI5ODBkZTI1OGMxOTcyOGZlMjQwY2Y5ODk2YTkzODUzMTM4MWVkOGI4MDIzODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1NTlhNTNhMmUyOGRhMzVkZjg0Y2Q4MWE4NmY0ZjAzOGEwNWYzZTg4YTE0Zjk4MTY5NTFmNjJhZWVjNTJiMDkifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L288-L302",
+          "version": "repo-lines-v1:sha256:45b905475960f5b14a270cb89b76c2e93e6e483f09b22cd9c3385996e619bb7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllNWVjNTZkNDA4YzFlMmI3ZDg5YjFhNzdjYjU0MmMzMThjMDhlMzk2ODFmMDdlMDkyMmRjYmY0NGZjOTRhYmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQxNzA3NTNiYTE4ZWFmNTlkZTZhZjdlNzNlZjBiNzQzNDY4NDA1OWUyMmY0ODUwNTdkMmYyZmI3ZjViMWEyZWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyNTI4OWIxNDlhOTViMWU3ZGUxZjYyNWY0ZGMwNzUzNDU4YjJkYmQ1MWI0NDkzMjEzMmU3NDdhNTRkOWNmOWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6125c77df7ab479e88a2f54cf1c31a20",
+      "statement": "Results are grouped into person, event and source in that order, always present even when empty; matchCount counts unique collapsed items and truncated reports matches beyond the page.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L158-L202",
+          "version": "repo-lines-v1:sha256:6721599c4735bc8071f012effc5c94db38633cb4e099b6daafb04fbe25503514:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0NTA3NDE0NjM1ZDc0YjRjNGQyNTg2OTlmYmE0OTA3YWVmMWRlMTViNjBmODVmNDE5M2IyMTBiMTg1N2I3ODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjMWI3YzZlNmY4NTZjZWQ3MGIxMGJiYTBiMGEzNTI2ZDIwYjIwMWY2NmYxZDgyM2JkZDJiNWM3NTY0ZDA1YzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzYmUxMGJiNDk1YWY3MDVjNzcyNWY0Y2JhM2U2YzQzN2UxNzA4OGNmYzcyZTYyOTU4YmY0YzIxOWE3OGY5MjQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L304-L359",
+          "version": "repo-lines-v1:sha256:cdbacd40996304d307e97b077bbf477de889d79ff1f2b86782c916d341188cbe:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxMWU0YzdlNjRmZjYwOWQ2ZWEzNWUwZjkwOTEyN2EyMDg2YzdlOGUwYjIxNzEyMDc0MjU5ZWY4MzBhMGIyNmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5YzEzNTkwNjY1NjMyM2QxYzVlYTQxNjU0ZWU2NmFmYjU4NWFjZGNmYWVhY2ExMjFkNWUzMGJmMTkzZWVkZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5NWU0NzMzYTEwNzM0Y2FmYjBmMDZkZThkNGNkMjE1OTJkNmE1MjI4OWVkMzcxOTA0MWFkYjUxN2E3OGFhZTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_36193101b54f4083b7716c4d79ebb4ea",
+      "statement": "Snippets are plain text capped at 240 characters with character-offset highlights (never HTML), preferring the first candidate that matches and trimming on word boundaries.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/src/snippet.rs#L1-L74",
+          "version": "repo-lines-v1:sha256:dfda6ced2c35e8d3c9febb429a6e508157a292f834030d39de68d1666aa78041:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5NTA5NTFkNTllMGY4ZjYwYWIzNWU4ZWM3YWE1YjE2Njg3OTk5MzI5MGUyZDUzYjQ5NGU3NDAyOTYxNGE5NTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQwMzhjYmJiM2IxZTVlZWI1ZmRkM2RjMDFiYTVlZmU3ZjVjZDE2YWViOWI0NzVmOGY4ODA3MTk3YTMxMTZmYmIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

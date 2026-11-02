@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:b75ee30dac1e75a83c60fee9f0a3ba332f2058be0bf86b2f22f8d06d22eb11a6",
+  "claims": [
+    {
+      "id": "claim_16f7c1c56c5f4aae82135e6c899429f4",
+      "statement": "Gentree Desktop is a local family-archive app built with Rust + Tauri 2 + React, with one user and one project folder, no server, accounts, telemetry or external database.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L1-L15",
+          "version": "repo-lines-v1:sha256:43ff1644a31c20ea5712ae7542c3cae3c977aba0f7f514535bf0d552d044cbd4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwOWRkY2Y5OWE5NTM4ZjcyY2Q0NDlkZmMzY2NkNDkxODM1NjhkZWI3MzIxZWRhODNhNDU2MTY0YWJkNzlkMGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4M2IzNTYyNDgwOTk3NDM3YTQ2NjlmMmRjNzY0NGRhYzQ5NmQ1ZDE0Y2JmYWMzODE5OTcwOWQyMjQ3ZDNkMWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmYjE0NDdlZmE1M2IxNTZmZWJjOGZjODA1ZGNlOTJhNDJkYzhiM2I4YTk5N2I0ODEyNzczMjg1YzA3NGY5MzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b4baf518af144fc7af034d2ad9d9e0b1",
+      "statement": "The repository is a Rust workspace with core/storage/search/import/config/chat/mcp crates, desktop and launcher Tauri apps, a React UI, and docs for build, exchange, map and release behavior.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L352-L380",
+          "version": "repo-lines-v1:sha256:c899d51ab58d0d7437ef2b88af36211dd5ebeaeeb6d55628fecc7086e049373d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1ODAxZDVlMDQ2Y2E0OTUzYjU1NzFmOTI0MjE5NjA0ZjNhZDJjMTUxYjljODdiM2QzNjhkNzY2YTQxODVlYWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwYjEwN2QyODI1MzZjNDY4Nzk0OWExODA2ODFlNjZhNjM1YjZkZTFkMWVjZDY4ZDNiMDNhYzM3NWZlMGJjMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhNTBlNzkxOGRjODg4NDUzZTgwY2FmNWU5ZGRkNWQ5NDJjNDkyYTBmMDFhMmIyNTA1YjBjMjViMWE5OTY2MzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9fe973c2145a4e0a8d81c4300a5ed158",
+      "statement": "The documented entry points are make setup, make check, make dev, make run, make exe and make build, and plain cargo build is insufficient because Tauri then waits for Vite on localhost:1420.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L218-L232",
+          "version": "repo-lines-v1:sha256:7e94f7b1eb4478cd7e6d4837b7bfd3102f36f094ef0e8b402a26ffb8899839bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3ZDNmZTkwOGFiMzk5ZTc1NzZhZWM1NjU0YmViNWZkODkxMDg3MDE3ZGQxNWFkZTg3MzU4ODM3YzljYWNmOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlOWFlOWY5YjhhYzFkZTYyM2U2ZDFlNDdmYmRhNDM0MDFjMzJhNTg1MDFmMjlhYWJjYTMwOTBmNTE5NmEyMWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjNGE1OGFlM2NmYTc3NDVmZTA4YTRhMjQ1MTMyMTc3NzE0MDM0NGY2ZDM1M2RlMDY3YWU5YmEyMDdmYTQ3M2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxODQyOTNjODA5NGZhZTk3MGNiYmQ4MmE2ZWM2ZjU3YzU0MjBlY2E0NGZlZjFlOTYzNjUzNGI5MzJiNWFlNmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9b7031f946684217af6a1511e35824fb",
+      "statement": "AGENTS.md defines the source-of-truth priority: invariants first, then contract tests, then current documentation under docs/, then README, and requires stopping instead of silently changing either side when they disagree.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L10-L18",
+          "version": "repo-lines-v1:sha256:49d24efaa5e103773f906ae06a23da85cdc5033b71eab324d1ea6637c5c5989b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzdiMTMwZjI5OGVlN2FhNDc4Y2I4ODdmMmFlMTQyZmNkOTY4NDViOGRjMjk1NWUyYjQ4OTA2NjBkMzE4ZjlhNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTU0NzYyNjFlMzdmNWQ2YTQwYTlmNzk0YjNkYzYyMmIwOGJmMjQwY2ZkMzU3NzQ1N2E4ZDliODI3ZDk1ZGI0ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjExYmRmN2YwYWEwYmYzZDJmNDNmZjFjM2UyOTIxM2E4ZWQxNWQyM2JlNTQ1NDAyM2IyMzVmMGUzNTQ4MzY5ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTdhNzU3OTk3M2ZiMDZkZGEzZjcwYzIyMzhjNDIxYTFlMDBkZjE2MjEwZGUzMjY3ZGJhYTgyZDRhZTZmNjJkYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7907550a649a49e1a8bc865d063801fa",
+      "statement": "The invariants ban fabricated dates, sibling edges, self-links/duplicates/cycles, cascade deletion of shared events, media file deletion on unlink, network MCP servers, secret logging and chat traffic before provider configuration.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L136-L155",
+          "version": "repo-lines-v1:sha256:fe91705f8d548970352d6ba499d1f9b606ab40efe21cb3aac9a65ec6963c2762:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjM2M0ZTE4MDNhYzZlYzEwNGFhMTVlZTI3YzljNzgzZmQ1ZTFhYTliZjZiMWE1MmIzNzA4Mjg5MDI1MzhjOWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlOWMxYTZmZjQ1ZGYzMWYxNjNkOTQ5MGM4N2IyNTc0Zjk5YjUyY2RmNTdkN2M3YzJmYWQ5NGQzYTcxMWM2MTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5YjQ4YzFjOTNhZjYzMmQwZDU0ZjM3NWYzNGJlNjNiZmUwODRkYTIxZGJmOThkODlmMmM1MTc0ZjRmNTY2ZWEifQ"
+        },
+        {
+          "resource": "repo://AGENTS.md#L24-L45",
+          "version": "repo-lines-v1:sha256:e1a1e17ddcdc6b3a5da30a9ef369902fff32882bb250d89da6b2faf53ca10c3b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhODEyMDNjMDExNTI5NjU0NTg3ZjU5NmVhYTk1NTU4MTVkNDk3MjUzODdlOWMyYjNhODYzNGQxMjk4NzQxYTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhYmNhNTc4NmQyYzVjYjc2MWQ2MDdkZjBmZDEzYzI0NjQxNmFiZTQzMjc2OTZlNDAzNzVkNzE2ZDM2ZDAwODYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyMGNkMDIzNDdhMjc5MmQ0ZWY3MzE0OGU1MzRhOWQ4MTRkYmFmYjEyMmM4ODc5OGI5MGVmZGQ3MWY3ODc1NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzODhlODU4MDFmYjI5MmViNDRjZTE0ZmRjODE5ZDU5OGNhYWI0YThkYWU5M2M3OWI4NDFkMzM2OTFkZjIwNTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9134da7f58b64130b3c4a95818c6898c",
+      "statement": "A project merge is documented as a first-class task: it opens both sources read-only, writes a validated new project, and never modifies the sources.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/merge.rs#L145-L186",
+          "version": "repo-lines-v1:sha256:7c4e23ff8fa0da35758d0756bc4a000bbe033b2698d37278a5dd89df937b49e7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3YjllNTk0NDg0MGQ5NTM4NzczMTY4M2U4MDE2OWUxNzE1YWIwYzBmZjQ4NjZjMmQwZWM5MTY3NDk3ZmRlNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5ZTE0MjEzNTE2YWJiNDVlMDc4M2ZlNTQxOTA2YWE3NDQwYzJlNmY0MjZjYTc0MzU3MTRiOWVmNTRjMDRkZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiYWQ0Y2JmYTNkZmVjNzNmYmU2NzkwZWRiOGQyMmQzMjQ0ZjA5MzNhZWM1MmE0YWYwZTk4NmNhMmJkYWEyN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d2d81892e65e476ca739067955a89b64",
+      "statement": "The quickstart invariant list includes the single-birth/single-death write guard and the merge-writes-a-new-project rule introduced by the current command layer.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/merge.rs#L145-L186",
+          "version": "repo-lines-v1:sha256:7c4e23ff8fa0da35758d0756bc4a000bbe033b2698d37278a5dd89df937b49e7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3YjllNTk0NDg0MGQ5NTM4NzczMTY4M2U4MDE2OWUxNzE1YWIwYzBmZjQ4NjZjMmQwZWM5MTY3NDk3ZmRlNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5ZTE0MjEzNTE2YWJiNDVlMDc4M2ZlNTQxOTA2YWE3NDQwYzJlNmY0MjZjYTc0MzU3MTRiOWVmNTRjMDRkZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiYWQ0Y2JmYTNkZmVjNzNmYmU2NzkwZWRiOGQyMmQzMjQ0ZjA5MzNhZWM1MmE0YWYwZTk4NmNhMmJkYWEyN2MifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/validation.rs#L432-L460",
+          "version": "repo-lines-v1:sha256:1558cfab1aec7420a19a243d61c6a5388f4d730b5f4828868bec6d4ee8521627:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxYTdmMjIwNmI3NWM3ZmJiNWIxN2IxM2Q1ODRkZGY3N2E5NmMyNWJhOTliMWMyYTM3YTI4ZmQ0OGYzODA2ZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxMWU4YjYyZTMzYmM0ODQxYzg2YTUyYmJmZDQyNGFlNDFlMGJiZWE4MjQyMmQxMGUwZDIwYjlmMzA1ZmI0MGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNmYzhhNGNiZDJlYmI3MzdmZjEwYmQwZWNkM2I2YjlmODZmOTQ5MWYyNmUyZTRmMTAwYmUwMjY2Y2FlMDU0NjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlMTgxNzYwODAyOWRhZjlhNzRhNTVjYjY0ZmQ5MzMyY2U2NzgwYmQzM2JlNjA4ZWMwMDk5M2ZhNGZjY2M1YTcifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

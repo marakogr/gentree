@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:f0f4a7fb2698bbea28f1d5e66f0311744e2e268fe175071020afafe49fa11a1c",
+  "claims": [
+    {
+      "id": "claim_577e856ab51c42d68d5b32cb5b8908f6",
+      "statement": "AT5 files are opened read-only with SQLITE_OPEN_READ_ONLY, and the preview path (plan_at5) reuses the same read code, creating, modifying and locking nothing.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L1-L20",
+          "version": "repo-lines-v1:sha256:6bc3efd00050b7108308d342f57cbf586d2fdfc32ca36752a277aee937004269:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3OGNmNjNlZjMxODhiMzA1MWIxMjQ5YmU3ODgxNThlZmI1Y2EyYjU0ZDJkOTcxOTUwYWM4MWE2YjUxM2Y5YjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxYTU0Yjg5MTE2YWRiM2NmYTBhYmE5ODQ2NzdlODVjNTczN2NiM2IyYTM1OWU5NGM1ZjEzNzQ1YTc1ZGUzNTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5MmMyOTU1MTJhODFhNjFlNDFjMDQ5ZTc4ZjA0N2I2NWQwOTc1NjI2NDljZTJjMzAyZmNlZmM5Mzk1ZDc4ZWQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L108-L125",
+          "version": "repo-lines-v1:sha256:23a8af8d749eeb5d160979e05b2c4d709502c4892aa17ab59133f5239a7d8e11:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxMWU4YjYyZTMzYmM0ODQxYzg2YTUyYmJmZDQyNGFlNDFlMGJiZWE4MjQyMmQxMGUwZDIwYjlmMzA1ZmI0MGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5MGZkYTVmZjk4N2E3ZWE1YjY5MDdjNDFhMTQ4Mzc4OWNmYzZiZjdmMTJhNDFkNWFlNzc3ZDQ4YjhjNjhjODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEyNjhmMDVjNmZkNWNmOWEyYjkyMGEyNjk4ZDg1ZmMzMjhiNTgyNjI1MmY0Mjk5YTJhODY2NGY3NzgzNWZhYTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_91765477f9864f609fd79341618b18f6",
+      "statement": "The importer detects either the real EAV export (Fields + ValuesStr + Persons without name columns) or a simplified person table resolved through column aliases; unrecognized tables and columns become report warnings.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L138-L205",
+          "version": "repo-lines-v1:sha256:53aa94e6f0cce866e29c35a61f60aaee47a1a2c459499d5809036c878a040746:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzZGFjMDVmNjljYzNiNTJhNTQ2ZDZjNWMyOTFlY2Q3MDg5YWFkM2IzMjUwOWJlYzcwZGE2NmNiYjBkM2JjMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjOWMyZWE1MDY0OWFjZGQzMzY2MjljYTk1YzUwYjM3YTQ5MjYzMzdlZGFkY2U5OTE3MDZhY2M5ZDA4ZTg0YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjNGUyMzkwNTA1MzIzZTRjOWJjNDliMmNkNTk1NTg2YzQxOTBiYWQ2YTAwZTM2Nzc5YzNjZTNkZWI0YjUxOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlNjAzY2EyZmE5YWU4NTk2YjYxMDY1NDk1ODEzOGRmZTA1OGFkNzQ1YWI2ZGI3ZjEyNGFkM2ZkNWMxZTIyNTQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L370-L506",
+          "version": "repo-lines-v1:sha256:3f232f2dd835e85fb646e985643c203f6e245382b6612823c72258611ac4459d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlODk1MGM2YjY5MmU2NWMxMzZjNTliMzZkMDczMmZhN2I5MjNjMmIxYThiZjRlMjg4OGUzY2ZhMTNhODIwMjhmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5NDljNWQwYWFmNmRhNDIzNDJlMDczMTRhOGEwYmJjZDMzOGIxN2UwYTIzZjExOWY1ZDBhYjUxZjQ2MGUyMGFjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxZWU3M2NmYmNmM2UwZDM1OGZlMjZiMDIxYWRlYWJlNjhiZDRjZTJiYWI2ZThiZTdlM2JkOTgxYmZiZTJjZTk3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjZTIyN2E3MDc3MTc0ZTVkYmU2ZDRhNmUzZjU1MjNhNTExZDhmNjk0MGQ5NDJmZWJjZTY2MjY3N2NkYjdiNzE3In0"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L88-L106",
+          "version": "repo-lines-v1:sha256:0eb0837e8eebdd9e7c69982676211c271099e71cb57b2feaaa2b6b8dd21b87f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwNTE3NmUyZDE1MjU2MTU1YWJhNDAzZmRhODgyZTZlOTcxZmFiMDZmNmJhNDcxYWU2NDc1ZDRlODQ2MTU3ZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjMTBlZjU0MDViN2M3OTNiOTIwMzllZWYxYmZjMjM1YzQwZWMxMzRhNWVmNDA3ZDEwOGYzZTNhZTZiZmM3ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0MmE0MjYyNzZhY2EzNWRlNjc1MmZmNzMxN2NiMTM2MzM2Mjk0MGZlNzExMTAzZmRjOWEyZTA0YzhkZjc4YmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c255a964512409992ce001b23d9e947",
+      "statement": "Structural failures abort with the file name (never an absolute path), while row-level problems become report issues without stopping the import.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L82-L106",
+          "version": "repo-lines-v1:sha256:e328470426f6b2321b1a604f263f4048148bcdd60bd49956818f145cfa97e538:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlZmU1YTE2YzgzNWViNjkzYjY1MzZhMjQyNDRlODkwMzg1N2ExODA3OGE0Mzg4YzVhZjg3MjE1OWVlNTIxZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyMWU0ODRlZmUwYjc4MWQzMzRkZjkzMzFlOTUzYWUyOWJiYzE4N2ZmYmEzZDkxZTRhN2ViM2Q4OGFhMjEyZjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0MmE0MjYyNzZhY2EzNWRlNjc1MmZmNzMxN2NiMTM2MzM2Mjk0MGZlNzExMTAzZmRjOWEyZTA0YzhkZjc4YmIifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/report.rs#L33-L52",
+          "version": "repo-lines-v1:sha256:5f28d7a6ce9373271fc35c73c6d7c1cb3794c4d3c58219130c7a1bbcf6773cb2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmZGVmYzk2MWYzMmE5NzMxNDdiOGIzNWRhMmFjN2EwMzA4MWMxMmM5MjA2Y2FlZTk4M2JhYjYyMGZhMzNlNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEyY2EwYmRhY2IzNDY3YjRhNTYzZTY5ZGQxY2RmOGFmODU2ZjA2NzE5Njk2YWE3ZDkxNzhlNGQ3OTE5ZGJjN2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5M2ZmOTdhY2Q2ZDRiODdiMzc5ZjMxOTUxMDc5ZmNmNWI0NmE0OTA1Y2M1MmI5NjJlOTcxNDVlOWEzNmJlMGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_95d5c65683684fd6bfa135e58931172a",
+      "statement": "Media rows are hashed with sha256, resolved from the sibling .files folder or an in-database blob and copied into the new project, with a stored-copy-wins issue if the file changed after preview.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/import.rs#L1-L7",
+          "version": "repo-lines-v1:sha256:c7f6f6fed51c81744242f66f33dff3eeca3dfce6e13e0a51b4d629d747fcb274:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ1YzM2M2EwYzMxOTM4MmEwMzIyZWRmY2Q5MmFlNTA0OTVlMmZlMGJiMmFmOGU4Y2U4NGE1MWI0NzZiNDZjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTg2MjkxMjlkMTYyYzYzZGEzODJjMGU3NTgwZGUzNTAzN2NkY2NiYTRiMWY5YTcxNzI3NmQ5MjE1YTNiZmU5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWVlZjJkNzJiYjAzZjdmOWVjZmYzODk1N2E3NjBmMGFhOTEyYjZiYWM0ZDQxNzNkNTk3NzNjYzliMjQ2MDY5MiJ9"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/import.rs#L30-L32",
+          "version": "repo-lines-v1:sha256:b8d9d300b7d084525528a2867dffa9048f4fa9b82457984169cab10059d019a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2Q1YmJhYTkzNTVmOWU1YWM3MTljMTFlNmMzNTQ4OGU5Njg5Y2IzOGEwYTFkMjkxNTlmNzljZWRkODA1MDIxMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzY4YzYzNjg5OWNjMzhlYTI0MzQ5YTU3NGRmODYzMmIzZGE4MGUyNmFiZTUwMDdkMjM4NDM3ZmFlYWZiYzE3NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJkNzdjYzViYmE2YjBlN2NiNDg5MDY0OWRmNzBlNDQ5MzhhOTFiYzEwYTY5ZDNiZWM2ZTI2MmJlMThjM2NjNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGQyYjQ2ZWI1OTUzYjA4MmVmNzRlMzE0ODI1ZmNiZDRhY2QzNDQ0MzQxYTE5YmZhYTQ5NTg0ZTM1ZDVjYWFlYiJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L40-L60",
+          "version": "repo-lines-v1:sha256:ecef6afe80b03029cda9a979f3c409e55a9d9d5b27a47ad72f0a472aa1dbbca0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0NzcxZTViZDBkOTBjNTYzNjNhYzZiYTMzNmE1ODA5MWJmYTg5N2M5OTFmNjdmNGVhZWI0Y2M0YWQ2ZmQ0Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ3NzAyNmQ1OGU0M2NhNmUyMzVhMzZkZmJlYjVkOTU4M2ViMGRjOGUzNzkwMmMxOTlkZTQyYzU0YzBiZmRlNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3NWI5OGNmZWIxNTFiNTYyMGE0MDg4MzcxNjZjNjllMDk1MWFlODhjOWFhZTYwODk2OGQyNWVmMzk1N2IyMDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d3634845e196452f894d5b6e3e565ecb",
+      "statement": "Import commands always create a new project, never open an existing project for writing, never modify the source file, and move a failed new folder to .trash.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/import.rs#L178-L187",
+          "version": "repo-lines-v1:sha256:375b923e9337337d3e552a1fde2669b65be85a432790b45d76036ae5beaabb06:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiOWE5Mjg0OTgwNTE0MDhkYzI2ZmUwMGIwZjZlZjIyNzYyNmJhNWU4NzU5YzJiYzY3MDY5MWEzN2IyZmMwZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0MTBhOGM1NDM0MWJiMmU4OWRjY2MwOTczYzNlMmZjMjA0N2Q2MWRkNzljYWRhYzQ2ZGMyOWJiYTI5MWMwYWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5YTJkMDIzZThjZWI5ODliYjM2Y2E3Y2JlMjNjOTliNmI3MWUwMGViOTNmMDg1YWYwYTVkNmY0ZDhkMGIyMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjExMjFmMjViZDM4MjVhOTg0ZTFjNmJkMDRjMDcyNmIxODIwMWMxZjEyM2Q5NDA4ZTEzNjcyZjNhYTAzOWNkZjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5501f15cf7ac45eebd86c9a32698c9c6",
+      "statement": "dedupe_persons makes re-imports idempotent by matching (source, externalId) first and normalized display name plus birth/death starts second, returning only index, existing id and reason codes.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/dedupe.rs#L1-L65",
+          "version": "repo-lines-v1:sha256:10e256718f1ca38cdb2411aa736960b4d02c53e089da2c4cac616a852ffdf00b:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZDhjNmMxMmFlYjY3MWFhMmMzYTRiNDU0MmM1N2NiOGMwNDY5NTRhNzM0ZTkwMzIyNjNlOTcwYjc3YjJlMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiYzk4ZDZiMGRjNDkyYzUwMTZkZjEwODA1YTNhNTRlYjljMTg0YTVhNjEzN2U3ZjRiZWNmYTBjMjIwNTUwZDAifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/report.rs#L6-L31",
+          "version": "repo-lines-v1:sha256:123f0ff4227ed91e5714fc8a0d3aef1663e0eb8123ac41dddbb7f0b31d446ded:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzZjYyNzA5ZDkwNWNmZDZhYzVlNjAyNmY5ODE0YjEwM2RmMmRiZjdlMzU2MGRjOWU5MjFkNWY2MTJkY2Y1NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEyOGRlZGFmY2UxODE3MzhiYzcxM2EzNjI4ZGYxMDk0NDc1N2Y5YTVmYWU0YTkzMDc2MTNmY2Y4OTgxZGU5ZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZWFiMzE2MWM5NDg1MDg0NGMwYzUyMzdlODEzNzEzNzA2MjI2NjcyNWI1ODY2MjMwNGRmOTM4YjM4ZDFkZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2c6b8aa4710e4e4081cf6f94d6435247",
+      "statement": "The AT5 importer records provenance as ExternalId source AT5 and keeps unparsable dates as UNKNOWN with the original text.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L1538-L1546",
+          "version": "repo-lines-v1:sha256:a1d4cf1e79d376d316581b590b0508a71319541a45390e399eab5d428e085505:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTM0Y2Y1ZjM3NWMwMjM5ZDgzYTliZjk0YjYyMzhkNjYxMTgxMGRmZDgwNmQyYTJlYzBiMTM1OGRmNzBlY2M1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Y5MGE5YWNiOTEyN2RjZTdiMTRhNTYxYjBiZjZhNzI3NDhlOTJlODU1ZmIwMGQ2OTQ5NmJkODRhZTYzMmUxMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjRhOGUwYTZkNjA0OGJhYTkwOTE1ZGQ0ZDQ3ZmM3OGVjOTU2MzZjNTUxMTA5OGRmZDVhNDVkYjUzNDRlMzMwOSJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L40-L44",
+          "version": "repo-lines-v1:sha256:e5c6de5e1227585118a220e312ce6b5ee1aa26df090c06368f134e78387033f4:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIxZjdlYTcwOGY5NzhkNjcyYjg3ZWQ2NjQwZTY2MzIzYWYwMWJmM2RkODgwZjYwNjJiZmIzNDUyMWQ3ZGEwOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDc3MDI2ZDU4ZTQzY2E2ZTIzNWEzNmRmYmViNWQ5NTgzZWIwZGM4ZTM3OTAyYzE5OWRlNDJjNTRjMGJmZGU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTA5M2U0YzlmMjhmYjM2NThmZjVhOGQ5ZDMzY2YwOGFjZDk2YWNhNzJlN2FmNjc4NjAzYTVmYzMyM2RiYWUzYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ed6b445cb094d30a83685048c3e2067",
+      "statement": "The real-baseline AT5 diagnostic is ignored by default, gated on GENTREE_AT5_BASELINE and prints aggregate counts only, never names, places, paths or values.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/tests/at5_eav_contract.rs#L545-L560",
+          "version": "repo-lines-v1:sha256:58c8ef83bbe05b2e799c3785b84ad9f329d162cf7aec73e9cad114bb23337cba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhNzY2ODQyOGFiZTcxMTYyN2NlN2EzYzFhZDBhNjEwODRmYTNhMzkwZmViMmNjNjVkOTBmNjcyMjRiOTk5OTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhYTFhNWRlYjE4ZDAzYmM3YWY5MWNkNzAwNzU2YWU4ZDRmODM2NWM5N2RjNjMzOTQ4YjA0MzZhZmFiMzllMjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA1ZmIxNjFjMWQyZTAyN2YyMmM1NzUwZDEwYTAxNjdkNjVmMTIyZjY1ZjZlNWJlN2MwOTZmZDNlMjM3ZDEzYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxMzUyNWMzZTA0MGE1ZmZjODkwNDdkMWQzYWYxMjdmMTU5NjFiYzRlM2FiNWM5MTRmNTMyYmIzMGYwMDBmNWQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8e2f04e16526d5dfb7121e7a294e88cce3afed9d27e1c2c19dd36ec15384084f",
+  "claims": [
+    {
+      "id": "claim_2cbed7acb1814b178c8a38b9ee873dc3",
+      "statement": "CivilDate is a timezone-free year/month/day value serialized as an ISO YYYY-MM-DD string, not a timestamp.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/date.rs#L5-L25",
+          "version": "repo-lines-v1:sha256:41b4449ac8257bfc9848dc03a6e3d87112d04ee54ca60e4bafc80dd5a21c4091:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3NGFhMGE1YzA1ZWQzMzhlODM0ZGUyZTEyZjUxOTg3N2FjYmU0YjJkNzM4YjQ3M2YyY2NiZmZhNTMxZDcyZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ODQyMDQwMTI5Y2VkNTU3NWY3NDVhNGQ5OTIwZGNhYmJkOGYxMGExNDg4YTRlNmE2NWQ1NjVlZWVlMGJmYmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzMDkyMWQ5NDFmODM1ZWFiZTAwYzFiYTVmYWVmM2FmOGZiOGUyZTA1ZGU5MjI3M2I0Nzk2NmZiNTYzNjAxYjUifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/date.rs#L89-L102",
+          "version": "repo-lines-v1:sha256:5f69ce28c3718f423a1e57a071ef7f5b98366055896792f2ab701aaaa09e1932:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmZTU5YTAyOWM5ZDdkN2I1OWRlMDVjMmJkNmNhNjdjMzg4OWYwNjUwMmNmNjRiMTVkYTE0M2IyMzZlYzE0ZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliOWQ5YWUzYzYxMmY2NmUxNzU4OGYyMWMyNWE2YzEzMjFiNWQwMTVlMWJhY2YyNGJjNjk0ZTNjY2Q5NWFlZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5Y2M5NzQ1ODMxNjI0MzIwNjVmYjc2MTc0ZWQ4OWQyYTAzMDc2ZjRhMWUwOGE1YTg1YTViNTM0YmU1NjY4YjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e7231216cb244a7d8efa70418b3d57dd",
+      "statement": "DateValue combines half-open start-inclusive/end-exclusive bounds, a DAY/MONTH/YEAR/UNKNOWN precision, an EXACT/APPROXIMATE/BEFORE/AFTER/RANGE/UNKNOWN qualifier and the original source text; the default is an unknown date with no bounds.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/date.rs#L27-L62",
+          "version": "repo-lines-v1:sha256:a9d26933d3faf449201b815de2454441f9bddcc635de3b7227b2d9f0552466f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwZGY2ZTI1Mjc5ZTYyMGNjMzkxNzNjMDUxYWI4OGI3ODY4MzM2ZjU5Mjc1NWQ0YTlhYTI5ZWE1NWU4ZWZiNmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhODgwYmViNWY3ZjU1YTNjNmUwMzQyNGI3NzYzM2ZmZWJiN2ZiMmU3MTA5NjJmMzBkZGY4YzVkNmMzMmU3YWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_82c85ecc997547b4a013117c82f5771f",
+      "statement": "The constructors encode an exact day, month and year as half-open intervals, and model before/after as one-sided bounds.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/date.rs#L186-L239",
+          "version": "repo-lines-v1:sha256:ee194182c71ba2a42fb412479c98504351e7b73d20bd364bf1cc39b2db678690:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzNDBhOTllYzQ0YTY0NzhkZjk1MGVlOTJlYWFjNTY1NzVmNWRkZmFlYmYxNzEyNDMwZmZjODFmZWRiN2QxYTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhOTg0YjkwMTdjNjVlYTA4ZWI5ZTIxYTI0YWI3ZDk3ZjFjMThiNTI3ZDMwMzIyYWI2YjgzYWE4OTcwMzVjZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ad7a8eebf68643d1a1085cb5dc865e24",
+      "statement": "Date validation rejects unknown dates with bounds, non-unknown dates without bounds, BEFORE with a start, AFTER with an end, start not before end, and bounds that do not align with day/month/year precision (RANGE is exempt).",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/date.rs#L241-L298",
+          "version": "repo-lines-v1:sha256:458496039dcd4ad9064cc101f92133b7fc1408517f7e463bf5c76b81ecbffe49:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjM2MxNDc5YjZmYTlmMjNkMGQ0ZGE3NmM0NmE4OWEzOGZkODU3MTZjZWYxODdhNGM2NzNlZDAzMTgyNTgzMzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1MjE2MDRiMzVmYzQwYWYwMGNiYTRlZWEyZmQ1ZTJjM2FmMTg2M2IzOTExODVkN2JmNGJiMDllNzJkMGM4YjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9ff31aafca0d48d6866b18b63a84c389",
+      "statement": "Persons carry birth and death as DateValue; validation rejects a death that starts before the birth but never requires either date.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/person.rs#L65-L110",
+          "version": "repo-lines-v1:sha256:78f50e056680a30db1985b0aa2bbdafa983c4afff86bf5c10c8645b1f9b2d7e3:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExYTM0M2Q4ODhkZWRkYzQ5Nzk0NWQzOGQwOWJmN2U4MjM0MDQ0ZDg5ODJmNDdjYTA3OGEzOTFjNzI1MWRlOWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4MmE5Mzg2ODA4MGRjNGM2YjE4ODM0NThkZjk1ZGEwYWM1YjU4YmFjM2NiMjdiY2E2ZmYwMTdjZjA0ZGIzYjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmZjAwOTQ1MTUzMmEzNDM5MDkyNDBlMDQ2MzliM2Y4NWM3YTVmZmQwMjBiNDBlOTJjYjgxYTAzZGIwOTY3ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4YzM3Y2EwMzg1MTUzNzczZDU3YTc2OTdhYmU2MmVlNDFmNjlmNDIzZmMwYzY0ZDhiOWEwMDkzMTBiZDZiOTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f9f45492770f49e39842ea783030fc1e",
+      "statement": "AT5 date parsing always preserves the trimmed source text in original, normalizes recognized numeric forms, and falls back to an unknown date instead of guessing.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L1538-L1546",
+          "version": "repo-lines-v1:sha256:a1d4cf1e79d376d316581b590b0508a71319541a45390e399eab5d428e085505:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTM0Y2Y1ZjM3NWMwMjM5ZDgzYTliZjk0YjYyMzhkNjYxMTgxMGRmZDgwNmQyYTJlYzBiMTM1OGRmNzBlY2M1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Y5MGE5YWNiOTEyN2RjZTdiMTRhNTYxYjBiZjZhNzI3NDhlOTJlODU1ZmIwMGQ2OTQ5NmJkODRhZTYzMmUxMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjRhOGUwYTZkNjA0OGJhYTkwOTE1ZGQ0ZDQ3ZmM3OGVjOTU2MzZjNTUxMTA5OGRmZDVhNDVkYjUzNDRlMzMwOSJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/at5.rs#L1548-L1576",
+          "version": "repo-lines-v1:sha256:97a9dff466c238a25d9002189a1edeed0468c246468fda94b6c024db027f7401:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3NGY5NjcxYTA0MmRkMGIzNGFlMzBlMDE3ZmM3ODMzYmVmMmE0MjBiYmJmODFmNzI1NjdkZjJkZDUzYWVjYWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5MGY4ZWY5NzkzZDNmYzExNzBhMTIxYzBmZjQ3OTM5MDExOTI4NzY1YTQ0YWU4YzY2MGI4NDliMjIxYzU0ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEyMzBkNjE2ZDBmZGI1OGFmZmM0YjkxNDEzMmM0YTNmNzA1ZjRiZWQ3NTc1ZTk0ZDQ1N2ZiMjEzNDQ5ZDViODAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_efd8d7357453465a81810a4e71aa3e87",
+      "statement": "The timeline derives display intervals from DateValue (life intervals, open-end detection) and formats by precision rather than fabricating a day.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/timeline/dates.ts#L212-L240",
+          "version": "repo-lines-v1:sha256:a972770ce975da9e800f7472b55a3c0a95498cfc819b60d62ab6c66576b6ff0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1MGNhOGZhMjhhNTU3NzFiOGU1NDNkNTJlMTI3Zjg3YWZiZDYzZDEyYjYyNzg3ZDEyNTA0MWVmOWFlNjRkODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4Mjc4ZTc5YTk3MGQ4ZWQwNjRjZGMxMjhiMWVjNDA4MTY3MTg5MDJkNzFhZTdhNTRiZDU3NmU5NWVjYjhlYjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJiNzVkNjM3YjU2NGM1OTAwMDg5YmNhYjQ5MjA1ZGI0MTBiMjgxNTk4ZWY0MTY3MTcwZDA0ZmQzZTEwMzRlMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhN2Q3NDNmZDJhNzQ5ZjY5Zjg0MmFjYjMzMTQ4MjVjNWY2OTk1YWFlZGQwMTJmZjM4Mzg2ZjExNTBiMGNkMzgifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/timeline/dates.ts#L25-L110",
+          "version": "repo-lines-v1:sha256:e0f22e915c093c8ec76e35a5da39aff685df3a1de1d59ed7503381483c2b02f6:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NGVmNGQwOTQwMWY3OTZiNjM1MDM4NmY2NThiOGNjNTc1Y2ZiNjExY2NiYWUzZmU4NmYzYzczZjg4MWQ1MzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyOWJmZjM5NGQ0MDM3MGMyM2NmZWI1NzhkZGI4MmZlNmM2OWNmMjZjNzBiYjBmNzY4NzAyMzI3Yzg4ZDlkODkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyNjU5ZmY2NGYxYWU5OGE3OGVjNTJhZTdkMTFiYjFmMzU0NjQ1ZDZlNWZkY2Y4NmE5ZDgxNTRkMmZmZjFjMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxOGVhZWFmZDIxZjc3ZTJkOTA3MmM0NTQwMWVmM2QyYzYwYTYzNzgzM2I3MGY2MTRkNmY4NTYwNTcyYjFkNmMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

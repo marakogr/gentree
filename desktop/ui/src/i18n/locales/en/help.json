@@ -1,0 +1,91 @@
+{
+  "title": "User guide",
+  "subtitle": "Short answers about how Gentree works. The guide is stored with the app and works offline.",
+  "searchPlaceholder": "Search the guide",
+  "searchLabel": "Search the guide",
+  "topicsLabel": "Guide sections",
+  "allTopics": "All sections",
+  "searchResultsLabel": "Search results",
+  "startTour": "Start the tour",
+  "sections": {
+    "basics": "Basics",
+    "explore": "Exploring the archive",
+    "tools": "Data and tools"
+  },
+  "noResults": "Nothing found. Try another word or ask the assistant.",
+  "resultsCount": "Sections found: {{total}}",
+  "openScreen": "Open “{{screen}}”",
+  "openProjectFirst": "Open a project first",
+  "askAssistant": "Ask the assistant",
+  "askAssistantHint": "The question is placed in the chat input with this section as context. Nothing is sent until you press Send.",
+  "stepsLabel": "How to do it",
+  "noteLabel": "Note:",
+  "askTopic": "How do I do this in Gentree: {{title}}? Explain it step by step and name the buttons.",
+  "askFree": "How do I do this in Gentree: {{question}}? Answer using the built-in guide.",
+  "topics": {
+    "start": {
+      "title": "Getting started",
+      "summary": "A project is a folder on your disk: people, events, media and backups live there. There is no server and no account.",
+      "step1": "On the Projects screen, create a project or open an existing folder.",
+      "step2": "Import data from AT5 or GEDCOM: the import creates a new project and never changes the source file.",
+      "step3": "Keep the project folder in your own backup: the app keeps internal copies, but an external copy is safer.",
+      "note": "One app instance writes to a project at a time. Do not open the same folder in two copies of the app."
+    },
+    "people": {
+      "title": "People",
+      "summary": "A person card keeps names, gender, life dates, a photo, events and relationships.",
+      "step1": "On the People screen, press Add and fill in the name.",
+      "step2": "Open a person in the side panel to see facts, events, media and relationships.",
+      "step3": "Use Edit to change the card. Deleting a person keeps events that have other participants.",
+      "note": "A person can have several names; the primary one is shown in lists and in the tree."
+    },
+    "relations": {
+      "title": "Relationships",
+      "summary": "Relationships are explicit: parent and child, spouse, partner and adoption. Siblings are derived from shared parents.",
+      "step1": "Open the relationships section of a person card.",
+      "step2": "Add a parent, a child, a spouse or a partner and choose the other person from the list.",
+      "step3": "Use the separate adoption type when a parent is adoptive.",
+      "note": "The app stores no sibling links and rejects duplicates, self-links and cycles."
+    },
+    "events": {
+      "title": "Events",
+      "summary": "An event has a type, a date, a place, participants and optional detail fields.",
+      "step1": "On the Events screen, press Add and choose the type.",
+      "step2": "Enter the date. If only the year or the month is known, choose that precision instead of a full date.",
+      "step3": "Add the place and participants, then fill in the detail fields of the chosen type.",
+      "note": "Unknown dates are never replaced by invented ones: the original value is kept with unknown precision."
+    },
+    "tree": {
+      "title": "Tree and kinship",
+      "summary": "The tree is built from one person: ancestors, descendants or the whole tree.",
+      "step1": "On the Tree screen, choose the person who becomes the root.",
+      "step2": "Switch the layout and the zoom level.",
+      "step3": "To connect two people, open Relation: the app shows the path and the kinship terms.",
+      "note": "Kinship labels are calculated from the person you selected."
+    },
+    "find": {
+      "title": "Search and checks",
+      "summary": "Full-text search covers people and events, the timeline shows dated events, and data checks find problems.",
+      "step1": "Type a query in Search and open a person or an event from the results.",
+      "step2": "On the Timeline, filter events by type, person and period.",
+      "step3": "Run the project check on the Projects page and review every warning.",
+      "note": "A check never changes data; it only points at what is worth fixing."
+    },
+    "data": {
+      "title": "Import, export and media",
+      "summary": "AT5 and GEDCOM import creates a project; export writes GEDCOM or a JSON/ZIP archive. Media is stored in the project folder with a checksum.",
+      "step1": "Import a file on the Import screen: a report is shown first and writing starts only after you confirm.",
+      "step2": "Export the project to GEDCOM or JSON/ZIP from the project menu.",
+      "step3": "Attach photos and files in a person card; the file is copied into the project.",
+      "note": "Importing the same file again does not create duplicates and does not overwrite manual edits."
+    },
+    "assistant": {
+      "title": "Assistant",
+      "summary": "The chat answers questions about your archive and about the app, using built-in read-only tools.",
+      "step1": "Enable chat in Settings and set an OpenAI-compatible base URL, a model and the name of the environment variable that holds the key.",
+      "step2": "Ask in Chat; people and events found in the archive open by link.",
+      "step3": "Proposed person edits are shown for review and applied only after you confirm.",
+      "note": "Nothing is sent until a provider is configured. The key stays in an environment variable, not in the project."
+    }
+  }
+}

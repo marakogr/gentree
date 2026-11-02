@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:78733b02872573a0f33851e5e7bd3f81472f8f3dc9fdb6472c2ae033ecce5941",
+  "claims": [
+    {
+      "id": "claim_c428124c8f894e1eb54af31cf355266d",
+      "statement": "Export archives contain one data file plus a sibling <stem>.files media folder, are built in a staging directory, and are moved into place only after the ZIP is complete.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/export.rs#L161-L235",
+          "version": "repo-lines-v1:sha256:d468721960473029d2bf30573fea76083d33c4819c6111334be5d91b33b58c2c:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZjQ3MGE4ZWY1MmE2YTFhMjk1NGQxMmNlMDk1YmJjNzA5NTE2ODBlM2I3NGVhYWYxY2EyYzM3YmZmNzdlYjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExZTQwY2MxYzlmYzBjYTI1MTk5N2VkMTJhNmE4NDYyZmYxMDUyYWFkNGQ4Yzc5ZjE3OTdiOWRhNTFhZjU3NTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhMjRlZGQ3ZDA5ZTM5ODE3MjI4ZjExMmY5NjE1ZmJlYTRjOTM4ZDY4NGU5ZjQzZmQzMWY0ZDMwM2Y3ZWZhNDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxZGQwZTRhODUyMTY4MzA1YTNmMzdjNTAxNGZjNjMzMWVlYzJiYjE4MTEyNDZlYjQwODY2NzVmMzViOWRmMTgifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/export.rs#L77-L156",
+          "version": "repo-lines-v1:sha256:3ff0a1f04d015a74de2f277e4d621d8882703793f1b8d089cac3104f2c4ac02c:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5M2I0ZmViMjQ3MjE4NWZkNDg0YmExZTJiY2NkOWM5ZGM3MDlkNzYyZjJlNzViZDFhNmI0YjQwYWFlZTJiNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5ZTcxYjFkZTU1N2U3NGQ2Mzg4NzY3OWRiZDJjZjk5YzEyN2EwOTEzN2NmZDNhZjJhNjZkNjU0NGQzYzAzZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlMWYyZmFjYmZhMzc5NGU5OTUwYjBlMjI4OWU5YWI0ZDEzMjRlOTdhYzdlMjFmZjk3MWQ5NDI5NjI5YmU0NjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzYTEwMzdmMDcxOTYxZmIzYjEzYTdkYWZmNjlhY2MyYmFiODEwZmU4YmRhMTZhMmIyMjcxNTU0MzcxNGNjNzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c567e0fc93ff40abaf11139e05fb5554",
+      "statement": "Missing media files are skipped with count-only warnings, and 5.5.1 archive exports warn that sources and citations are not included while the 7.0 writer includes them.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/export.rs#L148-L156",
+          "version": "repo-lines-v1:sha256:e440310cbfc60d7d361b3ec782eeebf68b9bd6470c5c20420efe2c6e3c727645:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWM1OTlhZGE1ODk3OWQwODhlNDBkY2I1YWFlMDI0YmMwYWI3ZTExNmI5N2EwY2RlYzE4NTc2ZDBhNWUyYmZiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDllNzFiMWRlNTU3ZTc0ZDYzODg3Njc5ZGJkMmNmOTljMTI3YTA5MTM3Y2ZkM2FmMmE2NmQ2NTQ0ZDNjMDNlMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGE5Zjg2ZDI4ZTc4NGY5ZmQzMWZiNzJkMTVmNjBjYmNlYWFmZGQ2NjljYmQ1YjZkYTc4ODhhMDIzMzIxZWJiOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDNhMTAzN2YwNzE5NjFmYjNiMTNhN2RhZmY2OWFjYzJiYWI4MTBmZThiZGExNmEyYjIyNzE1NTQzNzE0Y2M3NSJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/export.rs#L234-L240",
+          "version": "repo-lines-v1:sha256:f1c39acd1b04d164308810f3585860721fb64c4506291cbb79770b00850cb767:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2U2Y2RhMjFiOGMzOTk2MTE5YzM2MGM3ZjM2NmUwYzVkZDkyZTkwNjk4OGM5MmRjNTk3NGIxZDdlNjFmYjBkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTFlNDBjYzFjOWZjMGNhMjUxOTk3ZWQxMmE2YTg0NjJmZjEwNTJhYWQ0ZDhjNzlmMTc5N2I5ZGE1MWFmNTc1NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmYxNzY2MGRkMzBmNzc0YjVmMTIxNzBkYTI0OWFkZTk0Yzg2ODY3ZmMxNjM1YWE2NzQ0MDU3NmZlODQxZjFhNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzYwNTgxZWI3NzkyNDEyZDk1MjVkZTY3OGViZWJhYzlhNDk5YTI2MTNkZTM3MmNjNTljZWMyMWNiN2E3YjY4NiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3a80b6be7d614feb834076bee28ddc27",
+      "statement": "AT5 export writes a Gentree-readable EAV subset (Persons, Events, EventTypes, EventDetails, ValuesStr, ValuesDates, Documents, DocumentDetails, Fields, Global) and encodes relationships through BIRT and MARR events, not a full AT5 database.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/at5_export.rs#L1-L22",
+          "version": "repo-lines-v1:sha256:c12fbd76e4acdfe479031d9f787aebf6018cb10054b10ecb4772f5b323cd4735:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3OWZkYWViYjY0ZTA5OWE1YzU3NTk2M2I3MmJhZTNlMjg5ZGEyOWNlMTczODQ4ZTdlNWJiYTFiMzllY2Q0MWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyZjY0ODhmNWQwNWUwZmQ4YzE1MTJlM2IwNzAwMTk0NWIyYzQ5MDdkNWI1ZWFlNGIyZDczNTI5NTYzYzQwNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmODFjZDY5NzljMTNhYmIzYTgxNDg5YzQ5Njc0MWQxNDRlMWQ3MmEzNjZlZWM2OGI2ZWFmMWQyM2FlYjYyOTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b1342da84ea14635bf067c6766c1c7e9",
+      "statement": "GEDCOM export is deterministic: 5.5.1 is the default and 7.0 is explicit; both are UTF-8, never invent dates, and report every unrepresentable field as a warning, while 7.0 also writes sources and citations.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/gedcom.rs#L1-L30",
+          "version": "repo-lines-v1:sha256:c4497343a5cd63594c554412eed347f1ace30f8d5acb0f8726202b723e835856:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzOTA1ZjA5NGIzZDBhYWRlNTI2ZTMzMmJjODM0N2I4ZTQyOWVkOGFlNjRhMWY2YWYwODgzNWRhNzIyY2I3NjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhMWE2ZDdlZjY3NmZiODlmMDZmODU1YThkMmFiNzE5NmUzYzIxMDYxNDYyNTA0NDcxYmMzOTAzZmVmODc5ODAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3OGNkNjE0OGNkMzdmNmYzNDQ4OTk4ZjlkZWYxMzQxMmQ3Y2Q4NWUwY2Q1ZmI2NmU4MTY1OGExZjUwOGYwZTYifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/gedcom.rs#L400-L470",
+          "version": "repo-lines-v1:sha256:75cd9d21c945cd35642c00a61a473ce66b96d32a2b51dd834733e08e9b0a665b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyOTkwYTUzZDc2Yzk2NjU0ZTZlMzAwYjJjYjIzYmZhNGZkNzNlYWQ0OWVjZDk3ZDFhYmRmMGE4MzYyZTM4MDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwMDkxNTJmMzI3ZWViY2Q2YjQ0YWM2YjIyNzNiZTdkN2ZiNWFjZDQyYWFjYjJhZTUxNjhkYzIwZDFmZDg3YjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyNjkwMWIyZmFiMDAyNzUyYzhkMzhkMzY4NDljMTc5ODg3ODAwYTRjNjRmZjEwNGMyNDQyNTk2NjQ4YzhkNWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmNTk5ZDJkNTJiYWNiOWQ5OGFjMzVkYmJjMDA2OTJlZTJlNzRjNjA3NmYzMjhhNzdiZDY4ODZlMmRmYjdiMzgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4577409106574ab28598bf153d166a92",
+      "statement": "GEDCOM import detects the version from the header, decodes the declared charset, maps BIRT/DEAT to person dates, FAM to SPOUSE and PARENT_CHILD edges, preserves unknown event tags in original_type, and resolves media under .files with path safety and checksum dedupe.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/gedcom.rs#L207-L330",
+          "version": "repo-lines-v1:sha256:1f80ce95af72b4264a6a777f88664d323302fab46687a986202728064c9a24e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmOTYyYTMyNmYwNzMzMDE3OTAyMTFiMGZiZmYwYjA0YmEyM2VhMjYwYTMxMzI4ODk5M2IxY2FlOGVmOWYzOWRlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0Mzg3Mzc0NmMyZDc3YzA5ODgzYzIzZTdiZDZlYTUyYmQxMGI2NDVkZWRhMWMyMjVjODcwNzJmMzZjNDQxMzcyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0NjQwNTM0OThhNTQ4Mjg0NzU5YWIyMDg1MTZmYjkzMDMxZjkwZDNkYTk2MGVlZGUyOTNmNjQ1MjdhZjg1NzdmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmMTBhMDA5ZThjZTEyZTNiOTYwYjJiMDY5NmQwNzFlODY2ZjkwOTNlZThiN2U3NGI4ZjZjZDY1MzY0M2I2OGI1In0"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/gedcom.rs#L264-L330",
+          "version": "repo-lines-v1:sha256:74ad42e1527b4c497290c8230fd3395214a9f334ac6082ff70c97faee7886613:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3NjNmZTA1NTViZjJkYzZlNzIxZDRmM2JlZTg5YTI5NTIyNjY1OTI3ODFkNTc1NTJkZjczMTk2YzRkZTA1OTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzODczNzQ2YzJkNzdjMDk4ODNjMjNlN2JkNmVhNTJiZDEwYjY0NWRlZGExYzIyNWM4NzA3MmYzNmM0NDEzNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkM2NlYmQzMjJmZTE3NzQ0MTkxOTUwMzUwODUzOTQ4MDcyOTQ4MGM3ZjlkZWQ4Y2MwZDYxYTFmNzFkODdmZDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxMGEwMDllOGNlMTJlM2I5NjBiMmIwNjk2ZDA3MWU4NjZmOTA5M2VlOGI3ZTc0YjhmNmNkNjUzNjQzYjY4YjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cab70e82d75468ebc69db9cc9cbe3d5",
+      "statement": ".gentree.json is a media-free exchange document with caller-supplied exportedAt and no project identity, while .gentree.zip is the ADR-0009 backup layout produced by ProjectStore::backup.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/exchange.rs#L1-L20",
+          "version": "repo-lines-v1:sha256:7272d3677ffd8bf66d145d77841e2110074e48d456bef0df25d60980abaab4b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2NTE5NGRmMDZmNzlhYWYzN2QwOGFkYzAyYzYyZTg5OWI1ODYwNjU5YzlmMWQwNzc2OTVmMzVhNDdjZTFmZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyZmI2MWRlOWNiOWQ2ZDE1OGUyOWYyNjZjMjliOWFkNTYzYTMxOTY4NDg1ZTNjMGUxMWViZTk4MTJjZGVkM2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcyYWNjYWI3ZGYzYzY1ZTJjYjkzNTRjNThjOWVhZjJhMTFiMGQ3NGY2MjdiODRhOGZiMmUyMjNiYWEyMWQ3MTgifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/exchange.rs#L49-L65",
+          "version": "repo-lines-v1:sha256:8986d551f16f495d7112fb098390b3d5039b469a2260d181d60884158af48e95:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkYjJhYmI4MjY0MjlhY2QxNjdhMjM0NGZmYjdlMzNkMzk0YjJjY2IxNTY0NzBkODg4YmM3NDdjNDQ1YTE4NGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1MmZlNzVhZDNmZjE3YmM3NzAxZDg4NjQ5ZmU0N2JkYzNmOTkzMGRhMTEzYzUyZWYzZTk0MzJkNWJjNDY4ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE2N2QzYTI0ODBmYWM0ODc2ZDA5ZWE1NGQ3YTdiNjc0MzBhYzI4YjkyNjllODcyZTZkNTY0YjJjODBiMDFlNDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_70aa2580225b415f89810735c565baee",
+      "statement": "JSON input is validated record by record and as a relationship set before any write, and both JSON and ZIP imports always create a new project rather than merging.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/exchange.rs#L256-L277",
+          "version": "repo-lines-v1:sha256:08fb7879fefc2aeace6caab261e84769c6d359e0cbad833ca0d4ce4452273101:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjMjlmNDExMTVkM2NmZTM2NWMwYTIzYTdiMzQ1YTk3MmI2ZDg3Yjg4NGM2YmRiZWQwNTQ0YjA5ZDk3ZWZhYzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwNjNjNGQxYWY4Y2Q4OWJiMGJkZDc2NTdmZmNiZjY4MDZhNjEwZDc5ZDZjOGQ0YzMwN2MyNDFkZjM5MDA1MjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhMWJmZDA1OTRmZTliNTFmNzRhYTY0OWZmYzExN2FmNzliMjAxZmNkZDE3YjRmZjgxNDU4ODNkZWQwYzQ3OTYifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/exchange.rs#L67-L80",
+          "version": "repo-lines-v1:sha256:eae1e6c45cd6f7e796d5205ee10945fd2fb69c57a29a11ed3cbc9d34946c9054:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyNzcwNmJjY2ZjMGRlN2I4MjJkNjZjZjcyMDA1OTY3MjE0YTgzNDliODg3MGE4Y2I5NDRhNDMyZDc0ODlkMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0ZGIzZDE2YTE2ZTY4N2Y4NWQwNWI0ZGU1NzYyODg5Zjk5YmVlY2E0Njc3NzdhZTZlZTZkZWRiMjc2YzQ5N2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4YTNhNTJkNmVjZDU3YzFkYjJkMjEzMDQ2ZmE1MGMzNjEwYzJhZWZlMTliNGYyMWMwYzk5YjBlZWUxMjZhNDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_929eac44477340eab8bb9d973496e091",
+      "statement": "ZIP imports are limited to 2 GiB uncompressed, 100x compression ratio and 10000 entries, reject symlinks and zip-slip paths, and require manifest.json plus checksums covering all six data files.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/exchange.rs#L347-L434",
+          "version": "repo-lines-v1:sha256:ad2c662fa3ac955eaf8cebf99ecb6bbbfe7a6539b19c07cad7f52f9c0304c651:eyJzZWxlY3RlZExpbmVDb3VudCI6ODgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyYjg0NDNjNGViZTI1NDI4MTJhMGIwYjcyNmZhMmY4MmYwNGRmNjczNGZkODljMjk4MTgyZjUwMWQzYjA1ZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhYjA1MDM0NjRlYjEzZTFhZGU3YjAwN2E3MDAzYjU5ZmE4MTlkZjIxYTRmNjI4Y2ZmOTE5Mzk1Y2U3NTZiMjkifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/exchange.rs#L37-L47",
+          "version": "repo-lines-v1:sha256:a1a430def62278ebd8a706921fac582ccb4e0306f1fa79607fb9ee0e1dd643ae:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwN2E3ZjhlNjdlYTk2ZWRmMjAyZjdhN2U2NzA4OWVkZjQ5MDQ0OWM0ODk2ZjdiOWMyMDc5MDY0Y2VkNmZmOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYTkxODk1MDI5NDEzYmRiYTVjNzIyMDBlOGQxMjg1ZTI1OTk4MjNmNDE2OTQ1NWM2MTk5MDE0YTZmYTkzODUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2M2Y2OWRhNzhjMThjYjFjMmYxNzNmYzY5MjY0ZDMwNzg4YWU5NjA1MDFjZGZhNDgyMmNiYzY2ZWM3NDdmZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBiNmYzZDgzZDJhZWQwYjA0ZDY2NmM0YjMxZTg5ZjczZDJiZjU3MDcxMjFiMWU3NWU2YTdiMjliYjQxNzU0OTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fa818c03bdfe4360995ead5b0a094454",
+      "statement": "GEDCOM export writes detail keys that have a standard tag as real child tags (hospital/cemetery/residence address as ADDR, cause as CAUS, agency keys as AGNC, marriage rite as TYPE, occupation/education as the fact value) and serializes the remaining details as one [gentree:details] JSON NOTE.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/gedcom.rs#L629-L700",
+          "version": "repo-lines-v1:sha256:113691a6beef12291d15308ddb6158483b6b81c79ead6692f61fb0ea918ed9a2:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4NTVhM2I3YjhjYjJjM2MyNjNkZTQ4ZTg4YzVkZDRjNmFmZmMzNWVjOWMzNjIyNjc5ZGQ2ZWI0ZDYzMDdmMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlMGQ2YjQwZGZlYTQyNmVhNWZiZDE3OWRhNmZlMDBkYjQ3ZjcyYzcxMDczZDU3YzMzYjhlNDA5ODBhOGJhZDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NTFlMGUyMTQzMGZmY2IwMTU5OGM2ZWQzYTVlNWY4YWRlNTg0Y2MzM2Y3ZDQzMjg1YWYxZGY1YjA3YzgzMzgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e8fa771f30514e7a941ee27a06d3f803",
+      "statement": "GEDCOM import fills details from structured tags and the [gentree:details] note, joins structured address parts with ', ', lets the note win on conflicts, and sanitizes every key/value against the generic detail limits before storing it.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/src/gedcom.rs#L2615-L2739",
+          "version": "repo-lines-v1:sha256:c494690cf1441298a7a173a62c2c6f26b08f231a200ae39a28256669a542a2dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmNzNhMTgwOWExMjJjMDQxODQwMWQ0OTU5Mjg2NWZiMjMxNzg4ZmMwOWVhNDFmYzUwYzg3N2U3YWM2ZjM0M2ZkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJhMWI1NjVkMjBhM2Q3YWNjYTNiMGFjOTEwZDQ3MTY0NWZlYjA2ODc3MGY2ZjI5MDczZDA5MzFlNTk3ZGI5MTVhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5OTE4Y2FkMmFkYmFjOGViODExMTQxNjBkNjg3YzE3N2E1NmNjY2FhMGQ2ZjM2ZmYxYzBmZTMzMTBjY2NhMDc0In0"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

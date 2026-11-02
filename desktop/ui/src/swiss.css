@@ -1,0 +1,625 @@
+/*
+ * Swiss Archive — the opt-in `data-style="swiss"` visual language.
+ *
+ * The axis is independent of `data-theme` (light/dark): the palette lives in
+ * the two mode blocks, everything structural lives in the shared block. With
+ * no `data-style` attribute (or `data-style="classic"`) none of this applies,
+ * so the shipping look is untouched.
+ *
+ * Source of truth: design-system/gentree/MASTER.md.
+ * Measured contrast: design-system/gentree/contrast-report.md.
+ *
+ * Loaded from theme.css, unlayered on purpose: these rules must win over the
+ * layered legacy/component styles they are refining, and every selector is
+ * scoped by `:root[data-style="swiss"]` so they can never leak into classic.
+ */
+
+/* ==========================================================================
+   1. Palette primitives (measured values)
+   ========================================================================== */
+
+:root[data-style="swiss"][data-theme="light"] {
+  color-scheme: light;
+  --swiss-canvas: #f2f3ef;
+  --swiss-surface: #fbfbf8;
+  --swiss-raised: #ffffff;
+  --swiss-sunken: #e7e9e4;
+  --swiss-ink: #12161a;
+  --swiss-ink-2: #3a4247;
+  --swiss-ink-3: #5b6469;
+  --swiss-rule: #d3d7cf;
+  --swiss-rule-strong: #767f7a;
+  --swiss-accent: #0b6577;
+  --swiss-accent-hover: #0a5867;
+  --swiss-accent-solid: #0b6577;
+  --swiss-on-accent: #ffffff;
+  --swiss-tint: #dce8e6;
+  --swiss-ring: #0b6577;
+  --swiss-danger: #a3231a;
+  --swiss-danger-solid: #a3231a;
+  --swiss-success: #1f6b3a;
+  --swiss-warning: #7a4f00;
+  --swiss-disabled: #868e89;
+  --swiss-scrim: rgb(18 22 26 / 55%);
+}
+
+:root[data-style="swiss"][data-theme="dark"] {
+  color-scheme: dark;
+  --swiss-canvas: #111415;
+  --swiss-surface: #181c1d;
+  --swiss-raised: #1f2425;
+  --swiss-sunken: #212627;
+  --swiss-ink: #e9ebe8;
+  --swiss-ink-2: #b4bab7;
+  --swiss-ink-3: #8f9795;
+  --swiss-rule: #2b3132;
+  --swiss-rule-strong: #68716e;
+  --swiss-accent: #5fd6ec;
+  --swiss-accent-hover: #8ce6f7;
+  --swiss-accent-solid: #127a90;
+  --swiss-on-accent: #ffffff;
+  --swiss-tint: #1d2b2d;
+  --swiss-ring: #8ce6f7;
+  --swiss-danger: #ff8f85;
+  --swiss-danger-solid: #b3352b;
+  --swiss-success: #7fd3a0;
+  --swiss-warning: #e8c46a;
+  --swiss-disabled: #727a77;
+  --swiss-scrim: rgb(5 8 9 / 72%);
+}
+
+/* ==========================================================================
+   2. Semantic tokens and the Fluent bridge
+   ========================================================================== */
+
+/*
+ * The rule below also matches `.app-theme-root`, which the classic theme uses
+ * to re-point every app token at Fluent properties. Repeating the mapping with
+ * a higher specificity keeps the provider subtree on the Swiss values instead
+ * of Fluent's neutral greys.
+ */
+:root[data-style="swiss"],
+:root[data-style="swiss"] .app-theme-root {
+  --background: var(--swiss-canvas);
+  --foreground: var(--swiss-ink);
+  --card: var(--swiss-surface);
+  --card-foreground: var(--swiss-ink);
+  --popover: var(--swiss-raised);
+  --popover-foreground: var(--swiss-ink);
+  --primary: var(--swiss-accent);
+  --primary-foreground: var(--swiss-on-accent);
+  --secondary: var(--swiss-sunken);
+  --secondary-foreground: var(--swiss-ink-2);
+  --muted: var(--swiss-sunken);
+  --muted-foreground: var(--swiss-ink-3);
+  --accent: var(--swiss-tint);
+  --accent-foreground: var(--swiss-ink);
+  --destructive: var(--swiss-danger);
+  --border: var(--swiss-rule);
+  --input: var(--swiss-rule-strong);
+  --ring: var(--swiss-ring);
+
+  /* Tokens the classic theme does not have (MASTER §13.2). */
+  --fg-secondary: var(--swiss-ink-2);
+  --raised: var(--swiss-raised);
+  --text-disabled: var(--swiss-disabled);
+  --primary-solid: var(--swiss-accent-solid);
+  --primary-solid-hover: var(--swiss-accent-hover);
+  --on-primary-solid: var(--swiss-on-accent);
+  --destructive-solid: var(--swiss-danger-solid);
+  --on-destructive-solid: var(--swiss-on-accent);
+  --success: var(--swiss-success);
+  --warning: var(--swiss-warning);
+  --scrim: var(--swiss-scrim);
+
+  --radius-none: 0;
+  --radius-control: 2px;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --bw-hairline: 1px;
+  --bw-emphasis: 2px;
+  --shadow-none: none;
+  --shadow-overlay: none;
+
+  --text-2xs: 10.5px;
+  --text-xs: 11.5px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-display: 32px;
+  --leading-display: 1.08;
+  --leading-title: 1.2;
+  --leading-body: 1.5;
+  --leading-ui: 1.45;
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0;
+  --tracking-eyebrow: 0.09em;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --row-h-compact: 30px;
+  --row-h-default: 34px;
+  --row-h-comfortable: 40px;
+  --control-h-sm: 26px;
+  --control-h-md: 32px;
+  --control-h-lg: 36px;
+
+  --duration-1: 90ms;
+  --duration-2: 140ms;
+  --duration-3: 180ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /*
+   * Legacy aliases stay for one release (MASTER §13.5): screens still read
+   * `--legacy-*`, but the names now resolve to Swiss values instead of a
+   * second palette.
+   */
+  --legacy-bg: var(--swiss-canvas);
+  --legacy-fg: var(--swiss-ink);
+  --legacy-panel-border: var(--swiss-rule);
+  --legacy-control-bg: var(--swiss-surface);
+  --legacy-control-border: var(--swiss-rule-strong);
+  --legacy-muted: var(--swiss-ink-3);
+  --legacy-muted-strong: var(--swiss-ink-2);
+  --legacy-heading: var(--swiss-ink);
+  --legacy-link: var(--swiss-accent);
+  --legacy-accent: var(--swiss-accent);
+  --legacy-danger-border: color-mix(in oklab, var(--swiss-danger) 42%, var(--swiss-rule));
+  --legacy-danger-fg: var(--swiss-danger);
+  --legacy-error: var(--swiss-danger);
+  --legacy-edge: var(--swiss-rule-strong);
+  --legacy-node-hover-border: var(--swiss-accent);
+  --legacy-grid: var(--swiss-sunken);
+  --legacy-surface: var(--swiss-surface);
+  --legacy-surface-alt: var(--swiss-canvas);
+  --legacy-user-msg-border: color-mix(in oklab, var(--swiss-accent) 30%, var(--swiss-rule));
+  --legacy-user-msg-bg: var(--swiss-sunken);
+  --legacy-chat-banner-border: color-mix(in oklab, var(--swiss-warning) 45%, var(--swiss-rule));
+  --legacy-chat-banner-bg: color-mix(in oklab, var(--swiss-warning) 12%, var(--swiss-surface));
+  --legacy-chat-banner-fg: var(--swiss-warning);
+  --legacy-highlight-bg: var(--swiss-tint);
+  --legacy-highlight-fg: var(--swiss-ink);
+}
+
+/*
+ * `@theme inline` in theme.css resolves --color-* once on :root, before this
+ * block exists, so a Tailwind utility or the base `* { border-color }` rule
+ * would keep the classic value inside the Swiss style. Re-declare the aliases
+ * here so they recompute from the Swiss tokens.
+ */
+:root[data-style="swiss"] {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/* ==========================================================================
+   3. Base and shared chrome
+   ========================================================================== */
+
+:root[data-style="swiss"] body {
+  font-size: var(--text-sm);
+}
+
+:root[data-style="swiss"] .app-theme-root {
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+/*
+ * A single, explicit 2px focus ring. Fluent's own indicator stays as the inner
+ * 1px ring in the same colour; the outer ring is what makes it unambiguous on
+ * the paper background and at 200% zoom.
+ */
+:root[data-style="swiss"] :is(input, select, textarea):focus-visible {
+  outline: var(--bw-emphasis) solid var(--ring);
+  outline-offset: 1px;
+}
+
+:root[data-style="swiss"] button:focus-visible {
+  outline: var(--bw-emphasis) solid var(--ring);
+  outline-offset: 2px;
+}
+
+:root[data-style="swiss"] :is(a, .link, .back-bar, .name-btn, .person-name, .events-person-link):focus-visible {
+  outline: var(--bw-emphasis) solid var(--ring);
+  outline-offset: 2px;
+}
+
+:root[data-style="swiss"] .content {
+  gap: var(--space-3);
+}
+
+:root[data-style="swiss"] .sidebar {
+  background: var(--card);
+  border-right-color: var(--border);
+}
+
+:root[data-style="swiss"] .app-brand,
+:root[data-style="swiss"] .sidebar-project-name {
+  letter-spacing: 0.02em;
+}
+
+:root[data-style="swiss"] .back-bar {
+  border-radius: var(--radius-control);
+  border-color: var(--border);
+  background: var(--card);
+  color: var(--fg-secondary);
+}
+
+:root[data-style="swiss"] .back-bar:hover {
+  border-color: var(--primary);
+  color: var(--foreground);
+}
+
+/* ==========================================================================
+   4. Square geometry (everything that hardcoded a radius)
+   ========================================================================== */
+
+:root[data-style="swiss"] :where(
+  .panel,
+  .badge,
+  .error-block,
+  .graph-viewport,
+  .graph-node,
+  .graph-node-avatar,
+  .path-viewport,
+  .snippet mark,
+  .chat-message,
+  .markdown code,
+  .markdown pre,
+  .tool-detail pre,
+  .person-media-file,
+  .media-lightbox-frame,
+  .media-lightbox-frame img,
+  .persons-splitter,
+  .persons-splitter::before,
+  .col-resize-handle,
+  .col-resize-handle::before,
+  .person-living,
+  .person-timeline-rail::before,
+  .person-timeline-rail::after,
+  .person-section-count,
+  .person-search-avatar,
+  .persons-page .menu-item,
+  .events-anomalies,
+  .event-file,
+  .event-file-thumb,
+  .chat-status-chip,
+  .chat-privacy,
+  .chat .markdown code,
+  .entity-link,
+  .chat .tool-detail pre,
+  .filter-panel,
+  .year-range-track
+) {
+  border-radius: 0;
+}
+
+:root[data-style="swiss"] :where(input, select, textarea) {
+  border-radius: var(--radius-control);
+}
+
+/*
+ * Tailwind utilities are generated from the inlined `@theme inline` values, so
+ * the radius/shadow theme variables alone do not reach them. Override the
+ * utility classes the screens actually use; the timeline canvas relies on
+ * `rounded-full` markers and `shadow-sm` chips.
+ */
+:root[data-style="swiss"] :is(
+  .rounded-sm,
+  .rounded,
+  .rounded-md,
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-full
+) {
+  border-radius: 0;
+}
+
+:root[data-style="swiss"] :is(.shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl) {
+  box-shadow: none;
+}
+
+/* No soft elevation: a hairline or a state ring replaces the shadow. */
+:root[data-style="swiss"] :where(.persons-panel, .projects-section) {
+  box-shadow: var(--shadow-none);
+}
+
+:root[data-style="swiss"] .year-range-thumb {
+  border-radius: var(--radius-control);
+  box-shadow: none;
+}
+
+:root[data-style="swiss"] .graph-node.selected {
+  box-shadow: 0 0 0 var(--bw-emphasis) var(--primary);
+}
+
+:root[data-style="swiss"] .persons-splitter:focus-visible {
+  outline: var(--bw-emphasis) solid var(--ring);
+  outline-offset: -1px;
+}
+
+:root[data-style="swiss"] .persons-splitter:focus-visible::before {
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   5. Tables: mono labels, tabular figures, a 2px selection edge
+   ========================================================================== */
+
+:root[data-style="swiss"] :where(.persons-page, .events-table-wrap) thead th {
+  height: 38px;
+  background: var(--muted);
+  border-bottom: 1px solid var(--input);
+  color: var(--fg-secondary);
+  font-family: var(--font-medeo-mono);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+:root[data-style="swiss"] :where(.persons-page, .events-table-wrap) thead th * {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+}
+
+:root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tbody tr {
+  height: var(--row-h-default);
+}
+
+:root[data-style="swiss"] :where(.persons-list, .events-table-wrap) td {
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-style="swiss"] .persons-list tbody tr[aria-selected="true"] {
+  box-shadow: inset var(--bw-emphasis) 0 0 var(--primary);
+}
+
+:root[data-style="swiss"] .persons-head-title h1,
+:root[data-style="swiss"] .events-head-title h2 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+}
+
+/* ==========================================================================
+   6. Person card and the vertical timeline
+   ========================================================================== */
+
+:root[data-style="swiss"] .persons-panel {
+  border-color: var(--border);
+  background: var(--card);
+}
+
+:root[data-style="swiss"] .person-timeline {
+  --timeline-dot-center: 15px;
+}
+
+:root[data-style="swiss"] .person-timeline-rail::before {
+  width: 1px;
+  background: var(--border);
+}
+
+:root[data-style="swiss"] .person-timeline-rail::after {
+  width: 5px;
+  height: 5px;
+  background: var(--fg-secondary);
+  box-shadow: none;
+}
+
+:root[data-style="swiss"] .person-timeline-item:hover .person-timeline-rail::after {
+  background: var(--primary);
+}
+
+:root[data-style="swiss"] .person-timeline-date {
+  font-family: var(--font-medeo-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--fg-secondary);
+}
+
+:root[data-style="swiss"] .person-timeline-item {
+  border-radius: var(--radius-none);
+}
+
+:root[data-style="swiss"] .person-timeline-item:hover {
+  background: var(--muted);
+}
+
+:root[data-style="swiss"] .person-section {
+  border-top-color: var(--border);
+}
+
+/* ==========================================================================
+   7. Forms and settings
+   ========================================================================== */
+
+:root[data-style="swiss"] :where(.person-form-section legend, .filter-fieldset legend) {
+  font-family: var(--font-medeo-mono);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+:root[data-style="swiss"] .person-form-section,
+:root[data-style="swiss"] .person-relationship-form {
+  border-color: var(--border);
+  background: transparent;
+}
+
+:root[data-style="swiss"] .settings-path code,
+:root[data-style="swiss"] .mono {
+  font-family: var(--font-medeo-mono);
+}
+
+:root[data-style="swiss"] .filter-panel {
+  border-color: var(--border);
+  background: var(--card);
+}
+
+/* ==========================================================================
+   8. Dialogs, menus, overlays
+   ========================================================================== */
+
+/*
+ * Fluent's shadow token is already a 1px ring (app/theme.ts); the explicit
+ * border makes the modal edge unambiguous on the dark scrim, where the surface
+ * step is only 1.26:1.
+ */
+:root[data-style="swiss"] [role="dialog"] {
+  border: 1px solid var(--input);
+  background-color: var(--raised);
+}
+
+:root[data-style="swiss"] .media-lightbox-frame {
+  background: var(--raised);
+  border: 1px solid var(--input);
+}
+
+/* ==========================================================================
+   9. Narrow windows
+   ========================================================================== */
+
+/*
+ * The desktop window has a 960px minimum, so these rules only matter when the
+ * UI is embedded or the minimum is lowered later. They keep the Swiss style
+ * usable without restructuring the screens: the rail stays, the table becomes
+ * stacked rows, the page actions move to their own line.
+ */
+@media (max-width: 900px) {
+  :root[data-style="swiss"] .content {
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 767px) {
+  :root[data-style="swiss"] .persons-head,
+  :root[data-style="swiss"] .events-head {
+    align-items: flex-start;
+  }
+
+  :root[data-style="swiss"] .persons-head-actions,
+  :root[data-style="swiss"] .events-head-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+    margin-left: 0;
+  }
+
+  :root[data-style="swiss"] .filter-bar-inline .filter-row {
+    align-items: stretch;
+  }
+
+  /* Tables become stacked records: no horizontal scroll on a narrow screen. */
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) table,
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tbody,
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tr,
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) td {
+    display: block;
+    width: 100%;
+  }
+
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) thead {
+    display: none;
+  }
+
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 10px;
+    height: auto;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tbody td {
+    border-bottom: 0;
+    padding: 0;
+    height: auto;
+    min-height: 0;
+  }
+
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tbody td:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tbody td:last-child {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    width: auto;
+  }
+
+  :root[data-style="swiss"] :where(.persons-list, .events-table-wrap) tbody td:not(:first-child):not(:last-child) {
+    grid-column: 1 / -1;
+    font-size: var(--text-xs);
+    color: var(--muted-foreground);
+  }
+
+  :root[data-style="swiss"] .person-facts {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  :root[data-style="swiss"] .content {
+    padding: var(--space-3);
+  }
+
+  :root[data-style="swiss"] .person-facts {
+    grid-template-columns: 84px minmax(0, 1fr);
+    font-size: var(--text-xs);
+  }
+}
+
+/* ==========================================================================
+   10. Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-style="swiss"] *,
+  :root[data-style="swiss"] *::before,
+  :root[data-style="swiss"] *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

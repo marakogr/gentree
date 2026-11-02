@@ -1,0 +1,60 @@
+{
+  "gender": {
+    "MALE": "Чоловіча",
+    "FEMALE": "Жіноча",
+    "UNKNOWN": "Невідома"
+  },
+  "nameType": {
+    "BIRTH": "Ім’я при народженні",
+    "MARRIED": "Ім’я у шлюбі",
+    "RELIGIOUS": "Релігійне ім’я",
+    "OTHER": "Інше"
+  },
+  "eventType": {
+    "BIRTH": "Народження",
+    "DEATH": "Смерть",
+    "MARRIAGE": "Шлюб",
+    "DIVORCE": "Розлучення",
+    "BURIAL": "Поховання",
+    "RESIDENCE": "Проживання",
+    "OCCUPATION": "Заняття",
+    "EDUCATION": "Освіта",
+    "OTHER": "Інше"
+  },
+  "relationshipType": {
+    "PARENT_CHILD": "Батько або мати — дитина",
+    "ADOPTIVE_PARENT_CHILD": "Усиновлювач — дитина",
+    "SPOUSE": "Подружжя",
+    "PARTNER": "Партнер"
+  },
+  "datePrecision": {
+    "DAY": "День",
+    "MONTH": "Місяць",
+    "YEAR": "Рік",
+    "UNKNOWN": "Невідома"
+  },
+  "dateQualifier": {
+    "EXACT": "Точний",
+    "APPROXIMATE": "Приблизний",
+    "BEFORE": "До",
+    "AFTER": "Після",
+    "RANGE": "Діапазон",
+    "UNKNOWN": "Невідомий"
+  },
+  "ancestorRole": {
+    "ROOT": "Корінь",
+    "FATHER": "Батько",
+    "MOTHER": "Мати"
+  },
+  "descendantRole": {
+    "ROOT": "Корінь",
+    "SON": "Син",
+    "DAUGHTER": "Донька",
+    "CHILD": "Дитина"
+  },
+  "edgeDirection": {
+    "UP": "Вгору",
+    "DOWN": "Вниз",
+    "SPOUSE": "Подружжя"
+  }
+}

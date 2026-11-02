@@ -1,0 +1,683 @@
+/*
+ * Events screen: page header, the scroll viewport around the Fluent table,
+ * type accents and the row actions. Fluent owns the table itself (rows, cells,
+ * hover/selection, skeleton), so this file keeps only layout and accents.
+ */
+
+.events-page {
+  min-width: 0;
+}
+
+/* ---------- header ---------- */
+
+.events-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.events-head-title {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.events-head-title h2 {
+  margin: 0;
+}
+
+.events-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.events-anomalies {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid color-mix(in oklab, var(--edge-spouse) 45%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--edge-spouse) 12%, transparent);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.events-anomalies svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--edge-spouse);
+}
+
+/* ---------- table ---------- */
+
+.events-table-wrap {
+  position: relative;
+  max-height: min(62vh, 680px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+}
+
+/* The wrapper is the scroll container, so the Fluent head has to stay pinned.
+   With collapsed borders the bottom border scrolls away; the inset shadow
+   keeps the separator under the sticky row. */
+.events-table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--colorNeutralBackground1, var(--card));
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+/* A sortable header renders its label inside a Fluent button slot; the button
+   must not add its own padding or the header drifts from the cell text. */
+.events-table-wrap thead th > * {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Fixed layout: the column widths live on the colgroup, so paging never
+   re-measures the table against the values of the current page. */
+.events-col-date {
+  width: 11rem;
+}
+
+.events-col-type {
+  width: 8rem;
+}
+
+.events-col-person {
+  width: 40%;
+}
+
+.events-col-place {
+  width: 22%;
+}
+
+.events-col-actions {
+  width: 5rem;
+}
+
+/* A column drag can leave the handle; keep the cursor and suppress selection. */
+.events-table-wrap-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.events-table-wrap-resizing * {
+  cursor: col-resize;
+}
+
+/* Column resize handle: a thin grab area on the right edge of the header cell
+   (Fluent's `aside` slot). The sticky header is the positioning context; the
+   visible line only appears on hover, keyboard focus and while dragging. */
+.col-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 8px;
+  cursor: col-resize;
+  outline: none;
+  touch-action: none;
+}
+
+.col-resize-handle::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 1px;
+  bottom: 6px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--border);
+  opacity: 0;
+  transition:
+    opacity 120ms ease,
+    background-color 120ms ease;
+}
+
+.col-resize-handle:hover::before,
+.col-resize-handle:focus-visible::before,
+.col-resize-handle-active::before {
+  opacity: 1;
+  background: var(--primary);
+}
+
+.events-date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.events-date-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.events-person-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--legacy-link);
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.events-person-link:hover {
+  text-decoration: underline;
+}
+
+.events-person-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.events-person-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.events-person-sep {
+  color: var(--muted-foreground);
+}
+
+.events-person-static {
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- type accent ---------- */
+
+.events-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.events-type-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.events-type svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--muted-foreground);
+}
+
+.events-type-BIRTH svg {
+  color: var(--edge-sibling);
+}
+
+.events-type-DEATH svg {
+  color: var(--destructive);
+}
+
+.events-type-MARRIAGE svg {
+  color: var(--edge-spouse);
+}
+
+.events-type-DIVORCE svg {
+  color: var(--muted-foreground);
+}
+
+.events-type-BURIAL svg {
+  color: var(--muted-foreground);
+}
+
+.events-type-RESIDENCE svg {
+  color: var(--edge-child);
+}
+
+.events-type-OCCUPATION svg {
+  color: var(--primary);
+}
+
+.events-type-EDUCATION svg {
+  color: var(--edge-child);
+}
+
+.events-type-OTHER svg {
+  color: var(--muted-foreground);
+}
+
+.events-anomaly {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--edge-spouse);
+}
+
+.events-anomaly svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- row actions ---------- */
+
+.events-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+}
+
+/* ---------- footer / pager ---------- */
+
+.events-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.events-pager-info {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.events-pager-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- dialog form ---------- */
+
+.events-dialog-form {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Every grid/flex child may shrink below its content width; long German or
+   Russian labels wrap instead of pushing the dialog wider. */
+.events-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.events-form-grid > * {
+  min-width: 0;
+}
+
+.events-form-span {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* Date, precision and qualifier read as modifiers of one date. */
+.events-date-card {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--muted) 55%, var(--card));
+}
+
+.events-date-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+
+.events-date-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.events-date-grid-range {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ---------- type-specific details ---------- */
+
+.events-form-details {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.events-form-details-title {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.events-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.events-detail-grid > * {
+  min-width: 0;
+}
+
+.events-detail-span {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.events-form-details-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* Compact "the event links both profiles" marker for paired events. */
+.events-link-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  margin: 0;
+  padding: 4px 9px;
+  border: 1px solid color-mix(in oklab, var(--primary) 32%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--primary) 8%, transparent);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.events-link-badge svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--primary);
+}
+
+.events-related {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+/* ---------- dialog footer ---------- */
+
+.events-dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.events-dialog-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Fluent controls are inline-flex; stretch them to the grid cell. */
+.events-dialog-form .field > span {
+  width: 100%;
+}
+
+.events-dialog-form textarea {
+  resize: vertical;
+}
+
+.events-dialog-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.events-dialog-note svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.events-dialog-note p {
+  margin: 0;
+}
+
+.events-dialog-note .events-dialog-note-actions {
+  margin-top: 8px;
+}
+
+/* ---------- place autocomplete (ADR-0016) ---------- */
+
+.place-autocomplete {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+
+.place-autocomplete-input {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Same convention as `components/ui/helpers.ts`: five 48px rows plus padding,
+ * then scroll. The inline max-height in the component is the hard cap. */
+.place-autocomplete-listbox {
+  max-height: 256px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.place-autocomplete-option {
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  overflow: hidden;
+}
+
+.place-autocomplete-option-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.place-autocomplete-option-text > span {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.place-autocomplete-hint {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+/* Failures stay local to the field: no toast, free text keeps working. */
+.place-autocomplete-unavailable {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.place-autocomplete-unavailable svg {
+  flex: none;
+}
+
+@media (max-width: 560px) {
+  .events-form-grid,
+  .events-detail-grid,
+  .events-date-grid,
+  .events-date-grid-range {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Event files (ADR-0018) */
+
+.events-files {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-left: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  vertical-align: middle;
+}
+
+.event-files {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-files-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.event-files-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.event-file {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.event-file-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
+}
+
+.event-file-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0.5rem;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+.event-file-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.event-file-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.event-file-line > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-file-caption {
+  width: 100%;
+}
+
+.event-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  flex-shrink: 0;
+}
+
+.event-files-hint {
+  margin: 0;
+}
+
+.event-files-after-save {
+  margin: 0.75rem 0 0;
+}

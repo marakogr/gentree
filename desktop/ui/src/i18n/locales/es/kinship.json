@@ -1,0 +1,349 @@
+{
+  "kind": {
+    "FATHER": "padre",
+    "MOTHER": "madre",
+    "SON": "hijo",
+    "DAUGHTER": "hija",
+    "HUSBAND": "marido",
+    "WIFE": "mujer",
+    "BROTHER": "hermano",
+    "SISTER": "hermana",
+    "GRANDFATHER": "abuelo",
+    "GRANDMOTHER": "abuela",
+    "GRANDSON": "nieto",
+    "GRANDDAUGHTER": "nieta",
+    "UNCLE": {
+      "MALE": "tío",
+      "FEMALE": "tía",
+      "UNKNOWN": "tío o tía"
+    },
+    "AUNT": {
+      "MALE": "tío",
+      "FEMALE": "tía",
+      "UNKNOWN": "tía"
+    },
+    "NEPHEW": "sobrino",
+    "NIECE": "sobrina",
+    "GREAT_UNCLE": {
+      "MALE": "tío abuelo",
+      "FEMALE": "tía abuela",
+      "UNKNOWN": "tío abuelo o tía abuela"
+    },
+    "GREAT_AUNT": {
+      "MALE": "tío abuelo",
+      "FEMALE": "tía abuela",
+      "UNKNOWN": "tío abuelo o tía abuela"
+    },
+    "GRAND_NEPHEW": {
+      "MALE": "sobrino nieto",
+      "FEMALE": "sobrina nieta",
+      "UNKNOWN": "sobrino nieto o sobrina nieta"
+    },
+    "GRAND_NIECE": {
+      "MALE": "sobrino nieto",
+      "FEMALE": "sobrina nieta",
+      "UNKNOWN": "sobrina nieta"
+    },
+    "SPOUSE_OF_SPOUSES_SIBLING": {
+      "MALE": "concuñado",
+      "FEMALE": "concuñada",
+      "UNKNOWN": "concuñado o concuñada"
+    },
+    "PARTNER": {
+      "MALE": "pareja",
+      "FEMALE": "pareja",
+      "UNKNOWN": "pareja"
+    },
+    "STEP_PARENT": {
+      "MALE": "padrastro",
+      "FEMALE": "madrastra",
+      "UNKNOWN": "padrastro o madrastra"
+    },
+    "STEP_CHILD": {
+      "MALE": "hijastro",
+      "FEMALE": "hijastra",
+      "UNKNOWN": "hijastro/a"
+    },
+    "STEP_SIBLING": {
+      "MALE": "hermanastro",
+      "FEMALE": "hermanastra",
+      "UNKNOWN": "hermanastro/a"
+    }
+  },
+  "inLaw": {
+    "PARENT_IN_LAW": {
+      "MALE": {
+        "MALE": "suegro",
+        "FEMALE": "suegra",
+        "UNKNOWN": "suegro/a"
+      },
+      "FEMALE": {
+        "MALE": "suegro",
+        "FEMALE": "suegra",
+        "UNKNOWN": "suegro/a"
+      },
+      "UNKNOWN": {
+        "MALE": "suegro",
+        "FEMALE": "suegra",
+        "UNKNOWN": "suegro/a"
+      }
+    },
+    "CHILD_IN_LAW": {
+      "MALE": {
+        "MALE": "yerno",
+        "FEMALE": "nuera",
+        "UNKNOWN": "yerno o nuera"
+      },
+      "FEMALE": {
+        "MALE": "yerno",
+        "FEMALE": "nuera",
+        "UNKNOWN": "yerno o nuera"
+      },
+      "UNKNOWN": {
+        "MALE": "yerno",
+        "FEMALE": "nuera",
+        "UNKNOWN": "yerno o nuera"
+      }
+    },
+    "SIBLING_IN_LAW": {
+      "MALE": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      },
+      "FEMALE": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      },
+      "UNKNOWN": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      }
+    },
+    "SIBLING_OF_SPOUSE": {
+      "FEMALE": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      },
+      "MALE": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      },
+      "UNKNOWN": {
+        "MALE": "hermano de la pareja",
+        "FEMALE": "hermana de la pareja",
+        "UNKNOWN": "hermano o hermana de la pareja"
+      }
+    },
+    "SPOUSE_OF_SIBLING": {
+      "FEMALE": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      },
+      "MALE": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      },
+      "UNKNOWN": {
+        "MALE": "cuñado",
+        "FEMALE": "cuñada",
+        "UNKNOWN": "cuñado/a"
+      }
+    }
+  },
+  "cousin": {
+    "1": {
+      "peer": {
+        "MALE": "primo",
+        "FEMALE": "prima",
+        "UNKNOWN": "primo/a"
+      },
+      "elder": {
+        "MALE": "primo segundo",
+        "FEMALE": "prima segunda",
+        "UNKNOWN": "primo/a segundo/a"
+      },
+      "younger": {
+        "MALE": "primo segundo",
+        "FEMALE": "prima segunda",
+        "UNKNOWN": "primo/a segundo/a"
+      },
+      "far": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      }
+    },
+    "2": {
+      "peer": {
+        "MALE": "primo segundo",
+        "FEMALE": "prima segunda",
+        "UNKNOWN": "primo/a segundo/a"
+      },
+      "elder": {
+        "MALE": "primo tercero",
+        "FEMALE": "prima tercera",
+        "UNKNOWN": "primo/a tercero/a"
+      },
+      "younger": {
+        "MALE": "primo tercero",
+        "FEMALE": "prima tercera",
+        "UNKNOWN": "primo/a tercero/a"
+      },
+      "far": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      }
+    },
+    "3": {
+      "peer": {
+        "MALE": "primo tercero",
+        "FEMALE": "prima tercera",
+        "UNKNOWN": "primo/a tercero/a"
+      },
+      "elder": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      },
+      "younger": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      },
+      "far": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      }
+    },
+    "other": {
+      "peer": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      },
+      "elder": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      },
+      "younger": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      },
+      "far": {
+        "MALE": "primo lejano",
+        "FEMALE": "prima lejana",
+        "UNKNOWN": "primo/a lejano/a"
+      }
+    }
+  },
+  "line": {
+    "PATERNAL": "por parte de padre",
+    "MATERNAL": "por parte de madre"
+  },
+  "base": {
+    "greatGrandparent": {
+      "MALE": "abuelo",
+      "FEMALE": "abuela",
+      "UNKNOWN": "abuelo/a"
+    },
+    "greatGrandchild": {
+      "MALE": "nieto",
+      "FEMALE": "nieta",
+      "UNKNOWN": "nieto/a"
+    }
+  },
+  "chain": {
+    "parent": {
+      "MALE": "padre",
+      "FEMALE": "madre",
+      "UNKNOWN": "progenitor/a"
+    },
+    "child": {
+      "MALE": "hijo",
+      "FEMALE": "hija",
+      "UNKNOWN": "hijo/a"
+    },
+    "sibling": {
+      "MALE": "hermano",
+      "FEMALE": "hermana",
+      "UNKNOWN": "hermano/a"
+    },
+    "grandparent": {
+      "MALE": "abuelo",
+      "FEMALE": "abuela",
+      "UNKNOWN": "abuelo/a"
+    },
+    "grandchild": {
+      "MALE": "nieto",
+      "FEMALE": "nieta",
+      "UNKNOWN": "nieto/a"
+    },
+    "spouse": {
+      "MALE": "marido",
+      "FEMALE": "mujer",
+      "UNKNOWN": "cónyuge"
+    },
+    "partner": {
+      "MALE": "pareja",
+      "FEMALE": "pareja",
+      "UNKNOWN": "pareja"
+    }
+  },
+  "chainStyle": "possessive",
+  "generationalPrefix": "bis",
+  "chainGenitive": {
+    "adjectives": {
+      "двоюродный": "primo",
+      "двоюродная": "prima",
+      "троюродный": "segundo",
+      "троюродная": "segunda",
+      "четвероюродный": "tercero",
+      "четвероюродная": "tercera",
+      "дальний": "lejano",
+      "дальняя": "lejana",
+      "внучатый": "nieto",
+      "внучатая": "nieta",
+      "сводный": "medio",
+      "сводная": "media"
+    },
+    "nouns": {
+      "отец": "padre",
+      "мать": "madre",
+      "родитель": "progenitor",
+      "сын": "hijo",
+      "дочь": "hija",
+      "ребёнок": "hijo",
+      "брат": "hermano",
+      "сестра": "hermana",
+      "дед": "abuelo",
+      "бабушка": "abuela",
+      "бабка": "abuela",
+      "внук": "nieto",
+      "внучка": "nieta",
+      "муж": "marido",
+      "жена": "mujer",
+      "супруг": "cónyuge",
+      "партнёр": "pareja",
+      "партнёрша": "pareja",
+      "дядя": "tío",
+      "тётя": "tía",
+      "племянник": "sobrino",
+      "племянница": "sobrina",
+      "родственник": "pariente",
+      "родственница": "pariente"
+    }
+  },
+  "unknown": "pariente",
+  "unknownWithPath": "pariente (ruta: {{path}})"
+}

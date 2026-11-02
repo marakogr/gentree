@@ -1,0 +1,1682 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gentree — Swiss Archive · preview</title>
+<!--
+  Offline design preview for the "Swiss Archive" language (design-system/gentree/MASTER.md).
+  No CDN, no network, no build step: open this file directly.
+
+  Fonts: self-hosted Medeo (SIL OFL 1.1), referenced by relative path from the
+  app bundle. Licence: ../../desktop/ui/src/assets/fonts/OFL.txt
+  Fixture data is synthetic. UI strings here are illustrative; the real app
+  keeps every string in src/i18n/locales/*.
+-->
+<style>
+@font-face{
+  font-family:"Medeo Sans";
+  src:url("../../desktop/ui/src/assets/fonts/medeo-sans/MedeoSansVariable.woff2") format("woff2");
+  font-weight:100 900;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:"Medeo Mono";
+  src:url("../../desktop/ui/src/assets/fonts/medeo-mono/MedeoMonoVariable.woff2") format("woff2");
+  font-weight:100 900;font-style:normal;font-display:swap;
+}
+
+/* ============================================================
+   1. Tokens — exactly the contract in MASTER.md §3, §4, §5, §6, §8
+   ============================================================ */
+[data-style="swiss"][data-theme="light"]{
+  color-scheme:light;
+  --background:#f2f3ef;
+  --card:#fbfbf8;
+  --popover:#fbfbf8;
+  --raised:#ffffff;
+  --muted:#e7e9e4;
+  --foreground:#12161a;
+  --fg-secondary:#3a4247;
+  --muted-foreground:#5b6469;
+  --border:#d3d7cf;
+  --input:#767f7a;
+  --primary:#0b6577;
+  --primary-solid:#0b6577;
+  --primary-solid-hover:#0a5867;
+  --on-primary-solid:#ffffff;
+  --accent:#dce8e6;
+  --accent-foreground:#12161a;
+  --ring:#0b6577;
+  --destructive:#a3231a;
+  --destructive-solid:#a3231a;
+  --on-destructive-solid:#ffffff;
+  --success:#1f6b3a;
+  --warning:#7a4f00;
+  --text-disabled:#868e89;
+  --scrim:rgba(18,22,26,.55);
+}
+[data-style="swiss"][data-theme="dark"]{
+  color-scheme:dark;
+  --background:#111415;
+  --card:#181c1d;
+  --popover:#181c1d;
+  --raised:#1f2425;
+  --muted:#212627;
+  --foreground:#e9ebe8;
+  --fg-secondary:#b4bab7;
+  --muted-foreground:#8f9795;
+  --border:#2b3132;
+  --input:#68716e;
+  --primary:#5fd6ec;
+  --primary-solid:#127a90;
+  --primary-solid-hover:#0e6b7e;
+  --on-primary-solid:#ffffff;
+  --accent:#1d2b2d;
+  --accent-foreground:#e9ebe8;
+  --ring:#8ce6f7;
+  --destructive:#ff8f85;
+  --destructive-solid:#b3352b;
+  --on-destructive-solid:#ffffff;
+  --success:#7fd3a0;
+  --warning:#e8c46a;
+  --text-disabled:#727a77;
+  --scrim:rgba(5,8,9,.72);
+}
+[data-style="swiss"]{
+  --radius-none:0;
+  --radius-control:2px;
+  --bw-hairline:1px;
+  --bw-emphasis:2px;
+
+  --text-display:32px;
+  --text-2xl:24px;
+  --text-xl:20px;
+  --text-lg:16px;
+  --text-md:14px;
+  --text-sm:13px;
+  --text-xs:11.5px;
+  --text-2xs:10.5px;
+  --leading-display:1.08;
+  --leading-title:1.2;
+  --leading-body:1.5;
+  --leading-ui:1.45;
+  --tracking-tight:-.015em;
+  --tracking-normal:0;
+  --tracking-eyebrow:.09em;
+  --weight-regular:400;
+  --weight-medium:500;
+  --weight-semibold:600;
+  --weight-bold:700;
+
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+  --space-5:24px; --space-6:32px; --space-7:48px; --space-8:64px;
+
+  --row-h-compact:30px;
+  --row-h-default:34px;
+  --row-h-comfortable:40px;
+  --control-h-sm:26px;
+  --control-h-md:32px;
+  --control-h-lg:36px;
+
+  --duration-1:90ms;
+  --duration-2:140ms;
+  --duration-3:180ms;
+  --ease-standard:cubic-bezier(.2,0,0,1);
+
+  --shadow-none:none;
+  --shadow-overlay:none;
+}
+
+/* ============================================================
+   2. Preview chrome (not part of the language)
+   ============================================================ */
+:root{
+  --font-sans:"Medeo Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-mono:"Medeo Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:#0b0d0e;
+  color:#cfd5d1;
+  font:12px/1.45 var(--font-mono);
+  padding:0 0 40px;
+}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ico{width:16px;height:16px;flex:none;display:inline-block;vertical-align:-2px}
+.pv-bar{
+  position:sticky;top:0;z-index:100;
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;
+  padding:10px 16px;
+  background:#0b0d0e;
+  border-bottom:1px solid #272c2d;
+}
+.pv-brand{font:600 12px/1 var(--font-sans);letter-spacing:.12em;text-transform:uppercase;color:#e8eae7}
+.pv-brand span{color:#5fd6ec}
+.pv-group{display:flex;align-items:center;gap:6px}
+.pv-label{color:#7c8581;letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+.pv-btn{
+  appearance:none;background:#141819;color:#cfd5d1;border:1px solid #333a3b;
+  border-radius:2px;padding:5px 9px;font:11px/1 var(--font-mono);cursor:pointer;
+  transition:background-color 90ms linear,border-color 90ms linear,color 90ms linear;
+}
+.pv-btn:hover{background:#1c2223;border-color:#4a5354;color:#fff}
+.pv-btn[aria-pressed="true"]{background:#233032;border-color:#5fd6ec;color:#eafcff}
+.pv-btn:focus-visible{outline:2px solid #5fd6ec;outline-offset:2px}
+.pv-hint{margin-left:auto;color:#7c8581;font-size:10.5px}
+.pv-hint b{color:#cfd5d1;font-weight:400}
+
+.pv-stage{padding:20px 16px 0;display:flex;justify-content:center}
+.frame{
+  width:var(--pv-w,100%);
+  max-width:1440px;
+  container-type:inline-size;
+  container-name:app;
+}
+.app{
+  position:relative;
+  display:grid;grid-template-columns:264px minmax(0,1fr);grid-template-rows:minmax(0,1fr);
+  width:100%;
+  height:860px;
+  overflow:hidden;
+  background:var(--background);
+  color:var(--foreground);
+  font-family:var(--font-sans);
+  font-size:var(--text-sm);
+  line-height:var(--leading-ui);
+  border:1px solid #2b3132;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.app *{box-sizing:border-box}
+.app ::selection{background:var(--primary);color:var(--on-primary-solid)}
+
+/* ============================================================
+   3. Shell
+   ============================================================ */
+.sidebar{
+  grid-column:1;grid-row:1;
+  display:flex;flex-direction:column;gap:var(--space-4);
+  height:100%;min-height:0;padding:var(--space-4) 14px;
+  overflow-y:auto;
+  background:var(--card);
+  border-right:var(--bw-hairline) solid var(--border);
+}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-size:15px;font-weight:var(--weight-bold);letter-spacing:.02em;color:var(--foreground)}
+.brand span{color:var(--primary)}
+.rail-toggle{
+  width:28px;height:28px;display:grid;place-items:center;
+  background:transparent;border:1px solid transparent;border-radius:var(--radius-control);
+  color:var(--fg-secondary);cursor:pointer;
+}
+.rail-toggle:hover{background:var(--muted);border-color:var(--border);color:var(--foreground)}
+.nav{display:flex;flex-direction:column;gap:2px;margin-top:var(--space-2)}
+.nav-item{
+  position:relative;display:flex;align-items:center;gap:10px;
+  height:32px;padding:0 10px;
+  background:transparent;border:0;border-radius:var(--radius-none);
+  color:var(--fg-secondary);font:inherit;font-weight:var(--weight-medium);
+  text-align:left;cursor:pointer;
+}
+.nav-item .ico{width:20px;height:20px;flex:none;color:var(--fg-secondary)}
+.nav-item:hover{background:var(--muted);color:var(--foreground)}
+.nav-item:hover .ico{color:var(--foreground)}
+.nav-item[aria-current="page"]{background:var(--accent);color:var(--foreground);box-shadow:inset var(--bw-emphasis) 0 0 var(--primary)}
+.nav-item[aria-current="page"] .ico{color:var(--primary)}
+.nav-sep{height:1px;background:var(--border);margin:var(--space-3) 0}
+.nav-cap{
+  padding:0 10px;margin:0 0 6px;
+  font:var(--weight-medium) var(--text-2xs)/1.2 var(--font-mono);
+  letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted-foreground);
+}
+.project{
+  margin-top:auto;padding-top:var(--space-3);border-top:1px solid var(--border);
+  display:grid;gap:6px;
+}
+.project-name{
+  display:flex;align-items:center;gap:6px;padding:6px 10px;
+  background:transparent;border:0;color:var(--foreground);
+  font:inherit;font-weight:var(--weight-semibold);text-align:left;cursor:pointer;
+}
+.project-name .ico{width:16px;height:16px;color:var(--muted-foreground)}
+.sidebar-foot{display:grid;gap:2px;padding-top:var(--space-3);border-top:1px solid var(--border)}
+
+.appbar{display:none;grid-column:1/-1;grid-row:1}
+.nav-scrim{display:none}
+.content{
+  grid-column:2;grid-row:1;
+  min-width:0;min-height:0;height:100%;
+  overflow-y:auto;overscroll-behavior:contain;
+  padding:var(--space-5);
+  background:var(--background);
+  scrollbar-gutter:stable;
+}
+.content:focus{outline:none}
+
+/* ============================================================
+   4. Typography primitives
+   ============================================================ */
+h1,h2,h3,h4,p,dl,dd{margin:0}
+.eyebrow{
+  font:var(--weight-medium) var(--text-2xs)/1.2 var(--font-mono);
+  letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;
+  color:var(--muted-foreground);
+}
+.h1{font-size:var(--text-2xl);line-height:var(--leading-title);font-weight:var(--weight-semibold);letter-spacing:var(--tracking-tight);color:var(--foreground)}
+.h2{font-size:var(--text-xl);line-height:1.25;font-weight:var(--weight-semibold);letter-spacing:-.01em}
+.h3{font-size:var(--text-lg);line-height:1.35;font-weight:var(--weight-semibold)}
+.body{font-size:var(--text-md);line-height:var(--leading-body);color:var(--foreground)}
+.meta{font-size:var(--text-xs);color:var(--muted-foreground);line-height:1.35}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--font-mono);font-size:12px;letter-spacing:.02em}
+.muted{color:var(--muted-foreground)}
+.sec{color:var(--fg-secondary)}
+
+/* ============================================================
+   5. Page header, breadcrumb, buttons, fields
+   ============================================================ */
+.page{display:grid;gap:var(--space-4);align-content:start;min-width:0}
+.page[hidden]{display:none}
+.page-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.page-title{display:grid;gap:2px;min-width:0}
+.page-title .h1{display:flex;align-items:baseline;gap:10px}
+.count{font:400 12px/1 var(--font-mono);color:var(--muted-foreground)}
+.page-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:var(--control-h-md);padding:0 12px;
+  border:1px solid transparent;border-radius:var(--radius-control);
+  background:transparent;color:var(--foreground);
+  font:var(--weight-medium) var(--text-sm)/1 var(--font-sans);
+  cursor:pointer;white-space:nowrap;
+  transition:background-color var(--duration-1) var(--ease-standard),border-color var(--duration-1) var(--ease-standard),color var(--duration-1) var(--ease-standard);
+}
+.btn .ico{width:16px;height:16px}
+.btn-primary{background:var(--primary-solid);border-color:var(--primary-solid);color:var(--on-primary-solid)}
+.btn-primary:hover{background:var(--primary-solid-hover);border-color:var(--primary-solid-hover)}
+.btn-secondary{background:var(--card);border-color:var(--input);color:var(--foreground)}
+.btn-secondary:hover{background:var(--muted)}
+.btn-ghost{color:var(--fg-secondary)}
+.btn-ghost:hover{background:var(--muted);color:var(--foreground)}
+.btn-danger{background:transparent;border-color:var(--destructive);color:var(--destructive)}
+.btn-danger:hover{background:var(--destructive);color:var(--card)}
+.btn-sm{height:var(--control-h-sm);padding:0 10px;font-size:12px}
+.btn[disabled],.btn[aria-disabled="true"]{
+  background:var(--muted);border-color:var(--border);color:var(--text-disabled);
+  cursor:not-allowed;
+}
+.btn[disabled]:hover{background:var(--muted)}
+.icon-btn{
+  display:inline-grid;place-items:center;width:32px;height:32px;
+  background:transparent;border:1px solid transparent;border-radius:var(--radius-control);
+  color:var(--fg-secondary);cursor:pointer;
+  transition:background-color var(--duration-1) var(--ease-standard),border-color var(--duration-1) var(--ease-standard);
+}
+.icon-btn:hover{background:var(--muted);border-color:var(--border);color:var(--foreground)}
+.icon-btn .ico{width:16px;height:16px}
+.icon-btn:disabled{color:var(--text-disabled);background:transparent;border-color:transparent;cursor:not-allowed}
+
+:where(.app button,.app a,.app input,.app select,.app textarea,.app [tabindex]):focus-visible{
+  outline:var(--bw-emphasis) solid var(--ring);
+  outline-offset:2px;
+}
+.force-focus{outline:var(--bw-emphasis) solid var(--ring);outline-offset:2px}
+.app.hide-focus .force-focus{outline:none}
+
+/* filters */
+.filters{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;
+  padding:10px 12px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius-none);
+}
+.search{position:relative;display:flex;align-items:center;flex:0 1 300px;min-width:180px}
+.search .ico{position:absolute;left:9px;width:16px;height:16px;color:var(--muted-foreground);pointer-events:none}
+.field-input,.search input,.select,textarea{
+  width:100%;height:var(--control-h-md);
+  padding:0 10px;border:1px solid var(--input);border-radius:var(--radius-control);
+  background:var(--card);color:var(--foreground);
+  font:400 var(--text-sm)/1 var(--font-sans);
+}
+.search input{padding-left:32px}
+.field-input::placeholder,textarea::placeholder{color:var(--muted-foreground)}
+.select{
+  appearance:none;padding-right:26px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 13px) 14px,calc(100% - 9px) 14px;
+  background-size:4px 4px;background-repeat:no-repeat;
+}
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;
+  background:var(--card);border:1px solid var(--input);border-radius:var(--radius-none);
+  color:var(--fg-secondary);font:var(--weight-medium) 12px/1 var(--font-sans);cursor:pointer;
+  transition:background-color var(--duration-2) var(--ease-standard),border-color var(--duration-2) var(--ease-standard),color var(--duration-2) var(--ease-standard);
+}
+.chip .ico{width:12px;height:12px}
+.chip:hover{background:var(--muted);color:var(--foreground)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--primary);color:var(--foreground)}
+.chip[aria-pressed="true"] .ico{color:var(--primary)}
+.chip[disabled]{border-color:var(--border);color:var(--text-disabled);cursor:not-allowed}
+.filters-tail{display:flex;align-items:center;gap:8px;margin-left:auto}
+.sort-select{display:flex;align-items:center;gap:6px;color:var(--muted-foreground)}
+.sort-select .select{width:auto;min-width:132px}
+
+/* ============================================================
+   6. Master–detail + table
+   ============================================================ */
+.master{display:grid;grid-template-columns:minmax(0,58%) 8px minmax(0,1fr);gap:12px;min-height:0;align-items:stretch}
+.panel{
+  display:flex;flex-direction:column;min-width:0;min-height:0;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-none);
+}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;border-bottom:1px solid var(--border);
+}
+.panel-head .eyebrow{display:flex;align-items:center;gap:6px}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-top:1px solid var(--border)}
+.table-wrap{overflow:auto;max-height:none;min-height:0;flex:1 1 auto;overscroll-behavior:contain}
+.people{width:100%;border-collapse:collapse;font-size:var(--text-sm)}
+.people thead th{
+  position:sticky;top:0;z-index:2;
+  height:38px;padding:0 10px;text-align:left;
+  background:var(--muted);border-bottom:1px solid var(--input);
+  font:var(--weight-medium) var(--text-2xs)/1.2 var(--font-mono);
+  letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--fg-secondary);
+  white-space:nowrap;
+}
+.people thead th .th{display:inline-flex;align-items:center;gap:5px;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-transform:inherit;letter-spacing:inherit}
+.people thead th .th .ico{width:12px;height:12px;color:var(--primary)}
+.people thead th.num{text-align:right}
+.people tbody tr{
+  position:relative;height:var(--row-h-default);
+  transition:background-color var(--duration-1) var(--ease-standard);
+}
+.people tbody tr:hover{background:var(--muted)}
+.people tbody tr[data-selected="true"]{background:var(--accent);box-shadow:inset var(--bw-emphasis) 0 0 var(--primary)}
+.people tbody tr[data-selected="true"]:hover{background:var(--accent)}
+.people td{
+  padding:0 10px;border-bottom:1px solid var(--border);
+  vertical-align:middle;color:var(--foreground);
+}
+.people td.num{text-align:right}
+.people tr:last-child td{border-bottom:0}
+.c-name{min-width:168px}
+.name-btn{
+  display:inline-flex;align-items:center;gap:6px;max-width:100%;
+  padding:2px 0;background:none;border:0;border-radius:var(--radius-none);
+  color:var(--foreground);font:inherit;font-weight:var(--weight-medium);text-align:left;cursor:pointer;
+}
+.name-btn:hover{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.name-btn .ico{width:12px;height:12px;color:var(--primary);flex:none}
+.tag{
+  display:inline-flex;align-items:center;gap:4px;margin-left:6px;
+  height:17px;padding:0 5px;
+  background:var(--muted);border:1px solid var(--border);border-radius:var(--radius-none);
+  color:var(--fg-secondary);
+  font:500 10px/1 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;
+}
+.tag-live{border-color:var(--border);color:var(--success);background:var(--card)}
+.c-years{width:132px;color:var(--fg-secondary);white-space:nowrap}
+.c-age{width:82px;color:var(--muted-foreground)}
+.c-parents{color:var(--fg-secondary);font-size:0.8125rem;line-height:1.35}
+.c-actions{width:74px;text-align:right;white-space:nowrap}
+.c-actions .icon-btn{width:26px;height:26px}
+.row-sep{color:var(--border)}
+.pager .range{font:400 11.5px/1 var(--font-mono);color:var(--muted-foreground)}
+
+/* splitter */
+.splitter{position:relative;cursor:col-resize;align-self:stretch}
+.splitter::before{content:"";position:absolute;top:10px;bottom:10px;left:50%;width:2px;background:var(--border);transform:translateX(-50%);transition:background-color var(--duration-2) var(--ease-standard),width var(--duration-2) var(--ease-standard)}
+.splitter:hover::before,.splitter:focus-visible::before{width:3px;background:var(--primary)}
+.splitter:focus-visible{outline:2px solid var(--ring);outline-offset:-1px}
+
+/* ============================================================
+   7. Person card + vertical timeline
+   ============================================================ */
+.card{padding:14px 16px;overflow-y:auto}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.card-id{display:flex;align-items:center;gap:12px;min-width:0}
+.avatar{
+  display:grid;place-items:center;width:48px;height:48px;flex:none;
+  background:var(--muted);border:1px solid var(--input);border-radius:var(--radius-none);
+  font:500 15px/1 var(--font-mono);letter-spacing:.04em;color:var(--fg-secondary);
+}
+.card-title{display:grid;gap:3px;min-width:0}
+.card-title .h2{overflow-wrap:anywhere}
+.card-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-family:var(--font-mono);font-size:12px;color:var(--fg-secondary)}
+.card-actions{display:flex;gap:2px;flex:none}
+.facts{display:grid;grid-template-columns:112px minmax(0,1fr);gap:5px 12px;padding:12px 0;font-size:var(--text-sm);border-bottom:1px solid var(--border)}
+.facts dt{color:var(--fg-secondary)}
+.facts dd{color:var(--foreground);overflow-wrap:anywhere}
+.card-sec{padding-top:12px}
+.card-sec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:10px}
+.card-sec-head .eyebrow{display:flex;align-items:center;gap:6px}
+.card-sec-head .eyebrow .ico{width:12px;height:12px;color:var(--muted-foreground)}
+
+/* timeline */
+.timeline{list-style:none;margin:0;padding:0 0 4px;position:relative}
+.timeline::before{content:"";position:absolute;top:6px;bottom:12px;left:71px;width:1px;background:var(--border)}
+.tl-item{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr);gap:0 16px;padding:0 0 22px}
+.tl-item:last-child{padding-bottom:4px}
+.tl-year{
+  padding-top:1px;text-align:right;
+  font:400 12px/1.3 var(--font-mono);letter-spacing:.02em;color:var(--fg-secondary);
+  font-variant-numeric:tabular-nums;
+}
+.tl-body{position:relative;min-width:0;padding-left:2px}
+.tl-body::before{
+  content:"";position:absolute;left:-13px;top:4px;width:5px;height:5px;
+  background:var(--fg-secondary);border-radius:var(--radius-none);
+}
+.tl-item[data-kind="life"] .tl-body::before{background:var(--primary);width:7px;height:7px;left:-14px;top:3px}
+.tl-type{font-size:var(--text-sm);font-weight:var(--weight-medium);color:var(--foreground)}
+.tl-where{font-size:var(--text-xs);color:var(--muted-foreground);margin-top:2px}
+.tl-people{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin-top:4px;font-size:var(--text-xs);color:var(--fg-secondary)}
+.tl-link{color:var(--primary);text-decoration:none;border-bottom:1px solid transparent;cursor:pointer}
+.tl-link:hover{border-bottom-color:var(--primary)}
+.tl-add{margin-top:2px;display:inline-flex;align-items:center;gap:6px;color:var(--fg-secondary);background:none;border:0;padding:4px 0;font:inherit;font-size:var(--text-xs);cursor:pointer}
+.tl-add .ico{width:12px;height:12px;color:var(--primary)}
+.tl-add:hover{color:var(--foreground);text-decoration:underline;text-underline-offset:3px}
+
+/* ============================================================
+   8. Forms
+   ============================================================ */
+.form{margin:0;padding:16px;display:grid;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-none)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.form-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(132px,auto) minmax(132px,auto);gap:10px;align-items:start}
+.field{display:grid;gap:4px;min-width:0}
+.field-label{font-size:12px;font-weight:var(--weight-medium);color:var(--fg-secondary)}
+.field-label .req{color:var(--destructive)}
+.field-hint{font-size:var(--text-xs);color:var(--muted-foreground);line-height:1.4}
+.field-error{font-size:var(--text-xs);color:var(--destructive);line-height:1.4}
+.field-input:focus,.select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 1px var(--primary)}
+.field-input:focus-visible,.select:focus-visible,textarea:focus-visible{outline:var(--bw-emphasis) solid var(--ring);outline-offset:2px;border-color:var(--ring);box-shadow:none}
+.field-input[aria-invalid="true"]{border-color:var(--destructive);box-shadow:none}
+.field-input[disabled],.select[disabled],textarea[disabled]{background:var(--muted);border-color:var(--border);color:var(--text-disabled);cursor:not-allowed}
+.field-readonly{background:var(--muted);border-color:transparent;color:var(--fg-secondary)}
+textarea{height:auto;min-height:74px;padding:8px 10px;line-height:1.5;resize:vertical}
+fieldset{border:1px solid var(--border);border-radius:var(--radius-none);padding:10px;margin:0;display:grid;gap:10px;min-width:0}
+legend{padding:0 4px;font:var(--weight-medium) var(--text-2xs)/1.2 var(--font-mono);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--muted-foreground)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:var(--text-sm);color:var(--foreground);cursor:pointer}
+.check input{appearance:none;width:14px;height:14px;border:1px solid var(--input);border-radius:0;background:var(--card);display:grid;place-items:center;cursor:pointer;margin:0}
+.check input:checked{background:var(--primary);border-color:var(--primary)}
+.check input:checked::after{content:"";width:6px;height:6px;background:var(--on-primary-solid)}
+.form-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--border)}
+.form-foot .right{display:flex;gap:8px;margin-left:auto}
+.participant{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 6px 0 8px;border:1px solid var(--border);border-radius:var(--radius-none);background:var(--muted);font-size:12px;color:var(--foreground)}
+.participant .ico{width:10px;height:10px;color:var(--fg-secondary)}
+.participant button{display:grid;place-items:center;width:16px;height:16px;padding:0;background:none;border:0;color:var(--fg-secondary);cursor:pointer}
+.participant button:hover{color:var(--destructive)}
+
+/* ============================================================
+   9. Settings
+   ============================================================ */
+.settings{display:grid;gap:12px;max-width:920px}
+.set-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px 16px;padding:10px 0;border-bottom:1px solid var(--border)}
+.set-row:last-child{border-bottom:0;padding-bottom:0}
+.set-text{display:grid;gap:2px;min-width:220px;max-width:60ch}
+.set-title{font-size:var(--text-sm);font-weight:var(--weight-medium);color:var(--foreground)}
+.set-desc{font-size:var(--text-xs);color:var(--muted-foreground);line-height:1.45}
+.set-control{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none}
+.set-select{width:auto;min-width:170px}
+.path{font:400 12px/1.4 var(--font-mono);color:var(--fg-secondary);overflow-wrap:anywhere}
+.dict{display:grid;border:1px solid var(--border)}
+.dict-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--border);font-size:var(--text-sm)}
+.dict-row:last-child{border-bottom:0}
+.dict-code{font:400 11px/1.3 var(--font-mono);color:var(--muted-foreground)}
+.danger-zone{border-color:var(--destructive)}
+.danger-zone .set-title{color:var(--destructive)}
+
+/* switch */
+.switch{display:inline-flex;align-items:center;gap:8px;background:none;border:0;padding:0;cursor:pointer;color:var(--foreground);font:inherit;font-size:var(--text-sm)}
+.switch-state{font-size:var(--text-xs);color:var(--muted-foreground)}
+.switch-track{position:relative;width:32px;height:18px;flex:none;border:1px solid var(--input);border-radius:var(--radius-control);background:var(--card);transition:background-color var(--duration-2) var(--ease-standard),border-color var(--duration-2) var(--ease-standard)}
+.switch-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;background:var(--fg-secondary);border-radius:0;transition:transform var(--duration-2) var(--ease-standard),background-color var(--duration-2) var(--ease-standard)}
+.switch[aria-checked="true"] .switch-track{background:var(--primary-solid);border-color:var(--primary-solid)}
+.switch[aria-checked="true"] .switch-thumb{transform:translateX(14px);background:var(--on-primary-solid)}
+.switch[aria-checked="false"] .switch-track:hover{background:var(--muted)}
+.switch[disabled]{cursor:not-allowed;color:var(--text-disabled)}
+.switch[disabled] .switch-track{border-color:var(--border);background:var(--muted)}
+
+/* ============================================================
+   10. Kit page: states, dialog, tokens
+   ============================================================ */
+.kit{display:grid;gap:12px}
+.spec{display:grid;gap:12px;padding:16px;background:var(--card);border:1px solid var(--border)}
+.spec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.spec-head .h3{font-size:var(--text-md)}
+.spec-body{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.spec-body.stack{display:grid;gap:12px;align-items:stretch}
+.state-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:8px}
+.state{border:1px solid var(--border);padding:8px;display:grid;gap:6px;font-size:var(--text-2xs);color:var(--muted-foreground)}
+.state-label{font:var(--weight-medium) var(--text-2xs)/1.2 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
+.swatch{border:1px solid var(--border);background:var(--card);display:grid}
+.swatch-chip{height:44px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;padding:4px 6px;font:400 10px/1 var(--font-mono)}
+.swatch-body{display:grid;gap:2px;padding:6px}
+.swatch-name{font:500 11px/1.3 var(--font-mono);color:var(--foreground)}
+.swatch-val{font:400 10.5px/1.3 var(--font-mono);color:var(--muted-foreground)}
+.scale{display:grid;gap:8px}
+.scale-row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:baseline;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.scale-row:last-child{border-bottom:0}
+.scale-key{font:400 10.5px/1.3 var(--font-mono);color:var(--muted-foreground)}
+.ratio-table{width:100%;border-collapse:collapse;font-size:12px}
+.ratio-table th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--input);font:500 10.5px/1.2 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg-secondary)}
+.ratio-table td{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--fg-secondary)}
+.ratio-table td.num{text-align:right;color:var(--foreground);font-family:var(--font-mono);font-size:11.5px}
+.ok{color:var(--success)}
+
+/* modal */
+.modal-layer{position:absolute;inset:0;z-index:60;display:grid;place-items:center;padding:24px}
+.modal-layer[hidden]{display:none}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.dialog{
+  position:relative;width:min(560px,100%);max-height:88%;
+  display:flex;flex-direction:column;
+  background:var(--raised);border:1px solid var(--input);border-radius:var(--radius-none);
+  box-shadow:var(--shadow-overlay);
+}
+.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.dialog-head .h3{font-size:var(--text-lg)}
+.dialog-body{padding:16px;overflow-y:auto;display:grid;gap:12px}
+.dialog-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--border)}
+.dialog p{font-size:var(--text-sm);color:var(--fg-secondary);line-height:1.5}
+
+/* inline text helpers */
+.note{
+  display:flex;gap:8px;padding:10px 12px;border:1px solid var(--border);
+  background:var(--muted);color:var(--fg-secondary);font-size:var(--text-xs);line-height:1.5;
+}
+.note .ico{width:14px;height:14px;flex:none;color:var(--primary);margin-top:1px}
+.note strong{font-weight:var(--weight-semibold);color:var(--foreground)}
+.hr{height:1px;background:var(--border);margin:0}
+
+/* ============================================================
+   11. Container queries: 375 / 768 / 1024 / 1440
+   ============================================================ */
+@container app (max-width:1099px){
+  .master{grid-template-columns:minmax(0,1fr)}
+  .splitter{display:none}
+  .master .panel:first-child{max-height:380px}
+  .card{overflow-y:auto}
+}
+@container app (max-width:899px){
+  .app{grid-template-columns:72px minmax(0,1fr)}
+  .sidebar{padding:12px 8px;align-items:center}
+  .sidebar-head{justify-content:center}
+  .brand{display:none}
+  .rail-toggle{display:none}
+  .nav{width:100%;margin-top:0}
+  .nav-item{justify-content:center;padding:0;height:36px}
+  .nav-item span,.nav-cap{display:none}
+  .nav-item .ico{width:20px;height:20px}
+  .nav-sep{display:none}
+  .project{margin-top:0;align-items:center}
+  .project-name{justify-content:center;padding:6px 0}
+  .project-name span{display:none}
+  .sidebar-foot{justify-items:center}
+  .content{padding:16px}
+  .facts{grid-template-columns:112px minmax(0,1fr)}
+}
+@container app (max-width:767px){
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:48px minmax(0,1fr);height:820px}
+  .sidebar{display:none}
+  .appbar{
+    display:flex;align-items:center;gap:8px;height:48px;padding:0 10px;
+    background:var(--card);border-bottom:1px solid var(--border);
+  }
+  .appbar .brand{display:block;font-size:14px}
+  .nav-scrim{display:none}
+  .app.nav-open .sidebar{
+    display:flex;align-items:stretch;gap:16px;
+    position:absolute;left:0;top:48px;bottom:0;width:264px;z-index:70;
+    padding:16px 14px;
+  }
+  .app.nav-open .nav-scrim{display:block;position:absolute;left:0;right:0;top:48px;bottom:0;z-index:65;background:var(--scrim)}
+  .app.nav-open .sidebar .brand{display:block}
+  .app.nav-open .sidebar-head{justify-content:space-between}
+  .app.nav-open .nav{width:auto;margin-top:8px}
+  .app.nav-open .nav-item{justify-content:flex-start;padding:0 10px;height:32px}
+  .app.nav-open .nav-item span,.app.nav-open .nav-cap{display:inline}
+  .app.nav-open .nav-sep{display:block}
+  .app.nav-open .project-name{justify-content:flex-start;padding:6px 10px}
+  .app.nav-open .project-name span{display:inline}
+  .app.nav-open .sidebar-foot{justify-items:stretch}
+  .content{grid-column:1;grid-row:2;padding:12px}
+  .master .panel:first-child{max-height:none}
+  .people thead{display:none}
+  .people,.people tbody{display:block;width:100%}
+  .people tbody tr{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    height:auto;gap:2px 10px;padding:9px 12px;
+    border-bottom:1px solid var(--border);
+  }
+  .people td{border:0;padding:0;display:block;height:auto}
+  .people td.c-name{grid-column:1;grid-row:1;min-width:0}
+  .people td.c-actions{grid-column:2;grid-row:1;width:auto;justify-self:end}
+  .people td.c-years,.people td.c-age,.people td.c-parents{grid-column:1/-1;width:auto;font-size:12px;color:var(--muted-foreground);line-height:1.45}
+  .people td.c-years{grid-row:2;display:inline-flex}
+  .people td.c-age{display:none}
+  .people td.c-parents{grid-row:3}
+  .people td.c-parents[data-label]::before{content:attr(data-label) " · ";color:var(--muted-foreground)}
+  .people tbody tr[data-selected="true"]{box-shadow:inset var(--bw-emphasis) 0 0 var(--primary)}
+  .page-head{align-items:flex-start}
+  .page-actions .btn.collapse span{display:none}
+  .page-actions .btn.collapse{width:32px;padding:0}
+  .form-row{grid-template-columns:minmax(0,1fr)}
+  .form-grid{grid-template-columns:minmax(0,1fr)}
+  .filters{padding:8px 10px}
+  .filters-tail{margin-left:0;width:100%}
+  .sort-select{width:100%}
+  .sort-select .select{width:100%}
+  .facts{grid-template-columns:88px minmax(0,1fr);font-size:12px}
+  .card{padding:12px}
+  .timeline::before{left:55px}
+  .tl-item{grid-template-columns:48px minmax(0,1fr);gap:0 14px}
+  .tl-year{font-size:11px}
+  .set-row{grid-template-columns:minmax(0,1fr);align-items:flex-start}
+  .set-control{width:100%;justify-content:flex-start}
+  .set-select{width:100%}
+  .pager .range{display:none}
+  .modal-layer{padding:12px}
+}
+@container app (max-width:639px){
+  .h1{font-size:20px}
+  .card-title .h2{font-size:17px}
+  .avatar{width:40px;height:40px;font-size:13px}
+  .card-actions .icon-btn:nth-child(n+3){display:none}
+  .dict-row{grid-template-columns:minmax(0,1fr) auto}
+  .dict-code{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .app *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="ico-base" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"></g>
+  </defs>
+  <symbol id="i-people" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <circle cx="6" cy="5" r="2.4"/><path d="M1.8 13.4v-2a4.2 4.2 0 0 1 8.4 0v2"/><path d="M11 3.2a2.2 2.2 0 0 1 0 3.9"/><path d="M12 9.2a3.6 3.6 0 0 1 2.2 3.4v.8"/>
+  </symbol>
+  <symbol id="i-calendar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <rect x="2" y="3.5" width="12" height="10.5"/><path d="M2 6.8h12M5.2 1.8v3M10.8 1.8v3"/>
+  </symbol>
+  <symbol id="i-tree" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <rect x="6" y="1.5" width="4" height="3.4"/><rect x="1.5" y="11" width="4" height="3.4"/><rect x="10.5" y="11" width="4" height="3.4"/>
+    <path d="M8 4.9v3.3M3.5 11V8.2h9V11"/>
+  </symbol>
+  <symbol id="i-branch" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <circle cx="4" cy="3.5" r="1.8"/><circle cx="12" cy="3.5" r="1.8"/><circle cx="8" cy="12.5" r="1.8"/>
+    <path d="M4 5.3v2.2h8V5.3M8 7.5v3.2"/>
+  </symbol>
+  <symbol id="i-timeline" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M1.5 8h13M4.5 5.5v5M8 3.5v9M11.5 5.5v5"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <circle cx="6.8" cy="6.8" r="4.3"/><path d="M10.1 10.1 14 14"/>
+  </symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M1.8 3.2h12.4v8.2H8.4L5 14.2v-2.8H1.8z"/><path d="M4.6 6.2h6.8M4.6 8.6h4.4"/>
+  </symbol>
+  <symbol id="i-settings" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <circle cx="8" cy="8" r="2.6"/><path d="M8 1.4v2M8 12.6v2M1.4 8h2M12.6 8h2M3.3 3.3l1.4 1.4M11.3 11.3l1.4 1.4M12.7 3.3l-1.4 1.4M4.7 11.3l-1.4 1.4"/>
+  </symbol>
+  <symbol id="i-folder" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M1.8 3.4h4.4l1.6 2h6.4v7.2H1.8z"/>
+  </symbol>
+  <symbol id="i-plus" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M8 2.5v11M2.5 8h11"/>
+  </symbol>
+  <symbol id="i-edit" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M2 14h3.2L14 5.2 10.8 2 2 10.8z"/><path d="M9.4 3.4 12.6 6.6"/>
+  </symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M6 3.5 10.5 8 6 12.5"/>
+  </symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M10 3.5 5.5 8 10 12.5"/>
+  </symbol>
+  <symbol id="i-close" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M2.5 8.5 6 12l7.5-8"/>
+  </symbol>
+  <symbol id="i-menu" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M2 4h12M2 8h12M2 12h12"/>
+  </symbol>
+  <symbol id="i-more" viewBox="0 0 16 16" fill="currentColor">
+    <rect x="2.5" y="6.8" width="2.4" height="2.4"/><rect x="6.8" y="6.8" width="2.4" height="2.4"/><rect x="11.1" y="6.8" width="2.4" height="2.4"/>
+  </symbol>
+  <symbol id="i-sort" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M8 2v12M4.5 5.5 8 2l3.5 3.5"/>
+  </symbol>
+  <symbol id="i-filter" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M1.8 2.5h12.4L9.6 8.3v5.2l-3.2-1.6V8.3z"/>
+  </symbol>
+  <symbol id="i-export" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M2 10.5V14h12v-3.5"/><path d="M8 10V1.8M4.5 5.3 8 1.8l3.5 3.5"/>
+  </symbol>
+  <symbol id="i-warning" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M8 1.8 15 14H1z"/><path d="M8 6v4M8 11.6v1"/>
+  </symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <path d="M14 8H2M6 4 2 8l4 4"/>
+  </symbol>
+  <symbol id="i-info" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+    <rect x="2" y="2" width="12" height="12"/><path d="M8 7v5M8 4.4v1"/>
+  </symbol>
+</svg>
+
+<div class="pv-bar">
+  <div class="pv-brand">GENTREE <span>· SWISS ARCHIVE</span></div>
+
+  <div class="pv-group" role="group" aria-label="Тема">
+    <span class="pv-label">Тема</span>
+    <button class="pv-btn" data-act="theme" data-value="light" aria-pressed="true">Светлая</button>
+    <button class="pv-btn" data-act="theme" data-value="dark" aria-pressed="false">Тёмная</button>
+  </div>
+
+  <div class="pv-group" role="group" aria-label="Ширина">
+    <span class="pv-label">Ширина</span>
+    <button class="pv-btn" data-act="width" data-value="375">375</button>
+    <button class="pv-btn" data-act="width" data-value="768">768</button>
+    <button class="pv-btn" data-act="width" data-value="1024">1024</button>
+    <button class="pv-btn" data-act="width" data-value="1440">1440</button>
+    <button class="pv-btn" data-act="width" data-value="fit" aria-pressed="true">Fit</button>
+  </div>
+
+  <div class="pv-group" role="group" aria-label="Состояния">
+    <span class="pv-label">Фокус</span>
+    <button class="pv-btn" data-act="focus" aria-pressed="true">Кольца фокуса</button>
+  </div>
+
+  <div class="pv-hint"><b>Tab</b> — фокус · <b>Esc</b> — закрыть диалог · данные синтетические</div>
+</div>
+
+<div class="pv-stage">
+  <div class="frame" id="frame">
+  <div class="app" id="app" data-style="swiss" data-theme="light">
+    <aside class="sidebar" id="app-sidebar" aria-label="Основная навигация">
+      <div class="sidebar-head">
+        <div class="brand">Gen<span>tree</span></div>
+        <button class="rail-toggle" type="button" aria-label="Свернуть панель" title="Свернуть панель">
+          <svg class="ico" width="16" height="16" aria-hidden="true"><use href="#i-chevron-left"/></svg>
+        </button>
+      </div>
+
+      <nav class="nav">
+        <p class="nav-cap">Проект</p>
+        <button class="nav-item" type="button" data-view="people" aria-current="page">
+          <svg class="ico" aria-hidden="true"><use href="#i-people"/></svg><span>Люди</span>
+        </button>
+        <button class="nav-item" type="button" data-view="events">
+          <svg class="ico" aria-hidden="true"><use href="#i-calendar"/></svg><span>События</span>
+        </button>
+        <button class="nav-item" type="button" data-view="graph">
+          <svg class="ico" aria-hidden="true"><use href="#i-tree"/></svg><span>Древо</span>
+        </button>
+        <button class="nav-item" type="button" data-view="graph">
+          <svg class="ico" aria-hidden="true"><use href="#i-branch"/></svg><span>Связи</span>
+        </button>
+        <button class="nav-item" type="button" data-view="events">
+          <svg class="ico" aria-hidden="true"><use href="#i-timeline"/></svg><span>Хронология</span>
+        </button>
+        <div class="nav-sep"></div>
+        <button class="nav-item" type="button" data-view="kit">
+          <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg><span>Поиск</span>
+        </button>
+        <button class="nav-item" type="button" data-view="kit">
+          <svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg><span>Чат</span>
+        </button>
+      </nav>
+
+      <div class="project">
+        <button class="project-name" type="button">
+          <svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg>
+          <span>Архив семьи Ковалёвых</span>
+        </button>
+      </div>
+
+      <div class="sidebar-foot">
+        <button class="nav-item" type="button" data-view="tokens">
+          <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><span>Дизайн-система</span>
+        </button>
+        <button class="nav-item" type="button" data-view="settings">
+          <svg class="ico" aria-hidden="true"><use href="#i-settings"/></svg><span>Настройки</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="appbar">
+      <button class="icon-btn" type="button" id="nav-toggle" aria-label="Меню" aria-controls="app-sidebar" aria-expanded="false">
+        <svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+      <div class="brand">Gen<span>tree</span></div>
+    </div>
+    <div class="nav-scrim" data-nav-close></div>
+
+    <main class="content" id="content">
+
+      <!-- ================= PEOPLE ================= -->
+      <section class="page" data-page="people">
+        <div class="page-head">
+          <div class="page-title">
+            <p class="eyebrow">Проект · Люди</p>
+            <h1 class="h1">Люди <span class="count">128</span></h1>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary collapse" type="button">
+              <svg class="ico" aria-hidden="true"><use href="#i-export"/></svg><span>Экспорт</span>
+            </button>
+            <button class="btn btn-primary collapse" type="button">
+              <svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg><span>Новый человек</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="filters" role="search">
+          <label class="search">
+            <span class="visually-hidden">Поиск по имени</span>
+            <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+            <input type="search" placeholder="Имя, фамилия, место" value="">
+          </label>
+
+          <div class="filter-chips" role="group" aria-label="Тип события">
+            <button class="chip" type="button" aria-pressed="true">
+              <svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Рождение
+            </button>
+            <button class="chip" type="button" aria-pressed="false">Брак</button>
+            <button class="chip" type="button" aria-pressed="false">Смерть</button>
+            <button class="chip" type="button" aria-pressed="false">Переезд</button>
+          </div>
+
+          <div class="filters-tail">
+            <span class="sort-select">
+              <span class="meta">Сортировка</span>
+              <select class="select" aria-label="Сортировка">
+                <option>По имени</option>
+                <option selected>По году рождения</option>
+                <option>По году смерти</option>
+              </select>
+            </span>
+          </div>
+        </div>
+
+        <div class="master">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="eyebrow">Список · 6 из 128</span>
+              <button class="icon-btn" type="button" aria-label="Колонки" title="Колонки">
+                <svg class="ico" aria-hidden="true"><use href="#i-more"/></svg>
+              </button>
+            </div>
+
+            <div class="table-wrap">
+              <table class="people">
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <button class="th" type="button">Имя</button>
+                    </th>
+                    <th scope="col" class="num c-years">
+                      <button class="th" type="button">Годы <svg class="ico" aria-hidden="true"><use href="#i-sort"/></svg></button>
+                    </th>
+                    <th scope="col" class="num c-age">Возраст</th>
+                    <th scope="col" class="c-parents"><button class="th" type="button">Родители</button></th>
+                    <th scope="col" class="c-actions"><span class="visually-hidden">Действия</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="c-name">
+                      <button class="name-btn" type="button"><svg class="ico" aria-hidden="true"><use href="#i-people"/></svg>Анна Ковалёва</button>
+                      <span class="tag tag-live">жива</span>
+                    </td>
+                    <td class="num c-years" data-label="Годы">1874–1951</td>
+                    <td class="num c-age">76</td>
+                    <td class="c-parents" data-label="Родители">Иван Ковалёв · Мария Соколова</td>
+                    <td class="c-actions">
+                      <button class="icon-btn" type="button" aria-label="Изменить Анну Ковалёву"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                    </td>
+                  </tr>
+                  <tr data-selected="true">
+                    <td class="c-name">
+                      <button class="name-btn" type="button"><svg class="ico" aria-hidden="true"><use href="#i-people"/></svg>Пётр Ковалёв</button>
+                    </td>
+                    <td class="num c-years" data-label="Годы">1896–1972</td>
+                    <td class="num c-age">76</td>
+                    <td class="c-parents" data-label="Родители">Николай Соколов · Ольга Соколова</td>
+                    <td class="c-actions">
+                      <button class="icon-btn" type="button" aria-label="Изменить Петра Ковалёва"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="c-name">
+                      <button class="name-btn" type="button"><svg class="ico" aria-hidden="true"><use href="#i-people"/></svg>Мария Соколова</button>
+                    </td>
+                    <td class="num c-years" data-label="Годы">1849–1918</td>
+                    <td class="num c-age">69</td>
+                    <td class="c-parents" data-label="Родители">—</td>
+                    <td class="c-actions">
+                      <button class="icon-btn" type="button" aria-label="Изменить Марию Соколову"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="c-name">
+                      <button class="name-btn" type="button"><svg class="ico" aria-hidden="true"><use href="#i-people"/></svg>Катарина Шварценбах-Мюллер</button>
+                    </td>
+                    <td class="num c-years" data-label="Годы">1901–1988</td>
+                    <td class="num c-age">87</td>
+                    <td class="c-parents" data-label="Родители">Пауль Шварценбах · Гертруда Мюллер</td>
+                    <td class="c-actions">
+                      <button class="icon-btn" type="button" aria-label="Изменить Катарину Шварценбах-Мюллер"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="c-name">
+                      <button class="name-btn" type="button"><svg class="ico" aria-hidden="true"><use href="#i-people"/></svg>Оксана Гнатівна</button>
+                    </td>
+                    <td class="num c-years" data-label="Годы">1912–1994</td>
+                    <td class="num c-age">82</td>
+                    <td class="c-parents" data-label="Родители">—</td>
+                    <td class="c-actions">
+                      <button class="icon-btn" type="button" aria-label="Изменить Оксану Гнатівну"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="c-name">
+                      <button class="name-btn" type="button"><svg class="ico" aria-hidden="true"><use href="#i-people"/></svg>Николай Соколов</button>
+                      <span class="tag">жив</span>
+                    </td>
+                    <td class="num c-years" data-label="Годы">1871–1943</td>
+                    <td class="num c-age">72</td>
+                    <td class="c-parents" data-label="Родители">—</td>
+                    <td class="c-actions">
+                      <button class="icon-btn" type="button" aria-label="Изменить Николая Соколова"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pager">
+              <span class="range">1–6 из 128</span>
+              <div class="page-actions">
+                <button class="icon-btn" type="button" aria-label="Предыдущая страница" disabled><svg class="ico" aria-hidden="true"><use href="#i-chevron-left"/></svg></button>
+                <button class="icon-btn" type="button" aria-label="Следующая страница"><svg class="ico" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="splitter" role="separator" aria-orientation="vertical" aria-label="Изменить ширину списка" tabindex="0"></div>
+
+          <aside class="panel card" aria-labelledby="card-name">
+            <div class="card-head">
+              <div class="card-id">
+                <div class="avatar" aria-hidden="true">ПК</div>
+                <div class="card-title">
+                  <h2 class="h2" id="card-name">Пётр Ковалёв</h2>
+                  <div class="card-meta">
+                    <span>1896–1972</span><span aria-hidden="true">·</span>
+                    <span>76 лет</span><span aria-hidden="true">·</span>
+                    <span>умер</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-actions">
+                <button class="icon-btn" type="button" aria-label="Изменить"><svg class="ico" aria-hidden="true"><use href="#i-edit"/></svg></button>
+                <button class="icon-btn" type="button" aria-label="Хронология"><svg class="ico" aria-hidden="true"><use href="#i-timeline"/></svg></button>
+                <button class="icon-btn" type="button" aria-label="Ещё"><svg class="ico" aria-hidden="true"><use href="#i-more"/></svg></button>
+              </div>
+            </div>
+
+            <dl class="facts">
+              <dt>При рождении</dt><dd>Пётр Николаевич Соколов</dd>
+              <dt>Пол</dt><dd>мужской</dd>
+              <dt>Место рождения</dt><dd>Тверь, Российская империя</dd>
+              <dt>Место смерти</dt><dd>Казань, СССР</dd>
+              <dt>Источники</dt><dd>метрическая книга 1896, л. 42 об.</dd>
+            </dl>
+
+            <div class="card-sec">
+              <div class="card-sec-head">
+                <p class="eyebrow"><svg class="ico" aria-hidden="true"><use href="#i-timeline"/></svg>События · 5</p>
+                <button class="btn btn-ghost btn-sm" type="button">
+                  <svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Добавить
+                </button>
+              </div>
+
+              <ol class="timeline">
+                <li class="tl-item" data-kind="life">
+                  <span class="tl-year">1896</span>
+                  <div class="tl-body">
+                    <p class="tl-type">Рождение</p>
+                    <p class="tl-where">12 марта · Тверь</p>
+                    <p class="tl-people"><span>Родители:</span><a class="tl-link" href="#">Николай Соколов</a><span aria-hidden="true">·</span><a class="tl-link" href="#">Ольга Соколова</a></p>
+                  </div>
+                </li>
+                <li class="tl-item">
+                  <span class="tl-year">1921</span>
+                  <div class="tl-body">
+                    <p class="tl-type">Брак</p>
+                    <p class="tl-where">17 сентября · Казань</p>
+                    <p class="tl-people"><span>Супруг(а):</span><a class="tl-link" href="#">Анна Ковалёва</a></p>
+                  </div>
+                </li>
+                <li class="tl-item">
+                  <span class="tl-year">1923</span>
+                  <div class="tl-body">
+                    <p class="tl-type">Рождение ребёнка</p>
+                    <p class="tl-where">4 июня · Казань</p>
+                    <p class="tl-people"><a class="tl-link" href="#">Иван Ковалёв</a></p>
+                  </div>
+                </li>
+                <li class="tl-item">
+                  <span class="tl-year">1941</span>
+                  <div class="tl-body">
+                    <p class="tl-type">Переезд</p>
+                    <p class="tl-where">Свердловск</p>
+                    <p class="tl-people muted">эвакуация, архивный источник не указан</p>
+                  </div>
+                </li>
+                <li class="tl-item" data-kind="life">
+                  <span class="tl-year">1972</span>
+                  <div class="tl-body">
+                    <p class="tl-type">Смерть</p>
+                    <p class="tl-where">2 января · Казань</p>
+                  </div>
+                </li>
+              </ol>
+              <button class="tl-add" type="button"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Событие в этот период</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= EVENTS ================= -->
+      <section class="page" data-page="events" hidden>
+        <div class="page-head">
+          <div class="page-title">
+            <p class="eyebrow">Проект · События</p>
+            <h1 class="h1">Событие <span class="count">новое</span></h1>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-ghost collapse" type="button" data-view="people" aria-label="К списку">
+              <svg class="ico" aria-hidden="true"><use href="#i-arrow-left"/></svg><span>К списку</span>
+            </button>
+          </div>
+        </div>
+
+        <form class="form" novalidate>
+          <div class="form-grid">
+            <label class="field">
+              <span class="field-label">Тип события <span class="req" aria-hidden="true">*</span></span>
+              <select class="select" required>
+                <option selected>Брак</option>
+                <option>Рождение</option>
+                <option>Смерть</option>
+                <option>Переезд</option>
+                <option>Образование</option>
+              </select>
+            </label>
+
+            <div class="field">
+              <span class="field-label" id="lbl-place">Место</span>
+              <input class="field-input" aria-labelledby="lbl-place" value="Казань" autocomplete="off">
+              <p class="field-hint">Начните вводить — подсказки из справочника проекта.</p>
+            </div>
+          </div>
+
+          <fieldset>
+            <legend>Дата</legend>
+            <div class="form-row">
+              <label class="field">
+                <span class="field-label">Дата</span>
+                <input class="field-input num" value="17.09.1921" inputmode="numeric">
+              </label>
+              <label class="field">
+                <span class="field-label">Точность</span>
+                <select class="select"><option>День</option><option>Месяц</option><option>Год</option></select>
+              </label>
+              <label class="field">
+                <span class="field-label">Квалификатор</span>
+                <select class="select"><option>Точно</option><option>Около</option><option>До</option><option>После</option></select>
+              </label>
+            </div>
+            <label class="field">
+              <span class="field-label">Как в источнике</span>
+              <input class="field-input field-readonly" value="венчаны 17 сентября 1921 г." readonly>
+              <p class="field-hint">Исходное значение хранится без нормализации.</p>
+            </label>
+            <label class="check"><input type="checkbox"> Дата неизвестна — сохранить без нормализации</label>
+          </fieldset>
+
+          <div class="field">
+            <span class="field-label">Участники</span>
+            <div class="spec-body" style="gap:6px">
+              <span class="participant">Пётр Ковалёв <button type="button" aria-label="Убрать Петра Ковалёва"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button></span>
+              <span class="participant">Анна Ковалёва <button type="button" aria-label="Убрать Анну Ковалёву"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button></span>
+              <button class="btn btn-ghost btn-sm" type="button"><svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>Добавить</button>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Описание</span>
+            <textarea placeholder="Свободная заметка, цитата из источника">Поручители: мещанин И. П. Верещагин и купец С. А. Мельников.</textarea>
+          </label>
+
+          <div class="field">
+            <span class="field-label">Шифр источника</span>
+            <input class="field-input mono" value="ГАРТ, ф. 160, оп. 1, д. 42, л. 18 об.">
+            <p class="field-error" role="alert">Шифр не найден в справочнике — сохранение продолжится, поле отмечено как непроверенное.</p>
+          </div>
+
+          <div class="form-foot">
+            <button class="btn btn-danger" type="button">Удалить событие</button>
+            <div class="right">
+              <button class="btn btn-secondary" type="button">Отмена</button>
+              <button class="btn btn-primary" type="button">Сохранить</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="note">
+          <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+          <div><strong>Проверка.</strong> Дата с точностью «день» не может быть раньше даты рождения участника; при конфликте показываются оба значения и ссылка на источник, ничего не перезаписывается автоматически.</div>
+        </div>
+      </section>
+
+      <!-- ================= SETTINGS ================= -->
+      <section class="page" data-page="settings" hidden>
+        <div class="page-head">
+          <div class="page-title">
+            <p class="eyebrow">Приложение</p>
+            <h1 class="h1">Настройки</h1>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" type="button">Закрыть</button>
+          </div>
+        </div>
+
+        <div class="settings">
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Внешний вид</h2><span class="meta">применяется сразу, без перезапуска</span></div>
+
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Тема</span>
+                <span class="set-desc">Светлая, тёмная или как в системе.</span>
+              </div>
+              <div class="set-control">
+                <select class="select set-select" aria-label="Тема">
+                  <option>Как в системе</option><option selected>Светлая</option><option>Тёмная</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Стиль интерфейса</span>
+                <span class="set-desc">Отдельная ось: меняет типографику, радиусы и плотность, не меняя светлую/тёмную тему.</span>
+              </div>
+              <div class="set-control">
+                <select class="select set-select" aria-label="Стиль интерфейса">
+                  <option>Классический</option><option selected>Швейцарский архив</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Язык</span>
+                <span class="set-desc">Строки интерфейса и подписи дат.</span>
+              </div>
+              <div class="set-control">
+                <select class="select set-select" aria-label="Язык"><option selected>Русский</option><option>Українська</option><option>English</option><option>Deutsch</option></select>
+              </div>
+            </div>
+          </section>
+
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Проект</h2><span class="meta">локальная папка</span></div>
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Папка проекта</span>
+                <span class="path">D:\Архив\kovalev-2026\</span>
+              </div>
+              <div class="set-control">
+                <button class="btn btn-secondary btn-sm" type="button"><svg class="ico" aria-hidden="true"><use href="#i-folder"/></svg>Открыть</button>
+              </div>
+            </div>
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Резервная копия при сохранении</span>
+                <span class="set-desc">Копия манифеста и журналов в подпапку <span class="mono">backups/</span>.</span>
+              </div>
+              <div class="set-control">
+                <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Резервная копия при сохранении"><span class="switch-track"><span class="switch-thumb"></span></span><span class="switch-state">Включено</span></button>
+              </div>
+            </div>
+          </section>
+
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Типы событий</h2><span class="meta">5 из 12</span></div>
+            <div class="dict">
+              <div class="dict-row"><span>Рождение</span><span class="dict-code">BIRT</span><button class="icon-btn" type="button" aria-label="Удалить тип «Рождение»"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+              <div class="dict-row"><span>Брак</span><span class="dict-code">MARR</span><button class="icon-btn" type="button" aria-label="Удалить тип «Брак»"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+              <div class="dict-row"><span>Смерть</span><span class="dict-code">DEAT</span><button class="icon-btn" type="button" aria-label="Удалить тип «Смерть»"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+              <div class="dict-row"><span>Переезд</span><span class="dict-code">RESI</span><button class="icon-btn" type="button" aria-label="Удалить тип «Переезд»"><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+            </div>
+            <div class="set-row" style="border-bottom:0;padding-bottom:0">
+              <div class="set-control" style="width:100%">
+                <input class="field-input" placeholder="Название нового типа" aria-label="Название нового типа">
+                <button class="btn btn-secondary btn-sm" type="button">Добавить</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Чат и инструменты</h2><span class="meta">данные не отправляются без провайдера</span></div>
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Чат включён</span>
+                <span class="set-desc">Провайдер не настроен. Пока он не задан, запросы не отправляются.</span>
+              </div>
+              <div class="set-control"><button class="switch" type="button" role="switch" aria-checked="false" aria-label="Чат включён"><span class="switch-track"><span class="switch-thumb"></span></span><span class="switch-state">Выключено</span></button></div>
+            </div>
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Разрешить правки людей из чата</span>
+                <span class="set-desc">Доступно только при включённом чате.</span>
+              </div>
+              <div class="set-control"><button class="switch" type="button" role="switch" aria-checked="false" aria-label="Разрешить правки людей из чата" disabled><span class="switch-track"><span class="switch-thumb"></span></span><span class="switch-state">Недоступно</span></button></div>
+            </div>
+            <div class="set-row">
+              <div class="set-text">
+                <span class="set-title">Показывать вызовы инструментов</span>
+                <span class="set-desc">Технические подробности в ответах чата.</span>
+              </div>
+              <div class="set-control"><button class="switch" type="button" role="switch" aria-checked="true"><span class="switch-track"><span class="switch-thumb"></span></span><span class="switch-state">Включено</span></button></div>
+            </div>
+          </section>
+
+          <section class="spec danger-zone">
+            <div class="spec-head"><h2 class="h3" style="color:var(--destructive)">Удаление проекта</h2><span class="meta">необратимо</span></div>
+            <div class="set-row" style="border-bottom:0;padding-bottom:0">
+              <div class="set-text">
+                <span class="set-title">Удалить проект с диска</span>
+                <span class="set-desc">Файлы архива будут удалены. Резервные копии останутся.</span>
+              </div>
+              <div class="set-control"><button class="btn btn-danger btn-sm" type="button">Удалить…</button></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ================= KIT ================= -->
+      <section class="page" data-page="kit" hidden>
+        <div class="page-head">
+          <div class="page-title">
+            <p class="eyebrow">Дизайн-система · компоненты</p>
+            <h1 class="h1">Элементы</h1>
+          </div>
+          <div class="page-actions meta">радиус: структура 0 · контролы 2 · теней нет</div>
+        </div>
+
+        <div class="kit">
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Кнопки</h2><span class="meta">высота 32 · 26 · 36</span></div>
+            <div class="spec-body">
+              <button class="btn btn-primary" type="button">Сохранить</button>
+              <button class="btn btn-secondary" type="button">Отмена</button>
+              <button class="btn btn-ghost" type="button">Подробнее</button>
+              <button class="btn btn-danger" type="button">Удалить</button>
+              <button class="btn btn-primary" type="button" disabled>Недоступно</button>
+              <button class="btn btn-primary btn-sm" type="button">Маленькая</button>
+              <button class="btn btn-secondary force-focus" type="button">Фокус</button>
+              <button class="btn btn-primary" type="button" data-act="open-dialog">Открыть диалог</button>
+            </div>
+          </section>
+
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Чипы и метки</h2><span class="meta">не пилюли: 0 радиус, 24px</span></div>
+            <div class="spec-body">
+              <div class="filter-chips">
+                <button class="chip" type="button" aria-pressed="true"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Выбрано</button>
+                <button class="chip" type="button" aria-pressed="false">Не выбрано</button>
+                <button class="chip" type="button" disabled>Недоступно</button>
+              </div>
+              <span class="tag tag-live">жива</span>
+              <span class="tag">адопция</span>
+              <span class="tag">3 источника</span>
+            </div>
+          </section>
+
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Поля</h2><span class="meta">граница 3.98:1 (свет) / 3.42:1 (тьма)</span></div>
+            <div class="spec-body stack" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+              <label class="field">
+                <span class="field-label">Обычное</span>
+                <input class="field-input" placeholder="Имя или фамилия">
+              </label>
+              <label class="field">
+                <span class="field-label">Фокус</span>
+                <input class="field-input force-focus" value="Анна Ковалёва">
+              </label>
+              <label class="field">
+                <span class="field-label">Ошибка</span>
+                <input class="field-input" aria-invalid="true" value="31.02.1921">
+                <span class="field-error">Такой даты не существует.</span>
+              </label>
+              <label class="field">
+                <span class="field-label">Недоступно</span>
+                <input class="field-input" value="Только чтение" disabled>
+              </label>
+            </div>
+          </section>
+
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Состояния строки таблицы</h2><span class="meta">наведение · выбрано · обычная</span></div>
+            <div class="state-grid">
+              <div class="state"><span class="state-label">обычная</span><div style="height:30px;display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--card)">Пётр Ковалёв</div></div>
+              <div class="state"><span class="state-label">наведение</span><div style="height:30px;display:flex;align-items:center;background:var(--muted)">Пётр Ковалёв</div></div>
+              <div class="state"><span class="state-label">выбрано</span><div style="height:30px;display:flex;align-items:center;background:var(--accent);box-shadow:inset 2px 0 0 var(--primary)">Пётр Ковалёв</div></div>
+              <div class="state"><span class="state-label">недоступно</span><div style="height:30px;display:flex;align-items:center;color:var(--text-disabled)">Пётр Ковалёв</div></div>
+            </div>
+          </section>
+
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Типографика</h2><span class="meta">Medeo Sans / Medeo Mono</span></div>
+            <div class="scale">
+              <div class="scale-row"><span class="scale-key">--text-2xl</span><span class="h1">Люди и события</span></div>
+              <div class="scale-row"><span class="scale-key">--text-xl</span><span class="h2">Пётр Ковалёв</span></div>
+              <div class="scale-row"><span class="scale-key">--text-lg</span><span class="h3">Типы событий</span></div>
+              <div class="scale-row"><span class="scale-key">--text-md</span><span class="body">Тело формы и длинный текст. Метрическая книга, л. 42 об.</span></div>
+              <div class="scale-row"><span class="scale-key">--text-sm</span><span>Строка таблицы, навигация, контролы.</span></div>
+              <div class="scale-row"><span class="scale-key">--text-2xs</span><span class="eyebrow">Заголовок колонки</span></div>
+              <div class="scale-row"><span class="scale-key">--font-mono</span><span class="mono">1874–1951 · ГАРТ, ф. 160, оп. 1</span></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ================= TOKENS ================= -->
+      <section class="page" data-page="tokens" hidden>
+        <div class="page-head">
+          <div class="page-title">
+            <p class="eyebrow">Дизайн-система · токены</p>
+            <h1 class="h1">Палитра и шкала</h1>
+          </div>
+          <div class="page-actions meta">62 пары проверены · см. contrast-report.md</div>
+        </div>
+
+        <section class="spec">
+          <div class="spec-head"><h2 class="h3">Цвет</h2><span class="meta">переключите тему — значения меняются</span></div>
+          <div class="swatches">
+            <div class="swatch"><div class="swatch-chip" style="background:var(--background)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--background</span><span class="swatch-val">canvas</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--card)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--card</span><span class="swatch-val">surface</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--muted)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--muted</span><span class="swatch-val">sunken</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--foreground)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--foreground</span><span class="swatch-val">ink</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--fg-secondary)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--fg-secondary</span><span class="swatch-val">ink-2</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--muted-foreground)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--muted-foreground</span><span class="swatch-val">ink-3</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--border)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--border</span><span class="swatch-val">hairline</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--input)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--input</span><span class="swatch-val">3:1 boundary</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--primary)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--primary</span><span class="swatch-val">link / state</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--primary-solid)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--primary-solid</span><span class="swatch-val">fill</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--accent)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--accent</span><span class="swatch-val">selection tint</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--destructive)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--destructive</span><span class="swatch-val">danger</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--success)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--success</span><span class="swatch-val">status</span></div></div>
+            <div class="swatch"><div class="swatch-chip" style="background:var(--warning)" aria-hidden="true"></div><div class="swatch-body"><span class="swatch-name">--warning</span><span class="swatch-val">status</span></div></div>
+          </div>
+        </section>
+
+        <section class="spec">
+          <div class="spec-head"><h2 class="h3">Контраст</h2><span class="meta">WCAG 2.1 · измерено</span></div>
+          <table class="ratio-table">
+            <thead><tr><th>Пара</th><th>Светлая</th><th>Тёмная</th><th>Норма</th></tr></thead>
+            <tbody>
+              <tr><td>Основной текст / фон</td><td class="num">16.31:1</td><td class="num">15.43:1</td><td class="num">&ge; 4.5</td></tr>
+              <tr><td>Meta-текст / карточка</td><td class="num">5.83:1</td><td class="num">5.75:1</td><td class="num">&ge; 4.5</td></tr>
+              <tr><td>Meta / шапка таблицы</td><td class="num">4.95:1</td><td class="num">5.13:1</td><td class="num">&ge; 4.5</td></tr>
+              <tr><td>Ссылка / карточка</td><td class="num">6.45:1</td><td class="num">10.07:1</td><td class="num">&ge; 4.5</td></tr>
+              <tr><td>Текст / заливка кнопки</td><td class="num">6.68:1</td><td class="num">4.99:1</td><td class="num">&ge; 4.5</td></tr>
+              <tr><td>Кольцо фокуса / фон</td><td class="num">6.00:1</td><td class="num">13.02:1</td><td class="num">&ge; 3</td></tr>
+              <tr><td>Граница поля / карточка</td><td class="num">3.98:1</td><td class="num">3.42:1</td><td class="num">&ge; 3</td></tr>
+              <tr><td>Метка на выбранной строке</td><td class="num">14.48:1</td><td class="num">12.20:1</td><td class="num">&ge; 4.5</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="spec">
+          <div class="spec-head"><h2 class="h3">Сетка и плотность</h2><span class="meta">4 / 8 / 12 / 16 / 24 / 32 / 48 / 64</span></div>
+          <div class="spec-body" style="align-items:flex-end">
+            <div style="display:grid;gap:4px"><span class="meta">4</span><div style="width:4px;height:32px;background:var(--primary)"></div></div>
+            <div style="display:grid;gap:4px"><span class="meta">8</span><div style="width:8px;height:32px;background:var(--primary)"></div></div>
+            <div style="display:grid;gap:4px"><span class="meta">12</span><div style="width:12px;height:32px;background:var(--primary)"></div></div>
+            <div style="display:grid;gap:4px"><span class="meta">16</span><div style="width:16px;height:32px;background:var(--primary)"></div></div>
+            <div style="display:grid;gap:4px"><span class="meta">24</span><div style="width:24px;height:32px;background:var(--primary)"></div></div>
+            <div style="display:grid;gap:4px"><span class="meta">32</span><div style="width:32px;height:32px;background:var(--primary)"></div></div>
+            <div style="display:grid;gap:4px"><span class="meta">48</span><div style="width:48px;height:32px;background:var(--primary)"></div></div>
+            <div style="display:grid;gap:4px"><span class="meta">64</span><div style="width:64px;height:32px;background:var(--primary)"></div></div>
+          </div>
+          <div class="hr"></div>
+          <div class="spec-body">
+            <span class="meta">строка таблицы 34</span>
+            <span class="meta">компактная 30</span>
+            <span class="meta">просторная 40</span>
+            <span class="meta">контрол 32</span>
+            <span class="meta">строка формы 34</span>
+            <span class="meta">радиус структуры 0</span>
+            <span class="meta">радиус контрола 2</span>
+            <span class="meta">тень — нет</span>
+          </div>
+        </section>
+
+        <div class="note">
+          <svg class="ico" aria-hidden="true"><use href="#i-info"/></svg>
+          <div><strong>62 измеренные пары — все PASS.</strong> Слабое место старой темы: <span class="mono">--border</span> 1.35:1 и <span class="mono">--input</span> 1.43:1 (норма 1.4.11 — 3:1). В этой системе они разведены: декоративная линия 1.3–1.4:1, граница контрола 3.05–3.98:1.</div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- dialog -->
+    <div class="modal-layer" id="dialog-layer" hidden>
+      <div class="scrim" data-close></div>
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title" aria-describedby="dlg-desc" tabindex="-1">
+        <div class="dialog-head">
+          <div>
+            <h2 class="h3" id="dlg-title">Удалить событие?</h2>
+            <p class="meta" style="margin-top:2px">Брак · 17 сентября 1921</p>
+          </div>
+          <button class="icon-btn" type="button" aria-label="Закрыть" data-close><svg class="ico" aria-hidden="true"><use href="#i-close"/></svg></button>
+        </div>
+        <div class="dialog-body">
+          <p id="dlg-desc">Событие будет удалено из проекта. Связи с участниками сохранятся, файлы источников не затрагиваются.</p>
+          <div class="note">
+            <svg class="ico" aria-hidden="true"><use href="#i-warning"/></svg>
+            <div>Отменить это действие можно только из резервной копии проекта.</div>
+          </div>
+        </div>
+        <div class="dialog-foot">
+          <button class="btn btn-secondary" type="button" data-close>Отмена</button>
+          <button class="btn btn-danger" type="button" data-close style="background:var(--destructive-solid);color:var(--on-destructive-solid);border-color:var(--destructive-solid)">Удалить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var app = document.getElementById("app");
+  var frame = document.getElementById("frame");
+  var content = document.getElementById("content");
+  var layer = document.getElementById("dialog-layer");
+  var lastFocus = null;
+
+  /* Theme switch: only the app frame flips; the preview chrome keeps its own colours. */
+  document.querySelectorAll('[data-act="theme"]').forEach(function(btn){
+    btn.addEventListener("click", function(){
+      app.dataset.theme = btn.dataset.value;
+      document.querySelectorAll('[data-act="theme"]').forEach(function(b){
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+    });
+  });
+
+  /* Width presets: 375 / 768 / 1024 / 1440 / fit. The frame is the query container. */
+  document.querySelectorAll('[data-act="width"]').forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var value = btn.dataset.value;
+      frame.style.setProperty("--pv-w", value === "fit" ? "100%" : value + "px");
+      document.querySelectorAll('[data-act="width"]').forEach(function(b){
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+    });
+  });
+
+  /* Focus demo: shows the same ring as :focus-visible on the samples in "Элементы". */
+  var focusBtn = document.querySelector('[data-act="focus"]');
+  focusBtn.addEventListener("click", function(){
+    var on = focusBtn.getAttribute("aria-pressed") !== "true";
+    focusBtn.setAttribute("aria-pressed", String(on));
+    app.classList.toggle("hide-focus", !on);
+  });
+
+  /* Views: the sidebar drives the page, like the real shell. */
+  var navButtons = Array.prototype.slice.call(document.querySelectorAll(".nav-item[data-view]"));
+  function showView(name){
+    document.querySelectorAll("[data-page]").forEach(function(page){
+      page.hidden = page.dataset.page !== name;
+    });
+    navButtons.forEach(function(b){ b.removeAttribute("aria-current"); });
+    content.scrollTop = 0;
+  }
+  navButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      showView(btn.dataset.view);
+      navButtons.forEach(function(b){ b.removeAttribute("aria-current"); });
+      btn.setAttribute("aria-current", "page");
+    });
+  });
+  document.querySelectorAll("[data-view]:not(.nav-item)").forEach(function(b){
+    b.addEventListener("click", function(){
+      showView(b.dataset.view);
+      navButtons.forEach(function(n){ n.removeAttribute("aria-current"); });
+    });
+  });
+
+  showView("people");
+
+  /* Deep link for review: preview.html?w=375&theme=dark&view=settings */
+  (function initFromQuery(){
+    var q = new URLSearchParams(location.search);
+    var w = q.get("w");
+    var theme = q.get("theme");
+    var view = q.get("view");
+    if(theme === "dark" || theme === "light"){
+      app.dataset.theme = theme;
+      document.querySelectorAll('[data-act="theme"]').forEach(function(b){
+        b.setAttribute("aria-pressed", String(b.dataset.value === theme));
+      });
+    }
+    if(w){
+      if(w === "fit"){
+        frame.style.setProperty("--pv-w", "100%");
+      } else if(/^\d+$/.test(w)){
+        frame.style.setProperty("--pv-w", w + "px");
+      }
+      document.querySelectorAll('[data-act="width"]').forEach(function(b){
+        b.setAttribute("aria-pressed", String(b.dataset.value === w));
+      });
+    }
+    if(q.get("dialog") === "1"){
+      setTimeout(openDialog, 0);
+    }
+    if(q.get("nav") === "open"){
+      app.classList.add("nav-open");
+      var t = document.getElementById("nav-toggle");
+      if(t) t.setAttribute("aria-expanded", "true");
+    }
+    if(view && document.querySelector('[data-page="' + view + '"]')){
+      showView(view);
+      var match = navButtons.filter(function(b){ return b.dataset.view === view; })[0];
+      if(match) match.setAttribute("aria-current", "page");
+    }
+  })();
+
+  /* Narrow screens: the menu button opens the sidebar as a drawer. */
+  var navToggle = document.getElementById("nav-toggle");
+  function setNav(open){
+    app.classList.toggle("nav-open", open);
+    navToggle.setAttribute("aria-expanded", String(open));
+  }
+  navToggle.addEventListener("click", function(){
+    setNav(!app.classList.contains("nav-open"));
+  });
+  app.querySelectorAll("[data-nav-close]").forEach(function(el){
+    el.addEventListener("click", function(){ setNav(false); });
+  });
+  navButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){ setNav(false); });
+  });
+
+  /* Switches: real ARIA state, the label follows it. */
+  document.querySelectorAll('[role="switch"]').forEach(function(sw){
+    sw.addEventListener("click", function(){
+      if(sw.disabled) return;
+      var next = sw.getAttribute("aria-checked") !== "true";
+      sw.setAttribute("aria-checked", String(next));
+      var state = sw.querySelector(".switch-state");
+      if(state) state.textContent = next ? "Включено" : "Выключено";
+    });
+  });
+
+  /* Dialog: scrim + border, focus moves in, Escape and scrim close, focus returns. */
+  function openDialog(){
+    lastFocus = document.activeElement;
+    layer.hidden = false;
+    content.style.overflow = "hidden";
+    layer.querySelector(".dialog").focus();
+    document.addEventListener("keydown", onKey);
+  }
+  function closeDialog(){
+    layer.hidden = true;
+    content.style.overflow = "";
+    document.removeEventListener("keydown", onKey);
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function onKey(e){
+    if(e.key === "Escape"){ e.preventDefault(); closeDialog(); return; }
+    if(e.key !== "Tab") return;
+    var f = layer.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if(!f.length) return;
+    var first = f[0], last = f[f.length - 1], active = document.activeElement;
+    if(e.shiftKey && (active === first || active.classList.contains("dialog"))){
+      e.preventDefault(); last.focus();
+    } else if(!e.shiftKey && active === last){
+      e.preventDefault(); first.focus();
+    }
+  }
+  document.querySelector('[data-act="open-dialog"]').addEventListener("click", openDialog);
+  layer.querySelectorAll("[data-close]").forEach(function(el){
+    el.addEventListener("click", closeDialog);
+  });
+
+  /* The scroll container is a programmatic focus target only (tabindex -1). */
+  content.setAttribute("tabindex", "-1");
+})();
+</script>
+</body>
+</html>

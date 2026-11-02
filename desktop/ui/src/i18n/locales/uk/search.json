@@ -1,0 +1,46 @@
+{
+  "title": "Пошук",
+  "placeholder": "Ім’я, місце, подія, джерело…",
+  "label": "Пошуковий запит",
+  "hint": "Введіть щонайменше 3 символи — пошук почнеться автоматично після паузи",
+  "idle": "Почніть вводити, щоб шукати в проєкті",
+  "empty": "Нічого не знайдено",
+  "noTypeResults": "Серед вибраних типів нічого не знайдено",
+  "matchCount": "Знайдено: {{count}}",
+  "results": "Результати: {{count}}",
+  "resultCount": "Знайдено {{shown}} з {{total}}",
+  "truncated": "Показано перші {{shown}} результатів; уточніть запит",
+  "groupCount": "{{count}}",
+  "similarCount": "Ще {{count}}",
+  "groups": {
+    "person": "Люди",
+    "event": "Події",
+    "source": "Джерела"
+  },
+  "filters": {
+    "title": "Фільтри",
+    "typeLegend": "Тип сутності",
+    "reset": "Скинути фільтри",
+    "clearSearch": "Очистити запит"
+  },
+  "chips": {
+    "query": "Запит: {{value}}",
+    "type": "Тип: {{type}}",
+    "removeQuery": "Видалити фільтр запиту",
+    "removeType": "Видалити фільтр «{{type}}»"
+  },
+  "rebuild": "Перебудувати індекс",
+  "rebuilding": "Перебудова…",
+  "retry": "Повторити",
+  "openResult": "{{type}}: {{snippet}}",
+  "noSnippet": "без фрагмента",
+  "sourceDetails": "Деталі джерела",
+  "fields": {
+    "title": "Назва",
+    "author": "Автор",
+    "publication": "Видання",
+    "repository": "Сховище",
+    "url": "Посилання",
+    "notes": "Нотатки"
+  }
+}

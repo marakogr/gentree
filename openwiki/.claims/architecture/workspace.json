@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:5c2535a6425976bd944ef930c7da966cd07820754525ed63fc47cabbb4d56391",
+  "claims": [
+    {
+      "id": "claim_00a008cc032e469db0338fd427de4013",
+      "statement": "gentree-core is a pure domain crate with no I/O, Tauri or HTTP dependencies, and every other workspace crate depends on it.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/Cargo.toml#L1-L13",
+          "version": "repo-lines-v1:sha256:c273105928f18dfdc1f9bad82f3c2687b8d63d2204aab070d143dfde7ba25ef2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhM2NkNWE4MWIzZjlhNjIxYWE0OTNkOTBjNDVmNDJhYjU3MWQ0ZTQyYjhhZTVhZmYzNTFjYjBhMDJkMDZkODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkNGQ5YTFhOTBjOWZmY2I4ZGUyYmY1OTEwMzRhNTcyMGYxYWE5NmFjZDY5NjEyZjY3NjIzMDk1MjljZTM5MTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/lib.rs#L1-L51",
+          "version": "repo-lines-v1:sha256:b2563d71c06545e8a38ed531bb74a9b90174358db7b5ba6f1a0e62b31f4ea66f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NjE3YTNhNjIzYTU0ZGI1YTQyYzAxZjczM2NlNjg0Yjc3ODBlYjM3NTI0YmYwNDg5MjQzY2ZkMTlhNjBjNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwMzVlYmFkMjA2ZjQxMDI2MTA3ZjZiY2IxZjdhNDU4NjFiODBlNTA2NWUyN2NlNjg4YWQzNzUyMmIyMDgyZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExOTQwYjdlOThlMmRhOTI0MmFmNGMwOWZkOWQxNWRlZmQ5NDYzN2MxYzJiYTE0ZmM1MzAyNWM5MWY0Zjk4NDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9fc1591b10004729b56fa2c7b51a1a29",
+      "statement": "gentree-storage is the only crate that persists a project folder; it owns JSONL collections, the manifest, media, locking and backups.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/Cargo.toml#L1-L21",
+          "version": "repo-lines-v1:sha256:1025d5f465532f49c5ce0c09161032d816f42df8b1bc0970fcb22887aad78458:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhM2NkNWE4MWIzZjlhNjIxYWE0OTNkOTBjNDVmNDJhYjU3MWQ0ZTQyYjhhZTVhZmYzNTFjYjBhMDJkMDZkODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4NWIzMzUzN2U1MmZmNTVhYTQwZmVlNjRjNThhZThkOTYzODhjMTk5ZGRiMGQyODRhZjc2MGYwYjAzYTZmNTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L1-L44",
+          "version": "repo-lines-v1:sha256:2847967497c3ca939ef5d3b9bca15dd5e4702c34f0118b35540123d300e81e06:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3YWNjMDQwMmQ1NmMwZjMxNWY2YWFhMDNlODdmZTYxZTU3NWIwNzJjYjY0MjhiNmU3ODVjNzU5OGJjNDUzNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5NzBmOTU3YzBkZDZiYTkzYTE3YjEyOTM5Yzc0NmFlM2Q4MzdhYWI0NDU5OWRkMzYwZGQ0YzgxOTQ2Nzk5MmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_64443bc5485a41a490ab67319ef1a018",
+      "statement": "gentree-import is the one crate that depends on gentree-storage in addition to core, so it can read and write the documented backup/exchange layout.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/Cargo.toml#L1-L18",
+          "version": "repo-lines-v1:sha256:316311d2716687c79cf53a192cb9831405119faecfe5ca0a999dbbb15fa11f3e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhM2NkNWE4MWIzZjlhNjIxYWE0OTNkOTBjNDVmNDJhYjU3MWQ0ZTQyYjhhZTVhZmYzNTFjYjBhMDJkMDZkODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiNDI3NjNlOTNlMzAwN2EwOTE5YmFiODlhNTUyNWNhYjc5NjZlZDk2ZTZhNDJkZWFiYTE2N2ViNmFlZjk2N2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjNGQ5NzVlYzJiMDBjYTU5NGNhNjEwYzAwYTIzN2JlMTU5ZmM3OGI1ZmIwNzlhNDE0MjZjOGYwYjBlOTc4ZmQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/import/src/lib.rs#L1-L20",
+          "version": "repo-lines-v1:sha256:2dae2c0c87d57555298aa6fac1defa5e0c5f576e1192262bcb236e656d33e0ad:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1ZGIxZjdjNTU0NzQwZDc4MTFlZWY2ZmE4MDEzMjA4NWZmNjhmY2FhYTE3NjViYzllNWMwZmI4MGEwODQxZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlM2Q1NWMxOTBmYWRkMmRmZGM3MDgyZTkxYWE3MDM1NDA5ZmRiNTljNDcxMzFkOTUzYTA0Y2ZjNmRlYjc5ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ODI2ZDZmY2Q5ODE0ZmFhZDQyZTUyYTJjNjBjYzkxMzNiYjUzZTdiM2FiMmE5ZTZjN2VlNDAwNDg4MTgzOGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62082af2e8fa4f28bd901fc9cdea6b04",
+      "statement": "gentree-search builds a derived Tantivy index outside the project folder and stores the project schemaVersion and contentHash in index-meta.json so a stale index is rebuilt before searching.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/src/lib.rs#L1-L22",
+          "version": "repo-lines-v1:sha256:4698271d8a00e3072f19b11a87b1ef57ec8ed1d04bcc7fd32010527d4c1d3354:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MDg2M2Y4YTBlMWRiMzI3ZjA4MDIxZGMxNTJiYTE0NTdmNDE4N2MyNWNhMDJmZWJjMjRhNDA2NGViZjNiYTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0YmVlNGI5OTU5OTYyMDI4ZTA3NDdhODZiNTZlZDZhOGU2ZDI1ZDY1NGYyYzk0OWFiOGMxOThmMmNlN2I3NWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxNzg0NDU4ZDI2NTI2NmI2NzZlYWY5NzI0ZDBkMWRkNTdiMjdhYjIwYWYzM2IzOTNhNTAyZGYxNmI3OTI5MmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fe66248207d44dcc84004167794391a2",
+      "statement": "gentree-config merges defaults, global/project files, GENTREE_* environment variables and future CLI arguments, keeps defaults on invalid values, and stores only the environment variable name for the chat API key.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/config/src/lib.rs#L1-L12",
+          "version": "repo-lines-v1:sha256:c8944a009abe72592ab4e0d60e9e30e808c7dfbdd4834a46332bbdc73039e005:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwMmYwZWExNzRmYzdjYWMyMGY4N2E3OTY3YTUzMGEwMzVkN2M3Zjg3OTZhZmQ2YmJhZGNkZmZkMzdhOWQ5MjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZhMWQ5ODRlNTA1M2QwODk1OTZiZDc2ZTdjMDAxNDVkNGNhODhmOTNhMTFkNGY0NmMwMzhkZWUyZTlhMmRkZGMifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/config/src/paths.rs#L1-L59",
+          "version": "repo-lines-v1:sha256:35d6bb8c01940edeb7db5ba45addb10becd09e465d2951441b065a15dcb6660e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYjA2MjZjYzkyZDk1OWFkOWY0Mzk5OWYzODBkY2QxYWJiODMwMjRlYmVjZmVlZDBjZTQ2OGEyNGQxOWNkOWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2MGQ1MGI2NWNlMjYxOWJkNTIxZjJkZDJlYWQ5NmIyYjIzZDNkZDU3Y2I5NjM4MmZkZTQ0NWI5ODdjNzdjNjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxMTc1MWI3MzhiMzMxYmI1MGI0ZjA5MmEwYzUxMDFhMDc1NDExN2MxZmVlNjQ5NThjYjA5NDkxZWZmZDRhZDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a04a4fdfec174474a046960eb6c549b4",
+      "statement": "gentree-chat is transport-only: it streams OpenAI-compatible completions and maps errors, but never executes a tool, never chooses the tool set, and logs only metadata.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/chat/src/lib.rs#L1-L17",
+          "version": "repo-lines-v1:sha256:be13ef298df6b09ce02cc9674d1d4af44263e3049b73a85164385695305b5cb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3NzkyNDAzYzZkNzA0OWJmNjA3ZmI4YWY3NDhmNmYyOTNkNmMzMTllZTBlM2E4MzkxZmMwM2RmNWY2NWU1ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNjk3NzkyOGQ5NTEzNTRlYmU5YTUyOTExNmNlYmY2ZDRhMzg0YzIxNmMzN2YzMzFhNjBjMzc5NmVlMjBmMzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5ZGQ5MDEzMWQ4YTQ0MDBlZTZlZWUwNzU5ZmU3MGJmMGRkZTczNGVkNGNkOTc5NmU3ZGEyYmIxOTFmNjI3MTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_38f053e325cc4bf8b4ec433039a475e6",
+      "statement": "gentree-mcp contains no server: it keeps the tool catalogue as rmcp route definitions and the ProjectAccess seam, and has no filesystem, Tauri or storage dependency.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/mcp/Cargo.toml#L1-L20",
+          "version": "repo-lines-v1:sha256:01a0955c240efd968e43d8ab096c19a74f480f57ca1853aaaeb1e933b1e8a5cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhM2NkNWE4MWIzZjlhNjIxYWE0OTNkOTBjNDVmNDJhYjU3MWQ0ZTQyYjhhZTVhZmYzNTFjYjBhMDJkMDZkODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxZjdiYzk0NDc1YTJmNzhmNjRjNjUzNTg3NWQ4MzgxZGM2MzZlMDRmNTJhYjUzMzdkNGE3Y2QwNDA2MmVlMDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyOTY3MGYyMTc2ZTk2ZjFiMmRiZWU4M2Q1YmEyNGIzNjhlNzcxZjYzNzdmN2Y3NWMyMGI0ZTNmMDM5YjE1ODkifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/mcp/src/lib.rs#L1-L16",
+          "version": "repo-lines-v1:sha256:b417d03eaa52e5e58717317fc552b68b28ad60a1297d6a2fd11eb9df172f39b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTZmOGI0M2ZiZWZmODI4ODgyMWQ2NzZmYzdhZjM4NTA0ZTZhNWI2NGZiZTU4OGJjNjk3YWJhM2E2MmMwZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0YzQ4YzA3ZjY5NjIwOWNiYTNjY2RkN2M5NGM1Njg2YTcwNTFhMTM0MTI0MGEyYjQxMDdjYjY4Y2MwZjg5YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzYWQwMmYyMTBmZTAxZTEyMmVlOWVhYmVmNDhkNjljMjlkMjE1NmUxODM5YjFhM2YxMTQ0ZTljNWI5ZWI4OTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6fa58867f01646bf84022cfd6ae00f27",
+      "statement": "The desktop app is the composition root: it keeps one ProjectStore in a shared Arc<Mutex<Option<ProjectStore>>> for both Tauri commands and the chat tool backend, and registers project, person, graph, path, event, geocode, media, timeline, relationship, import, merge, search, chat and settings commands.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L434-L500",
+          "version": "repo-lines-v1:sha256:02180606494a6ebf57fdd717c53d7a5b2e5ba47790c2b743650af07287a9e059:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmNjdkMTRhYmMzNmU1NzAzYTYxNGQ2MTJlMTE4ZWQ2YTEzMWFkYTI2M2YwMzc5ZTUwNzY1MDVkM2E4OWIxNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkMjVmNmJkNjYyMGY4ZGMzZjM3MGFmNTZiNTRjZTYyMmNmNThlZjIyN2RiOGU4NTZlYjZlZWQ0MGI4NDcwM2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxOTgxYjRjYjljZGE5MjI3YjhjNzAwNGMwYWVlOGY4YjVmMDg5YTY4MDE4ZjFhZjhiNDJmZmI3ZDZmZWI3NTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyYjhiNzUzZDhjYWUwNjNjODc1YjA4OTllOTk0Nzk1M2QyYThhMmIyNTc0MGRiYmJkODBiY2MwYWMxNmU3N2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_11da7827776140d1953af74f3df405a5",
+      "statement": "The workspace forbids unsafe code, warns on all Clippy lints and shares version 0.2.0 plus edition 2021 across every crate.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/Cargo.toml#L1-L41",
+          "version": "repo-lines-v1:sha256:588b644e8be152cbc943d7e9b66980688f00bed3c070cce695c82ea366473744:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzNGUxMDJjODYxZjk5NGQyYWFjZTkxMTRkMzkyZGJjMTYyMTkwZTAwYmU4ZmUzNTdkNDcyMTUwY2E0Mzk2MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0ZWU2OTFkY2I4ZGE1OTcxODNlNmNmYzhhNzAwYTI3NDQ2NDY4Y2RhNzNmMmY4ZTRjMjZmNmY4Njk4MWI3YjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1NWJhZDgwYTMyNmM1ODYwYzYwZGY3ZGRhMTNkZTcyYTdlNWVjZjZiNjI3ODYzMDkyZjhhNzk5NjQ5ZTdiYjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f98e1eb3563d45f49579b5466c6fdd44",
+      "statement": "The merge engine and both graph directions live in gentree-core, so the desktop layer only wires them to commands and the UI.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/lib.rs#L26-L35",
+          "version": "repo-lines-v1:sha256:458d36a62c7f336f5db431b42b105337ed25358ba24de30eb5f3c6c4e80db498:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmZmFjYjBlNGQ1MDNmZWJlNTgzZTVjMTg2ZTRjZDQzNmQ1MTU4MjNlZDgyYTA2Y2FlMmFhYTE3YjU0NTU0ZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwMzZlZTcwOGQ0MGZiYWYzMzRiNTVlMDA4NmNkN2NmOTNhN2Q4YWY2ZDk5OWU5YzQ2NmQzMzRlYjQzZDcyOGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzZjhiZGFlNjVlYjQ4ZTI5N2FhZDRhZTliM2ExMmE0NDdhZjJiM2IzNGUyOGU5MmMyOWVmNzY5MDhmNjdlOGQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L403-L404",
+          "version": "repo-lines-v1:sha256:3ba22a0c8201016379173c608153ae9844f5992c0f84ddc70173f1ab7dc91ee3:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTc1NmRhYTZhNTRhYzIyZmVhOGVjZjJhOGQzZjFiMDBlNzI0MWExNzEwMDk0NTI1MzRlODM1OTNlZjRkNzQyYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZThiNjJlMzNiYzQ4NDFjODZhNTJiYmZkNDI0YWU0MWUwYmJlYTgyNDIyZDEwZTBkMjBiOWYzMDVmYjQwYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjJiNmMyMDA0MjE5OWU1OTg4ZGIxNGI1NzYzZGQ4YTZjZjBiYmM5OGZmNmRjNDIzYWIwMDZmMWM2NTE5MWJjNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQ1OWRlYWU3OTA1MzJlMGYwNjgxZmY0ZWY1MGQ2MGQyZmMzZmRkMzc3MDRmYWY4M2Q2MTVmMjNjMGMyYzBmOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_786bb55f2197433e8c1d06552faeb54d",
+      "statement": "The chat tool implementation applies the same single-life-event guard as the Tauri commands, so create_event and update_event cannot bypass the rule.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/project_access.rs#L691-L704",
+          "version": "repo-lines-v1:sha256:47b585eafe1188a826e16bacc97b2e28626b5ac053fefb0a596db4085ae17e89:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2ODg0OWJjYTcyMTQ0ZmM2ZjdhOTMxOWY1MTdjYmFiNzRkZDM3YTJjZjBjNjVhM2Q3ZmVjZTRlYjMyOTU0MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyODVmMmI2YjA2ZWE5MjU3YWJiN2EwYmQ1NDZiMzk5YzQ4MjJkNGU3NmE0ZjkwMzI3NGM0NThkN2I2ZTVkMDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViOWEwOGJjMjlmNmViZWJlOWE1ZjAxOTAzZDk4NDVkYmNiNTg0MmE0NTVmMDdkNWY0MDAyZGFjMzJhNWM2MDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2ZTc0NTQ4MmRhNDE3MTIzMmZmOTJiMDkyZTc4ZTM2NjUyYjMxZDFjOGJjYmNmNThkNjhkMWY4OTAyMDNmOWQifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/project_access.rs#L710-L730",
+          "version": "repo-lines-v1:sha256:58f21d80a677fc476983d1d3bef220b466c49942dca1322b4413f8fff36b4a65:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwYjQ3ODJiZDhlN2FiYTRjOGEyOTgyZTdiNzgyMzY2ODQ3OTMyN2MyZjRmZjM0ZDZlYzA1ZjRlOGI4YjkwYWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2YjMyNTU0OWMwZWNiZGZlY2ZlM2Q0MTI0ZWUzYTlhNDNmNjNjMWRkNzg0Y2NjN2Q1MGYzYmVmY2E2YjExNWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI0MWJlYzA4MzcyNDIwOGVlMjdhNDVkYzFhYjNkZDU1NjJkYTQyZTZkOGU3YjhhM2JmODE2YTdhNjZhNWM1NmEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

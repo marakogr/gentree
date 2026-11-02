@@ -1,0 +1,91 @@
+{
+  "title": "Guía",
+  "subtitle": "Respuestas breves sobre cómo funciona Gentree. La guía se guarda en la aplicación y funciona sin conexión.",
+  "searchPlaceholder": "Buscar en la guía",
+  "searchLabel": "Buscar en la guía",
+  "topicsLabel": "Secciones de la guía",
+  "allTopics": "Todas las secciones",
+  "searchResultsLabel": "Resultados de búsqueda",
+  "startTour": "Iniciar el recorrido",
+  "sections": {
+    "basics": "Fundamentos",
+    "explore": "Explorar el archivo",
+    "tools": "Datos y herramientas"
+  },
+  "noResults": "No se encontró nada. Pruebe otra palabra o pregunte al asistente.",
+  "resultsCount": "Secciones encontradas: {{total}}",
+  "openScreen": "Abrir «{{screen}}»",
+  "openProjectFirst": "Abra primero un proyecto",
+  "askAssistant": "Preguntar al asistente",
+  "askAssistantHint": "La pregunta pasa al campo de chat junto con esta sección. No se enviará nada hasta que pulse «Enviar».",
+  "stepsLabel": "Cómo hacerlo",
+  "noteLabel": "Nota:",
+  "askTopic": "¿Cómo se hace en Gentree: {{title}}? Explícalo paso a paso y nombra los botones.",
+  "askFree": "¿Cómo se hace en Gentree: {{question}}? Responde con la guía integrada.",
+  "topics": {
+    "start": {
+      "title": "Primeros pasos",
+      "summary": "Un proyecto es una carpeta en el disco: contiene personas, eventos, archivos multimedia y copias de seguridad. No hay servidor ni cuenta.",
+      "step1": "En la pantalla «Proyectos», cree un proyecto o abra una carpeta existente.",
+      "step2": "Importe datos de AT5 o GEDCOM: la importación crea un proyecto nuevo y nunca modifica el archivo de origen.",
+      "step3": "Guarde la carpeta del proyecto en su propia copia de seguridad: la aplicación crea copias internas, pero una copia externa es más segura.",
+      "note": "Solo una instancia de la aplicación escribe en un proyecto. No abra la misma carpeta en dos copias a la vez."
+    },
+    "people": {
+      "title": "Personas",
+      "summary": "La ficha de una persona guarda nombres, sexo, fechas de vida, foto, eventos y relaciones.",
+      "step1": "En la pantalla «Personas», pulse «Añadir» y escriba el nombre.",
+      "step2": "Abra una persona en el panel lateral para ver datos, eventos, archivos multimedia y relaciones.",
+      "step3": "«Editar» abre la ficha para cambiarla. Al eliminar una persona se conservan los eventos con otros participantes.",
+      "note": "Una persona puede tener varios nombres; el principal aparece en las listas y en el árbol."
+    },
+    "relations": {
+      "title": "Relaciones",
+      "summary": "Las relaciones son explícitas: progenitor e hijo, cónyuge, pareja y adopción. Los hermanos se derivan de los progenitores comunes.",
+      "step1": "Abra la sección de relaciones de la ficha de la persona.",
+      "step2": "Añada un progenitor, un hijo, un cónyuge o una pareja y elija a la otra persona de la lista.",
+      "step3": "Si el progenitor es adoptivo, use el tipo de relación específico.",
+      "note": "La aplicación no guarda vínculos de hermanos y rechaza duplicados, vínculos consigo mismo y ciclos."
+    },
+    "events": {
+      "title": "Eventos",
+      "summary": "Un evento tiene tipo, fecha, lugar, participantes y campos de detalle opcionales.",
+      "step1": "En la pantalla «Eventos», pulse «Añadir» y elija el tipo.",
+      "step2": "Indique la fecha. Si solo conoce el año o el mes, elija esa precisión en lugar de una fecha completa.",
+      "step3": "Añada el lugar y los participantes y complete los campos de detalle del tipo elegido.",
+      "note": "Las fechas desconocidas nunca se sustituyen por inventadas: el valor original se conserva con precisión «desconocida»."
+    },
+    "tree": {
+      "title": "Árbol y parentesco",
+      "summary": "El árbol se construye a partir de una persona: antepasados, descendientes o todo el árbol.",
+      "step1": "En la pantalla «Árbol», elija la persona que será la raíz.",
+      "step2": "Cambie la vista y el zoom.",
+      "step3": "Para conectar a dos personas, abra «Relación»: la aplicación muestra el camino y los términos de parentesco.",
+      "note": "Las etiquetas de parentesco se calculan desde la persona seleccionada."
+    },
+    "find": {
+      "title": "Búsqueda y comprobación",
+      "summary": "La búsqueda de texto completo cubre personas y eventos, la línea de tiempo muestra eventos con fecha y la comprobación de datos encuentra problemas.",
+      "step1": "Escriba una consulta en «Buscar» y abra una persona o un evento de los resultados.",
+      "step2": "En la «Línea de tiempo», filtre eventos por tipo, persona y periodo.",
+      "step3": "Ejecute la comprobación del proyecto en la página de proyectos y revise cada aviso.",
+      "note": "Una comprobación no cambia los datos; solo señala lo que conviene corregir."
+    },
+    "data": {
+      "title": "Importación, exportación y multimedia",
+      "summary": "La importación de AT5 y GEDCOM crea un proyecto; la exportación escribe GEDCOM o un archivo JSON/ZIP. Los archivos multimedia se guardan con suma de verificación en la carpeta del proyecto.",
+      "step1": "Importe un archivo en la pantalla «Importar»: primero se muestra un informe y la escritura empieza solo tras confirmar.",
+      "step2": "Exporte el proyecto a GEDCOM o JSON/ZIP desde el menú del proyecto.",
+      "step3": "Adjunte fotos y archivos en la ficha de la persona; el archivo se copia al proyecto.",
+      "note": "Volver a importar el mismo archivo no crea duplicados ni sobrescribe cambios manuales."
+    },
+    "assistant": {
+      "title": "Asistente",
+      "summary": "El chat responde preguntas sobre el archivo y sobre la aplicación usando herramientas internas de solo lectura.",
+      "step1": "Active el chat en «Ajustes» e indique la dirección de un proveedor compatible con OpenAI, el modelo y el nombre de la variable de entorno con la clave.",
+      "step2": "Pregunte en el «Chat»; las personas y los eventos encontrados se abren mediante un enlace.",
+      "step3": "Los cambios propuestos de una persona se muestran para revisión y solo se aplican tras confirmar.",
+      "note": "Mientras no haya un proveedor configurado no se envía nada. La clave permanece en una variable de entorno, no en el proyecto."
+    }
+  }
+}

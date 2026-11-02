@@ -1,0 +1,49 @@
+/*
+ * Settings screen layouts that need breakpoints. Settings copy is long in
+ * de/ru, so the custom event field row uses zero-based `minmax()` columns and
+ * stacks on narrow panels instead of forcing horizontal scroll.
+ */
+
+.settings-event-field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto;
+  align-items: end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-event-field-row .field {
+  min-width: 0;
+}
+
+.settings-event-field-row .field-label {
+  overflow-wrap: anywhere;
+}
+
+/* Holds the multiline checkbox and the remove button in one column. Its height
+ * matches a Fluent medium input so both controls centre on the input line. */
+.settings-event-field-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  align-self: end;
+  height: 32px;
+  min-width: 0;
+}
+
+.settings-event-field-key-hint {
+  margin: 0;
+  opacity: 0.8;
+}
+
+@media (max-width: 640px) {
+  .settings-event-field-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-event-field-controls {
+    height: auto;
+    justify-content: space-between;
+  }
+}

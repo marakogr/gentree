@@ -1,0 +1,99 @@
+/*
+ * Medeo — open typefaces for interfaces, code and headlines, made by Timur
+ * Akhimov and dnf.dev for prtner.ai. Licensed under SIL OFL 1.1: the licence
+ * text ships next to the files in ./assets/fonts/OFL.txt.
+ *
+ * The webfonts are self-hosted variable files (RC4, npm 1.0.0-rc.4.1) so the
+ * desktop build needs no network at runtime. The @font-face rules mirror the
+ * upstream package CSS (medeo-font/dist/{sans,mono,pixel}.css); to update,
+ * replace the files in ./assets/fonts/ and bump the version above.
+ *
+ * Sources: https://prtner.ai/font/ · https://github.com/DNFDEVS/medeo-font
+ */
+
+@font-face {
+  font-family: "Medeo Sans";
+  src: url("./assets/fonts/medeo-sans/MedeoSansVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Medeo Sans";
+  src: url("./assets/fonts/medeo-sans/MedeoSansVariable-Italic.woff2")
+    format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Medeo Mono";
+  src: url("./assets/fonts/medeo-mono/MedeoMonoVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Medeo Mono";
+  src: url("./assets/fonts/medeo-mono/MedeoMonoVariable-Italic.woff2")
+    format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Pixel ships as WOFF 1.0: every format loads, but the dot components cost
+ * more to encode as WOFF2. Unused by the shell today, declared for headlines. */
+@font-face {
+  font-family: "Medeo Pixel";
+  src: url("./assets/fonts/medeo-pixel/MedeoPixelVariable.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * One source of truth for the stacks: the stylesheets, Tailwind's font-sans /
+ * font-mono utilities and the Fluent theme tokens (src/app/theme.ts) all read
+ * these variables. Fallbacks stay after the Medeo families so a missing file
+ * degrades to the previous system fonts instead of Times.
+ */
+:root {
+  --font-medeo-sans:
+    "Medeo Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-medeo-mono:
+    "Medeo Mono", ui-monospace, SFMono-Regular, "Roboto Mono", Menlo, Monaco,
+    "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
+  --font-medeo-pixel:
+    "Medeo Pixel", "Medeo Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* The dot shape is the Pixel font's ELSH axis; these are its named instances. */
+.medeo-pixel-square {
+  font-family: var(--font-medeo-pixel);
+  font-variation-settings: "ELSH" 1;
+}
+
+.medeo-pixel-circle {
+  font-family: var(--font-medeo-pixel);
+  font-variation-settings: "ELSH" 20;
+}
+
+.medeo-pixel-grid {
+  font-family: var(--font-medeo-pixel);
+  font-variation-settings: "ELSH" 40;
+}
+
+.medeo-pixel-triangle {
+  font-family: var(--font-medeo-pixel);
+  font-variation-settings: "ELSH" 60;
+}
+
+.medeo-pixel-line {
+  font-family: var(--font-medeo-pixel);
+  font-variation-settings: "ELSH" 80;
+}

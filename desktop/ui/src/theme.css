@@ -1,0 +1,242 @@
+/*
+ * Design tokens for the desktop UI.
+ * `data-theme` on <html> (set by src/lib/theme.ts) switches the palette.
+ * The dark set is the original desktop palette; the light set mirrors it with
+ * readable contrast. Legacy screens read the `--legacy-*` variables below.
+ *
+ * Layer order matters: the legacy stylesheet (src/styles.css) lives in the
+ * `legacy` layer, so Tailwind utilities can override its element rules while
+ * all non-Tailwind screens keep their previous appearance.
+ */
+@layer theme, base, legacy, components, utilities;
+
+@import "tailwindcss";
+/* Self-hosted Medeo family; also defines --font-medeo-sans/mono/pixel. */
+@import "./fonts.css";
+/* Opt-in Swiss Archive language (`data-style="swiss"`); no effect otherwise. */
+@import "./swiss.css";
+
+/* Tailwind `dark:` follows our attribute, not the OS, so the Settings choice
+ * also controls the accent colours of the timeline screens. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: oklch(0.15 0.015 255);
+  --foreground: oklch(0.96 0.005 255);
+
+  --card: oklch(0.19 0.015 255);
+  --card-foreground: oklch(0.96 0.005 255);
+  --popover: oklch(0.19 0.015 255);
+  --popover-foreground: oklch(0.96 0.005 255);
+
+  --primary: oklch(0.74 0.13 215);
+  --primary-foreground: oklch(0.15 0.02 255);
+  --secondary: oklch(0.25 0.02 255);
+  --secondary-foreground: oklch(0.94 0.005 255);
+  --muted: oklch(0.23 0.015 255);
+  --muted-foreground: oklch(0.69 0.015 255);
+  --accent: oklch(0.27 0.04 210);
+  --accent-foreground: oklch(0.95 0.01 210);
+  --destructive: oklch(0.62 0.2 25);
+  --border: oklch(0.3 0.015 255);
+  --input: oklch(0.3 0.015 255);
+  --ring: oklch(0.74 0.13 215);
+
+  --graph-bg: oklch(0.115 0.012 260);
+  --graph-grid: oklch(0.26 0.015 250);
+  --edge-spouse: oklch(0.88 0.17 98);
+  --edge-child: oklch(0.84 0.085 205);
+  --edge-sibling: oklch(0.8 0.16 150);
+
+  /* Legacy palette (src/styles.css). */
+  --legacy-bg: #0f1115;
+  --legacy-fg: #e8e8ea;
+  --legacy-panel-border: #262a33;
+  --legacy-control-bg: #171a21;
+  --legacy-control-border: #333844;
+  --legacy-muted: #8b8b96;
+  --legacy-muted-strong: #a8a8b3;
+  --legacy-heading: #c9c9d1;
+  --legacy-link: #8ab4ff;
+  --legacy-accent: #6ea8fe;
+  --legacy-danger-border: #5a2a2a;
+  --legacy-danger-fg: #ffb4b4;
+  --legacy-error: #ff8d8d;
+  --legacy-edge: #3d4452;
+  --legacy-node-hover-border: #4b5563;
+  --legacy-grid: #232732;
+  --legacy-surface: #13161c;
+  --legacy-surface-alt: #12151b;
+  --legacy-user-msg-border: #2d3b55;
+  --legacy-user-msg-bg: #151b26;
+  --legacy-chat-banner-border: #4b3a1f;
+  --legacy-chat-banner-bg: #1b1710;
+  --legacy-chat-banner-fg: #f0c674;
+  --legacy-highlight-bg: #6ea8fe;
+  --legacy-highlight-fg: #0f1115;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --background: oklch(0.985 0.002 250);
+  --foreground: oklch(0.24 0.01 255);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.01 255);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.01 255);
+
+  --primary: oklch(0.52 0.12 215);
+  --primary-foreground: oklch(0.99 0.002 210);
+  --secondary: oklch(0.95 0.006 250);
+  --secondary-foreground: oklch(0.28 0.01 255);
+  --muted: oklch(0.955 0.005 250);
+  --muted-foreground: oklch(0.52 0.012 255);
+  --accent: oklch(0.93 0.03 210);
+  --accent-foreground: oklch(0.3 0.035 210);
+  --destructive: oklch(0.55 0.2 25);
+  --border: oklch(0.9 0.006 255);
+  --input: oklch(0.88 0.008 255);
+  --ring: oklch(0.52 0.12 215);
+
+  --graph-bg: oklch(0.97 0.004 250);
+  --graph-grid: oklch(0.88 0.008 250);
+  --edge-spouse: oklch(0.58 0.14 98);
+  --edge-child: oklch(0.52 0.1 235);
+  --edge-sibling: oklch(0.54 0.13 150);
+
+  --legacy-bg: #f7f8fb;
+  --legacy-fg: #1b1f27;
+  --legacy-panel-border: #dde2ea;
+  --legacy-control-bg: #ffffff;
+  --legacy-control-border: #ccd3de;
+  --legacy-muted: #687083;
+  --legacy-muted-strong: #4a5262;
+  --legacy-heading: #333a48;
+  --legacy-link: #1d4ed8;
+  --legacy-accent: #2563eb;
+  --legacy-danger-border: #efc4c0;
+  --legacy-danger-fg: #b42318;
+  --legacy-error: #b42318;
+  --legacy-edge: #b9c1ce;
+  --legacy-node-hover-border: #8d98a8;
+  --legacy-grid: #e3e7ee;
+  --legacy-surface: #ffffff;
+  --legacy-surface-alt: #f1f4f9;
+  --legacy-user-msg-border: #c7d2fe;
+  --legacy-user-msg-bg: #eef2ff;
+  --legacy-chat-banner-border: #ecd39b;
+  --legacy-chat-banner-bg: #fff8e8;
+  --legacy-chat-banner-fg: #7a4f00;
+  --legacy-highlight-bg: #93c5fd;
+  --legacy-highlight-fg: #10131a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* `font-sans` / `font-mono` utilities resolve to the Medeo stacks. */
+  --font-sans: var(--font-medeo-sans);
+  --font-mono: var(--font-medeo-mono);
+}
+
+/*
+ * Inside the provider Fluent owns the palette. Re-bind the remaining legacy
+ * tokens to Fluent neutrals so the shell, panels and cards share one colour
+ * family in light and dark instead of mixing the old blue-grey surfaces with
+ * Fluent's neutral grey.
+ */
+.app-theme-root {
+  --background: var(--colorNeutralBackground2);
+  --foreground: var(--colorNeutralForeground1);
+  --card: var(--colorNeutralBackground1);
+  --card-foreground: var(--colorNeutralForeground1);
+  --popover: var(--colorNeutralBackground1);
+  --popover-foreground: var(--colorNeutralForeground1);
+  --primary: var(--colorBrandForegroundLink);
+  --primary-foreground: var(--colorNeutralForegroundOnBrand);
+  --secondary: var(--colorNeutralBackground2);
+  --secondary-foreground: var(--colorNeutralForeground1);
+  --muted: var(--colorNeutralBackground2);
+  --muted-foreground: var(--colorNeutralForeground2);
+  --accent: var(--colorNeutralBackground1Selected);
+  --accent-foreground: var(--colorNeutralForeground1);
+  --destructive: var(--colorStatusDangerBackground3);
+  --border: var(--colorNeutralStroke2);
+  --input: var(--colorNeutralStroke1);
+  --ring: var(--colorStrokeFocus2);
+
+  --legacy-bg: var(--colorNeutralBackground2);
+  --legacy-fg: var(--colorNeutralForeground1);
+  --legacy-panel-border: var(--colorNeutralStroke2);
+  --legacy-control-bg: var(--colorNeutralBackground1);
+  --legacy-control-border: var(--colorNeutralStroke1);
+  --legacy-muted: var(--colorNeutralForeground2);
+  --legacy-muted-strong: var(--colorNeutralForeground2);
+  --legacy-heading: var(--colorNeutralForeground1);
+  --legacy-link: var(--colorBrandForegroundLink);
+  --legacy-accent: var(--colorBrandStroke1);
+  --legacy-danger-border: var(--colorStatusDangerBorder1);
+  --legacy-danger-fg: var(--colorStatusDangerForeground1);
+  --legacy-error: var(--colorStatusDangerForeground1);
+  --legacy-edge: var(--colorNeutralStrokeAccessible);
+  --legacy-node-hover-border: var(--colorNeutralStroke1Hover);
+  --legacy-grid: var(--colorNeutralStroke3);
+  --legacy-surface: var(--colorNeutralBackground1);
+  --legacy-surface-alt: var(--colorNeutralBackground2);
+  --legacy-user-msg-border: var(--colorBrandStroke2);
+  --legacy-user-msg-bg: var(--colorNeutralBackground2);
+  --legacy-chat-banner-border: var(--colorStatusWarningBorder1);
+  --legacy-chat-banner-bg: var(--colorStatusWarningBackground1);
+  --legacy-chat-banner-fg: var(--colorStatusWarningForeground1);
+  --legacy-highlight-bg: var(--colorBrandBackground);
+  --legacy-highlight-fg: var(--colorNeutralForegroundOnBrand);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-medeo-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+}

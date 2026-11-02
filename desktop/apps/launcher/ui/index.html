@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Gentree Launcher</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <img class="brand-mark" src="assets/logo.png" alt="" width="44" height="44" />
+        <div class="brand-text">
+          <h1 data-i18n="app.title">Gentree Launcher</h1>
+          <p data-i18n="app.subtitle"></p>
+        </div>
+        <div class="topbar-actions">
+          <label class="switch">
+            <input type="checkbox" id="auto-check" />
+            <span data-i18n="toggle.autoCheck"></span>
+          </label>
+          <label class="lang">
+            <span class="visually-hidden" data-i18n="lang.label"></span>
+            <select id="locale">
+              <option value="en" data-i18n="lang.en">EN</option>
+              <option value="uk" data-i18n="lang.uk">UK</option>
+              <option value="ru" data-i18n="lang.ru">RU</option>
+            </select>
+          </label>
+        </div>
+      </header>
+
+      <main>
+        <section class="status-grid" aria-live="polite">
+          <article class="card">
+            <span class="card-label" data-i18n="label.installed"></span>
+            <strong class="card-value" id="installed-version">&mdash;</strong>
+            <button type="button" class="ghost" id="open-app" data-i18n="action.open"></button>
+          </article>
+          <article class="card accent">
+            <span class="card-label" data-i18n="label.latest"></span>
+            <strong class="card-value" id="latest-version">&mdash;</strong>
+            <span class="badge" id="update-badge"></span>
+          </article>
+        </section>
+
+        <section class="hero">
+          <div class="hero-text">
+            <h2 id="headline"></h2>
+            <p id="headline-detail"></p>
+          </div>
+          <button type="button" class="primary" id="install-latest" data-i18n="action.installLatest"></button>
+        </section>
+
+        <section class="progress hidden" id="progress" aria-live="polite">
+          <div class="progress-labels">
+            <span id="progress-phase"></span>
+            <span id="progress-value"></span>
+          </div>
+          <div
+            class="progress-track"
+            id="progress-track"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+        </section>
+
+        <p class="message hidden" id="message" role="alert"></p>
+
+        <section class="versions">
+          <div class="versions-head">
+            <h2 data-i18n="label.versions"></h2>
+            <div class="versions-actions">
+              <label class="switch small">
+                <input type="checkbox" id="show-prerelease" />
+                <span data-i18n="toggle.prerelease"></span>
+              </label>
+              <button type="button" class="ghost" id="refresh" data-i18n="action.refresh"></button>
+            </div>
+          </div>
+          <ul class="version-list" id="version-list"></ul>
+          <p class="empty" id="empty"></p>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span id="platform"></span>
+        <span class="dot" aria-hidden="true">&middot;</span>
+        <span id="feed-host"></span>
+      </footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

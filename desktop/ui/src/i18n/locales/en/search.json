@@ -1,0 +1,46 @@
+{
+  "title": "Search",
+  "placeholder": "Name, place, event, source…",
+  "label": "Search query",
+  "hint": "Type at least 3 characters — search starts automatically after a pause",
+  "idle": "Start typing to search the project",
+  "empty": "Nothing found",
+  "noTypeResults": "Nothing found among the selected types",
+  "matchCount": "Found: {{count}}",
+  "results": "Results: {{count}}",
+  "resultCount": "Found {{shown}} of {{total}}",
+  "truncated": "Showing the first {{shown}} results; refine the query",
+  "groupCount": "{{count}}",
+  "similarCount": "{{count}} more",
+  "groups": {
+    "person": "People",
+    "event": "Events",
+    "source": "Sources"
+  },
+  "filters": {
+    "title": "Filters",
+    "typeLegend": "Entity type",
+    "reset": "Reset filters",
+    "clearSearch": "Clear the query"
+  },
+  "chips": {
+    "query": "Query: {{value}}",
+    "type": "Type: {{type}}",
+    "removeQuery": "Remove the query filter",
+    "removeType": "Remove the filter \"{{type}}\""
+  },
+  "rebuild": "Rebuild index",
+  "rebuilding": "Rebuilding…",
+  "retry": "Retry",
+  "openResult": "{{type}}: {{snippet}}",
+  "noSnippet": "no snippet",
+  "sourceDetails": "Source details",
+  "fields": {
+    "title": "Title",
+    "author": "Author",
+    "publication": "Publication",
+    "repository": "Repository",
+    "url": "Link",
+    "notes": "Notes"
+  }
+}

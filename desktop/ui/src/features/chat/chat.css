@@ -1,0 +1,700 @@
+/*
+ * Chat feature styles (desktop-ux change, wave B7).
+ *
+ * The file is intentionally unlayered: the legacy screen stylesheet lives in
+ * `@layer legacy`, and unlayered declarations win over every cascade layer
+ * regardless of bundle order. That lets the chat refine its own `.chat*` and
+ * `.markdown*` classes without editing src/styles.css. Colours come from
+ * theme.css tokens only.
+ */
+
+/* ---------- screen: full window height, feed grows, composer stays put ---------- */
+
+.chat.chat-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: calc(100vh - 48px);
+  min-height: 20rem;
+  padding: 16px 18px;
+  overflow: hidden;
+}
+
+@media (max-width: 899px) {
+  .chat.chat-screen {
+    height: calc(100vh - 32px);
+    padding: 12px;
+  }
+}
+
+.chat-head {
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.chat-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.chat-head-actions .chat-delete:hover:not(:disabled) {
+  color: var(--destructive);
+}
+
+/* ---------- status strip: provider, model, privacy notice ---------- */
+
+.chat-status-strip {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.chat-status-chip {
+  max-width: 100%;
+  padding: 2px 9px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.chat-privacy svg {
+  flex: 0 0 auto;
+  font-size: 14px;
+}
+
+.chat-privacy-local {
+  border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+  background: color-mix(in oklab, var(--primary) 12%, var(--card));
+  color: var(--primary);
+}
+
+.chat-privacy-external {
+  border-color: color-mix(in oklab, var(--destructive) 45%, var(--border));
+  background: color-mix(in oklab, var(--destructive) 10%, var(--card));
+  color: color-mix(in oklab, var(--destructive) 80%, var(--foreground));
+}
+
+/* ---------- feed ---------- */
+
+.chat-feed {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding-right: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.chat-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 2px;
+}
+
+.chat-loading .skeleton {
+  width: 100%;
+  height: 14px;
+}
+
+.chat-loading .skeleton:nth-child(2) {
+  width: 72%;
+}
+
+.chat-loading .skeleton:nth-child(3) {
+  width: 48%;
+}
+
+/* ---------- message bubbles ---------- */
+
+.chat .chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+.chat .chat-message.assistant {
+  align-self: stretch;
+}
+
+.chat .chat-message.user {
+  max-width: min(85%, 46rem);
+  align-self: flex-end;
+  border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+  background: color-mix(in oklab, var(--primary) 12%, var(--card));
+}
+
+.chat-message-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.chat .chat-author {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.chat .chat-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat-note {
+  margin: 0;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.chat-answer-actions {
+  display: flex;
+  align-self: flex-end;
+  gap: 2px;
+  opacity: 0.8;
+}
+
+.chat-answer-actions:hover,
+.chat-answer-actions:focus-within {
+  opacity: 1;
+}
+
+/* ---------- Markdown ---------- */
+
+.chat .markdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: normal;
+}
+
+.chat .markdown > * {
+  margin: 0;
+}
+
+.chat .markdown p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat .markdown h1,
+.chat .markdown h2,
+.chat .markdown h3,
+.chat .markdown h4,
+.chat .markdown h5,
+.chat .markdown h6 {
+  margin: 4px 0 0;
+  color: var(--foreground);
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.chat .markdown h1 {
+  font-size: 1.25rem;
+}
+
+.chat .markdown h2 {
+  font-size: 1.125rem;
+}
+
+.chat .markdown h3 {
+  font-size: 1rem;
+}
+
+.chat .markdown h4,
+.chat .markdown h5,
+.chat .markdown h6 {
+  font-size: 0.9375rem;
+}
+
+.chat .markdown ul,
+.chat .markdown ol {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding-left: 1.4em;
+}
+
+.chat .markdown li::marker {
+  color: var(--muted-foreground);
+}
+
+.chat .markdown li > p {
+  margin: 0;
+}
+
+.chat .markdown blockquote {
+  margin: 0;
+  padding: 6px 12px;
+  border-left: 3px solid color-mix(in oklab, var(--primary) 55%, var(--border));
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.chat .markdown code {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--muted);
+  font-family: var(--font-medeo-mono);
+  font-size: 0.8125rem;
+}
+
+.chat .markdown pre,
+.chat .markdown .md-code {
+  margin: 0;
+  padding: 10px 12px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  line-height: 1.45;
+}
+
+.chat .markdown pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.8125rem;
+  white-space: pre;
+}
+
+.chat .markdown hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.chat .markdown a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+
+.chat .markdown a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.chat .markdown a:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/* Tables can be wider than the bubble; the wrapper scrolls, not the page. */
+.chat .md-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.chat .md-table {
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.chat .md-table th,
+.chat .md-table td {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.chat .md-table th {
+  background: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chat .md-table tbody tr:nth-child(even) {
+  background: color-mix(in oklab, var(--muted) 45%, transparent);
+}
+
+/* ---------- person mentions ---------- */
+
+.entity-link {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.entity-link:hover {
+  background: color-mix(in oklab, var(--primary) 16%, transparent);
+  text-decoration-style: solid;
+}
+
+.entity-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/* ---------- activated skills: a compact, always-visible audit line ---------- */
+
+.chat-skills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 6px;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
+.chat-skills svg {
+  flex: 0 0 auto;
+  color: var(--primary);
+}
+
+/* ---------- tool calls: one collapsible row per tool ---------- */
+
+.chat-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-tools-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
+.chat-tools-summary svg {
+  flex: 0 0 auto;
+}
+
+.chat-tools-failed {
+  color: var(--destructive);
+}
+
+/* Fluent owns the accordion chrome; only the header row layout stays ours. */
+.chat-tool-head {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.chat-tool-name {
+  overflow-wrap: anywhere;
+  font-family: var(--font-medeo-mono);
+  font-size: 0.8125rem;
+}
+
+.chat-tool-status-running {
+  color: var(--muted-foreground);
+}
+
+.chat-tool-status-ok {
+  color: var(--primary);
+}
+
+.chat-tool-status-error {
+  color: var(--destructive);
+  font-weight: 600;
+}
+
+.chat-tool-duration {
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.chat-tool-item-error {
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--destructive) 8%, transparent);
+}
+
+.chat .tool-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat .tool-detail p {
+  margin: 0;
+}
+
+.chat .tool-detail pre {
+  max-height: 220px;
+  margin: 0;
+  padding: 6px 8px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--muted);
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- working line: narrated progress while tool calls are hidden ---------- */
+
+.chat-working {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 2px;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.chat-working svg {
+  flex: 0 0 auto;
+  color: var(--primary);
+  animation: chat-working-pulse 2.2s ease-in-out infinite;
+}
+
+/* One ellipsised line: a long phrase must not grow the feed. */
+.chat-working-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: chat-working-in 360ms ease-out;
+}
+
+@keyframes chat-working-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chat-working-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-working svg,
+  .chat-working-text {
+    animation: none;
+  }
+}
+
+/* ---------- empty state with example prompts ---------- */
+
+.chat-empty {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.chat-empty-title {
+  margin: 0;
+}
+
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 44rem;
+}
+
+/* ---------- composer ---------- */
+
+.chat-compose {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Fluent owns the field chrome; only the auto-grow box stays ours. */
+.chat-compose-textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.chat-compose-textarea textarea {
+  min-height: 2.75rem;
+  max-height: 7rem;
+  overflow-y: auto;
+}
+
+.chat-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+/* ---------- editing-enabled status chip ---------- */
+
+.chat-status-chip-edit {
+  border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+  background: color-mix(in oklab, var(--primary) 12%, var(--card));
+  color: var(--primary);
+}
+
+/* ---------- update_person confirmation card ---------- */
+
+.chat .chat-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Keep the card inside the transcript: a long name or note must wrap
+     instead of stretching the card (and its approval buttons) to the right. */
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, var(--border));
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+.chat-confirm-title {
+  margin: 0;
+}
+
+.chat-confirm-body,
+.chat-confirm-warning {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.chat-confirm-warning {
+  color: var(--muted-foreground);
+}
+
+.chat-confirm-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chat-confirm-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chat-confirm-field {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.chat-confirm-values {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  min-width: 0;
+  max-height: 8rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+.chat-confirm-before,
+.chat-confirm-after {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.chat-confirm-before {
+  color: var(--destructive);
+  text-decoration: line-through;
+}
+
+.chat-confirm-after {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.chat-confirm-arrow {
+  color: var(--muted-foreground);
+}
+
+.chat-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

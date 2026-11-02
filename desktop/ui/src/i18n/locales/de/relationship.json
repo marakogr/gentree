@@ -1,0 +1,15 @@
+{
+  "addParent": "Elternteil",
+  "addChild": "Kind",
+  "addSpouse": "Ehepartner",
+  "addPartner": "Partner",
+  "addAdoptiveParent": "Adoptivelternteil",
+  "direction": "Beziehungstyp",
+  "add": "Beziehung hinzufügen",
+  "relatedPerson": "Wer",
+  "type": "Beziehungstyp",
+  "deleteConfirm": "Diese Beziehung löschen?",
+  "conflict": "Die Daten wurden in einem anderen Fenster geändert. Beziehungen neu laden.",
+  "empty": "Keine Beziehungen",
+  "selectPerson": "Person auswählen"
+}

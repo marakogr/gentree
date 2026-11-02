@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:10f7a83981183bac09f0af497f1745a1cda7849c7cdac4cd1d8d5d09425172e0",
+  "claims": [
+    {
+      "id": "claim_ba9df456e30c44ff9ec50d6338eebb8b",
+      "statement": "Tests exist at four levels: inline unit tests in crate sources, integration contract suites under crates/*/tests, Vitest suites next to UI modules, and an optional WebdriverIO review harness that is not part of make check.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/Cargo.toml#L1-L41",
+          "version": "repo-lines-v1:sha256:588b644e8be152cbc943d7e9b66980688f00bed3c070cce695c82ea366473744:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzNGUxMDJjODYxZjk5NGQyYWFjZTkxMTRkMzkyZGJjMTYyMTkwZTAwYmU4ZmUzNTdkNDcyMTUwY2E0Mzk2MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0ZWU2OTFkY2I4ZGE1OTcxODNlNmNmYzhhNzAwYTI3NDQ2NDY4Y2RhNzNmMmY4ZTRjMjZmNmY4Njk4MWI3YjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1NWJhZDgwYTMyNmM1ODYwYzYwZGY3ZGRhMTNkZTcyYTdlNWVjZjZiNjI3ODYzMDkyZjhhNzk5NjQ5ZTdiYjQifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/package.json#L1-L51",
+          "version": "repo-lines-v1:sha256:cb78c75d237b1c3cdd1d79f19a98b0c64146a307e02b958b1c1a4c01d91166b9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5f1aa2804913479d88c85a2f4e0fd0a1",
+      "statement": "Storage tests pin create/write/reopen round trips, a second writer being locked, corrupt JSONL reporting, rejection of invalid entities before writes, and relationship invariants on save.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L1297-L1421",
+          "version": "repo-lines-v1:sha256:63deabf83790b61da0a558c6c9e53ac0847557391e39f032f7f6d842723b9cba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjMGMwNzc2YjJkZjE2YTk4NGRhNjUxZDVjOTUzNjBhZGE5ZjU5ZmIzMzRkN2IwNGJlYTNlZWVjYzEzZDIyYzcyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJhMDBkYjA0MGYyOTA5YmY5NzhmZjBhOTU2YTU1ZTgzYzY1MzQxOGRlNmJiNjhmODA0MWRhOTc2ZjhkM2QyMjcwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzN2M1ZGQ1NjY4ZDg4YzM3ZWQwZjdiMDMzNGVkMTljODlkZTEyMDczMjA2NjViMjc4YWUyOTIyYTQ2MDFhYzRiIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_73bba71c7c1d45e796d1383d3976e037",
+      "statement": "Storage tests also pin skipping corrupt projects in listings, backup pruning to the newest N, deletion to trash while locked, media name traversal rejection and layout repair reporting.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L1423-L1649",
+          "version": "repo-lines-v1:sha256:879484f9c22fd06a1440110528fe94ef424e7012f2576ac820a196c93131e8d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjI3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhOTU5Y2JhM2M4NTVlZjgwM2ZjYWIyNTA3OTVjOTU2NGExODcyOWNiYTUwNmJhMTI4YTUxNzc5NWJiNDQ1MWNjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3NDBiNTg0N2Q4MWEzYWJkOTE2ZGZhNjYwOThlNDhmYzk0MThmZGY5YTdhNjRiYmMzNDRlYzVjMjQ5ODY2YTExIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJhMDBkYjA0MGYyOTA5YmY5NzhmZjBhOTU2YTU1ZTgzYzY1MzQxOGRlNmJiNjhmODA0MWRhOTc2ZjhkM2QyMjcwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmMmIwNDFiNDA2Y2Q5NjE3ODQ4Y2YyZjUxOTk4ZDQ5OTAwN2FkNGEyZjJhOTc5ZDUwZGM0ZjI5ZjQ4OGZmNzU2In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_2555a23443bb466eac9684f41597ba5e",
+      "statement": "Config contract tests pin YAML/JSON parity, defaults, layer precedence, ~ expansion, relative-path rejection, unknown-key warnings, patch merge, atomic update and recovery from a broken file, plus map, geocoder, historical-place and event-field settings.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/config/tests/config_contract.rs#L1-L284",
+          "version": "repo-lines-v1:sha256:c0ba8ebabdfd14d03ee05107eba1b155a443561d5fe9f0714bc9c911516f06f2:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjg0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkMWU3ZjA4ODk0OTkwZDk3NzQyZTZmNmM3ODdmN2I5ZTBlYjA5Y2U4MjJkZTM3MmM2ZGUxMjJiMGVjYTY5MmFmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_95dc8932e85240aea0c0932fa5d0b07d",
+      "statement": "AT5 contract tests assert the preview and import counts agree, reads cover persons/relationships/events/media, missing media is reported and skipped, and dedupe prevents duplicates; EAV tests keep unknown and partial dates unknown and warn once per unmapped field.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/tests/at5_contract.rs#L180-L451",
+          "version": "repo-lines-v1:sha256:200702ed08e4e8a51480406e8bde465899161ba2aa5f2941a92c408eb1053f24:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxNmNjYzYwNGI4NGYzNzJiZmU3ZjI3MTNkYWMwZDk1NmNhYTRiNTg5NjRmZTM1ZDA4YWNlZDk2ZmE5ZGE3MzAzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3ZjlhZDQ2M2JlNzFjNWY0MjA5NDZhZmJmMDdkMGZlOWY1ZjExZGE4MmYxZTk0OTAzY2MzMzk1ZDhjMWEwYjM4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://desktop/crates/import/tests/at5_eav_contract.rs#L166-L360",
+          "version": "repo-lines-v1:sha256:d390014492db683d19e97eb5e130d9a5dc81c943cf1ef243e42f5b951a45dd9a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTk1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkMzA3ZGEyZDU0ZTViMmFmNjc5NWFjMGYwZWNhN2UzZDliNjJhOWYzODAxNTBkNmUzNjM5NjNlNGFkYmUzYzMyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzMDlkZDVkYThlZDhkOTM3ZGUzMDgyMDA1YjU2OGJjN2U3OGE0ZmQ5MWQxMGQxNjM5NTYzZGM1NTZjZWM3ZmExIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3ZjlhZDQ2M2JlNzFjNWY0MjA5NDZhZmJmMDdkMGZlOWY1ZjExZGE4MmYxZTk0OTAzY2MzMzk1ZDhjMWEwYjM4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5OTk4NDkyZTk0ZDRjOTMwMTI1ZjJlYjliNzdlODU4YTA1NzFlZTM1Zjc2YjkyYWQ2ZDQ4OTg2ZWZmOGMwYWNjIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_5c2b315fcbd9410c88e5c113ca28ca18",
+      "statement": "Exchange contract tests cover JSON/ZIP round trips, checksum tampering, missing checksum coverage, zip-slip entries and unsupported format versions; GEDCOM tests cover Cyrillic round trips, preserved date precision, ANSEL/Latin-1 decoding, rejected unknown encodings, stable export and 5.5.1/7.0 behavior.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/tests/exchange_contract.rs#L1-L509",
+          "version": "repo-lines-v1:sha256:389940b275430d1636ce870d8bc9b241fe5c9ad08eae5d961fc2514382037a6a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTA5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzZThjODEzYTAyNjZkZDJkZWRkMGRiNjI1MGMzZjVlNmEwZTZmOTI0ODI0NTdlNzg0Y2Y2Y2UxZTViZDRjM2VmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://desktop/crates/import/tests/gedcom7_contract.rs#L1-L503",
+          "version": "repo-lines-v1:sha256:af70a48a92dc4a44a444f098583091f99a9cec72fa3068669961fc8a39ae3343:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlOTJiYzI2OTBmMDg4YjJhOTQ4YmQxZDdkZmI3ODE3OGUzNDlkNjA2MjI1YmU5NWFmOTZjMDFlMWU0MTIxYTAwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://desktop/crates/import/tests/gedcom_contract.rs#L1-L809",
+          "version": "repo-lines-v1:sha256:53dc1e0c050f70e1acad4c9d990c443f92f19b71237b2f9d5dd769b124175e09:eyJzZWxlY3RlZExpbmVDb3VudCI6ODA5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxMTMyZjE1YjAxZjQ5NDBhY2VlZDJmOWRmYmU4YmI3MTIyNzdjYmVkMmJlMTYxMTc4YzdjNjJkZWJiYTUwNjUwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ab8ea3f41f44fba8081099055c0e178",
+      "statement": "Search contract tests pin Russian inflection, Latin queries through the English field, exact-name ranking, 240-character plain snippets, prefix matches for partial surname/notes/place, group counts and truncation, limit validation and stale detection.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/search/tests/groups_contract.rs#L47-L238",
+          "version": "repo-lines-v1:sha256:6fe03e13167acf5db8046fb703cd09e33c32ced8e10a88c346e41a9e7fb6331b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTkyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhNjViNmQyNDEwMzUxZWJiODllNTFmNDZhNjFmMmRjMWU1MzFlYzIzZjA5NjFhOWY2ZmYxOGY1MjRjZDEzMThlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3ZjlhZDQ2M2JlNzFjNWY0MjA5NDZhZmJmMDdkMGZlOWY1ZjExZGE4MmYxZTk0OTAzY2MzMzk1ZDhjMWEwYjM4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://desktop/crates/search/tests/index_contract.rs#L38-L151",
+          "version": "repo-lines-v1:sha256:a25711b4cda59688dec8bc2c5ff240d2a01b39046a58e0fcd697efeae6a5d250:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmMTFiYjdkMTU5NTk4N2UwMjM3NjFjYjI0ZDNmZmQ5ZjljOGIyOTZhMWIwNmFjYmQ3MjIwNWEyMWFhMmNiNmQ3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3ZjlhZDQ2M2JlNzFjNWY0MjA5NDZhZmJmMDdkMGZlOWY1ZjExZGE4MmYxZTk0OTAzY2MzMzk1ZDhjMWEwYjM4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://desktop/crates/search/tests/prefix_contract.rs#L52-L117",
+          "version": "repo-lines-v1:sha256:fb3dc9f039a1ff844db9d52a3acb46d921fca314535cc22be31e00f6312a9e14:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5MDZiZjk1OTVmYmFiYmE2MWVhOTdjMDZiZjc5ZGFiMzI5MjkyMzcyZWFjOWFmOWVjODM2ZGJlNmNkYjk0N2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmOWFkNDYzYmU3MWM1ZjQyMDk0NmFmYmYwN2QwZmU5ZjVmMTFkYTgyZjFlOTQ5MDNjYzMzOTVkOGMxYTBiMzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ae23e30a532540679834a708bf374abf",
+      "statement": "The real-baseline diagnostic is ignored by default, gated on GENTREE_AT5_BASELINE, and prints aggregates only.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/import/tests/at5_eav_contract.rs#L551-L570",
+          "version": "repo-lines-v1:sha256:021bb16a8b640f4d5de19e1121fbfec342a7fdebbd80883253f71a189df62fde:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyZWJiMDAzMTdiZmU1YzIyMzM2NGFlNWNiOGI5ZDgwMDY0NTQ1YTY3YTY3NGRkOTMxZThjMWY0MWFiMzc5NzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiMGQ0YmM0MDc5YTBjY2E0MWM4NWY1ZTdhYTUzZDFmODQzNmQ5YzhkNmQ1ZDM0MzU1NjdlZGU3NDg2ZjVmOTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0NjYyNjBiN2U3ZTU3YjZkMjg3YmUyZmViMzlhNGMwN2I5Yjg1Yzk5OTRkNGNhYTJiZjIxNDU0OGQyN2UyMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU4NGQ1OTFkYWRmMGZjNWUzZWI1MDYzM2I5MGQwZTczN2NiNDljYjYzODc2ODJiN2Y3MmVmMzU3NmFmNWEzZmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_792c07f0540c4ad5bd9ba392db2ba4d5",
+      "statement": "The merge contract suite pins deterministic one-to-one assignment, name-token matching, conflict rejection, merge/keep-both decisions, field policies, id claiming, relationship/media/citation remapping, place-point handling and a validated, deterministic output.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/tests/merge_contract.rs#L1-L1673",
+          "version": "repo-lines-v1:sha256:9312ba4f2278d05f52ef6cd241f20f1d8018da906b7e95468501eedd1c8214c2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTY3MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGE1ZGE1YjE2NjdhYzhlNjgzZjk4M2RhMDIyMTQwZDdjNjkzY2UyMDYyZDcwY2YwMDYwOGFiMjliMzk4MDdhZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_53b1617fc48c4379ba1245de115ff688",
+      "statement": "The WebdriverIO harness is review tooling: its audits are evidence for a human, and specs fail only when the session breaks, a section renders no heading, or the console reports severe errors.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/e2e/README.md#L16-L34",
+          "version": "repo-lines-v1:sha256:4389551c9c04f408b7abaeef0b57a3c4f58010bdaf7e7a34694017c1c6b0a9c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiODgwMTYzZjljZGM1YTQ1ZGI2OTVhZDJmZmRlM2JmYTQwOTQzZDJhNjkzOTY0ZGU3NTI2ZTVlNTFiODczYjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkZWUyMTkyMTM2YjE2MTI4NjkwMjBlNTAwYjRjMWJmMGUxNDliMDI3MzdjM2M2MTUwM2JiM2RkMmIwOTZkNGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFkYjM2MDdjMWIwMTRhOWJmNDUyZTA0NGQ1ZjlkZTAxOWJkZThkZWFkNTNjZDRiODQyYzA5M2YzMjZiYjQ5YjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5NWNkMjdhYTQyYjI1NTJjYTk2NDBkYjk5MWZhNTc0MWZlZWRkNzA5NmI3NWM4OGQ2YzY4NWZhMGRmY2FkZWQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

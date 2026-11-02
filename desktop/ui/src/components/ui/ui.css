@@ -1,0 +1,192 @@
+/*
+ * UI kit primitives (components/ui/**). Only classes from the desktop-ux
+ * contract §6 plus small internal helpers. Colours come from theme.css tokens,
+ * so the light/dark switch works without extra `[data-theme]` rules.
+ */
+@layer components {
+  /* ---------- misc ---------- */
+
+  .ui-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- button label slot ---------- */
+
+  .btn-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ---------- rich combobox option ---------- */
+
+  /* Custom `renderOption` bodies (see `PersonSearch`) still wrap long labels. */
+  .combo-option-label {
+    overflow-wrap: anywhere;
+  }
+
+  /* ---------- menu ---------- */
+
+  .menu-root {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* ---------- bulk selection ---------- */
+
+  .bulk-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 4px 10px;
+    border: 1px solid color-mix(in oklab, var(--primary) 28%, var(--border));
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--primary) 8%, var(--card));
+  }
+
+  .bulk-bar-count {
+    color: var(--foreground);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .bulk-select-cell {
+    width: 1%;
+    padding-left: 8px;
+  }
+
+  .bulk-select-col {
+    width: 32px;
+  }
+
+  .bulk-hint {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  /* ---------- empty state ---------- */
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px 16px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--card) 55%, transparent);
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .empty-state-text {
+    margin: 0;
+    max-width: 48ch;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .empty-state-compact {
+    gap: 8px;
+    padding: 12px 8px;
+    border: 0;
+    background: transparent;
+    font-size: 0.8125rem;
+  }
+
+  /* ---------- field ---------- */
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .field-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    color: var(--foreground);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .field-required {
+    color: var(--destructive);
+  }
+
+  .field-hint {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .field-error {
+    margin: 0;
+    color: var(--destructive);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  /* Fluent inputs flag themselves with `aria-invalid`; `.field-invalid` stays
+   * on the wrapper as a stable hook for page CSS. */
+  .field [aria-invalid="true"] {
+    border-color: var(--destructive);
+  }
+
+  /* ---------- skeleton ---------- */
+
+  .skeleton {
+    display: block;
+    width: 100%;
+    min-height: 0.875rem;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(
+      90deg,
+      var(--muted) 25%,
+      color-mix(in oklab, var(--muted) 55%, var(--card)) 50%,
+      var(--muted) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton {
+      animation: none;
+    }
+  }
+}
+
+/* Fluent ships its checkbox indicator as an unlayered rule, so a rule inside
+   `@layer components` loses the cascade. Keep this one unlayered too, matching
+   the rounded project selection checkboxes. */
+.bulk-select-cell .fui-Checkbox__indicator {
+  border-radius: 4px;
+}

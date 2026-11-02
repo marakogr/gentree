@@ -1,0 +1,46 @@
+{
+  "title": "Пошук",
+  "placeholder": "Імя, месца, падзея, крыніца…",
+  "label": "Пошукавы запыт",
+  "hint": "Увядзіце хаця б 3 сімвалы — пошук пачнецца аўтаматычна пасля паўзы",
+  "idle": "Пачніце ўводзіць, каб шукаць у праекце",
+  "empty": "Нічога не знойдзена",
+  "noTypeResults": "Нічога не знойдзена сярод выбраных тыпаў",
+  "matchCount": "Знойдзена: {{count}}",
+  "results": "Вынікі: {{count}}",
+  "resultCount": "Знойдзена {{shown}} з {{total}}",
+  "truncated": "Паказаны першыя {{shown}} вынікаў; удакладніце запыт",
+  "groupCount": "{{count}}",
+  "similarCount": "яшчэ {{count}}",
+  "groups": {
+    "person": "Людзі",
+    "event": "Падзеі",
+    "source": "Крыніцы"
+  },
+  "filters": {
+    "title": "Фільтры",
+    "typeLegend": "Тып сутнасці",
+    "reset": "Скінуць фільтры",
+    "clearSearch": "Ачысціць запыт"
+  },
+  "chips": {
+    "query": "Запыт: {{value}}",
+    "type": "Тып: {{type}}",
+    "removeQuery": "Выдаліць фільтр запыту",
+    "removeType": "Выдаліць фільтр «{{type}}»"
+  },
+  "rebuild": "Перабудаваць індэкс",
+  "rebuilding": "Перабудова…",
+  "retry": "Паўтарыць",
+  "openResult": "{{type}}: {{snippet}}",
+  "noSnippet": "без фрагмента",
+  "sourceDetails": "Звесткі пра крыніцу",
+  "fields": {
+    "title": "Назва",
+    "author": "Аўтар",
+    "publication": "Публікацыя",
+    "repository": "Сховішча",
+    "url": "Спасылка",
+    "notes": "Нататкі"
+  }
+}

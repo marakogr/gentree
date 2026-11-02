@@ -1,0 +1,349 @@
+{
+  "kind": {
+    "FATHER": "father",
+    "MOTHER": "mother",
+    "SON": "son",
+    "DAUGHTER": "daughter",
+    "HUSBAND": "husband",
+    "WIFE": "wife",
+    "BROTHER": "brother",
+    "SISTER": "sister",
+    "GRANDFATHER": "grandfather",
+    "GRANDMOTHER": "grandmother",
+    "GRANDSON": "grandson",
+    "GRANDDAUGHTER": "granddaughter",
+    "UNCLE": {
+      "MALE": "uncle",
+      "FEMALE": "aunt",
+      "UNKNOWN": "uncle or aunt"
+    },
+    "AUNT": {
+      "MALE": "uncle",
+      "FEMALE": "aunt",
+      "UNKNOWN": "aunt"
+    },
+    "NEPHEW": "nephew",
+    "NIECE": "niece",
+    "GREAT_UNCLE": {
+      "MALE": "great-uncle",
+      "FEMALE": "great-aunt",
+      "UNKNOWN": "great-uncle or great-aunt"
+    },
+    "GREAT_AUNT": {
+      "MALE": "great-uncle",
+      "FEMALE": "great-aunt",
+      "UNKNOWN": "great-uncle or great-aunt"
+    },
+    "GRAND_NEPHEW": {
+      "MALE": "grand-nephew",
+      "FEMALE": "grand-niece",
+      "UNKNOWN": "grand-nephew or grand-niece"
+    },
+    "GRAND_NIECE": {
+      "MALE": "grand-nephew",
+      "FEMALE": "grand-niece",
+      "UNKNOWN": "grand-niece"
+    },
+    "SPOUSE_OF_SPOUSES_SIBLING": {
+      "MALE": "co-brother-in-law",
+      "FEMALE": "co-sister-in-law",
+      "UNKNOWN": "co-sibling-in-law"
+    },
+    "PARTNER": {
+      "MALE": "partner",
+      "FEMALE": "partner",
+      "UNKNOWN": "partner"
+    },
+    "STEP_PARENT": {
+      "MALE": "stepfather",
+      "FEMALE": "stepmother",
+      "UNKNOWN": "step-parent"
+    },
+    "STEP_CHILD": {
+      "MALE": "stepson",
+      "FEMALE": "stepdaughter",
+      "UNKNOWN": "stepchild"
+    },
+    "STEP_SIBLING": {
+      "MALE": "stepbrother",
+      "FEMALE": "stepsister",
+      "UNKNOWN": "step-sibling"
+    }
+  },
+  "inLaw": {
+    "PARENT_IN_LAW": {
+      "MALE": {
+        "MALE": "father-in-law",
+        "FEMALE": "mother-in-law",
+        "UNKNOWN": "parent-in-law"
+      },
+      "FEMALE": {
+        "MALE": "father-in-law",
+        "FEMALE": "mother-in-law",
+        "UNKNOWN": "parent-in-law"
+      },
+      "UNKNOWN": {
+        "MALE": "father-in-law",
+        "FEMALE": "mother-in-law",
+        "UNKNOWN": "parent-in-law"
+      }
+    },
+    "CHILD_IN_LAW": {
+      "MALE": {
+        "MALE": "son-in-law",
+        "FEMALE": "daughter-in-law",
+        "UNKNOWN": "child-in-law"
+      },
+      "FEMALE": {
+        "MALE": "son-in-law",
+        "FEMALE": "daughter-in-law",
+        "UNKNOWN": "child-in-law"
+      },
+      "UNKNOWN": {
+        "MALE": "son-in-law",
+        "FEMALE": "daughter-in-law",
+        "UNKNOWN": "child-in-law"
+      }
+    },
+    "SIBLING_IN_LAW": {
+      "MALE": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      },
+      "FEMALE": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      },
+      "UNKNOWN": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      }
+    },
+    "SIBLING_OF_SPOUSE": {
+      "FEMALE": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      },
+      "MALE": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      },
+      "UNKNOWN": {
+        "MALE": "spouse's brother or sister",
+        "FEMALE": "spouse's brother or sister",
+        "UNKNOWN": "spouse's brother or sister"
+      }
+    },
+    "SPOUSE_OF_SIBLING": {
+      "FEMALE": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      },
+      "MALE": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      },
+      "UNKNOWN": {
+        "MALE": "brother-in-law",
+        "FEMALE": "sister-in-law",
+        "UNKNOWN": "sibling-in-law"
+      }
+    }
+  },
+  "cousin": {
+    "1": {
+      "peer": {
+        "MALE": "first cousin",
+        "FEMALE": "first cousin",
+        "UNKNOWN": "first cousin"
+      },
+      "elder": {
+        "MALE": "first cousin once removed",
+        "FEMALE": "first cousin once removed",
+        "UNKNOWN": "first cousin once removed"
+      },
+      "younger": {
+        "MALE": "first cousin once removed",
+        "FEMALE": "first cousin once removed",
+        "UNKNOWN": "first cousin once removed"
+      },
+      "far": {
+        "MALE": "distant cousin",
+        "FEMALE": "distant cousin",
+        "UNKNOWN": "distant cousin"
+      }
+    },
+    "2": {
+      "peer": {
+        "MALE": "second cousin",
+        "FEMALE": "second cousin",
+        "UNKNOWN": "second cousin"
+      },
+      "elder": {
+        "MALE": "second cousin once removed",
+        "FEMALE": "second cousin once removed",
+        "UNKNOWN": "second cousin once removed"
+      },
+      "younger": {
+        "MALE": "second cousin once removed",
+        "FEMALE": "second cousin once removed",
+        "UNKNOWN": "second cousin once removed"
+      },
+      "far": {
+        "MALE": "distant cousin",
+        "FEMALE": "distant cousin",
+        "UNKNOWN": "distant cousin"
+      }
+    },
+    "3": {
+      "peer": {
+        "MALE": "third cousin",
+        "FEMALE": "third cousin",
+        "UNKNOWN": "third cousin"
+      },
+      "elder": {
+        "MALE": "third cousin once removed",
+        "FEMALE": "third cousin once removed",
+        "UNKNOWN": "third cousin once removed"
+      },
+      "younger": {
+        "MALE": "third cousin once removed",
+        "FEMALE": "third cousin once removed",
+        "UNKNOWN": "third cousin once removed"
+      },
+      "far": {
+        "MALE": "distant cousin",
+        "FEMALE": "distant cousin",
+        "UNKNOWN": "distant cousin"
+      }
+    },
+    "other": {
+      "peer": {
+        "MALE": "distant cousin",
+        "FEMALE": "distant cousin",
+        "UNKNOWN": "distant cousin"
+      },
+      "elder": {
+        "MALE": "distant cousin",
+        "FEMALE": "distant cousin",
+        "UNKNOWN": "distant cousin"
+      },
+      "younger": {
+        "MALE": "distant cousin",
+        "FEMALE": "distant cousin",
+        "UNKNOWN": "distant cousin"
+      },
+      "far": {
+        "MALE": "distant cousin",
+        "FEMALE": "distant cousin",
+        "UNKNOWN": "distant cousin"
+      }
+    }
+  },
+  "line": {
+    "PATERNAL": "on the father's side",
+    "MATERNAL": "on the mother's side"
+  },
+  "base": {
+    "greatGrandparent": {
+      "MALE": "grandfather",
+      "FEMALE": "grandmother",
+      "UNKNOWN": "grandparent"
+    },
+    "greatGrandchild": {
+      "MALE": "grandson",
+      "FEMALE": "granddaughter",
+      "UNKNOWN": "grandchild"
+    }
+  },
+  "chain": {
+    "parent": {
+      "MALE": "father",
+      "FEMALE": "mother",
+      "UNKNOWN": "parent"
+    },
+    "child": {
+      "MALE": "son",
+      "FEMALE": "daughter",
+      "UNKNOWN": "child"
+    },
+    "sibling": {
+      "MALE": "brother",
+      "FEMALE": "sister",
+      "UNKNOWN": "sibling"
+    },
+    "grandparent": {
+      "MALE": "grandfather",
+      "FEMALE": "grandmother",
+      "UNKNOWN": "grandparent"
+    },
+    "grandchild": {
+      "MALE": "grandson",
+      "FEMALE": "granddaughter",
+      "UNKNOWN": "grandchild"
+    },
+    "spouse": {
+      "MALE": "husband",
+      "FEMALE": "wife",
+      "UNKNOWN": "spouse"
+    },
+    "partner": {
+      "MALE": "partner",
+      "FEMALE": "partner",
+      "UNKNOWN": "partner"
+    }
+  },
+  "chainStyle": "possessive",
+  "generationalPrefix": "great-",
+  "chainGenitive": {
+    "adjectives": {
+      "двоюродный": "cousin",
+      "двоюродная": "cousin",
+      "троюродный": "second cousin",
+      "троюродная": "second cousin",
+      "четвероюродный": "third cousin",
+      "четвероюродная": "third cousin",
+      "дальний": "distant",
+      "дальняя": "distant",
+      "внучатый": "grand",
+      "внучатая": "grand",
+      "сводный": "step",
+      "сводная": "step"
+    },
+    "nouns": {
+      "отец": "father",
+      "мать": "mother",
+      "родитель": "parent",
+      "сын": "son",
+      "дочь": "daughter",
+      "ребёнок": "child",
+      "брат": "brother",
+      "сестра": "sister",
+      "дед": "grandfather",
+      "бабушка": "grandmother",
+      "бабка": "grandmother",
+      "внук": "grandson",
+      "внучка": "granddaughter",
+      "муж": "husband",
+      "жена": "wife",
+      "супруг": "spouse",
+      "партнёр": "partner",
+      "партнёрша": "partner",
+      "дядя": "uncle",
+      "тётя": "aunt",
+      "племянник": "nephew",
+      "племянница": "niece",
+      "родственник": "relative",
+      "родственница": "relative"
+    }
+  },
+  "unknown": "relative",
+  "unknownWithPath": "relative (path: {{path}})"
+}

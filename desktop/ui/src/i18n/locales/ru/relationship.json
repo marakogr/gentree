@@ -1,0 +1,15 @@
+{
+  "addParent": "Родитель",
+  "addChild": "Ребёнок",
+  "addSpouse": "Супруг(а)",
+  "addPartner": "Партнёр",
+  "addAdoptiveParent": "Приёмный родитель",
+  "direction": "Тип связи",
+  "add": "Добавить связь",
+  "relatedPerson": "Кто",
+  "type": "Тип связи",
+  "deleteConfirm": "Удалить связь?",
+  "conflict": "Данные изменены в другом окне. Перечитайте связи.",
+  "empty": "Связей нет",
+  "selectPerson": "Выберите человека"
+}

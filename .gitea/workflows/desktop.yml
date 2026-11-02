@@ -1,0 +1,64 @@
+name: desktop
+
+# Quality gates for the Rust core and the desktop UI.
+# Native bundle builds (msi/nsis, dmg) run on the developer OS until
+# Windows/macOS runners are configured.
+on:
+  push:
+    paths:
+      - "desktop/**"
+      - "desktop/crates/chat/skills/**"
+      - ".gitea/workflows/desktop.yml"
+  pull_request:
+    paths:
+      - "desktop/**"
+      - "desktop/crates/chat/skills/**"
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Clippy (core crates, no Tauri)
+        run: >-
+          cargo clippy
+          -p gentree-core -p gentree-storage -p gentree-search
+          -p gentree-import -p gentree-chat -p gentree-config -p gentree-mcp
+          --all-targets -- -D warnings
+
+      - name: Test (core crates, no Tauri)
+        run: >-
+          cargo test
+          -p gentree-core -p gentree-storage -p gentree-search
+          -p gentree-import -p gentree-chat -p gentree-config -p gentree-mcp
+
+  ui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: desktop/ui
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/ui/package-lock.json
+
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+      - run: npm run i18n:check

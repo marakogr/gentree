@@ -1,0 +1,60 @@
+{
+  "gender": {
+    "MALE": "Male",
+    "FEMALE": "Female",
+    "UNKNOWN": "Unknown"
+  },
+  "nameType": {
+    "BIRTH": "Birth name",
+    "MARRIED": "Married name",
+    "RELIGIOUS": "Religious name",
+    "OTHER": "Other"
+  },
+  "eventType": {
+    "BIRTH": "Birth",
+    "DEATH": "Death",
+    "MARRIAGE": "Marriage",
+    "DIVORCE": "Divorce",
+    "BURIAL": "Burial",
+    "RESIDENCE": "Residence",
+    "OCCUPATION": "Occupation",
+    "EDUCATION": "Education",
+    "OTHER": "Other"
+  },
+  "relationshipType": {
+    "PARENT_CHILD": "Parent — child",
+    "ADOPTIVE_PARENT_CHILD": "Adoptive parent — child",
+    "SPOUSE": "Spouse",
+    "PARTNER": "Partner"
+  },
+  "datePrecision": {
+    "DAY": "Day",
+    "MONTH": "Month",
+    "YEAR": "Year",
+    "UNKNOWN": "Unknown"
+  },
+  "dateQualifier": {
+    "EXACT": "Exact",
+    "APPROXIMATE": "Approximate",
+    "BEFORE": "Before",
+    "AFTER": "After",
+    "RANGE": "Range",
+    "UNKNOWN": "Unknown"
+  },
+  "ancestorRole": {
+    "ROOT": "Root",
+    "FATHER": "Father",
+    "MOTHER": "Mother"
+  },
+  "descendantRole": {
+    "ROOT": "Root",
+    "SON": "Son",
+    "DAUGHTER": "Daughter",
+    "CHILD": "Child"
+  },
+  "edgeDirection": {
+    "UP": "Up",
+    "DOWN": "Down",
+    "SPOUSE": "Spouses"
+  }
+}

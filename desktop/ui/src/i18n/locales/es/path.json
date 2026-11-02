@@ -1,0 +1,58 @@
+{
+  "title": "Relación",
+  "fromLabel": "De",
+  "toLabel": "A",
+  "filterPlaceholder": "Filtrar por nombre",
+  "pickPlaceholder": "Selecciona una persona",
+  "swap": "Intercambiar",
+  "find": "Buscar relación",
+  "emptyProject": "El proyecto aún no tiene personas: créalas en la pestaña Personas.",
+  "samePerson": "Selecciona dos personas diferentes.",
+  "notFound": "No hay relación familiar en los datos",
+  "kinshipLabel": "Parentesco: {{term}}",
+  "resultTitle": "{{from}} → {{to}} — {{term}}",
+  "kinshipUnknown": "pariente",
+  "routesLabel": "Opciones de ruta",
+  "primaryRoute": "Ruta principal",
+  "alternativeRoute": "Opción {{number}}",
+  "chainLabel": "Cadena de parentesco",
+  "kinshipPanel": {
+    "title": "Cómo se relaciona esta persona con la persona seleccionada",
+    "searchPlaceholder": "Buscar una persona",
+    "noMatch": "No se encontró nada",
+    "empty": "No hay otras personas con las que comparar.",
+    "direction": "{{from}} → {{to}}"
+  },
+  "commonAncestor": "Antepasado común: {{name}}",
+  "noCommonAncestor": "No hay antepasado común: la ruta pasa por cónyuges.",
+  "distance_one": "{{count}} paso",
+  "distance_few": "{{count}} pasos",
+  "distance_many": "{{count}} pasos",
+  "distance_other": "{{count}} pasos",
+  "stepsLabel": "Pasos de la ruta",
+  "openInGraph": "Abrir en el árbol",
+  "diagramLabel": "Diagrama de parentesco",
+  "zoomLabel": "Zoom del diagrama",
+  "zoomIn": "Acercar",
+  "zoomOut": "Alejar",
+  "zoomReset": "Restablecer el zoom al 100 % (ahora {{percent}} %)",
+  "fit": "Ajustar a la ventana",
+  "clickHint": "Haz clic en una persona del diagrama para abrir la ficha; arrastra para mover el diagrama y desplázate para hacer zoom.",
+  "step": {
+    "UP": {
+      "MALE": "padre",
+      "FEMALE": "madre",
+      "UNKNOWN": "progenitor/a"
+    },
+    "DOWN": {
+      "MALE": "hijo",
+      "FEMALE": "hija",
+      "UNKNOWN": "hijo/a"
+    },
+    "SPOUSE": {
+      "MALE": "marido",
+      "FEMALE": "mujer",
+      "UNKNOWN": "pareja"
+    }
+  }
+}

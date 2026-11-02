@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+# Block secrets, local-only material and build artifacts before they reach the index.
+set -e
+
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+fail() {
+  echo "pre-commit: $1" >&2
+  exit 1
+}
+
+# Environment files may hold provider keys. The example file is the only
+# exception because it carries names and placeholders, never values.
+env_files="$(printf '%s\n' "$staged" | grep -E '(^|/)\.env($|\.)' | grep -Ev '(^|/)\.env\.example$' || true)"
+[ -z "$env_files" ] || fail ".env files must never be committed."
+
+keys="$(printf '%s\n' "$staged" | grep -E '(^|/)id_(rsa|ecdsa|ed25519)$|\.(pem|key|p12|pfx|jks|keystore)$' || true)"
+[ -z "$keys" ] || fail "private keys must not be committed."
+
+if printf '%s\n' "$staged" | grep -Eq '(^|/)test-fixtures/|\.(at5|atdb)$'; then
+  fail "real AT5 data must never be committed."
+fi
+
+if printf '%s\n' "$staged" | grep -Eq '(^|/)(node_modules|dist|coverage|target|release-assets)/|^desktop/apps/[^/]+/gen/|\.(msi|exe|dmg|pkg|deb|rpm|AppImage)$'; then
+  fail "build artifacts are staged (node_modules/dist/coverage/target/release-assets/gen or an installer)."
+fi
+
+if printf '%s\n' "$staged" | grep -Eq '(^|/)(docs/research/|\.opencode/opencode\.json$|HANDOFF\.md$)'; then
+  fail "internal research, local agent config and handoffs stay out of git."
+fi
+
+if printf '%s\n' "$staged" | grep -Eq '(^|/)openwiki/\.run\.json$'; then
+  fail "transient OpenWiki run state must not be committed."
+fi

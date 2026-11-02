@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:af23b074fdd273b640414fd06574e1f6d18b13a8559a2a0a3c74e5a907950b5b",
+  "claims": [
+    {
+      "id": "claim_b606bdba01fa4c90a8f8eb5affcfb14c",
+      "statement": "The app runs one window labeled main (1200x800, minimum 960x600) with CSP disabled and the asset protocol enabled for $APPDATA/**; opening a project narrows the scope to its media folder.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L75-L82",
+          "version": "repo-lines-v1:sha256:0333aefffefbf7b32606964d57a2d3a7a13759aa70d6ff83c997999386f5dafe:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjE5ZjE3ODA2ZGFiYTM5MzhhNTUxYzg1ODNlZTMwZGViMjRlNjc0NDJhYTI1NGI2ZjI2N2Q4NjJlYzg4YmNiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTllNzYzNTVjZjExOTk0ODBjM2Y5OTgzNmIxNDg2Yzg0MWQ4OTFmYWFkOTA0YzYwOGUwOTMwMjJkMzc1N2FlZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTVhNDQ2ZDNhNTdhNmRjMmI1YTdiZGNiZTI4MTZjNmZmODQzYjU5MDFlMzA1MTA5NDZlZmRiYWMzYWI5MmVmYiJ9"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/tauri.conf.json#L12-L30",
+          "version": "repo-lines-v1:sha256:ab5cac7ffe913eabc9283885bde66f8691851fc255b3ae1866f7e44a53306ec6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5MzZhYjhlMjQ4MjhiMWZhYTRkNjMzNzZlOGQxMmIwODlkNGQ0YzMzYzRiZmRiMThmNmNjZWQ1MmQ2YzY2MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjODJhMTIwZDE1MTdjOTk5NWMxNjc3MTI5YzEwODFkNjdjM2VjMzljZmU3YmQxYzZjZWQ5MTNjNDhhODYwYzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiZDFhZGRkYWZjNWIwZTI3YWE3NmQ4MjljNWYzMjQ5ZWRjZDMwZjY0ZmQ3YmVmMDUxNWQ1NGExMTMwODZhZGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2730d4fcb58d409fb5823e15faa31595",
+      "statement": "The webview capability set is limited to core:default and dialog:default, so the renderer cannot use shell, filesystem or HTTP plugins directly.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/capabilities/default.json#L1-L6",
+          "version": "repo-lines-v1:sha256:8895c9609747fd4e196b94879d495ef1be949ab60c3e3324da31ff1f00455ff5:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e4d008203abe4399b047f8126cddb89b",
+      "statement": "The open ProjectStore is held in a shared Arc<Mutex<Option<ProjectStore>>> so Tauri commands and the chat tool backend operate on the same project instance.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L619-L642",
+          "version": "repo-lines-v1:sha256:a75be1508eb410b185a3d991a67ea08b2a82175af9f5cd03ba9ae16e3ead3984:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlY2IyNTBiMGVkMmM1YWE3NDU5YzhkMWJhNTgxMzNmNjlmYTkxOGY2NjQ5NTM3NjQxNTM1YTQ5NmUxNDgwZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNjJmYTNhNGMxMmNhZjM4MjlmNWE5MDJmYWU1YmFmMjA2NTUwOWM0NjdjMzA0ZjFlM2RkNTQ3YzkyNWI4NDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzMzk4MzQ3ZmYxZTRhNjBhMWVlMmJiZDEyZTJlMjE5MzE0YWI2MWFjNGI0ZGVjNmEwMmVhZjgzOWE1MTkyMzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NmFhNjc3ZjRjOGIwN2QwMjEyMjUxM2RmNzYwMTM0OTc3ZWRmMjU2NTk4ZjNlYTNlOGRmOGI1NzJhOGMyNGIifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L36-L42",
+          "version": "repo-lines-v1:sha256:a4382a8b94f8a31be64dca485e0e1677c95ab2f0db6a3c76e8023e738b9ca9b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGU0ODU4MjI1NjNhMTQ0OGFlZmFjNTNmNDQ5YzA0MzdmMjA5MWYyYTFkYjU1NjU1OGM1YzgwNTU4MjQ3MGZkNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWFiMDIxZTU4NjgzMDUxNWUzZGNiNjEzMzQ5ODVhN2Q5ZmM0NmU0MGNlMmY3NDgxMGYyY2Q1Y2UwZWU1YjQyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDY4YzhjN2I5MDJlMjNmYWZlYjcyN2E4ZTE5ZGJkNDIxNzBkZTBmMzJmMDRkZDgwYTFkMjBkNGNlYzRmNWQ2NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_067d7b6831b74fe6aa3dcc123005cdaa",
+      "statement": "project_open takes the write lock, backfills the second spouse into legacy marriage events, and grants the media asset scope before storing the project.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L157-L178",
+          "version": "repo-lines-v1:sha256:291ffffa46abbb1fab758649b14dd7f011463f355595ae3c87a76e13f40af3af:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMWVlMzNlZTk1ZmFlZTFjMTBlOWViZjNkM2RlNDFiYjE5MjUxNWNhZDc3Y2RhMjA1ZTU0NmRhMTcwMDFhNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkYjNmZGE1OGZkMzNmODhlZTFiMDAwYTg1ZmIxNGNiNTFjMjgyZTU5NTFmZDA0YzhlYmVhODc3Yzg4M2JhNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ODdjZTRmODAzNzhlZTU2NjlmZGZjMDkyNjhkMWUyNGVjNzcyOWZlNzNhNWY3NTlmZDI1NGYwNWM3YjhlNzIifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L84-L97",
+          "version": "repo-lines-v1:sha256:db7a86643023bba13c93d191e5d1742bed32cef05c62e0e94f906462e243947a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2NzVlY2RkMzViMmQ4MWU3MDM1YTBlZThlZDNhNzk0MmExMmVkNWE4NDQxNTcxZjVmNjgyZjE0MjAwODE4YmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkOTk3NzRiMzM2ZTUyYzUxNWM0Yjk0M2U5ZDVmYzRkZWQyOGZhOGEyNTY0ZjQyNzEzNTU4ODVhZmZiOTEyNTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzODFkMGFiZGFkMjllMzUwMzEzNDhlNzQ1YjJlYzFiZmUxMjY1YzhiM2ZiZjQ4N2MyMzJkM2IzNGJmYTljMGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2eb1465aea6c40a2bf8258c04d4f0280",
+      "statement": "Closing a project writes a backup and prunes older backups to the ten most recent archives, while deleting refuses an open project and moves the folder to projects/.trash.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L210-L243",
+          "version": "repo-lines-v1:sha256:df9a1357b4180a3e28e9faac7273a435ee92785c0311a26f954c8b91db933a67:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMWVlMzNlZTk1ZmFlZTFjMTBlOWViZjNkM2RlNDFiYjE5MjUxNWNhZDc3Y2RhMjA1ZTU0NmRhMTcwMDFhNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2OWM2ZDlkZGQyMzIwZTBhOTY4ZmZlNWM3NzczN2ZhYTA4OWI0YTgxOWFkNjYyZmYxZjljNzE1ZWM1OWViYjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyNDYyMWJkMGI2MGU1YTVlNThmMGNjYTI5ZjA5ZTNmNDU3ZWViZTdiNTVlYzdmOGNmNzkwY2VkMGVmMjM0ZjUifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L24-L26",
+          "version": "repo-lines-v1:sha256:63c21112f7122d66c3c1bc80d5e55a5bf42df12b443af082f6d04c28e4a9236d:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjVjZWJmOTljNDA0NjA3NmM2MTdkNWFiYTk1YzJlZjI3ZmExYzY3NzllMTNhNGMwYmRlYjk0YzRhMGQ2ZjhjZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjg0MDJhNDQwNzIwZDU5YWU3MjkxN2M5MWMwZGFjNDM1YWJlNDdiZjZkOThiYTQ0ZmM3ZDk4NWU1ZjQwNzMxMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGMzZTlmMTAxODliOGM1Y2RjOThmOWY4MjFjMjljNzg0YmE2YmNlYzkyY2E2NjAzMzBjODg2YjM4ZDc1MDUyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDZmOWVhYWQwYjJhMDliNTJmNzVhYzQ5NjljOTFhZDAyMTIxYzZiODdjMjZkOTc2OWI5YWQzNGJmOWQ2MDZkNiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d06205087890419683a57bf77c9457bc",
+      "statement": "Backup reveal treats the renderer-supplied path as untrusted and accepts only an absolute, traversal-free .gentree.zip directly inside one project folder under the backups root.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L259-L348",
+          "version": "repo-lines-v1:sha256:7f678c9b3b5281308e3921e5494ceb9725649183cda1d6b5d27c368272547a03:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxMWU4YjYyZTMzYmM0ODQxYzg2YTUyYmJmZDQyNGFlNDFlMGJiZWE4MjQyMmQxMGUwZDIwYjlmMzA1ZmI0MGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQyMGU5ZDU2YmNlZjAyZGJkMzI3MTFhYjUzNTgwM2NlM2RmN2UxMzU2OWQ1MjQ1M2JhNjMyNTZmNWU1YTkzNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYwNTg0YTlhMDgyYjViZjAxZGIwYzQzMGVjMzU5MmM4OGRmMmU3NjJmN2FlYjA2ZWY4MWVkYjVmNTAxMjUzMWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_da404056ef124a67b31f740a5452a913",
+      "statement": "Commands are grouped into chat, event, export, geocode, graph, import, media, merge, path, person, relationship, search and timeline modules plus project, settings and updater commands in main, and share helpers for with_store, Versioned, Page, version checks and UUID/date parsing.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/mod.rs#L1-L16",
+          "version": "repo-lines-v1:sha256:06eb41e213f94aeb4a03cc756e813f48e05a3472cab74cb3edd4ee626002c852:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4NzFkYzA2YzNhMjI0YzllNzQ1ZmY3NTRjNjUzOTIxNGRkMGU4MGU5MzhkM2ViNDYxYzhmMDYyMmE5YTk5YmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MGFiMzA3NTZkODcxODJkODI0NDY2ZmRkMjQ5NGI1NDdhZGJlZTViNzhjNzc0ZDQ1YzY1OWMwMDAxNWMxMDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwYWY3ZDg3ZDE3Y2RmMDFjYTFjNzA3NDE1OGM5YzIwM2UxNTM3NGRjZjA3MDEwM2E5NmQ3MzIzYTY3ODY4MDMifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L434-L516",
+          "version": "repo-lines-v1:sha256:bba50f320c1be064c35976a2aa4cb06c95696682eed20ad8272c19fd3d914ecb:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmNjdkMTRhYmMzNmU1NzAzYTYxNGQ2MTJlMTE4ZWQ2YTEzMWFkYTI2M2YwMzc5ZTUwNzY1MDVkM2E4OWIxNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhZDMzMDJhZDdkYjFhM2RkOWIzOTNiNTFkN2FiYWY1OGQzNmMzMTQxZTI0OTE4OWI1OWFiNzIxYzBkODIyYzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxOTgxYjRjYjljZGE5MjI3YjhjNzAwNGMwYWVlOGY4YjVmMDg5YTY4MDE4ZjFhZjhiNDJmZmI3ZDZmZWI3NTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjMWQ5MDZkM2U2ZjZiYjQyODY2ZGI1MTY1OTNiYTI0NTBjOGMwMWU5NmNlNmEyYjNkMmQzOTNhNTRkNDBmNWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_df3d24889e414089bb0165431201b5c1",
+      "statement": "IPC payloads serialize as camelCase and errors carry stable codes with parameters rather than localized prose, which the UI translates.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/mod.rs#L1-L2",
+          "version": "repo-lines-v1:sha256:ecef4dc2c59154302f8f40eaac51dba20d5173068bda5a96c5ad22fdbd654386:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTg3MWRjMDZjM2EyMjRjOWU3NDVmZjc1NGM2NTM5MjE0ZGQwZTgwZTkzOGQzZWI0NjFjOGYwNjIyYTlhOTliYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQxNjdmOTI3OWZmMmFlNmYwMDk2Y2U4NjlmYThjZjgyMmVjNzFhNmVhMjA3Zjc3NDQyYTE5ODczZDIxMzAzNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWYxMGNjMjNlZGZhNmU4NzIzMjgzYWJhNzlkZjU4YTlmMDMyMGFkZGFkODdiZGUzNzc1NGE0YzdiMGJhM2JkNSJ9"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/main.rs#L44-L56",
+          "version": "repo-lines-v1:sha256:3a47f2584946c9afbd09670a9c7bccfab11999e8dad14517eac016542f68ce24:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlkZDY5NmU0ODJlYzM3NDJlOGQ1ZGNiYzE3ZWZiYzdhYTIzZGIxMWM3ZmJlN2M3ZmYyNDQyNTQ2MDkxMDlmYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNmZjBiYTA0MTI5YzYyOGI0OTI2MDI5M2RiYzc1YzhhZDlhZDRhZDA0MjdmNDJiZmJiYzg3MTJjZDEyNTNjOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4ZmY2MjIwN2ZlMjJmZGFlZTQ2NWMyYWY2NGQyZDhjNDBhOTQ5NDA1Y2QyZjQxMjhkYTMxODk5NzM5OGQ2ODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_445c336116b44decb658c366ea0d8fec",
+      "statement": "The app writes a metadata-only log to <app data>/logs/gentree.log (timestamp, level, target, message) and never records prompts, answers, person data, tool arguments/results or the API key.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/logging.rs#L1-L57",
+          "version": "repo-lines-v1:sha256:026941b7b3c92383f4fb9f363bb3a3c72f42ebf7a0ab2f4647eb0ab19ddf69c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NTk1ODg0MDdmNTUwYzViMDk2MzljMGMzYjk2ZmE3ODE2NzRiZTQ3NGVhMjQzODY2OTU5ZWIxODk0YmFlOTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c9cea00457d24c1ab81eeef5871d680d",
+      "statement": "event_create and event_update refuse a second BIRTH or DEATH for the same person with LIFE_EVENT_ALREADY_EXISTS, while editing an existing birth/death keeps its slot even when old data already contains duplicates.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/event.rs#L163-L215",
+          "version": "repo-lines-v1:sha256:56995f01caf8150f5e2126c237e6a67f806bfdf5dd2cc0f4d47ee29f9969b553:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1OTI4ODg2NzA4NjM5ZjQ4NDM1ZTk2YTZlNjA0MjgyZTRkOThmMDY5NTFiMzk3NGRiM2ZlYzYxMTA1YWI3OTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyMzAwZWQyOWJmYzQ5ZGM3ODJkMDEzNDc3MTlhODBhYWVkMjhhMDI5YzIzZTI0NDZlN2Q4NjU2YzVlYzczNWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlYzA5YTk5MGFhODBmMjE3YWJhYjE0YWZkYTcxZjc5Yzk0OTc3ZmI3MjZjYjMzZjcwZGZkMzczNWFmNjAwODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU4YTAzNjk2Y2I3ZDlmZDliNzc0MmNjYTNhOTgyNmFkZGMxNGFjMDIzOTQ3NTJmOWY2NmUyNGVjMjhhZDZmOWEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/validation.rs#L432-L470",
+          "version": "repo-lines-v1:sha256:20656bae697f6f2492f9a2fd09171c42e66296d4d8a8a958396ecf7f79129708:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxYTdmMjIwNmI3NWM3ZmJiNWIxN2IxM2Q1ODRkZGY3N2E5NmMyNWJhOTliMWMyYTM3YTI4ZmQ0OGYzODA2ZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiMWM5OTZkY2E1YzkxNGNiZDE5MzM2MTM0YzkzZjA2MmRkNWEzMWE5MTU2MjgzZmNjOTU1ZDRmMzhjM2Y1NDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNmYzhhNGNiZDJlYmI3MzdmZjEwYmQwZWNkM2I2YjlmODZmOTQ5MWYyNmUyZTRmMTAwYmUwMjY2Y2FlMDU0NjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU4YmI0MTkwMWY2NDdkOTNlN2JhNjZjMWExZGQ2NTA1NmM1MTQ5ZWI3ZDk2OGU3MDA1Y2QxNTkyYmIxN2VkYmMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

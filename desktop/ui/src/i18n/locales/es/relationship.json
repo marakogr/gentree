@@ -1,0 +1,15 @@
+{
+  "addParent": "Padre o madre",
+  "addChild": "Hijo o hija",
+  "addSpouse": "Cónyuge",
+  "addPartner": "Pareja",
+  "addAdoptiveParent": "Padre o madre adoptivo",
+  "direction": "Tipo de relación",
+  "add": "Añadir relación",
+  "relatedPerson": "Quién",
+  "type": "Tipo de relación",
+  "deleteConfirm": "¿Eliminar esta relación?",
+  "conflict": "Los datos se modificaron en otra ventana. Recarga las relaciones.",
+  "empty": "Sin relaciones",
+  "selectPerson": "Selecciona una persona"
+}

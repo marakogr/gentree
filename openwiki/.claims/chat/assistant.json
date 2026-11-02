@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:85e5334a92c610643aeb53d5da618a1e891391fd4c196dece1616e3b9db75e75",
+  "claims": [
+    {
+      "id": "claim_510af4a718ee43718953f185f8cdc048",
+      "statement": "Chat is disabled by default and chat_send refuses with CHAT_UNAVAILABLE when the feature is off, the key environment variable is empty or the model name is blank, so no project data is sent before provider configuration.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L530-L561",
+          "version": "repo-lines-v1:sha256:6f3059a7af0bd70e8c835f515933830248802ac6363e739e10632daddb74e9b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmMmNmYjJlZmIyYzBkMmFhZGIxOWVmM2Q2MzM2ZWYyMDhkMTkyMDE3ODcyZjk0MTgxY2QyMTNiZDA0NGNhYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhMmNhOTk3YjBhZjkyZmMyNjRkMmM4MDZkMzcwZmY2ZjE5YTQ2NzVlMTk2NjQ5NzFjYWEyM2Q4NTg3MzRiZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwYWMwODYwN2EyOGUyOTI5MWRlNzA3YWZiMDcyODAwZDQyZDI2YzcyMWIyNDJkNjE5YTg0N2ZjNzNjMGMyZTEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/config/src/model.rs#L324-L371",
+          "version": "repo-lines-v1:sha256:e5708d8d8dd37bffcd1ce330fb369e0fe8080ede1b184c8af7d6999c7e3d6166:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwYmEyMWU3ODljZjMxOTliY2E4OTVjMjhlNmQwMWZlZjE3ZDVjNDYyYzI0ZmMzMzE5ZmM4YTRlY2YwYTlmNDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlYjExMzdlMDY3NDJmMjliZTBhNjlkNTcwZGUyN2ZhNDU3ODRmMGI4YTJhZTZiMDFkNjJlZWJkMTJiN2QyNmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5OTk4YzVmOTllY2U2MzY2MTQ3YjkzNDE1YzYxMjRlY2Y0YTAwZGZlZmNjZjkzNTU1NjU3MzVlODc2NmM3MGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7090540184a249cfa483e84ede9a3b71",
+      "statement": "The API key is resolved on every request from the environment variable named by chat.api_key_env (with a Windows registry fallback) and lives only in ChatConfig and the Authorization header.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L19-L23",
+          "version": "repo-lines-v1:sha256:89a1bd5d7926b351fd828eca4874bc33f0d31b4de3243e7b98b6f28eaa81910d:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzk1ZWQ0OWEwMWYzNmYzNTc1Y2E5NTI0NTExOWYzNzg0MmNmNDlmMWY2N2U1YzA5YTBhYzUxYzk3Njk0MWE4NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjA2NTczN2UwNzFmOWZiY2RmNTRiOGFkMzhlNjZlNGI2ZjFmOWZhMWMwMWVkNmFmOWQ5NjY0ZDIyMmE5NjQwMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDIxYzU5ZDMyODE4MTBhZTFmOTcyNDhlYWIwNmZiYjEzMzAwNGQ5ZjhkNTZlY2M5ODhjNzBkMmExM2MwMzQxYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjI0ZDQ4NGNkYWQ1MmU4MTg4MTczMzQyNDgxMDk2NzZiZGMwMzE2MjY0YmUzZjM2ZDY3MzBkOGI1MTIyMGY0NSJ9"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/envvars.rs#L1-L30",
+          "version": "repo-lines-v1:sha256:22522d0fafe120773409984aab5d5cd25354703246092fd58bdae36774e9fd2e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0YTBkODExODI5MzAyMjMwYTg3MDgyNTJmMTZjMjQ5YmZhYTczMzAxNjdlMmEzMDA0ZGIzNDgwNmY5ZGZlYTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwMzhiYzk5ZmNjMmMwYTU5MmI1Nzg2YTQzNjQ4ZTMwMzg1ODk5MzVlMWVjYTE2NWZiNGU0ZmQ4OGQ3YzQ5NWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b5fb9a7a32ca409e93ab233f55e7bd0b",
+      "statement": "chat_send validates the request, registers a cancel token, starts a background thread and returns immediately; the answer arrives through chat-skill, chat-delta, chat-tool, chat-confirm, chat-done and chat-error events.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L3-L7",
+          "version": "repo-lines-v1:sha256:b806af67fb45101249e4d1afec74942761e46bf536fbe9b07c7c8dcf6c81f49e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjEwMTVkZTNlOGZkMGFiZjhhZGFkOTI5NjI1YzQ1NDZkZDM3YzQxYzkxMWIxOTA1Mjc2OTU0ZWQxOGMwYmNhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWMxNjA0NWZkYTczMjhjMjhmNGM0MTY4OGI1NDcxOWYzNGYzNTZlNWQwNTFlZDM5ZWE3MzE2YWI0OTkzYTY0ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmRjMmI5ZDQyOWQ0NzNjZTNiMTVjMGVlNDczYmE5ZmFjNjJjM2M2NTAxNjIxOWVjNWVmYjI4MDFkZGNmNzhhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzBhMWFiYWNkMjZhMDhhMzQwNWE5ZmM4M2VjMzkyYjAyZDA5NWUyMzA4ZTQ2Yjg1NDQ2ZmYxZGE0MWQzOWIwNyJ9"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L495-L500",
+          "version": "repo-lines-v1:sha256:6ed9558268e95a4ddf39ac9bd00d478eca75225d9fe27b8b0cfdc0245d7c98a9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FjMmYyZDYyYTFhYTk1MWEzOGI4ZmEyZGYzZmI2MmI0ZjQ1MjE2YTZmZDdiZTBjZDhkM2I4YmRlNTdjMjVlZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGRlNWM3ZGMwNjZkNjYxODVkZDQ5YzRiOTgwMjM2NjBjMzY4ZGM3NWRmZTMwNTIwMjJlNjE3Y2U1YTYwOTQwZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzAzYmMxZDllZmU3YTVlMTFhYzA1YmVmMGFjNTkwZTM0NDVlMmNiODQzZmJhOThmMWQ3MWI3MTZjYWYzOGZkYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTMyZmY0MWRlOTAzZGM3MDIyMGQzMmMwMzY1MGI5MDg5ZWVlMWI1ZTJmZGY0OGRjYmExOWQ0ZmNiYTQ0ZjZjNiJ9"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L638-L650",
+          "version": "repo-lines-v1:sha256:084d245893b4233e743fda168748e2043121a509c3655022fa41cf984d34767a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3NDNmNDY2ZDQzYzE1YzcwM2JhNzcxZGQ2MTA4MjI5ODIxNzgyMWIwN2Q3N2ZjZmY5ZTNkN2MzNmU4Njg3YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyMDM4OWQwZDdiMWJlYzljOTQ4OWRkZTZjNzY5ZGMxOTZmNTdiZDhiZTRjZjEwNjc4YTJjYjEzMTBkMmE0OGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlOWVlYzU0YmM4YTdmNTUwMjg4MzM1YWM2Yzc4MDQyYjAwMDJjMDI5YjQ1MmU3YzVkMjRiNDczNzhlZDI0NDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhMDBhOGM1ZDM0ZTRkYjM5ODBlNjcxODE3NmM5ODNjMmE5YmFmNzljZDJjMTkzMjFkMWY5ZThiNDdlMTFlMTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_389c0ef64ef8412aa31cc781a7f5d3a7",
+      "statement": "The system prompt is English, names the UI locale, forbids translating user data, forbids inventing dates, requires get_current_date for today or age questions, requires naming the source of a proposed change, links people through real ids, and treats person data as data rather than instructions.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/chat/src/prompt.rs#L37-L67",
+          "version": "repo-lines-v1:sha256:b37ab6e4e5e4e1be674473e26493bcc2aa46621cd58f4efb50efb2867dd08156:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzMjkxNTk0ZjBjMGU5MTFmNGM0YWE1ZTM4OWU2M2UxODYwNjY4NmU2OWUyNjllODYxNDdkYzJmYzY3NDVlZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5OGQ4YzJiNjkwMDk5YzhmOTc4ZTg2NzdlZjQ2OWQ1OWMwYjNhN2RlZWZkMzg0ODE4ZTE0YWYwYmU5YWE2YTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1N2JiYzAxNmE5ZGRjZTQ3YTg2OWVmYzdkZjM2YjkyNWIxYmMyNzU2YjlkYzUzMjQ2Y2JjZDYzZWUyYWYzN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk4OGZlODkxNjE4NmM5Y2EzNWEwMDM4M2Y1NzU1YTY0NTg3Yzg0NWY5Mjk4NTg1ZjBhZTA4ZWJhNGNmMTgwZDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_88e02d553d5049faaac518e83654b332",
+      "statement": "Skills are Markdown files embedded at compile time, never read from disk at runtime; core is always loaded and a deterministic local router adds at most three thematic skills.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/chat/src/skills.rs#L1-L60",
+          "version": "repo-lines-v1:sha256:52a8cf3565ebed526c74121be5d074543aa30635063f23b8b04dbc7f424efa51:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkODYyNjk5NDg0ODcyMWI2YWEzMGNhNjI4MTUyYTg5OGFmZjA5MTE0MzI4OTczNzJlYjdhNjMxZjRiYzM4ODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZDZjZTcwM2Y3OWFhNWViYTQ5N2VmMmZhMTUxZWJlMTkxM2Y2ZjVjZjE2ZDBmZDY4ZGMxNmVhMDdlZDhjYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkxMGQyNWFmZWRkZjE3NzMxY2JmMDQwOWViNGVlNDFlMzAyNGJiNjQ4ZDE4MGEwYTM1YWZkODliNTQ2ZDk0MmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_79606940658d4da49eac40e765bfea26",
+      "statement": "The chat offers 14 read-only tools plus update_person only when person editing is enabled, allows at most 12 tool turns, forwards streamed deltas, returns tool failures to the model as {code, params, message} and rejects duplicate identical calls.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L67-L103",
+          "version": "repo-lines-v1:sha256:f7bf3b989ab5a5fb47f094e6ec88856bedbba1bc4594ca603ab5084564823fce:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZjViNjg2YWUyNjA4NjQ1YzE4ZmFjMWRjMDI1NGI3MDQ3MGFkNzJhM2YwZjUzMjZkZjZjNzgwYTBiYmI3NWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhOWRlMDAyMmYzYzI0MzdkN2NiMWRiOTVhODEwNGE0ZGQyNDUwMzg2MjdlZDY4MDE1MmUxNWM0YjI5MTgzYTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1NjBhNzU5YzBmYTk5ZmY5YzAyZDkwZTZkMTJmYWIxNGJiMzU0ZDFjOTIzYmEzMjA5MjMzOTYwZDBiZTI2MTkifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L762-L832",
+          "version": "repo-lines-v1:sha256:9afd7e075e3471322dfeecae9b120bd751856ce09d67f6a4d922b29ff55f6648:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNzM3ZGFhYmU0MDliNmI5MDg0ZjU3NmNjNTczMWJkNTVjMzVlMWZjYmVmOTcwY2EyYTcwMjY4OGM4ZDc3MmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzNTE1NDEwOGY3NTkxNmU2YjQ2NThmNGMyMzc2MTA4NGE1MTU0OWRmNGM3MTVmMDA1ZGJiZTc0Mjk1MDY4MmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxNjY0MDUzZTEyODI1ZDRiYjM4MjgyMjdjY2E0ZmNjOGIwYjA2MjM4MzQyYTFjYTg3N2QxMjlmZmI1YzBmYjUifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L849-L879",
+          "version": "repo-lines-v1:sha256:291ed1aa110341d81baf13f8ebc9b61349b749b6982ef6c6ba3f30239d0abad7:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3ZGY0MzMzNGUyZmJjM2JkMDc0ZDgwY2Q0NGI1ZDQ1NDc4MGYyMjQwMTNmYmU1NDIxOTBhZWZkMDQ3NDc5YTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjJjNDJjZDE5YzZkMDNkODA4YzQ1MjcyMDU1MjgyNWI3ZWExYzViNDkxYjIxODUxMWNhYzc0MTVjZjlkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1MTU0NTMxNzkwNTcyZmI3ZWEzOTkxNTMzNGU1MzFjODZhZjYwY2M0M2I4NjI4MDZiYWNjNDY0NjQ0M2Q1N2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBiZTE2MmMwOThlYjNmMzIxMDZjODdmZjliMTNjODA1MThiZDE5ZTdkNGRkNGNmMDcxYzA3OTA5ZWMxMmY2NmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4f695751e6c9470696d3004aec7420e2",
+      "statement": "update_person never writes directly: it re-reads the person, applies the patch to a copy, pre-validates with dry_run and the captured version, emits a confirmation card with a 300-second timeout, and writes only after approval.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L1030-L1125",
+          "version": "repo-lines-v1:sha256:2766dc685012e3d047fc28bb6f9d0c55db84db1baa2777cdbf85d4e2bdfe22a8:eyJzZWxlY3RlZExpbmVDb3VudCI6OTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzNmQ1ZjU1MTViNTllNDQwY2QzYWU3ZmRmNTU5MzA4MDMxNWMxZTQ3YjQ5ODRjZDZkZjc0ZjhhMWJjYWY3NWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyZDYwZTgyZWM0NGMxNjQxNjhjMTRkMjk2ODFkMmM2NmU0YzM5NDM1Yzg5Yjg0NDU5NjY0YjAzOGU3NmE3MDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_490447c6cdaf4dadba9554de6b97b16d",
+      "statement": "Tools execute in process through the same ProjectAccess implementation as the Tauri commands; no network MCP server is started.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L9-L17",
+          "version": "repo-lines-v1:sha256:eb0c181dc4478a301b5072d9e25cdd193075281d13f12b01ea17cd0a37b855d4:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDA2MDEzMmI3OTU2ZjJjYmE4NTAzNjE1MjZlNTY0OTRjZDhlZTkyMDljYTBlMzY4ZTAzNmJhYzA2ODJkYjM4OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODJhYTAxNjFjYWRlMDE4MjZhNGU3NzNjNmI5NzFjMTRiM2UzODE5MDViNDhmMjMxMzVhZGUyZTc1MjQ0ZmEyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTc4ZTMxYzZiOGVhMmJiNjZiN2U5ZjY2MTc1NTM0MjgzM2Y4YWI3Yjk3MjhiNjNiY2IxZjMwMDk5OTQzODllOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQzNDY3ZTBhZGYyN2NiMjU1ODFjY2Q2ZmU1ZTlkYTE3OTQ0ODZiYjc3OTQzMTc3YWIwYjE1MTg1NjEzZDMxMSJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/mcp/src/lib.rs#L1-L16",
+          "version": "repo-lines-v1:sha256:b417d03eaa52e5e58717317fc552b68b28ad60a1297d6a2fd11eb9df172f39b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTZmOGI0M2ZiZWZmODI4ODgyMWQ2NzZmYzdhZjM4NTA0ZTZhNWI2NGZiZTU4OGJjNjk3YWJhM2E2MmMwZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0YzQ4YzA3ZjY5NjIwOWNiYTNjY2RkN2M5NGM1Njg2YTcwNTFhMTM0MTI0MGEyYjQxMDdjYjY4Y2MwZjg5YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzYWQwMmYyMTBmZTAxZTEyMmVlOWVhYmVmNDhkNjljMjlkMjE1NmUxODM5YjFhM2YxMTQ0ZTljNWI5ZWI4OTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_38c090c4a5a544b8bf5899faebdb2147",
+      "statement": "The chat is offered exactly 14 read-only tools, plus update_person only when chat.allow_person_edits is enabled; the larger in-process catalogue's write tools are filtered out by tool_specs.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L705-L729",
+          "version": "repo-lines-v1:sha256:abae15da4c78c72c1bfe467086062551195e997c7fa1dc826019a9e4b5a00a1e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmYmVhOGU2Yjc5ZDBjYmNiMjc0N2MwMWJhNGRmYzg0NzlhNTNiZDJlNDI5MWRhMDc3MGRmNTY0MGIwNzY3OTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAwOWU3NDdhZGY2OGI1OTA0MWZiYzg0OGZlOTNmMDQwNzhkMjM5OTQxZjAxMjk1YjYzYTYyYzgxYzIwODNlYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlMGYzOGZlYjdlMzYxYWEyYmZiY2I0MzZiMzJmMWNhODI0OGY5ZWJhOTc0N2U2ZjYyMjM5NmM3NmFjYjQ5Y2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlMTFiYzk5MmIxNDAwZmNjODgzZTI0NmUyMjMxN2MzOGU3ZDEzNmNiNzYzYmY5NWMzYTJkMWJmNjk3MWNmY2MifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L88-L103",
+          "version": "repo-lines-v1:sha256:aea6ccccaf29d7a0e9eb8e0b6919a9b6f4c0ab89081a4e629559c55993f2b9d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3ZWYwNTUzMzRjOWZlZWIyMzY4OTYwYTA0MTQ3NmFkNGY3YjQ5MjlhYjgzOTQ0ZWU2ZDNkMzUzNDI1MTJiYTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxNDJkMjZiNzg0MmZmYmY4ZTBhODY0ZjNlZGEyNzhhNTBjZDY3YWJkMTQ0N2I1NDFiZTA4MTdiZTEwMTc4YTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1NjBhNzU5YzBmYTk5ZmY5YzAyZDkwZTZkMTJmYWIxNGJiMzU0ZDFjOTIzYmEzMjA5MjMzOTYwZDBiZTI2MTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e009121c6f12443cba7f82dbbc961e79",
+      "statement": "The chat confirmation card's before/after rows are computed locally from the current and patched Person values by features/chat/confirm.ts, not from the model's arguments.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L1030-L1112",
+          "version": "repo-lines-v1:sha256:0d559a230d0e67ba3beac9caf70d3e286a5578c9e5267f7d2868d1f7fc4e6222:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzNmQ1ZjU1MTViNTllNDQwY2QzYWU3ZmRmNTU5MzA4MDMxNWMxZTQ3YjQ5ODRjZDZkZjc0ZjhhMWJjYWY3NWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkOWU3ODY0NDA4ZDIzYzJlYTNlZDNlZTk2ZGNjYWJiYTZkOTJhNjY2NTI2ZTdiMTg3ZjJlZjI4M2M1YmMwOTEifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/chat/confirm.ts#L16-L80",
+          "version": "repo-lines-v1:sha256:02552a2e865b875f51694ee1161c1916dd1db3238ece78327a94eb85bc700efc:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhZGQ5NDdjYjVhMDI2YjMyYjJkNWQ1ZTA3YzE3OWJlMzI2OTcwNGMzYjA4NTVkZGU4OTA2ZTM4NTAzZDU5YmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3ZjcwN2NjNzUzZDJkZDIxMDc2OGJlYzA1MjYxYzJjM2QwZDM3ZjYwZWY2NmZhMmZhMmQ4NjAwMTNiZTg4ZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyZTk1NTczY2UxOTUwMzNkZmM5OGY3ODUwMzQxYWY0MmFmNWIxYjkyODNhNDNiZjQzYzViMDQyZTdjZmIzM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkZjA4NTNjZmUyNmUzN2Y2NTdjMTk0ODhmZjJiNTJjNWQ5MTk2MzNmY2FhZGI5NWIyYTkyZjU0NGMyNDU2NjYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

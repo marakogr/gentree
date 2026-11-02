@@ -1,0 +1,467 @@
+/*
+ * Projects start screen: header, the pinned open-project row, the project
+ * table and the empty state. Layout only — controls, badges, messages and the
+ * table are Fluent components, so this file keeps the page grid, spacing and
+ * the few accent surfaces that Fluent does not expose as a prop.
+ */
+
+.projects-page {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.projects-panel {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ---------- header ---------- */
+
+.projects-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.projects-header-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.projects-page-title {
+  margin: 0;
+}
+
+.projects-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- projects card and toolbar ---------- */
+
+.projects-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--background) 40%, transparent);
+}
+
+.projects-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.projects-toolbar-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.projects-section-title {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.projects-search {
+  width: min(20rem, 100%);
+  min-width: 10rem;
+}
+
+.projects-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.projects-sort select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.projects-sort select:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.projects-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in oklab, var(--primary) 32%, var(--border));
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--primary) 10%, var(--card));
+}
+
+.projects-selection-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Destructive text on a ghost button; solid red is reserved for the dialog. */
+.projects-danger-text:not(:disabled) {
+  color: var(--colorStatusDangerForeground1, var(--destructive));
+}
+
+/* ---------- table ---------- */
+
+.projects-table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.projects-cell-muted {
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.projects-persons-header,
+.projects-actions-header {
+  white-space: nowrap;
+}
+
+.projects-actions-header {
+  width: 1%;
+}
+
+.projects-select-cell {
+  width: 1%;
+  padding-left: 16px;
+}
+
+/* Fluent's checkbox indicator is almost square; match the rounded controls
+   used by the rest of the projects screen. */
+.projects-card .fui-Checkbox__indicator {
+  border-radius: 4px;
+}
+
+.projects-name-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.projects-name-text {
+  min-width: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.projects-backup-stale {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--legacy-chat-banner-fg);
+}
+
+.projects-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* Fluent buttons default to a 96px minimum; row actions size to their label. */
+.projects-row-actions .projects-row-primary {
+  min-width: 0;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+
+/* The open project is pinned on top with a light blue tint and a left stripe. */
+.projects-row-current {
+  background: color-mix(
+    in oklab,
+    var(--colorBrandBackground) 8%,
+    var(--card)
+  );
+}
+
+.projects-row-current:hover {
+  background: color-mix(
+    in oklab,
+    var(--colorBrandBackground) 12%,
+    var(--card)
+  );
+}
+
+/* `tr` box-shadow is unreliable with collapsed tables; paint the stripe on the
+ * first cell instead. */
+.projects-row-current > td:first-child {
+  box-shadow: inset 3px 0 0 var(--colorBrandBackground);
+}
+
+/* A missing validation is the one state the row menu cannot show inline. */
+.projects-check-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--colorStatusWarningBackground3, var(--legacy-chat-banner-fg));
+}
+
+.projects-header-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.projects-header-info-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted-foreground);
+  cursor: help;
+}
+
+.projects-skeleton-cell {
+  padding-block: 8px;
+}
+
+.projects-no-results {
+  margin: 0;
+  padding: 32px 16px;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.projects-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--muted) 45%, var(--card));
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+/* ---------- empty state ---------- */
+
+.projects-empty {
+  padding: 40px 24px;
+  border: 1px dashed color-mix(in oklab, var(--border) 70%, var(--muted-foreground));
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--background) 40%, transparent);
+}
+
+.projects-empty-inner {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.projects-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 4px;
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--primary) 12%, var(--card));
+  color: var(--primary);
+}
+
+.projects-empty-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.projects-empty-hint {
+  max-width: 34rem;
+  margin: 0 0 16px;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.projects-empty-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  text-align: start;
+}
+
+.projects-empty-option {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--card-foreground);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.projects-empty-option:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px color-mix(in oklab, var(--background) 45%, transparent);
+}
+
+.projects-empty-option:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.projects-empty-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--primary) 14%, var(--card));
+  color: var(--primary);
+}
+
+.projects-empty-option-icon-import {
+  background: color-mix(
+    in oklab,
+    var(--colorStatusSuccessBackground1, var(--accent)) 55%,
+    var(--card)
+  );
+  color: var(--colorStatusSuccessForeground1, var(--primary));
+}
+
+.projects-empty-option-title {
+  font-weight: 600;
+}
+
+.projects-empty-option-hint {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.projects-empty-option-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ---------- shared bits ---------- */
+
+.projects-hint {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.projects-hint-tight {
+  margin-top: -6px;
+}
+
+.projects-dialog-error {
+  margin-top: 12px;
+}
+
+/* ---------- validation summary ---------- */
+
+.projects-report {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--muted) 45%, var(--card));
+}
+
+.projects-report-head {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.projects-issues {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.projects-issue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+}
+
+.projects-issue-text {
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .projects-empty-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .projects-toolbar,
+  .projects-empty {
+    padding-inline: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projects-empty-option {
+    transition: none;
+  }
+}

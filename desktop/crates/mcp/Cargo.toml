@@ -1,0 +1,25 @@
+[package]
+name = "gentree-mcp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+gentree-core = { path = "../core" }
+serde.workspace = true
+serde_json.workspace = true
+# `get_current_date` reports the local clock. `local-offset` is the feature that
+# makes `OffsetDateTime::now_local()` available; the tool falls back to UTC when
+# the platform cannot resolve a local offset.
+time = { workspace = true, features = ["local-offset"] }
+uuid.workspace = true
+
+# `server` gives `ServerHandler`/`tool_router`; `macros` gives the
+# `#[tool]`/`#[tool_handler]` attributes used by the tool catalogue.
+rmcp = { version = "3.6.0", default-features = false, features = ["server", "macros"] }
+# `JsonSchema` derive emits `schemars::` paths, so the crate must be a direct
+# dep. `uuid1` adds the `JsonSchema` impl for `uuid::Uuid` used in tool schemas.
+schemars = { version = "1", features = ["uuid1"] }
+# `spawn_blocking` keeps the (synchronous) access calls off the async runtime.
+tokio = { version = "1", features = ["rt"] }

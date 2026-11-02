@@ -1,0 +1,60 @@
+{
+  "gender": {
+    "MALE": "Männlich",
+    "FEMALE": "Weiblich",
+    "UNKNOWN": "Unbekannt"
+  },
+  "nameType": {
+    "BIRTH": "Geburtsname",
+    "MARRIED": "Ehename",
+    "RELIGIOUS": "Religiöser Name",
+    "OTHER": "Sonstiges"
+  },
+  "eventType": {
+    "BIRTH": "Geburt",
+    "DEATH": "Tod",
+    "MARRIAGE": "Heirat",
+    "DIVORCE": "Scheidung",
+    "BURIAL": "Beerdigung",
+    "RESIDENCE": "Wohnsitz",
+    "OCCUPATION": "Beruf",
+    "EDUCATION": "Ausbildung",
+    "OTHER": "Sonstiges"
+  },
+  "relationshipType": {
+    "PARENT_CHILD": "Elternteil — Kind",
+    "ADOPTIVE_PARENT_CHILD": "Adoptivelternteil — Kind",
+    "SPOUSE": "Ehepartner",
+    "PARTNER": "Partner"
+  },
+  "datePrecision": {
+    "DAY": "Tag",
+    "MONTH": "Monat",
+    "YEAR": "Jahr",
+    "UNKNOWN": "Unbekannt"
+  },
+  "dateQualifier": {
+    "EXACT": "Exakt",
+    "APPROXIMATE": "Ungefähr",
+    "BEFORE": "Vor",
+    "AFTER": "Nach",
+    "RANGE": "Zeitraum",
+    "UNKNOWN": "Unbekannt"
+  },
+  "ancestorRole": {
+    "ROOT": "Wurzel",
+    "FATHER": "Vater",
+    "MOTHER": "Mutter"
+  },
+  "descendantRole": {
+    "ROOT": "Wurzel",
+    "SON": "Sohn",
+    "DAUGHTER": "Tochter",
+    "CHILD": "Kind"
+  },
+  "edgeDirection": {
+    "UP": "Aufwärts",
+    "DOWN": "Abwärts",
+    "SPOUSE": "Ehepartner"
+  }
+}

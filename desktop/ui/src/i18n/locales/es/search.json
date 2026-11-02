@@ -1,0 +1,46 @@
+{
+  "title": "Buscar",
+  "placeholder": "Nombre, lugar, evento, fuente…",
+  "label": "Consulta de búsqueda",
+  "hint": "Escribe al menos 3 caracteres: la búsqueda se inicia automáticamente tras una pausa",
+  "idle": "Empieza a escribir para buscar en el proyecto",
+  "empty": "No se encontró nada",
+  "noTypeResults": "No se encontró nada entre los tipos seleccionados",
+  "matchCount": "Encontrados: {{count}}",
+  "results": "Resultados: {{count}}",
+  "resultCount": "Encontrados {{shown}} de {{total}}",
+  "truncated": "Se muestran los primeros {{shown}} resultados; concreta la consulta",
+  "groupCount": "{{count}}",
+  "similarCount": "{{count}} más",
+  "groups": {
+    "person": "Personas",
+    "event": "Eventos",
+    "source": "Fuentes"
+  },
+  "filters": {
+    "title": "Filtros",
+    "typeLegend": "Tipo de entidad",
+    "reset": "Restablecer filtros",
+    "clearSearch": "Borrar la consulta"
+  },
+  "chips": {
+    "query": "Consulta: {{value}}",
+    "type": "Tipo: {{type}}",
+    "removeQuery": "Quitar el filtro de consulta",
+    "removeType": "Quitar el filtro «{{type}}»"
+  },
+  "rebuild": "Reconstruir el índice",
+  "rebuilding": "Reconstruyendo…",
+  "retry": "Reintentar",
+  "openResult": "{{type}}: {{snippet}}",
+  "noSnippet": "sin fragmento",
+  "sourceDetails": "Detalles de la fuente",
+  "fields": {
+    "title": "Título",
+    "author": "Autor",
+    "publication": "Publicación",
+    "repository": "Repositorio",
+    "url": "Enlace",
+    "notes": "Notas"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "title": "Verwandtschaft",
+  "fromLabel": "Von",
+  "toLabel": "Bis",
+  "filterPlaceholder": "Nach Namen filtern",
+  "pickPlaceholder": "Person auswählen",
+  "swap": "Tauschen",
+  "find": "Verwandtschaft finden",
+  "emptyProject": "Das Projekt enthält noch keine Personen — auf dem Tab „Personen“ anlegen.",
+  "samePerson": "Zwei verschiedene Personen auswählen.",
+  "notFound": "Keine verwandtschaftliche Beziehung in den Daten",
+  "kinshipLabel": "Verwandtschaft: {{term}}",
+  "resultTitle": "{{from}} → {{to}} — {{term}}",
+  "kinshipUnknown": "Verwandter",
+  "routesLabel": "Routenvarianten",
+  "primaryRoute": "Hauptroute",
+  "alternativeRoute": "Variante {{number}}",
+  "chainLabel": "Verwandtschaftskette",
+  "kinshipPanel": {
+    "title": "Wie diese Person mit der ausgewählten Person verwandt ist",
+    "searchPlaceholder": "Person finden",
+    "noMatch": "Nichts gefunden",
+    "empty": "Es gibt keine anderen Personen zum Vergleichen.",
+    "direction": "{{from}} → {{to}}"
+  },
+  "commonAncestor": "Gemeinsamer Vorfahre: {{name}}",
+  "noCommonAncestor": "Kein gemeinsamer Vorfahre — der Pfad verläuft über Ehepartner.",
+  "distance_one": "{{count}} Schritt",
+  "distance_few": "{{count}} Schritte",
+  "distance_many": "{{count}} Schritte",
+  "distance_other": "{{count}} Schritte",
+  "stepsLabel": "Schritte des Pfades",
+  "openInGraph": "Im Stammbaum öffnen",
+  "diagramLabel": "Verwandtschaftsdiagramm",
+  "zoomLabel": "Diagramm-Zoom",
+  "zoomIn": "Vergrößern",
+  "zoomOut": "Verkleinern",
+  "zoomReset": "Zoom auf 100 % zurücksetzen (aktuell {{percent}} %)",
+  "fit": "An Fenster anpassen",
+  "clickHint": "Auf eine Person im Diagramm klicken, um die Karte zu öffnen; ziehen, um das Diagramm zu bewegen, scrollen zum Zoomen.",
+  "step": {
+    "UP": {
+      "MALE": "Vater",
+      "FEMALE": "Mutter",
+      "UNKNOWN": "Elternteil"
+    },
+    "DOWN": {
+      "MALE": "Sohn",
+      "FEMALE": "Tochter",
+      "UNKNOWN": "Kind"
+    },
+    "SPOUSE": {
+      "MALE": "Ehemann",
+      "FEMALE": "Ehefrau",
+      "UNKNOWN": "Partner"
+    }
+  }
+}

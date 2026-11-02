@@ -1,0 +1,351 @@
+/* Built-in guide: a grouped card index, one focused article view and a
+   stacked result grid while searching. Tokens come from the active theme, so
+   the page follows the classic and swiss styles without extra overrides. */
+
+.help-page {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+
+/* ---------- header ---------- */
+
+.help-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.help-head-text {
+  display: grid;
+  gap: 4px;
+  min-width: 15rem;
+}
+
+.help-subtitle {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--muted-foreground);
+}
+
+.help-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.help-search {
+  width: min(22rem, 100%);
+  min-width: 12rem;
+}
+
+/* ---------- index ---------- */
+
+.help-body {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.help-index {
+  display: grid;
+  gap: 24px;
+}
+
+.help-group {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.help-group-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.help-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 12px;
+}
+
+.help-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    transform 120ms ease;
+}
+
+.help-card:hover {
+  border-color: color-mix(in oklab, var(--ring) 55%, var(--border));
+  background: color-mix(in oklab, var(--ring) 7%, var(--card));
+  transform: translateY(-1px);
+}
+
+.help-card:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.help-card-icon,
+.help-article-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--ring);
+  background: color-mix(in oklab, var(--ring) 14%, transparent);
+}
+
+.help-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+}
+
+.help-card-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.help-card-title {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.help-card-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+
+.help-card-arrow {
+  margin-top: 8px;
+  color: var(--muted-foreground);
+  transition: transform 120ms ease;
+}
+
+.help-card:hover .help-card-arrow {
+  color: var(--ring);
+  transform: translateX(2px);
+}
+
+/* ---------- article ---------- */
+
+.help-article {
+  display: grid;
+  gap: 20px;
+  max-width: 62rem;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+.help-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.help-back:hover {
+  color: var(--foreground);
+  background: color-mix(in oklab, var(--ring) 10%, transparent);
+}
+
+.help-back:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+.help-article-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.help-article-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+}
+
+.help-article-heading {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.help-article-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.help-summary {
+  margin: 0;
+  max-width: 52rem;
+  color: var(--muted-foreground);
+}
+
+.help-article-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(15rem, 0.6fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.help-steps-block {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.help-steps-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.help-steps {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.help-steps li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  line-height: 1.45;
+}
+
+.help-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ring) 16%, transparent);
+  color: var(--ring);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.help-aside {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.help-note-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in oklab, var(--ring) 28%, var(--border));
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--ring) 7%, var(--card));
+}
+
+.help-note-icon {
+  margin-top: 1px;
+  color: var(--ring);
+}
+
+.help-note-title {
+  margin: 0 0 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.help-note {
+  margin: 0;
+  color: var(--muted-foreground);
+  line-height: 1.45;
+}
+
+/* ---------- search results and empty state ---------- */
+
+.help-results {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.help-results-count {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.help-empty {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  max-width: 34rem;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 900px) {
+  .help-article-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .help-head {
+    align-items: flex-start;
+  }
+
+  .help-head-actions,
+  .help-search {
+    width: 100%;
+    max-width: none;
+  }
+}

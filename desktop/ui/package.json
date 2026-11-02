@@ -1,0 +1,51 @@
+{
+  "name": "gentree-ui",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Gentree desktop UI — a local-first family archive",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "i18n:check": "node scripts/i18n-check.mjs",
+    "contrast:check": "node ../../design-system/gentree/verify-contrast.mjs",
+    "test": "vitest run",
+    "ux:setup": "node e2e/scripts/ensure-driver.mjs",
+    "ux:build": "node e2e/scripts/build-app.mjs",
+    "ux:review": "node e2e/scripts/run.mjs",
+    "ux:smoke": "node e2e/scripts/run.mjs --smoke"
+  },
+  "dependencies": {
+    "@fluentui/react-components": "^9.74.11",
+    "@fluentui/react-icons": "^2.0.344",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2",
+    "clsx": "^2.1.1",
+    "i18next": "^24",
+    "leaflet": "^1.9.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@tauri-apps/cli": "^2",
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^22.20.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@wdio/cli": "^10.1.0",
+    "@wdio/local-runner": "^10.1.0",
+    "@wdio/mocha-framework": "^10.1.0",
+    "@wdio/spec-reporter": "^10.1.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8",
+    "webdriverio": "^10.1.0"
+  }
+}

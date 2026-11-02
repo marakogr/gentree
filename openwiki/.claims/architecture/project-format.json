@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:c414c802369d2cbfe1566f489da93d2a773a646a21e43825d390cd960283cf2e",
+  "claims": [
+    {
+      "id": "claim_a820be8849e14af2831f75fbdb740895",
+      "statement": "A project folder contains manifest.json, six JSONL collections, a media/ tree and a .lock file; checksums.sha256 exists only inside backups.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L206-L225",
+          "version": "repo-lines-v1:sha256:f917abe744c95f6609be29ac45b59ac76af5b3ba43c858d20308a6a21e8f0c2c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYzUxZTI3MTAxZjE3ZWIxNDM1ZDFjNjY4YmM3N2U2MjhkYWViODc2MTliNTJkMGExNDE4YTJiMWYxNTZjYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk4ZTVhNmU4MThkZDkyMmJhZjY0YmI5NjJjYTEzZjBmOWY5MzRjMTRjZGFlMmJiYmI3OTE1ZjgzMDhiOTM2N2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmYTQzMzRkMWVmZjdhNWE0Y2YyMzJhMmY1MjZkOTAyMDFhNzNkYWNjMTU3N2JhNWU3NTlkOGQ2NmUwNTY5YTUifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L25-L44",
+          "version": "repo-lines-v1:sha256:d232d1665fb7c86451c7cd353771f6efa1ef0811e5b364cc1fd7e58298191d4b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjY2RiZjk0ZTljNGI5NWY5MDRkNGVjZmViYWFiNWU4ZGUyYWY3YzA4NDlmY2QzYjBhYTcxZjkyYjA0ZTVlYjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlZDU4MjViM2JiOWZlYTgxNWY1NDEzNjhkYzk0NWE4ZjQ3YjdhM2Y4ZGQ3ZTVhZDc2N2Q0ZDAzZGY1MzZhZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5NzBmOTU3YzBkZDZiYTkzYTE3YjEyOTM5Yzc0NmFlM2Q4MzdhYWI0NDU5OWRkMzYwZGQ0YzgxOTQ2Nzk5MmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b787b5a653cf45439fec57dd0f3530e4",
+      "statement": "manifest.json carries format/schema versions, projectId, counts and contentHash; a folder with a newer formatVersion is rejected with FORMAT_VERSION_UNSUPPORTED, and counts are recounted on open rather than trusted.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/project.rs#L53-L84",
+          "version": "repo-lines-v1:sha256:0f82af0964daa9011e8b02f93733f383764394bb0fc91ad1c32a43d1c3e6814f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3YzE4Nzk4OTAzNDUzYzYwYTUxN2Y0M2JhYTRlOTNmZGMzYTBmMWQ0ZGQ4N2FhMjNlYjY3MDA5NzNkMTM0MzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmYWEwYjRkYzUzMTY4M2FjZDdiMzhkOGI3NjM5YTUxMDA5ZDdiYzdiYzkwYjA3M2MxZTJjZjExMTBkODM3MjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiYzk4ZDZiMGRjNDkyYzUwMTZkZjEwODA1YTNhNTRlYjljMTg0YTVhNjEzN2U3ZjRiZWNmYTBjMjIwNTUwZDAifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L227-L249",
+          "version": "repo-lines-v1:sha256:586bbc072bb25ef2f95e03fc49267b14f20f5ee9b0d03d76ea8a757d5b7d39d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmY2IzMmU3N2I5NzBjNzlhOGRmNWVkMGViZTBhODhmODJlZjg4OTJiNTIzOTE5MTk3OGI5NzE0MDlmMzU4N2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk4ODdhZDc2NjA2MWJiZTQxMGJiMjI0ZDdiNjA1M2ZjNDk4ZGEzZmEzZWVkZWUyYTIxOTA3MzI3YWVkYjA0ZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2NDI0Y2ZlYzc3Y2M3MDY1NGU5YTE0ODhjOGE3YmIzNmQ4ZjI2MWFhYzg5ZjFhYzNkMzc1N2UzZWFlYmE4YzEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L457-L467",
+          "version": "repo-lines-v1:sha256:8b6d33c3543489ec032d151062efd1395d82f0aee8590e06fee75561342cca48:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZWM5NDk4MTkzMGIxNmQxNzQwMmRjNjMxY2YzM2RlMDJhZTdhZWJjNmJiNjgyZWQ2NmQzNTg3MWY1NGZhOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzZTVjMzhkMzZkOGRmMDgyMjc5NDEzMmEwYWUwNDlhM2I2MTliMWExM2E4MGFjNjkyZGNiYmQyMDFkYmFhOWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2MjNjMTk2OTQ1MDQ2ZTFiZGU4YzYyMWViYTdhNjYzNWQ3NGEwZTZlMmEwNTBlMWRlZTk3YjA2YjUyMWI1MjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_795ec17277854cddb7e845374f848f78",
+      "statement": "contentHash is sha256 over the schema version and each data file's name, line count and content digest, prefixed with 'sha256:', and is computed on demand rather than stored per row.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L1196-L1214",
+          "version": "repo-lines-v1:sha256:36cf0e0708fda68cf7ba6924a59b96bdfdd35d250e24df9d62e62ff52c56951c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkM2M1ZGI2NWJmMjdiYTE3NzUyNTBhYmUwZTZkYzNlMmUzZTU2MjlhMTdjNTIxNWU2NGY0Mjk4ZWY5OWE5OGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2YWMzNGM1NDUxYzliZmIyMGU1YmYzZTBhYTUwZjM5NzlkYTEwMTg5MjgzMTcxZjYwNzA4MTMyN2U4NWIzOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiYzk4ZDZiMGRjNDkyYzUwMTZkZjEwODA1YTNhNTRlYjljMTg0YTVhNjEzN2U3ZjRiZWNmYTBjMjIwNTUwZDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_282a50cd6da043be92360a519833060b",
+      "statement": "Collection writes validate every entity, preserve createdAt, keep updatedAt for unchanged payloads to avoid false STALE_WRITE conflicts, and rewrite the whole JSONL file atomically through a temp file, fsync and rename.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L1186-L1194",
+          "version": "repo-lines-v1:sha256:dcbf85430e24285e9ecac6ad43a38ca0ffb9a169ba3e8ae7c8f6d47e2ab311d6:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2ZkZWI3NDU5NzUyNzMxOWE1ZmE1NzRiYTFmZTk3NmVlNGM5NjBmNWVhNzY1OTBhNWRmYWIxMjMyMDQwOWE1ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2M3ZTlhOGQwMjkxOGFhNzE3YzhmY2NiZDZiZGU5NTQ4MGM2MmExMjQ5M2E4NTFlYzgwMjQ0NGQ4NWZjMWRiMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTIwYjQxOTY2ZDg1ZDNhYmY4N2ZlODg3NDFmZWE2ZDU4NWU3ZDJmNWNlMmQwNGQwNDgwNWNjYmYxYTdiMTgwYiJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L342-L366",
+          "version": "repo-lines-v1:sha256:20c511bc4552b91f35bba39d146ca22ae04dc2c6fcbcc264fec878e51d54f1e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1MDAyMDE0MzMxNGEzODRkNWIwZTk5YTllYjA5YjcxZTM0MDcxYjczNWJjMjIyMTFkZWIxMDFlMmNmNGU2NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyYjk5ZDYyZjNkZDg1OTkzN2I0NDE4N2M0YjJiZGU1ZWMzMjY2OTU2OTlmN2ViMmRlOGY2ZmE3ZWVkZmMxNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1MGFjYzIwM2VjNmJiN2Y4NWI3ODc2OWNkMTUyNjMwYjkxYmFhODUxMjkxMzg1MTI4NTIwOWI0YzhhNmI1NTgifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L408-L433",
+          "version": "repo-lines-v1:sha256:6ad55f1a7bae334254046115df1859ae9e0e4b2821a642b67d24e3ed700a1765:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2NzViMDk5NGI5NzhiODNiZjBkOGUxM2U3Y2FhNWQ1NWY1NTE1NjcwMjg2Y2E2NTJhMDExMjRlOTBlZDNkODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3MmI3OTAxMjZkMTVlNDA5MjMxMWFmOTgwNTg2NGYxZDdjYTk3ODc3ODA5YjIzNzg5YjQxMmIzOGFmMGFjMDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwYzAzZmQ1YWFiMzNkMDNhNTNiZmQ3M2U2MDZhZjBkMGFlOTlmNDE0Yjg3ZGI0MTRkNGU1NDE0ZGYwYWE4YTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f2e05ce2deda44b8af64a97f2bf74c0d",
+      "statement": "A mutation rewrites the data file first and manifest.json last, refreshing updatedAt, counts and contentHash, so an interrupted write surfaces as a count or hash mismatch instead of silent corruption.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L432-L449",
+          "version": "repo-lines-v1:sha256:7a2115cf894861a8d75b2b1181c88c085d4cd31bd18ce7e954c8fb9505cb4233:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjZDJjZjk3MzI0N2I1NjAwZjk5NDU3NDllYjQ4MDQyMTBhZmNkZjk5Y2NlMDY4NzNmMDk3ZmE0NzhjYmQ0NTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzYzYxNjhmMTMxN2RkYjJhNDc0NmE4NWJhZGNlNTEzMmM2YTQ1NzQ1MDY5ODhiZDA4N2I2MTlhZjA2MzMxYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMDc3MDAxNzQ2YTRmY2Y0YThkNTlmODU3OGMwNjgzY2Y3MTIxZDM1MDEwOGRlZTIxZmQ2NzVjOTBkOWQ2YTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6f7f4873f4254545a8b07d22e53001ab",
+      "statement": "Writable stores take a non-blocking exclusive lock on <project>/.lock and a second writable open fails with PROJECT_LOCKED, while read-only opens skip the lock and work while the project is locked elsewhere.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L261-L278",
+          "version": "repo-lines-v1:sha256:6442415468d1e16eca89830b01aa11fbce9981434336cf4c18965162602b51de:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyMWFmNmI5NDM1MGI3MDNlNzRhZGQyZTQxZTliNjQ1ZTM2ZTE4MDUwOTVkNzljMmQ5M2ZmMjQ5ZmNkMTFjZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhZmUzODQ1ZDM4ZGEzZTljOGEwYjE0ZDRiNjAyYWExMWE1YjczYWQxYjAxZThiNTkxZGZkMjQyZDQ2YTkxNDQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L82-L100",
+          "version": "repo-lines-v1:sha256:25f3e1478e0f804a8ba7592b6899e602ef1dae2c0b6e6ef2cc7f319d035ec012:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxYjYwYzU0ZjU5MzQ4N2VlYzFlYmQ4ZWVhMDBhMTNhYjU3ZTYwOGJjMGFjMzc1NzlkODEwMTE5OTQxMTM1MzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyNDMxMzkzNTkzZGE2MjZmMDc3NjVkNDcwOTk5YmVkMTgyOGQxNmJhN2Y2YWY2ZDYzOWM4MzEwZDE5M2Q4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a8b7963458a14b92b4aee0d52c1a98ef",
+      "statement": "Media bytes live under media/<sha256 first two hex chars>/<fileName>, the checksum is mandatory, file names are restricted, and resolve_media_path refuses any record that would escape the project media folder.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/record.rs#L324-L360",
+          "version": "repo-lines-v1:sha256:65aa5131abe2858b778b074d61521ca5fca1594e73d718b45bc0445aef3d8ea1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5ZjM0ZWEwNGMxY2I0NTQ4ZmJmNzM1MWQ3YTM1NWQ1ZTQ5ZmEwYzUzYzZkMDFhNjkwNDZhN2NlMjJhMzYxNTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmZjAwOTQ1MTUzMmEzNDM5MDkyNDBlMDQ2MzliM2Y4NWM3YTVmZmQwMjBiNDBlOTJjYjgxYTAzZGIwOTY3ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4NzYwMzRhM2JjMmU3ZGQyZjlkZDBjMWViNzM2ZmQzOGQ0MmY5OGQzMzdjMDc4MzU4N2Q5M2FhNjY5YjNlODQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L865-L900",
+          "version": "repo-lines-v1:sha256:04d52e3b3520ff3a2208b1586705bd84d88e85441996b3f07a7860c7f054b8a2:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3MzJjZDc0N2Y2OWZkZGFhMWJmNzYyY2YxMDczY2M5ZmNkM2U4NTcxMTkyNzIxZjQ3NjA2ZGQ0NmI5NzQxZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ODkzZWI4ZWZiMTk2MjZhZDE0Yzk4YjFiYWM4MTgzZTlhNWQwNmFjNjc5Zjk5ZGQzNzNhZmNmN2IwYTA4NmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlYWNmZWM2ZTY2ZmZhNTc4MjQ3MzFhMGFkNjQ2YmEwNTNiZmFhODgzYzY5NjhmMDhmOGViYTUzOTJjYjNhMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5NGY4ZDhlMGUxMzA5ZjIyNDZmNzE3MTU5NmFiMWRiMWViMTUwNzE3YjY4MDQ5Yjc2ODY0NjM3ZGQ1MDVlZDEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L997-L1005",
+          "version": "repo-lines-v1:sha256:b7352ed1df00d3e322f910f465b653f484d22f9173bcb2764946aabf341ea460:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2I5NDZmNmJjYWFjMTEwMGQ4M2JlY2ZhODNjZDM4MzIzNWZlMDRlODM2NzZmM2UxNTU1OTQyYmVjOTA4ZmQ3NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTllNzYzNTVjZjExOTk0ODBjM2Y5OTgzNmIxNDg2Yzg0MWQ4OTFmYWFkOTA0YzYwOGUwOTMwMjJkMzc1N2FlZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzVmNmY0NjZlNTljZmMzMDcwM2M0NWY3MmFmNjVkZTU0YWMzNjNkMzU0Y2MxYTMzMzAzNTBhY2Q0NTI0MzRjNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_970816556141406db2e34e5d3dfc873d",
+      "statement": "Backups are zips of the manifest, data files, media and a generated checksums.sha256; restore verifies every declared checksum, rejects escaping, oversized or empty archives, assigns a new project id and never overwrites an existing project.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L474-L511",
+          "version": "repo-lines-v1:sha256:d9c5ebe0d1dd4cadc792801c8a3f4b0cb7d1aca52f9ec418e1be063e14c4f4ea:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjNjQ1ZTU5MjI1ZDVmMjA1OGVhNWE1ZTBmYzNiMzEyODQ2Mzc4ZmEyNTQ3OWMxYzQ2MWE5NTUxOTJjMzIxNmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhMGZmOWNmZjAyNzI4Y2UyODgzMjBkNTllZDk5YTI2NTc4Yjk3MmE1YTg4N2FmOGQ0Yzk0M2E4MmQ4MDQ4MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0ZTBiYzg1N2U2ODRkMjAwZTg3NTMyODFlYmVjOGI3NjJhMDMyNjhiYmVjY2U2NDY5MmNiN2NlYTZjODY3MWYifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L536-L636",
+          "version": "repo-lines-v1:sha256:1f3cdfca63ba0047d1405f2bf7ff04b0018f1b85a9b94f834e5ab3d013395d67:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5NDU5NGQxNDhhMzg2NDc5YjlmMmI0MWM4ZjBjYTEwNTQ1ZDI0OWQ1YWUzODZhYjU5ZWU1ZjhjMzg0NWIyYzg5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4NDQ2NGFjNTZlMGU5YjFmNDc3Y2RmYjBlOTA5NDQ1M2FjNmQ5NmZhYTg2NTQ1ZGRkOGQ5MzNhZjRlNmM1ZGU5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkMDY2MDMxN2U3ZGJmNjg1YTY2Mjk4ZGJkMjhiMzY2M2NiZTUyMWRmOThhYjU5OWI5NTdiYTY3Y2UwY2Q3YmQ0In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_323bf9e396244b52b8643f813786f2c9",
+      "statement": "Deleting a project moves its folder to trash instead of removing files, and pruning backups always keeps the newest archive.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L709-L797",
+          "version": "repo-lines-v1:sha256:80b718e58eed67db5826f0c2cb36dc7ec8c43b1646eac15ffaba61fcd3e0856d:eyJzZWxlY3RlZExpbmVDb3VudCI6ODksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4Y2UzYTUzNGE0YTkxZDRmMjJiM2Y4N2ZjMGU4NDdkOGEwMDAzZTgyOTJiYzA4ZDQxZDBkY2YyMjcxMGMxNDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3NzkwYjU3Njk3MWM5NzVmZTkzZGU1YWY4OGFmOGY5MTU2MmFhZmJkZjhlZjVjMjhmNmMzZGRlMGUyZGQyMWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1ZjZmNDY2ZTU5Y2ZjMzA3MDNjNDVmNzJhZjY1ZGU1NGFjMzYzZDM1NGNjMWEzMzMwMzUwYWNkNDUyNDM0YzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4MmJkODA4YmEzMjZhZmE2MzY2M2IxOTBmNmE2ZTAwNzJhYTRhNDU3YmExNzlkZjA1ZjE5MTExZDM5NzgxNDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_94ea2d9f735941948f27f86aedf52a08",
+      "statement": "validate_layout reports missing or unreadable manifests and files, unsupported format versions, count mismatches and a stale contentHash without repairing anything, and list_projects skips broken folders so healthy projects stay visible.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L148-L181",
+          "version": "repo-lines-v1:sha256:3f734a78c7e65650e43552aaefe8b21396e2253fa9ee454e2bae3566412d3203:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiMzM1NWUwMTdhNmI0MTViMzk2MGM5M2M5YTZmMWZjODg0YjUwM2FjY2U1ZTE5YWVhMTFkNGQ0OGQxODMwOGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNTFhYzZkZGY5OTcxZTBiOWE5MTQ1ZTAxYmU0ZDQzY2Y3NTMxYjUzMjAyNjQ5NmExYmE5ZmQxODJhMmU5ZTgifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L639-L674",
+          "version": "repo-lines-v1:sha256:ba5f92b94f29e83fe98042bf3214576a05889bfd0704dd1823c67dd6e9b017b5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1NzZkNjA5NDY1NjA5ZjcxN2VjMjdhOTQ0MmJiYWM2OGIwMjE0NTIwOWU3Y2Y5Y2YyNzFkODM0ZjcyNGZkOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2YzljYjUyN2MwYjE2YjNiYjI4NGE0NmFjN2JmYjY1Yzc0ZjUwN2M3OTgwNTcxZjZmZjJlOWY1NGMxYjk5OTUifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L910-L983",
+          "version": "repo-lines-v1:sha256:a9c9dba25f5f66ef2f3b58c0575fcd33f37390f1641069fd24870c70b9a56d16:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2ZDAzOWVjM2RkMGJlNzZhNTUwZTBiOWVkMTk3MWU5NzI5OTY0NDJkNWVlYzM3NWEyNWU0ZjRkZmQzOTE5NmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwNGRjNTJhZTA0NWM4MjZjNWI2ZWUzZGRhZWU2MjU4OGMxNjllOWZmZTg5YmE3NGNiNTg4MDM2NWE4MjgyMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjOGU3ZWMxNDNmY2Q0YWFkOGViZTRkNmQ5ZDlmNzQ1ZjMwY2ZkMDQyMGU0ODBhZGUzNWQ4NDFiMGRlOTNjZjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2d0a2e32465a44d38d6a627e5522f353",
+      "statement": "A project merge opens both source folders read-only and writes all merged rows into a newly created project folder, so neither source manifest nor its data files are modified.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/merge.rs#L145-L186",
+          "version": "repo-lines-v1:sha256:7c4e23ff8fa0da35758d0756bc4a000bbe033b2698d37278a5dd89df937b49e7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3YjllNTk0NDg0MGQ5NTM4NzczMTY4M2U4MDE2OWUxNzE1YWIwYzBmZjQ4NjZjMmQwZWM5MTY3NDk3ZmRlNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5ZTE0MjEzNTE2YWJiNDVlMDc4M2ZlNTQxOTA2YWE3NDQwYzJlNmY0MjZjYTc0MzU3MTRiOWVmNTRjMDRkZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiYWQ0Y2JmYTNkZmVjNzNmYmU2NzkwZWRiOGQyMmQzMjQ0ZjA5MzNhZWM1MmE0YWYwZTk4NmNhMmJkYWEyN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e2b0241c043f45f9a57ecb7138a5143d",
+      "statement": "The merged project is written in the order persons, sources, events, media, relationships, citations after media bytes are copied; any validation error makes the command return MERGE_CONFLICT and discard the new folder to .trash.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/merge.rs#L291-L296",
+          "version": "repo-lines-v1:sha256:7dc66ff6a6a863887bacdc551023527c1847c3faae0654e1165a86a75262ce9a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTE2ZDhjYTlkMDM1NDdhOWMwN2I2YmU5YmU4MTA4ZDE0MTkwZjc5MTVlMjUwMjEzNWJhNTBhMjQ3YmI0OWRhMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDRmYWQ3YWVhYTU5ZDJjYWZmMWUwZDJlNzkzM2JjNGQ0NWY1Zjk4ZjBhYmY2MWU3NjVlODUzMWQyOTFhY2M5NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjBiZTYyMDhjNTcwNTNiN2MwYTRmZTZmYTExNDY4MWUxNDFlYWVhYThjOTQwYjg1NGFjZmExZDk5MmU2MGU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTRjNTJkNTgwODljNmNiYzY1MTM3MTZkMjViODBlY2JkNzQ5NjE4OGY0M2NhMWZjNzExZDJmMTU3YzM4N2I0OCJ9"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/merge.rs#L300-L313",
+          "version": "repo-lines-v1:sha256:a60065676ea8dbdbe46e13d28e6765701f5d9cf2c8e2880ea93ad1bee503db2c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3Y2FkNWY2N2NiNmI2ZDc5ZGMxNGRlYzdhYzAwYTZkMDkzNjU1YTdjMzY0MjgzNzI1ZWU2YjNlYzU5NDZjMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkMTE5MWQ5Njg2OWRhOWI1NGYxMTk3YTQ2NDZkMmYxNTU0MmRmOTI2ZWYxZjc2YzljYTQ2NzMyMjVkNjQ1YjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0YzUyZDU4MDg5YzZjYmM2NTEzNzE2ZDI1YjgwZWNiZDc0OTYxODhmNDNjYTFmYzcxMWQyZjE1N2MzODdiNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU0ZTdkODZiMzgwMzQ1YmM3M2U2MWYyOTU5YWM2YWZlMWJjOGZlNjNlOTM5ZjhlYjA0YmQxYjNiYjUyMGIyNDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6ef5bac75d7d457f91e3d639791d5dfa",
+      "statement": "A blank merge project name falls back to '<left name> + <right name>'.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/merge.rs#L197-L204",
+          "version": "repo-lines-v1:sha256:f35fc3683bbc61ac07f66a0c1882fb4a38f4b8587aee5dd69cbf3a1f190c6cd5:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTI0MzcxY2ZjZTRkNjc3NTlmZGEyMWQ3NWNiMmIzZjkyMmQ4M2Y3MTFhMTBlNmI4NDA5YmI2Y2ViMWQ1ODNjMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzVmNmY0NjZlNTljZmMzMDcwM2M0NWY3MmFmNjVkZTU0YWMzNjNkMzU0Y2MxYTMzMzAzNTBhY2Q0NTI0MzRjNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDMwY2EyYzdjYzgzNWMxNGEyOWQyMTY2Y2UzMDg1MmQ2MGU4MjAxM2Y4NDlmMDViM2FkZDQxZDYwMGM3MTA1MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ce39e9a9b1884730a075857482472825",
+      "statement": "The project format version grows with optional row fields: 2 added type-specific event details, 3 added the eventId link on media rows, 4 added the confirmed place point on an event, and 5 added the Wikidata place source; schemaVersion stays at 1.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/geo.rs#L29-L35",
+          "version": "repo-lines-v1:sha256:0ed9e50dd973345b2638b96ce7a3f11236929f92bb2e6815e4cc1b54a69ff636:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTdkY2RkZTYxMDNhZTQ2YWFkOWMyNGM1NjI3ODk3Nzc0MjgxMmUyNjc3MjI0YWU2MGI2MDgzOWJhMzRjYThiYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGE2ZDk3NmQ1MmVkODg3YWM3YmNlY2Y2ZDJjMDZjMzM3MWIxMWUwOGMyYWQzMmU1M2E0OWI0NjUzZGZjZDUxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmUxY2E2YzQyODFkMDY3NGY2MGVhZGYzNjkwNjNmNDk2MjIyZTJlYTZjODQ5NTA3N2U5NmE1NjE2ZWJkZWQyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjNkYmZiNjAzMDg2Nzg0NGEzMjZmYTMzMGU5NDkyNzg2YWE0OGM5OTc3N2MyODk0ZGZmNmJiMzNiZjI4ZTJkZCJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/project.rs#L7-L14",
+          "version": "repo-lines-v1:sha256:c791f62dfd988c0b4f0ea364a627ea290cd9278a40ef6cbcdf96a5592d6e4f8a:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZThiNjJlMzNiYzQ4NDFjODZhNTJiYmZkNDI0YWU0MWUwYmJlYTgyNDIyZDEwZTBkMjBiOWYzMDVmYjQwYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRhMjZkNzFiZTNiZmRiYzJjZjU2ZjJkY2IyNDNmYjk0ZTY5OGVhYTEyNGM4YzlhODQ1N2FmMjI5ODUwZjkxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTI2NWY4NjcwNDQwYzg3NmZlYTU2ZmM5ZTgyODg1ZTU0YzIxNTc4MWFmZjJjYjQ3MTEwOWQ3YTAwZjVlZDM0NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmRhNjk2YzYyMzA3ZjcyMmRlMWYxMTFmN2E2NzkxZTY2MTY0YTk4Zjc0OTU2NDc2MjRiZDFlYjQ5NDAzMGU1MiJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

@@ -1,0 +1,1145 @@
+@layer legacy {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.17em;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+h5 {
+  font-size: 0.83em;
+}
+
+h6 {
+  font-size: 0.67em;
+}
+
+:root {
+  font-family: var(--font-medeo-sans);
+  background: var(--legacy-bg);
+  color: var(--legacy-fg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  min-height: 100vh;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.content {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px;
+  overflow-x: auto;
+}
+
+/* Right sidebar: brand, global items, the open project's tabs, settings. */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100vh;
+  padding: 16px 14px;
+  overflow-y: auto;
+  order: -1;
+  border-right: 1px solid var(--legacy-panel-border);
+  background: var(--legacy-surface);
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-group {
+  display: grid;
+  gap: 2px;
+}
+
+/* Collapsed rail: icons only, labels move to title tooltips. */
+.shell.sidebar-collapsed {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.sidebar-collapsed .sidebar-project-head {
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar-collapsed .sidebar-project-name {
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.sidebar-collapsed .sidebar-project-title {
+  display: none;
+}
+
+.sidebar-collapse {
+  display: inline-flex;
+}
+
+/* Minimal chevron tab on the sidebar's right border. */
+.shell .sidebar-collapse-edge {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
+  z-index: 5;
+  width: 24px;
+  min-width: 24px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--legacy-panel-border);
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  background: var(--legacy-surface);
+  color: var(--legacy-muted-strong);
+}
+
+.shell .sidebar-collapse-edge:hover {
+  color: var(--legacy-fg);
+  border-color: var(--legacy-control-border);
+}
+
+.back-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  padding: 6px 10px 6px 6px;
+  border: 1px solid var(--legacy-panel-border);
+  border-radius: 6px;
+  background: var(--legacy-surface);
+  color: var(--legacy-muted-strong);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.back-bar:hover {
+  color: var(--legacy-fg);
+  border-color: var(--legacy-accent);
+}
+
+.back-bar svg {
+  width: 15px;
+  height: 15px;
+}
+
+.back-bar:focus-visible {
+  outline: 2px solid var(--legacy-accent);
+  outline-offset: 2px;
+}
+
+.sidebar-project {
+  padding-top: 12px;
+  border-top: 1px solid var(--legacy-panel-border);
+}
+
+.sidebar-project-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px 10px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: var(--legacy-heading);
+}
+
+.sidebar-project-name:hover {
+  color: var(--legacy-fg);
+}
+
+.sidebar-project-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-footer {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--legacy-panel-border);
+}
+
+@media (max-width: 899px) {
+  .shell,
+  .shell.sidebar-collapsed {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .sidebar {
+    position: sticky;
+    height: 100vh;
+    padding: 10px 8px;
+    border-bottom: none;
+    border-right: 1px solid var(--legacy-panel-border);
+  }
+
+  .sidebar-menu-toggle,
+  .sidebar-collapse-edge {
+    display: none;
+  }
+
+  .sidebar-nav {
+    display: flex;
+  }
+
+  .sidebar-project-title {
+    display: none;
+  }
+
+  .sidebar-project-head {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar-project-name {
+    justify-content: center;
+    padding: 6px 0;
+  }
+
+  .content {
+    padding: 16px;
+  }
+}
+
+.panel {
+  border: 1px solid var(--legacy-panel-border);
+  border-radius: 10px;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--legacy-heading);
+}
+
+input,
+select,
+button {
+  font: inherit;
+  border-radius: 6px;
+  border: 1px solid var(--legacy-control-border);
+  background: var(--legacy-control-bg);
+  color: inherit;
+  padding: 8px 10px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hint,
+.meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--legacy-muted);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--legacy-error);
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--legacy-panel-border);
+  vertical-align: top;
+}
+
+.table th {
+  color: var(--legacy-muted-strong);
+  font-weight: 600;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+.form h2,
+.form h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--legacy-heading);
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--legacy-muted-strong);
+}
+
+.field > span:first-child {
+  color: var(--legacy-heading);
+}
+
+textarea {
+  font: inherit;
+  border-radius: 6px;
+  border: 1px solid var(--legacy-control-border);
+  background: var(--legacy-control-bg);
+  color: inherit;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-block;
+  border: 1px solid var(--legacy-control-border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: var(--legacy-muted-strong);
+  margin-left: 6px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--legacy-heading);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card-head h2 {
+  margin: 0;
+}
+
+.link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--legacy-link);
+  text-align: left;
+}
+
+.danger {
+  border-color: var(--legacy-danger-border);
+  color: var(--legacy-danger-fg);
+}
+
+.error-block {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--legacy-danger-border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--legacy-error);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.facts dt {
+  color: var(--legacy-muted-strong);
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.plain {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Ancestor graph: absolute nodes over an SVG edge layer. Panning is a
+   `translate` on the canvas, zooming a `scale` on the inner layer with its
+   origin at the layout origin, so `screen = offset + layout * scale` holds and
+   Chromium rasterises glyphs at the final scale. */
+
+.graph-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.graph-viewport {
+  position: relative;
+  overflow: hidden;
+  height: clamp(320px, 62vh, 720px);
+  border: 1px solid var(--legacy-panel-border);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 1px 1px, var(--legacy-grid) 1px, transparent 0) 0 0 / 24px
+      24px;
+  overscroll-behavior: contain;
+  touch-action: none;
+  /* Pan cursor: a two-tone hand (dark glyph inside a light halo) instead of
+     the white OS hand, which disappears on the light canvas. Inline SVG keeps
+     the cursor asset-free; WebView2 (Chromium) renders SVG cursors when the
+     root element declares width and height. The hotspot sits in the palm. */
+  --graph-cursor-grab: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'32'%20height%3D'32'%20viewBox%3D'0%200%2032%2032'%3E%3Cg%20fill%3D'none'%20stroke%3D'%23ffffff'%20stroke-width%3D'5.2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M10.6%2017.2V9.2a1.9%201.9%200%200%201%203.8%200v6.1M14.4%2015.3V7.6a1.9%201.9%200%200%201%203.8%200v7.7M18.2%2015.3V8.6a1.9%201.9%200%200%201%203.8%200v7.4M22%2016.6V11.4a1.9%201.9%200%200%201%203.8%200v8.9c0%204.9-3.9%208.9-8.8%208.9h-1.9c-2.4%200-4.4-1.2-5.8-3.3l-3.4-5.3a2.1%202.1%200%200%201%203.3-2.4l2.4%202.6'%2F%3E%3C%2Fg%3E%3Cg%20fill%3D'none'%20stroke%3D'%23111111'%20stroke-width%3D'1.9'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M10.6%2017.2V9.2a1.9%201.9%200%200%201%203.8%200v6.1M14.4%2015.3V7.6a1.9%201.9%200%200%201%203.8%200v7.7M18.2%2015.3V8.6a1.9%201.9%200%200%201%203.8%200v7.4M22%2016.6V11.4a1.9%201.9%200%200%201%203.8%200v8.9c0%204.9-3.9%208.9-8.8%208.9h-1.9c-2.4%200-4.4-1.2-5.8-3.3l-3.4-5.3a2.1%202.1%200%200%201%203.3-2.4l2.4%202.6'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")
+    14 17;
+  --graph-cursor-grabbing: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'32'%20height%3D'32'%20viewBox%3D'0%200%2032%2032'%3E%3Cg%20fill%3D'none'%20stroke%3D'%23ffffff'%20stroke-width%3D'5.2'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M8.8%2015.4a1.7%201.7%200%200%201%203.4%200%201.7%201.7%200%200%201%203.4%200%201.7%201.7%200%200%201%203.4%200%201.7%201.7%200%200%201%203.4%200v3.9c0%204.9-4%208.9-8.9%208.9h-.8c-2.6%200-4.7-1.2-6-3.4l-3.4-5.4a2.1%202.1%200%200%201%203.4-2.4l1.1%201.3z'%2F%3E%3C%2Fg%3E%3Cg%20fill%3D'none'%20stroke%3D'%23111111'%20stroke-width%3D'1.9'%20stroke-linecap%3D'round'%20stroke-linejoin%3D'round'%3E%3Cpath%20d%3D'M8.8%2015.4a1.7%201.7%200%200%201%203.4%200%201.7%201.7%200%200%201%203.4%200%201.7%201.7%200%200%201%203.4%200%201.7%201.7%200%200%201%203.4%200v3.9c0%204.9-4%208.9-8.9%208.9h-.8c-2.6%200-4.7-1.2-6-3.4l-3.4-5.4a2.1%202.1%200%200%201%203.4-2.4l1.1%201.3z'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")
+    14 17;
+  cursor: var(--graph-cursor-grab), grab;
+}
+
+/* Drag the canvas with the left button, exactly like the relation diagram. */
+.graph-viewport.graph-panning {
+  cursor: var(--graph-cursor-grabbing), grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.graph-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+/* Inner zoom layer: `transform-origin: 0 0` keeps scaling anchored at the
+   layout origin, exactly like the CSS `zoom` it replaced. A scale transform
+   keeps layout at 100% and lets the compositor rasterise text at the final
+   scale; `zoom` re-laid-out at fractional sizes and smeared the captions. */
+.graph-canvas-zoom {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+/* Far zoom: captions below the legibility threshold only smear, so the canvas
+   drops the text and keeps the avatar (initials) inside the card chrome. The
+   card keeps its layout box, which leaves edges and hit-testing untouched. */
+.graph-canvas-compact .graph-node-body,
+.graph-canvas-compact .graph-node-flag,
+.graph-canvas-compact .graph-node-levels {
+  display: none;
+}
+
+.graph-canvas-compact .graph-node {
+  justify-content: center;
+  padding: 8px;
+}
+
+.graph-canvas-compact .graph-node-main {
+  justify-content: center;
+}
+
+.graph-canvas-compact .graph-node-avatar {
+  width: 46px;
+  height: 46px;
+}
+
+
+/* Reserved slot: the percentage appears after a manual zoom, but its width
+   does not change, so the buttons after it never jump. */
+.graph-zoom-value {
+  display: inline-block;
+  min-width: 3.25rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--legacy-muted);
+}
+
+.graph-edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.graph-edge {
+  fill: none;
+  stroke: var(--legacy-edge);
+  stroke-width: 1.5;
+}
+
+.graph-edge.adoptive {
+  stroke-dasharray: 6 4;
+}
+
+.graph-edge.spouse {
+  stroke: var(--legacy-accent);
+  stroke-width: 2;
+}
+
+.graph-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  text-align: left;
+  background: var(--legacy-control-bg);
+  border: 1px solid var(--legacy-control-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.graph-node:hover {
+  border-color: var(--legacy-node-hover-border);
+}
+
+.graph-node.root {
+  border-color: var(--legacy-accent);
+}
+
+.graph-node.selected {
+  box-shadow: 0 0 0 2px var(--legacy-link);
+}
+
+/* Root card with direct-line depth controls. The card itself stays a button;
+   the level arrows are siblings, so both keep their own click target. */
+.graph-node-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.graph-node-levels {
+  display: grid;
+  gap: 2px;
+  flex: none;
+}
+
+.graph-node-level {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 19px;
+  padding: 0;
+  border: 1px solid var(--legacy-control-border);
+  border-radius: 4px;
+  background: var(--legacy-control-bg);
+  color: var(--legacy-fg);
+  cursor: pointer;
+}
+
+.graph-node-level:hover:not(:disabled) {
+  border-color: var(--legacy-node-hover-border);
+}
+
+.graph-node-level:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.graph-node.placeholder {
+  border-style: dashed;
+  color: var(--legacy-muted);
+  background: transparent;
+}
+
+.graph-node-name {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.graph-node-meta {
+  font-size: 11px;
+  color: var(--legacy-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.graph-node-flag {
+  font-size: 10px;
+  color: var(--legacy-link);
+}
+
+.graph-node-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.graph-node-avatar {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--legacy-control-border);
+  background: var(--legacy-control-bg);
+}
+
+.graph-node-avatar.placeholder {
+  border-style: dashed;
+  background: transparent;
+}
+
+.graph-node-avatar-initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--legacy-muted-strong);
+}
+
+.graph-node-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Relation path: A on the left, B on the right, common ancestor above. */
+
+.path-pickers {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 10px;
+}
+
+.path-swap {
+  align-self: end;
+  min-width: 44px;
+}
+
+.path-summary {
+  align-items: center;
+}
+
+.path-viewport {
+  overflow-x: auto;
+  border: 1px solid var(--legacy-panel-border);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 1px 1px, var(--legacy-grid) 1px, transparent 0) 0 0 / 24px
+      24px;
+}
+
+.path-canvas {
+  position: relative;
+}
+
+.path-edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.path-edge {
+  fill: none;
+  stroke: var(--legacy-edge);
+  stroke-width: 1.5;
+}
+
+.path-edge.spouse {
+  stroke: var(--legacy-accent);
+  stroke-width: 2;
+}
+
+.path-edge-label {
+  fill: var(--legacy-muted);
+  font-size: 11px;
+}
+
+.path-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  text-align: left;
+  background: var(--legacy-control-bg);
+  border: 1px solid var(--legacy-control-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.path-node:hover {
+  border-color: var(--legacy-node-hover-border);
+}
+
+.path-node.endpoint {
+  border-color: var(--legacy-node-hover-border);
+}
+
+.path-node.ancestor {
+  border-style: dashed;
+  border-color: var(--legacy-link);
+}
+
+.path-node.selected {
+  box-shadow: 0 0 0 2px var(--legacy-link);
+}
+
+/* Same round portrait as the tree card, so a person is recognisable in both
+   diagrams; initials stay underneath while the photo loads or is missing. */
+.path-node-avatar {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--legacy-control-border);
+  background: var(--legacy-control-bg);
+}
+
+.path-node-avatar-initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--legacy-muted-strong);
+}
+
+.path-node-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.path-node-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.path-node-name {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.path-node-meta {
+  font-size: 11px;
+  color: var(--legacy-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* Search: grouped results, safe highlight marks. */
+
+.search-group {
+  display: grid;
+  gap: 6px;
+}
+
+.search-group h3 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--legacy-heading);
+}
+
+.snippet mark {
+  background: var(--legacy-highlight-bg);
+  color: var(--legacy-highlight-fg);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* Chat: transcript, streamed bubbles, compose box. */
+
+.chat {
+  min-height: 60vh;
+}
+
+.chat-message {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--legacy-panel-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--legacy-surface);
+}
+
+.chat-message.user {
+  border-color: var(--legacy-user-msg-border);
+  background: var(--legacy-user-msg-bg);
+}
+
+.chat-author {
+  margin: 0;
+  font-size: 12px;
+  color: var(--legacy-muted);
+}
+
+.chat-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.markdown {
+  white-space: normal;
+  display: grid;
+  gap: 8px;
+}
+
+.markdown > * {
+  margin: 0;
+}
+
+.markdown p {
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  color: var(--legacy-heading);
+  line-height: 1.25;
+}
+
+.markdown h1 { font-size: 19px; }
+.markdown h2 { font-size: 17px; }
+.markdown h3 { font-size: 15px; }
+.markdown h4,
+.markdown h5,
+.markdown h6 { font-size: 14px; }
+
+.markdown ul,
+.markdown ol {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 3px;
+}
+
+.markdown blockquote {
+  margin: 0;
+  padding: 2px 0 2px 10px;
+  border-left: 3px solid var(--legacy-control-border);
+  color: var(--legacy-muted-strong);
+}
+
+.markdown code {
+  font-family: var(--font-medeo-mono);
+  font-size: 12.5px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--legacy-control-bg);
+  border: 1px solid var(--legacy-panel-border);
+}
+
+.markdown pre,
+.markdown .md-code {
+  margin: 0;
+  padding: 10px;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: var(--legacy-control-bg);
+  border: 1px solid var(--legacy-panel-border);
+  font-family: var(--font-medeo-mono);
+}
+
+.markdown pre code {
+  padding: 0;
+  border: none;
+  background: transparent;
+  white-space: pre;
+}
+
+.markdown a {
+  color: var(--legacy-link);
+  overflow-wrap: anywhere;
+}
+
+.markdown hr {
+  border: none;
+  border-top: 1px solid var(--legacy-panel-border);
+  width: 100%;
+}
+
+.markdown .md-table {
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.markdown .md-table th,
+.markdown .md-table td {
+  border: 1px solid var(--legacy-panel-border);
+  padding: 4px 7px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.tool-detail {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tool-detail p {
+  margin: 0;
+}
+
+.tool-detail pre {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--legacy-panel-border);
+  background: var(--legacy-surface);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat-compose {
+  display: grid;
+  gap: 8px;
+}
+
+.chat-compose textarea {
+  min-height: 72px;
+}
+
+/* Root picker above the ancestor graph: searchable person select. */
+
+.graph-root-picker {
+  align-items: flex-end;
+}
+
+.graph-root-picker .field {
+  flex: 1 1 360px;
+  min-width: 320px;
+  max-width: 560px;
+  width: 100%;
+}
+
+/* Person card media: primary avatar, photo grid, document rows, lightbox. */
+
+.person-card-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.person-card-identity h2 {
+  overflow-wrap: anywhere;
+}
+
+.person-media {
+  display: grid;
+  gap: 10px;
+}
+
+.person-media-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.person-media-grid li {
+  margin: 0;
+}
+
+.person-media-files {
+  display: grid;
+  gap: 4px;
+}
+
+.person-media-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: var(--legacy-link);
+  text-decoration: none;
+}
+
+.person-media-file:hover {
+  background: var(--legacy-control-bg);
+}
+
+.person-media-file svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.person-media-file-name {
+  overflow-wrap: anywhere;
+}
+
+.person-media-file .meta {
+  margin-left: auto;
+  font-size: 11px;
+}
+
+.media-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 0.72);
+}
+
+.media-lightbox-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(92vw, 1200px);
+  max-height: 90vh;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--legacy-bg);
+}
+
+.media-lightbox-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--legacy-fg);
+  overflow-wrap: anywhere;
+}
+
+.media-lightbox-head span {
+  flex: 1;
+  min-width: 0;
+}
+
+.media-lightbox-frame img {
+  display: block;
+  max-width: 88vw;
+  max-height: 78vh;
+  border-radius: 6px;
+  object-fit: contain;
+}
+}

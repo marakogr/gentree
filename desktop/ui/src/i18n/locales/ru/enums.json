@@ -1,0 +1,60 @@
+{
+  "gender": {
+    "MALE": "Мужской",
+    "FEMALE": "Женский",
+    "UNKNOWN": "Неизвестно"
+  },
+  "nameType": {
+    "BIRTH": "При рождении",
+    "MARRIED": "В браке",
+    "RELIGIOUS": "Религиозное",
+    "OTHER": "Другое"
+  },
+  "eventType": {
+    "BIRTH": "Рождение",
+    "DEATH": "Смерть",
+    "MARRIAGE": "Брак",
+    "DIVORCE": "Развод",
+    "BURIAL": "Погребение",
+    "RESIDENCE": "Место жительства",
+    "OCCUPATION": "Занятие",
+    "EDUCATION": "Образование",
+    "OTHER": "Другое"
+  },
+  "relationshipType": {
+    "PARENT_CHILD": "Родитель — ребёнок",
+    "ADOPTIVE_PARENT_CHILD": "Приёмный родитель — ребёнок",
+    "SPOUSE": "Супруг(а)",
+    "PARTNER": "Партнёр"
+  },
+  "datePrecision": {
+    "DAY": "День",
+    "MONTH": "Месяц",
+    "YEAR": "Год",
+    "UNKNOWN": "Неизвестно"
+  },
+  "dateQualifier": {
+    "EXACT": "Точная",
+    "APPROXIMATE": "Приблизительная",
+    "BEFORE": "До",
+    "AFTER": "После",
+    "RANGE": "Интервал",
+    "UNKNOWN": "Неизвестно"
+  },
+  "ancestorRole": {
+    "ROOT": "Корень",
+    "FATHER": "Отец",
+    "MOTHER": "Мать"
+  },
+  "descendantRole": {
+    "ROOT": "Корень",
+    "SON": "Сын",
+    "DAUGHTER": "Дочь",
+    "CHILD": "Ребёнок"
+  },
+  "edgeDirection": {
+    "UP": "Вверх",
+    "DOWN": "Вниз",
+    "SPOUSE": "Супруги"
+  }
+}

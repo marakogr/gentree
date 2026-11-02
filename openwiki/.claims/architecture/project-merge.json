@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:916a7fe3fa209a3a25150f43914aa19286ed3aaf068face959f522ac4f62be95",
+  "claims": [
+    {
+      "id": "claim_305ff2627fe34fff9eda140bc6e364c6",
+      "statement": "merge_preview is a pure function over two project snapshots: it returns one-to-one person suggestions in left input order, the unmatched right people, stable-coded warnings and input/matched counts, and writes nothing.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L404-L451",
+          "version": "repo-lines-v1:sha256:e091d43176966461db7635b6d59ebb0df7d7b91cc0c3da919e51a9ac17efb4d0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxMWU4YjYyZTMzYmM0ODQxYzg2YTUyYmJmZDQyNGFlNDFlMGJiZWE4MjQyMmQxMGUwZDIwYjlmMzA1ZmI0MGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjZjZmNzlkMjEwNjU3ZGYwZThkZTdmZTUwZWU5OThmYjc5ODI5ZjVlMTM0ODczNmNjOTc4OGVlNGY2YWFhYTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjZDE3MzQzNWQ5MjllMDMyMDA3NWZiY2ZjNmIxMWQ4OGI3YzdjM2ZlMzA4OTVhZmQ5YmE1ZTVkNzdiMTcwZDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjN2VlY2RkOWRhMTYwMGMyNTFmMjZlNDkxZGFiNTFjZGE1MmE5MzQ3MDE4YjIxNTcwY2NkMjRlOTJjNDMyOTkifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L518-L543",
+          "version": "repo-lines-v1:sha256:0070b3af73226f8ec4cfac88af49a5e76c32a6ad6b196d730bb0d34ca4ed2536:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxOGIwYmY0MmM3MzdlMDhjZGU3OWFhNzk4NjIxZWUzOGRhMjE2NWFhOGIwMWMxYjA5ZjU5ZGVmNzdjMjQzMzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5YjA0NjBjOTY1Y2UwY2NhMmRjMWYzZTcwYTFjNjYzOTkzMmVlOTlmZjczNzc4ODBmN2MzOTM3NDk4NDE3OTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiZGNlZmU3YWY0NGEzNDAyNWFmZmEzNmZlNjAwMWQ3ODRiNzJjMTAxYTIzZTY1ODQ1NjlkYmMxMjRhNmZmZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c7f211cc585944d583ac803d0d9799fb",
+      "statement": "Person suggestions are scored deterministically (external id 100, full name with compatible birth 80, full name with unknown dates 50, name parts with compatible birth 60, name parts with unknown dates 40, shared-relative bonus 10) and mapped to High at 80+, Medium at 60+ and Ambiguous below; candidates within AMBIGUITY_DELTA 10 of the chosen pair make it ambiguous.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L125-L139",
+          "version": "repo-lines-v1:sha256:2bf8e8413f56e337e1a7891f29981db3a5f40744e891a8986584e1d4e909e48e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxNGZmZTljY2QwZWRhYzBlMTJkNjhhYmVjMzg5MjFiYzE3NDNkNjQ2YzE0ODY3ZmI4OGIxNThmMjk4ZGYwNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMyZjkwZGZkYTFhNTBkM2FmMGEzYjk4NDVhZjBkYTNjZTc5ZjA1MmNjNGMyZjQzNWE1MjM1YTZhYzM0YTkyZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2YjJiYTljZjhmNGY5NDI4MTY1ZTFmNjZmYjBlMWQ2MGUyMDU3NDM3NzgyMzMzNjgyMTdmYzAxY2E2ODAzMzEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L1292-L1356",
+          "version": "repo-lines-v1:sha256:caf599ef83c347694973b811fa105e5a1f8d87f57c8212279ddae197d49be079:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkN2MwMGNjZWI5YzRkMmFkMGIwMzgxNmM5MGYwYzFjNTc0ODgzMDJkZDU4NDYwNzU1YzcxMWI0MmI5YTk2ZWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiNTE3NzBjOThjNTAwNTg5NjEwMWNhZDBmNDA5MDg4N2Y3ZmQ0NGY0NWNjMjdlOWM2OWI0ZmU0YWU1ZjU4NjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRiN2RjNGVhNTIzM2IzNWRlMDRhZjQzNzE1ZTBhYjE2Zjk3YTlmM2M3YmZhM2E0NjUwMDJlNTcxMDRiMGE1YzgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_45b4f8b95ef949abbf0f70167b472377",
+      "statement": "A pair is rejected before scoring when a known male/female gender conflict exists or when a birth or death year is known on both sides and more than one year apart.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L1027-L1049",
+          "version": "repo-lines-v1:sha256:eaa565ae4003ae1d670b5efaaa08f7b92b26f98e1f46057f0acb473257b32b60:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1NDQ4OTZmOTdmNjMwZTU5OTExZDM5MWM4MzBkOTIzM2U4YWY1NjQyMTQzMTlhYWZmNGQyMzYyOWZhODVhZTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMjc5MzM4NWQ4MDg2YzkxNmY5M2E0M2VlYjdhMTRmOTUyNjI5NTcwNjc4NWQ3YjkyYjU3OWUzMGVkMjcyY2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJiMjUxY2U0NDNkYzNkOTJlYzQ2NjlmMmFmMWM5OGU0NDljMzMxY2QyZTAwODc4NTAxZTUwYjdiMGMzNGFiMDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0YTU5NjM2YmMyODMzNmU0OTdmNDQ5M2I3MjBhNTk0NGUyMTU0YWFmYzdjMDdiZTVhMDJiNjRkN2UwNjM1ZWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_be47a2b5a90841c9abc39f298437e753",
+      "statement": "Full-name matching compares the surname plus the combined given and patronymic token sequences, so a patronymic stored inside the given field still matches a separately stored one, while the weaker partial match uses the first given token.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L1140-L1215",
+          "version": "repo-lines-v1:sha256:6efc2a281fc18717cf7454604179c9ef0f23d3ebc4bd02c439225a67f3ef5054:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhM2Q2YzM4N2Y2MDMwYWY4Y2FlZDA3OGY2N2FlNGZhOTNkYjNiOGQyZTIyOWVmZGMzMWQzOWIwZWY1ZjA3ZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzZDQ3YzI3YzFjZTlhNzBhMmU5N2E0NzM2NWQyYTViOGFhZWVhYjBkNmVhNzRkZTM4NDcxMmQ4ZmNlYmM5NTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5NmY4Y2IwODNmYTgwMGE0ZGNkMjk2OTcyMmQ3YjkyNjg2YWRkOWViZTM2NTU0OTJmYTY3MmIxYTdjZWQyNDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3ZTIyMDc5NTIyZTI3MGVmOTIwNTliOGMxMDk4MTc3NjkzNzg4Nzg5Y2JkZTM0NTYwMDZjZDgyODAzMDg5OWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ce0a8614b411471f8e53cbab2a00a91d",
+      "statement": "Events match only inside an accepted person pair and only when type, date, place and description do not conflict; exact events score 100, compatible dates 60, unknown dates 40, with a 10-point bonus for the same place.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L1447-L1553",
+          "version": "repo-lines-v1:sha256:7cf63e0e168891098c3e7645449859eabb9d584ce1af6a05584cffacfe2cc97e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlMzYzNDlmNjUxMDBjYTFjMDE3NWZjZThjNjljZWJlYWUzMDc1M2Q5NzYwNzk4ZjA0NmU0YzVmOTI1NDdlOGMzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjY2E3MDU3OWQzN2I4Y2Y2MTM2Nzk5YjA3ODhjZDUxNTM3ZDdkNGMyZWFjMGQwM2FhOWRlYjJhNWZlMDI1NGJlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxZTc4YmYzY2JkMGE4M2I1ODllOTExZmYxZWZlM2NhNDFkMGIxNDAyZjhmNWU2NDE4YjUxMmVlNjYwMDU3NmIwIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_31dd29b4dba049c48a5104f71d4c066e",
+      "statement": "The UI pre-selects Merge only for High confidence and KeepBoth otherwise; merging unions names and external ids, fills empty scalar fields from the other side, and requires an explicit Left/Right policy for conflicting non-empty birth or death dates.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L1614-L1692",
+          "version": "repo-lines-v1:sha256:b746f401605b032601ab498e5be2af9db7b13601e55bdfc0842b3b2afdf4ab7c:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjYWU5N2VjOGFhY2FhNWM4MTA0ZWQ2ZmNhODg3ZDZhZTEwMzcyNGYyNzI0YjBjZDIzNjBiNzc3MTU3NzU4ODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1Y2JiYjFlNjQ3NDMxNTg2N2VlOWUxYTUzZmU3MWE3ZmU2ODAwNjI2ZWM1ZmUxZjkwNzQ1NTM5NjM1OTk3ZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiYWQ5MjczOGJlYTM3NWM4YTNmMDhmNzA1NDgyZGJiY2U4ZGNhN2FhYzJjM2NkZTZjMDEwZjY3NDA5NWRjMGUifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/projects/merge.ts#L66-L99",
+          "version": "repo-lines-v1:sha256:a55d6812b1c5889a8a02cfb066e0cfef2f548952bced871f5c698403ebab3d0e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3ZjgyNGQzZjBjM2JkZTBlOTVjODVjYjI5ZmI2NTk2NDc2YzZiODBlNDA0Y2ZmNzIxODIwOGIzYzM4NjY1OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1NWM0M2YzNTFiNzM2ZWNhNGEwODEyZDBkYzVjOWY4OGNiNjE0ODRkNDgzYjZiNDM0MTYyODlkODhlOWZiM2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_00905d35da294a6e8f65f87dba3d7525",
+      "statement": "apply_merge keeps every left row, folds merged right people and events into left ids, copies the rest with a claimed or deterministically derived id, remaps relationship endpoints (dropping self-collapses and reporting type conflicts), and remaps media and citations so none dangle.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L554-L700",
+          "version": "repo-lines-v1:sha256:7b7d3fbfe9ad8665fbaa703a690cc59c7f117387619e016d787ce69e758060f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4MWIxNDQ5ZGMzNTJkZWZiYjk1MjA3MTdiOTYxZDRjMWNiNDg2MzgxZWEyNjRhZDI3NDk5Y2JlMTQ1NWEzM2M2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3Y2E3NjhhYWJkMmZmNjU5NjAyNWQwNTQ0NTNlNjMyMjU1YWRhMzZjYmVkN2E0ZjQxMmM5NDRhNDYzMWRjOTcwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0YjAzZTdkZjdhM2VlNGFiMjc2Yzg3NjdlZGE1NGUzZTQwODQ4YTIyYThhODY4MGFmMmY5MjYyYjQ2ZDkxYTEwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5ZjMwNGI4YmRmMWY0YmI0Y2I2ZTU3NDMwMjFkMjhiMjg4YzVlM2E4NWE4ZmVhNTRmMDUzNGZmY2Q4MjM0MzkyIn0"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L734-L795",
+          "version": "repo-lines-v1:sha256:3fccabfd2bceec972a6083ed814bfd9445efc3c83dd5ad686deeafa504d40be8:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIxNDA4NjcyYjYyMGQ3MGEyYTYxMzdlMTBmYTI1ZTE1NjVkNWNiYjg1MzkwNTdjZjYxODg1OGE0OTlkY2RkNWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhNTM2MDQ4Njk0M2RkMTZjZGUxMzA3ZjliYjAwMzg5MjkzNTIyNjVhOWEzZTAwYjc4Nzc4MTkwZTY2ZmFlNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5MWFmNDlhNTliY2U0MGFhZmM4MWI0YTAyZWQwYzM4MGMzYzgxZDcxNzM3NDFhZWY5M2JkNmI3ZjUzYzljZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRjYjllMDZjMzAzZGEwOTVmMDM1ZWY0ZTk0ODFlMTg2NDU0MTRjOWZiN2M0OGEwOTRlYWJhMGZkNzRkYWFmMTQifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L798-L866",
+          "version": "repo-lines-v1:sha256:2cbcd34f475468276342ddd7cb824d2f82e1dae738af3716093becd67bbb23dc:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyNTlmNmQzNWJmNjgxM2QzZmVhODRlMWQzYjcyMzU0YzAyZTQxMGU0NDcyOTljMzc3ZjZkZjBjZTMwOGVmNmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2NjFiZTNlODg3ZWY5OTkxMmRiNDdkYTU5NWNkOTgyM2NiNTY4ZTFjZmZmZTJmYzc2YmZhZGFjN2IyMzU4OWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5Nzk5MTFkZmM1Y2MzYTE4NzgyZTJmNTEwYzQxZjdjMTU0MmI3MGQyODU4MmQ2NjJiOTJjZWFhYTViYjA0NWEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L867-L910",
+          "version": "repo-lines-v1:sha256:48298f05b1275bd8097677c7c33adab6608f988fed3145319398d242b3edcb1c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhYzJmNWVkOGJmYjYzMjk4ZTdmM2I5MTdlZWM0NTUyMmJhNTk4ZThmMjI2MzQ3YzJhYmEwNzEzMzhhYTc4ZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0NjUzMDc5YjhkNzRkNTA0MjE0ZWQ0OTQwMGVlOTAyYzQzMWI0NjMxNGQ1OWJlZDA2Y2ZiNDRkNWE2Y2Q3NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyNjNhMWM3ZTIyMzUxY2Q4ZDZkYTc2Zjc3NjRkMTJlZTYwMDdhZTQwNGZmYmFjN2RiZWY2Y2YxMzZmYjU0NmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_98041ed1a1a24af284eceac83686b8a4",
+      "statement": "The merged snapshot is validated before it is returned: validation errors abort the merge with MERGE_CONFLICT, while warnings do not, so duplicate birth or death events inherited from the sources survive a merge.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L911-L955",
+          "version": "repo-lines-v1:sha256:69956e8c274577583464c9ffa6fe0beeca0930daab89674232bac2ae9db0f5e0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1YThiZmZmNzNmMDhkODAzNWE2ODUwMGUwOGYxZGIyODIyYTZkMDJjNzU1NGYwNTM3YTNjMmIwMTQwMDRlNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlMzNhOTNhZjYyNDUxYTExYmU1Y2EzOWYyNGMyMTI3ZTZlNzBmOWFmODhhY2ZiNTM0ODAwYWQwMTQyZjIwYTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQzOTg5NGYzYzg4OThmODk2ZjkxMWEzN2M3ZmQ1OTg0OGM1ZjlmNDdlNWI3MTMxYTAwYmNhOWY2ZTQ1MzE1MGIifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/validation.rs#L447-L480",
+          "version": "repo-lines-v1:sha256:48754ccef42848cf0d2dfb0542f30045c75307f0890841a1eba9eb5b2ff620a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjZGMxMTNjNThjOTlhZGQ2ZTJhMGVjODNhNzZmNTYxOTc2NTg5NmJhZjk3NmEwMzZlOWYxMGMxNzE4OGU4OGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwZTBhYjY1ZmUyYmJkMGNkNDQwZmVjYzdhNGUyNTJiM2Y3MDU1MGMxYzkzYmFmYWJjNDI4N2JkYjY2YzJjMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyOWMwZDYyOWY2ZGRhZTA1ZjA5NmJkNDIwMjg5ODVmNWEyOWM3NzhhMjdjM2Y0ZGY2OGYzMmI5MDU3MjZkN2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_78c7550e98ad45e98c6f0d238f25b97a",
+      "statement": "Person matching compares every left person with every right person only, so duplicate rows that already exist inside one source project are not detected and are copied as-is.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/merge.rs#L408-L447",
+          "version": "repo-lines-v1:sha256:eb40962141600fb4bd63f92c4e5fd99942fdad2b10703b58877334539dec71a8:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNWM1ZTBiNWM0NjQwN2E2ZTI3ZmU4ZWZlNjllMWYzNjc0ODM3YWZiYTQzYTFhMDZhZTk2YTdlMjNiMjcxNDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjJjNDJjZDE5YzZkMDNkODA4YzQ1MjcyMDU1MjgyNWI3ZWExYzViNDkxYjIxODUxMWNhYzc0MTVjZjlkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0NTlkZWFlNzkwNTMyZTBmMDY4MWZmNGVmNTBkNjBkMmZjM2ZkZDM3NzA0ZmFmODNkNjE1ZjIzYzBjMmMwZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

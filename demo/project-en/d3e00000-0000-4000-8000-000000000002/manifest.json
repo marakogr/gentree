@@ -1,0 +1,19 @@
+{
+  "formatVersion": 5,
+  "schemaVersion": 1,
+  "projectId": "d3e00000-0000-4000-8000-000000000002",
+  "name": "Demo: the Volkov family",
+  "createdAt": "2026-10-01T09:00:00Z",
+  "updatedAt": "2026-10-24T18:30:00Z",
+  "appVersion": "0.2.0",
+  "homePersonId": "00000000-0000-4000-8000-000000000009",
+  "contentHash": "sha256:66f124220380d68807bc1419fccbdbec82aab98db25c99695338a7aceb14c915",
+  "counts": {
+    "persons": 20,
+    "events": 51,
+    "relationships": 31,
+    "sources": 2,
+    "citations": 12,
+    "media": 0
+  }
+}

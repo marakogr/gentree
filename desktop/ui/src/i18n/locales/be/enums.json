@@ -1,0 +1,60 @@
+{
+  "gender": {
+    "MALE": "Мужчынскі",
+    "FEMALE": "Жаночы",
+    "UNKNOWN": "Невядомы"
+  },
+  "nameType": {
+    "BIRTH": "Імя пры нараджэнні",
+    "MARRIED": "Прозвішча пасля шлюбу",
+    "RELIGIOUS": "Рэлігійнае імя",
+    "OTHER": "Іншае"
+  },
+  "eventType": {
+    "BIRTH": "Нараджэнне",
+    "DEATH": "Смерць",
+    "MARRIAGE": "Шлюб",
+    "DIVORCE": "Развод",
+    "BURIAL": "Пахаванне",
+    "RESIDENCE": "Пражыванне",
+    "OCCUPATION": "Занятак",
+    "EDUCATION": "Адукацыя",
+    "OTHER": "Іншае"
+  },
+  "relationshipType": {
+    "PARENT_CHILD": "Бацька або маці — дзіця",
+    "ADOPTIVE_PARENT_CHILD": "Прыёмны бацька або маці — дзіця",
+    "SPOUSE": "Сужэнец",
+    "PARTNER": "Партнёр"
+  },
+  "datePrecision": {
+    "DAY": "Дзень",
+    "MONTH": "Месяц",
+    "YEAR": "Год",
+    "UNKNOWN": "Невядомая"
+  },
+  "dateQualifier": {
+    "EXACT": "Дакладная",
+    "APPROXIMATE": "Прыблізная",
+    "BEFORE": "Да",
+    "AFTER": "Пасля",
+    "RANGE": "Дыяпазон",
+    "UNKNOWN": "Невядомы"
+  },
+  "ancestorRole": {
+    "ROOT": "Корань",
+    "FATHER": "Бацька",
+    "MOTHER": "Маці"
+  },
+  "descendantRole": {
+    "ROOT": "Корань",
+    "SON": "Сын",
+    "DAUGHTER": "Дачка",
+    "CHILD": "Дзіця"
+  },
+  "edgeDirection": {
+    "UP": "Уверх",
+    "DOWN": "Уніз",
+    "SPOUSE": "Сужэнцы"
+  }
+}

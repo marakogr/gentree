@@ -1,0 +1,974 @@
+/*
+ * Persons master-detail screen (features/persons). Colours come from
+ * theme.css tokens only: the screen follows the light/dark switch.
+ *
+ * Unlayered on purpose: src/styles.css styles the bare button/input
+ * elements in the legacy layer, which wins over the kit components layer.
+ * Scoped bridge rules at the end restore the kit look for this screen only;
+ * the shell owns the global fix (same approach as features/projects).
+ */
+
+/* The page is one panel surface, the same shell as Search/Path/Events:
+   a page frame, a card-head title row and the content inside. The height
+   accounting keeps the table scrolling inside the frame instead of the page. */
+.persons-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  /* Leave only the shell padding around the page so the table can use the
+     whole window height instead of stopping at a fixed max-height. The panel
+     padding and border are part of that height (border-box). */
+  height: calc(100vh - 48px);
+}
+
+/* The optional back breadcrumb is one more row above the page. */
+.content:has(> .app-breadcrumb) .persons-page {
+  height: calc(100vh - 48px - 48px);
+}
+
+/* `.card-head` already spaces the title and the actions; here the row is allowed
+   to wrap so the buttons move to their own line on a narrow window. */
+.persons-head {
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.persons-head-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Keep the shared Title2 size of the other screens; only the heading box is
+   normalised here, its size comes from the component. */
+.persons-head-title h1 {
+  margin: 0;
+}
+
+.persons-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ---------- master-detail ---------- */
+
+/*
+ * The list takes the wider share of the row; the splitter in the middle track
+ * writes the width back into `--persons-list-width`, so a drag only touches
+ * one custom property. `-solo` is used while nothing is selected: the detail
+ * pane is not rendered and the list spans the whole row.
+ */
+.persons-layout {
+  --persons-list-width: 58%;
+  display: grid;
+  grid-template-columns:
+    minmax(0, var(--persons-list-width))
+    8px
+    minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.persons-layout-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.persons-layout-resizing {
+  user-select: none;
+  cursor: col-resize;
+}
+
+/* Vertical splitter between the list and the card. */
+.persons-splitter {
+  position: relative;
+  align-self: stretch;
+  min-height: 120px;
+  border-radius: 999px;
+  cursor: col-resize;
+  outline: none;
+  touch-action: none;
+}
+
+.persons-splitter::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 50%;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--border);
+  transform: translateX(-50%);
+  transition:
+    background-color 120ms ease,
+    width 120ms ease;
+}
+
+.persons-splitter:hover::before,
+.persons-splitter:focus-visible::before,
+.persons-layout-resizing .persons-splitter::before {
+  width: 3px;
+  background: var(--primary);
+}
+
+.persons-splitter:focus-visible::before {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 35%, transparent);
+}
+
+@media (max-width: 1100px) {
+  .persons-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked layout has no splitter and may scroll as a page again. */
+  .persons-splitter {
+    display: none;
+  }
+
+  .persons-page {
+    height: auto;
+  }
+
+  .persons-list {
+    max-height: 60vh;
+  }
+
+  .persons-detail > .person-card {
+    overflow-y: visible;
+  }
+}
+
+/*
+ * Panes inside the page panel: the list and the card keep a hairline so the
+ * table and the card stay readable as panes, but they no longer build their own
+ * card. The page panel is the only frame; there is no elevation on the panes, so
+ * the screen reads as one block instead of three stacked cards.
+ */
+.persons-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--card-foreground);
+}
+
+/* The filter bar and the optional bulk selection share the panel's first row. */
+.persons-toolbar {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.persons-detail {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The card owns its own scrollbar; the list pane and the card pane start at the
+   same row, so the table header and the card head sit on the same line. */
+.persons-detail > .person-card {
+  overflow-y: auto;
+}
+
+.persons-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* The full-window card: same card, more room, its own scroll area inside the
+   dialog surface. */
+.person-window {
+  display: grid;
+  min-width: 0;
+}
+
+.person-window > .person-card {
+  overflow: visible;
+}
+
+/* Placeholders: the same pane slot, but hatched so an empty detail column does
+   not read as a second card next to the table. */
+.persons-detail-empty,
+.persons-detail-skeleton {
+  border-style: dashed;
+  background: transparent;
+}
+
+.persons-detail-empty {
+  min-height: 220px;
+  align-content: center;
+  justify-items: center;
+}
+
+.persons-detail-skeleton {
+  gap: 10px;
+}
+
+/* ---------- list ---------- */
+
+/* The shared search field is flex-grow by default; on the persons table it
+   should stay a normal-width control instead of spanning the whole panel. */
+.persons-page .filter-search {
+  flex: 0 1 24rem;
+  max-width: 24rem;
+}
+
+.persons-list {
+  max-height: none;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* A column drag can leave the handle; keep the cursor and suppress selection. */
+.persons-list-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.persons-list-resizing * {
+  cursor: col-resize;
+}
+
+/* Column resize handle: a thin grab area on the right edge of the header cell
+   (Fluent's `aside` slot). The sticky header is the positioning context; the
+   visible line only appears on hover, keyboard focus and while dragging. */
+.col-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 8px;
+  cursor: col-resize;
+  outline: none;
+  touch-action: none;
+}
+
+.col-resize-handle::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 1px;
+  bottom: 6px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--border);
+  opacity: 0;
+  transition:
+    opacity 120ms ease,
+    background-color 120ms ease;
+}
+
+.col-resize-handle:hover::before,
+.col-resize-handle:focus-visible::before,
+.col-resize-handle-active::before {
+  opacity: 1;
+  background: var(--primary);
+}
+
+.person-name {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  /* Calm neutral label: the old brand colour was brighter than the rows. */
+  color: var(--foreground);
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.person-name:hover {
+  background: transparent;
+}
+
+.person-name:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.person-years {
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.person-living {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--primary) 14%, var(--card));
+  color: var(--foreground);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.person-parents {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 0.8125rem;
+}
+
+.person-parent {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.person-parent-adoptive {
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.person-parent-extra {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.person-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+}
+
+.persons-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+/* ---------- card ---------- */
+
+.person-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Profile photo with the Telegram-style edit affordance on hover/focus. */
+.person-avatar {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.person-avatar-edit {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.person-avatar:hover .person-avatar-edit,
+.person-avatar:focus-within .person-avatar-edit {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .person-avatar-edit {
+    opacity: 1;
+  }
+}
+
+/* Age colour: green while alive, red once the person is known/presumed dead. */
+.person-age {
+  font-variant-numeric: tabular-nums;
+}
+
+.person-age-living {
+  color: var(--colorStatusSuccessForeground1, oklch(0.55 0.16 145));
+}
+
+.person-age-dead {
+  color: var(--colorStatusDangerForeground1, var(--destructive));
+}
+
+.person-age-unknown {
+  color: var(--muted-foreground);
+}
+
+.person-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.person-card-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.person-card-title {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.person-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.person-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.person-facts {
+  font-size: 0.8125rem;
+}
+
+/* ---------- events timeline ---------- */
+
+/*
+ * Date | 14px thread | content. The item has no vertical padding: the date and
+ * the body carry it, so the thread spans the whole row and neighbouring rows
+ * meet without a seam. The first row starts at its dot and the last one ends
+ * there, which is why the thread never hangs in the air.
+ */
+.person-timeline {
+  --timeline-dot-center: 15px;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.person-timeline-item {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 8.5rem) 14px minmax(0, 1fr);
+  grid-template-areas: "date rail body";
+  column-gap: 8px;
+  align-items: start;
+  min-width: 0;
+  /* Horizontal-only padding keeps the hover band comfortable; vertical
+     padding here would split the thread between two rows. */
+  padding-inline: 4px;
+  margin-inline: -4px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.person-timeline-item:hover {
+  background: color-mix(in oklab, var(--muted) 55%, transparent);
+}
+
+.person-timeline-date {
+  grid-area: date;
+  padding-block: 6px;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.person-timeline-rail {
+  position: relative;
+  grid-area: rail;
+  align-self: stretch;
+  justify-self: center;
+  width: 2px;
+}
+
+.person-timeline-rail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--border);
+  transform: translateX(-50%);
+}
+
+/* Only the first/last items trim the thread; a single row gets neither end. */
+.person-timeline-item:first-child .person-timeline-rail::before {
+  top: var(--timeline-dot-center);
+}
+
+.person-timeline-item-last .person-timeline-rail::before {
+  bottom: auto;
+  height: var(--timeline-dot-center);
+}
+
+.person-timeline-item:first-child:last-child .person-timeline-rail::before {
+  display: none;
+}
+
+.person-timeline-rail::after {
+  content: "";
+  position: absolute;
+  top: var(--timeline-dot-center);
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 16%, transparent);
+  transform: translate(-50%, -50%);
+}
+
+.person-timeline-body {
+  display: grid;
+  grid-area: body;
+  gap: 2px;
+  min-width: 0;
+  padding-block: 6px;
+  justify-items: start;
+}
+
+/* The type button and the attachment count share one line. */
+.person-timeline-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* A derived row (a child's birth) has no event to open: its label is text. */
+.person-timeline-type {
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* The child name on a derived row; fills the track so it can wrap. */
+.person-timeline-child {
+  display: flex;
+  min-width: 0;
+  justify-self: stretch;
+}
+
+/* Number of files attached to the event (ADR-0018). */
+.person-timeline-files {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+/* Place and type-specific details share one wrapping line, separated by a dot
+ * drawn in CSS so the text never starts or ends with a separator. */
+.person-timeline-meta {
+  min-width: 0;
+  /* The parent aligns items to start; these two must still fill the track so
+     long text wraps instead of overflowing the card. */
+  justify-self: stretch;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.person-timeline-meta > span + span::before {
+  content: "\00b7";
+  margin: 0 6px;
+  opacity: 0.7;
+}
+
+/* Two lines by default; the full text stays in the DOM and in the tooltip. */
+.person-timeline-note {
+  display: -webkit-box;
+  min-width: 0;
+  justify-self: stretch;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Narrow screens: the date moves above the content, the thread stays left. */
+@media (max-width: 640px) {
+  .person-timeline-item {
+    grid-template-columns: 14px minmax(0, 1fr);
+    grid-template-areas:
+      "rail date"
+      "rail body";
+    row-gap: 0;
+  }
+
+  .person-timeline-date {
+    padding-block: 6px 0;
+  }
+
+  .person-timeline-body {
+    padding-block: 2px 6px;
+  }
+}
+
+.person-names {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-left: 0;
+}
+
+.person-notes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- accordion sections ---------- */
+
+/* Fluent owns the accordion layout; the card only keeps its separators. */
+.person-section {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* Accordion header + the optional quick action share one row. */
+.person-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Title and its real row count stay one flex item of the header button. */
+.person-section-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.person-section-count {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* Section actions may carry an icon inside the kit button label. */
+.person-section-head .btn-label,
+.person-media-empty .btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- relationship form ---------- */
+
+.person-relationship-form {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--muted) 55%, transparent);
+}
+
+.person-relationship-form h4 {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.person-relationship-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.person-relationship-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.person-field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.person-media-loading {
+  display: grid;
+  gap: 8px;
+}
+
+/* Empty files section: the hint plus the attach action. */
+.person-media-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+/* Each photo thumb owns its profile-photo action right below it. */
+.person-media-item {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  width: 96px;
+}
+
+.person-media-set-primary {
+  max-width: 96px;
+  height: auto;
+  padding: 2px 4px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: normal;
+  text-align: left;
+}
+
+/* ---------- form dialog ---------- */
+
+.person-form {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.person-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.person-form-grid > * {
+  min-width: 0;
+}
+
+.person-form-section {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.person-form-section legend {
+  padding: 0 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+
+.person-date-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(8rem, auto) minmax(8rem, auto);
+  align-items: start;
+  gap: 10px;
+}
+
+.person-date-row > * {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .person-date-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- kit bridge over the legacy element rules ---------- */
+
+.persons-page .btn,
+.dialog .btn {
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.persons-page .btn-sm,
+.dialog .btn-sm {
+  padding: 0 10px;
+  font-size: 0.8125rem;
+}
+
+.persons-page .btn-primary,
+.dialog .btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.persons-page .btn-primary:hover:not(:disabled),
+.dialog .btn-primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--primary) 88%, var(--background));
+}
+
+.persons-page .btn-secondary,
+.dialog .btn-secondary {
+  border-color: var(--border);
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.persons-page .btn-secondary:hover:not(:disabled),
+.dialog .btn-secondary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--secondary) 82%, var(--foreground));
+}
+
+.persons-page .btn-ghost,
+.dialog .btn-ghost {
+  background: transparent;
+  color: var(--foreground);
+}
+
+.persons-page .btn-ghost:hover:not(:disabled),
+.dialog .btn-ghost:hover:not(:disabled) {
+  background: var(--muted);
+}
+
+.persons-page .btn-danger,
+.dialog .btn-danger {
+  background: var(--destructive);
+  color: oklch(0.99 0 0);
+}
+
+.persons-page .btn-danger:hover:not(:disabled),
+.dialog .btn-danger:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--destructive) 88%, var(--background));
+}
+
+/* Icon buttons: the bare button rule adds a border and legacy padding. */
+.persons-page .icon-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted-foreground);
+}
+
+.persons-page .icon-btn:hover:not(:disabled) {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.persons-page .icon-btn:disabled {
+  opacity: 0.55;
+}
+
+/* Card menu. */
+.persons-page .menu-root {
+  display: inline-block;
+}
+
+.persons-page .menu {
+  min-width: 180px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--popover);
+  color: var(--popover-foreground);
+}
+
+.persons-page .menu-item {
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.persons-page .menu-item:hover,
+.persons-page .menu-item:focus-visible {
+  background: var(--muted);
+}
+
+.persons-page .menu-item-danger {
+  color: var(--destructive);
+}
+
+.persons-page .menu-item-danger:hover,
+.persons-page .menu-item-danger:focus-visible {
+  background: color-mix(in oklab, var(--destructive) 14%, transparent);
+}
+
+.persons-page .menu-item[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Form dialog controls (the dialog is portalled outside .persons-page).
+ * Controls are Fluent now, so only the vertical rhythm and width stay here. */
+.person-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Fluent Input/Select/Textarea roots are inline-flex by default. */
+.person-form .field > span {
+  width: 100%;
+}

@@ -1,0 +1,46 @@
+{
+  "title": "Suche",
+  "placeholder": "Name, Ort, Ereignis, Quelle…",
+  "label": "Suchanfrage",
+  "hint": "Mindestens 3 Zeichen eingeben — die Suche startet nach einer Pause automatisch",
+  "idle": "Tippen, um das Projekt zu durchsuchen",
+  "empty": "Nichts gefunden",
+  "noTypeResults": "Nichts unter den ausgewählten Typen gefunden",
+  "matchCount": "Gefunden: {{count}}",
+  "results": "Ergebnisse: {{count}}",
+  "resultCount": "{{shown}} von {{total}} gefunden",
+  "truncated": "Die ersten {{shown}} Ergebnisse werden angezeigt; die Anfrage präzisieren",
+  "groupCount": "{{count}}",
+  "similarCount": "{{count}} weitere",
+  "groups": {
+    "person": "Personen",
+    "event": "Ereignisse",
+    "source": "Quellen"
+  },
+  "filters": {
+    "title": "Filter",
+    "typeLegend": "Entitätstyp",
+    "reset": "Filter zurücksetzen",
+    "clearSearch": "Anfrage leeren"
+  },
+  "chips": {
+    "query": "Anfrage: {{value}}",
+    "type": "Typ: {{type}}",
+    "removeQuery": "Anfragefilter entfernen",
+    "removeType": "Filter „{{type}}“ entfernen"
+  },
+  "rebuild": "Index neu erstellen",
+  "rebuilding": "Wird neu erstellt…",
+  "retry": "Erneut versuchen",
+  "openResult": "{{type}}: {{snippet}}",
+  "noSnippet": "kein Auszug",
+  "sourceDetails": "Quellendetails",
+  "fields": {
+    "title": "Titel",
+    "author": "Autor",
+    "publication": "Veröffentlichung",
+    "repository": "Aufbewahrungsort",
+    "url": "Link",
+    "notes": "Notizen"
+  }
+}

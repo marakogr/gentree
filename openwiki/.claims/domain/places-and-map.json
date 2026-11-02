@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:7465bb17617caf621dfcfef06d77d09f70254b730344ea8eea666f9bff50cc26",
+  "claims": [
+    {
+      "id": "claim_c6011a06e8aa4d68ad08a28ca3189cf1",
+      "statement": "A PlaceGeo stores a WGS84 latitude and longitude, a PlacePrecision, a PlaceSource, an optional provider reference and an optional label; validation rejects out-of-range coordinates, a provider reference over 200 characters and a label over 500 characters.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/geo.rs#L44-L115",
+          "version": "repo-lines-v1:sha256:2335bab8fd2baab967fc3240eac4a274d12149ebd919ff4ce534e4e63bcc829d:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyY2M3ZjVlOGQ4OWU3MzA1NzRhOGMyMWIzNDJiMTQwYzYzYWYyODA5Y2Q2ZTA2YTg1YTk5ZTY5Mjk1NzU4MWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4YmMzYzM2YmY3NDNlNjI3YmFkNTAyZjM4OTZiN2MyZDg1ZTc0OTE1OGY0ZGIyYzQxMWU5M2U1Y2M1YTk0N2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjNDk2ZmIyYWRmMjczYWE2ZTE3MTM4YzFkMzliMjY2ZGNlYTYwMjVkN2E2ZDI2MzU3YWI1YjBmYjNiZDUyNjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3NWNhMmIyYjk5ZGY4MDA3OGMzOGJkMzBhZmI0MmQ5OTFhNDFhMGJjOTY3NjdiZDczOGZjNzUwZDlmMjU0ZDUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7b26669b84c14507b07efdbc91e09ff4",
+      "statement": "Event.place_geo is optional and omitted from JSON when absent; project format 4 added the confirmed point and format 5 added the Wikidata place source.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/project.rs#L7-L14",
+          "version": "repo-lines-v1:sha256:c791f62dfd988c0b4f0ea364a627ea290cd9278a40ef6cbcdf96a5592d6e4f8a:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTExZThiNjJlMzNiYzQ4NDFjODZhNTJiYmZkNDI0YWU0MWUwYmJlYTgyNDIyZDEwZTBkMjBiOWYzMDVmYjQwYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRhMjZkNzFiZTNiZmRiYzJjZjU2ZjJkY2IyNDNmYjk0ZTY5OGVhYTEyNGM4YzlhODQ1N2FmMjI5ODUwZjkxZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTI2NWY4NjcwNDQwYzg3NmZlYTU2ZmM5ZTgyODg1ZTU0YzIxNTc4MWFmZjJjYjQ3MTEwOWQ3YTAwZjVlZDM0NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmRhNjk2YzYyMzA3ZjcyMmRlMWYxMTFmN2E2NzkxZTY2MTY0YTk4Zjc0OTU2NDc2MjRiZDFlYjQ5NDAzMGU1MiJ9"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/record.rs#L69-L94",
+          "version": "repo-lines-v1:sha256:c6e5232569dc29858f92cc422096c71c33b756026f9c2504ded47a33c18f6475:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZWZkMDU2MzlmNDM0OTZmMWQzZDRhZWRiNDZiMTBjYzI5Mzk3MmUwZmVlMjFlMDI3ZjcxNDhmMzE0YTAzZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1MTY0MjJhNTk1YTViMWYyYTA4MDhmZjU1ODU0MjU3YmM5NWFjYTliNDAzOTQzMzZlZGQxZDc5ODc2MzZhY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkMjg2ZjVkYWFiNmY4MjA0M2FkMTBhZTkyZWQzNDljZGYyMmY0ZWExYjdkZWUxNmY5YTIzNmFmNDQyNDJhY2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c82c20946f9c47e3aa79577940b9e43b",
+      "statement": "apply_place_geo applies one confirmed point only to events whose current place matches case- and whitespace-insensitively, skips existing points unless overwrite is true, counts duplicate ids once and validates the point before changing anything.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/place.rs#L30-L80",
+          "version": "repo-lines-v1:sha256:db63b27df81b8768134014083e886c68bb73790a0e1a6892ed70466fb5cbdbf7:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MThlZmJlYTk2ZGU4MWJmZTcyY2VmOGNmNWIzODYwYmFkNjI2YjY2ZTQwODA4MWEzNjZmZjNmMmRjY2U5NzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYWMxOGI1MDAwMzEzYmExNTg1MmY5NGMwNjliMDJmMTAyYWVlM2FhNWJhYTI3NDc0MTI0ODhiMjJlNTUyMDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc3ZTQzNGI2NDI4NDIxZGNjYzVkYjU4ODNmNWRlNjU1MWRiYjkwMDMyMGNmMGExMDdhNTdhNmRkNmM1MzY3NmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNGVkNGJmNzc2Mjc2N2Y4Yzk4ZDU3ZDUwMjIxN2VkMTIxZGI4MTU3MGQ2YmQzYTYyNDZkYzk1N2FkZDhjMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8b0ab8dc91224a08a12a0a7fc10667ae",
+      "statement": "The Map tab filters dated events by an inclusive year range, groups events by a four-decimal place key and merges groups whose markers collide on screen at the current zoom.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/map/group.ts#L1-L100",
+          "version": "repo-lines-v1:sha256:411b674cba21bc40e98dcdc1383d38d1cbd4d7c3912ab4dfeaea3d626631223d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0MjlhZjU0NjMzMGE2ZjI3NDZlNmQ1MmZiYjllOGE1MzcyMDM5YTgzZmRhYmRlZjc1ZDZmNTY4OTQxYjBlNjhlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhYTFkMWE2MzM5MDIyOWM3OTgzNDdlODNhMDQwNTQ0MWM5NDAwMDM1Mjg0YWQxNjhjMWJmNmNkZjFkNzBhMzcwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2MWUzNDQ2NDdjMTAxZTA0OWUzNGZiY2NhYmIyMDIyMTNlZDBhYjc4YTIwYzAwYWI4OTQyMDkyMTRjMDNmYjc3In0"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/map/range.ts#L1-L42",
+          "version": "repo-lines-v1:sha256:0651031d1cc7b3ce7622326494bdf84f8a63ce38dc7ad76953f4340de083c9c4:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhNDRhMzRjZDg1ODFjNDBkNTMwNGM3ZDBlZGNiY2Y5NDZkZmZjZWQ2ZjY0NjM3MDg4YzhjNzc2YzVkZWMyZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5NTljZTY2NGIyYTcwMzVhZjE2ZjRkYWQyMGQxNjJjODBhMTBkZjMyZDA2ODkwYjZlYzgzM2E2YmE4ZTY4MTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4Zjg3ZDhmNzU1YjEzZDcyMjgxNjMzNGY5ZGYxYmY2YWFmMGY0MmFjYzU0YmNhZWViYzFkZjcwZGZkZTg2ZDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ffe02d7b54bb45bf9f605972bec1a963",
+      "statement": "OSM raster tiles are requested only while the Map tab is open, the offline basemap uses the bundled Natural Earth outline instead, and address suggestions plus Wikidata historical names are separate opt-in features with their own switches.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/geocode.rs#L280-L300",
+          "version": "repo-lines-v1:sha256:a2fa28c4da08e8d39e524cc366415d4fe1de1a239164fa1d40983e1beed0efc7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1N2Y3YmZiNjc1ZGE3MzNlZDMzZDY4Y2Q4OThmMDJiOGVhZGU3NmZlMTQ2YTczOWVhODFmMzY0Y2I2NjAzOWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2MDc3NjQ4NDk0MGQ3ZGM1MDkxMzI0ZDNiOTUwNDYzOGUyMjQyOGIzZjk5MTQzYTMzMTFlOTY1NWNiMjU1YTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkZDllYjI5NDRmOGE5YTNiMzUxNWVlMzllMTFmZTQ5MzY4MDgzZDQzODU4YjRlZGNlNmJjZWJmY2NkZTA5N2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjExMTIyYWIwMDhlMDFhMDQ4YzIyOGZlZmIwNTlkOGY5NWZlYmM5NjhhMjEwY2ZjYjZhNzQ4MTFkNzY1ZGU0ZWUifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/config/src/model.rs#L452-L480",
+          "version": "repo-lines-v1:sha256:a2baeed8ec7f50c3d3643099c0fafd93d561885d8bc30ecb617d64f6ccf83a90:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkOGY5ZTE3N2U0NTA2ODZiNjU5NDc3MTViMGM1YWYwMDBmOWE3YjMxYmMxZjRhMTBkMTgyOGYyNDg1NmZkYzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5ZGQyYTZjZWRjNmU4NWVhYjU0MzJlMWZiYjY2MGJjOWZkNjVmNDYxOTRjMTllMDFjZTk1ZjEzODJlNjA0NzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMDg5ZDQyMzM2NDAzZTlmMjY3MGQwNjU4Y2MwZTliMzQwMjZjN2U1YTcyZGUyM2U2M2FlMzgwMzY0ZjI0OWUifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/map/MapCanvas.tsx#L1-L120",
+          "version": "repo-lines-v1:sha256:e207e165381cd639ba0e52e9af9be5f2c9584e5680f8cfcaab818e799b4c7887:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwNGExZDc2NjIwYjRhNjJlNWZlOGVhY2M3NmE5ZmM1ZjY4M2Q5YzU5YjYwYjgwYzY5MWRhNGJlZmNlMTliMDBkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI1OTY2ZmJmYTg4OTk4ZGE3NDY1NmM1MDE5NDk1NmMyNWYwODQ5NDU3NjYwYzAwOWZlNjNkMWU5ZmE5ZGM5MzFjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhMzYwOGFmOWQyMzNiMDQzOGIxMDM0YTJkNTU4NmE0ZjBlYTFiMDg3ZWRjYjZkZWI2YjgyZDdjNWEyNGYxNDkwIn0"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

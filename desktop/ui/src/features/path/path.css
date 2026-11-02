@@ -1,0 +1,114 @@
+/* "Relation" screen and the kinship block of the person card. Only layout lives
+   here: typography, colours, cards and controls come from Fluent. */
+
+.path-result-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.path-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  margin: 10px 0 4px;
+  overflow-wrap: anywhere;
+}
+
+.path-chain-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.path-chain-arrow {
+  margin: 0 2px;
+}
+
+.path-routes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.kinship-panel {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--colorNeutralStroke2);
+}
+
+.kinship-panel h3 {
+  margin: 0 0 8px;
+}
+
+.kinship-picker {
+  max-width: 380px;
+  margin-bottom: 12px;
+}
+
+.kinship-directions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.kinship-direction-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.kinship-term {
+  display: block;
+  margin: 4px 0 6px;
+}
+
+.kinship-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+}
+
+.kinship-empty {
+  margin: 0;
+}
+
+/* Relation diagram viewport: drag with the left button to pan, the wheel to
+   zoom around the cursor. Sizes live here so styles.css keeps the base look. */
+
+.path-viewport.path-viewport-pan {
+  position: relative;
+  overflow: hidden;
+  height: clamp(240px, 46vh, 480px);
+  touch-action: none;
+  cursor: grab;
+}
+
+.path-viewport.path-viewport-pan.path-panning {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.path-viewport .path-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+/* Inner layer: the pan is a `translate` on the canvas above, the zoom is CSS
+   `zoom` here. Unlike `scale`, `zoom` re-rasterises node text at the target
+   size, so names stay crisp while zooming. */
+.path-viewport .path-canvas-zoom {
+  position: relative;
+  transform-origin: top left;
+}

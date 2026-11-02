@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:4e1bc62c14fb9d38ea5f83af033690dc6a1cb52cfc39436908f9bd7b3fdf9409",
+  "claims": [
+    {
+      "id": "claim_b4b35f59b5d54e4b9cb3f796b9b205a0",
+      "statement": "Relationships have four explicit types (PARENT_CHILD, ADOPTIVE_PARENT_CHILD, SPOUSE, PARTNER); for parent edges person_id is the parent and related_person_id the child, and spouse rows are canonicalized so person_id sorts before related_person_id.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/relationship.rs#L8-L59",
+          "version": "repo-lines-v1:sha256:66e6407d0d2fcfb0cf5019faf0016f312ea9fdc0729debd4a4bb2069d86d6af5:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwZGY2ZTI1Mjc5ZTYyMGNjMzkxNzNjMDUxYWI4OGI3ODY4MzM2ZjU5Mjc1NWQ0YTlhYTI5ZWE1NWU4ZWZiNmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiNDYxZGJjZmZkMjczMTAxZGQ2N2U2NjNhMjg1NmYwNmIyNWZhNDllNDZjZDFhOTkwOGQ5M2ZlZTVmMDVhMmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1NDk4YTk2ZDcwNDE5Y2JlZTM2YTk1MWNiNmIzYjZjOGVlMDNkN2RkNjFiYjk0ZTVkOTZmNTI1ZTA4MmM4YjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4daff5e8377c4b0e9f76df90ff2f62ed",
+      "statement": "Row validation rejects self-links and non-canonical spouse rows; set validation additionally rejects duplicate edges, duplicate spouse/partner pairs and parent cycles.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/relationship.rs#L61-L80",
+          "version": "repo-lines-v1:sha256:ce478750a400d1d39bd39edb0bcd07d168f756f4a37ced49fa803a76f69c6135:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2ZDk3Mzc0Y2M3NDYyNDk0MjliODFmZWY2MTQxYmY1ZDcxZGI2MTgwZTA2NDExMGU2MGFmNDFjNGRmMWI5MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkMGEzMzEyODQ2Yzg4ZTcwOWQ3MmU3ZTRkODVhY2E1OWFmOGQ5MWY3OTcxMWRkNjBkYzAxMjczZjhmMDM3YTEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/relationship.rs#L91-L147",
+          "version": "repo-lines-v1:sha256:e04b51c1e1734ba892f4634b8fced76fa472613f821211f7e855404c946cebf2:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwNzI1YTEzNTUwZmIwM2I2OTM5MWQ1MWExOWNlZDBiYTdjOTYzMTRkNjkwMWQyYmMwMDE0YWQ1NjA1MWIzNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZTc2MzU1Y2YxMTk5NDgwYzNmOTk4MzZiMTQ4NmM4NDFkODkxZmFhZDkwNGM2MDhlMDkzMDIyZDM3NTdhZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFmYTkyM2Y5ODYyOTNkZDNjOTQzNzhmZWNiMjM3MThiMGFjZTlhZGJmYjUxMzkxMjI0MGMzNTE0YzM2OTJmZTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_712692bd417041418e8234cc1b27b8ac",
+      "statement": "The validated relationship set is re-checked on every save_relationships call, so on-disk rows follow the same invariants as new rows.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/storage/src/lib.rs#L296-L310",
+          "version": "repo-lines-v1:sha256:4159c7ff1b93eb113aa038313987d22e273d784a98e9f99803cd983be311bb80:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MzMyZDFmMjU2N2VjMTZlOWQyMjZmNDlhZTY4ZjliYzg5OGI0MTljM2EzZmFlOGVjODc2MmI2ZGNhMTdiMTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiNDYxZTY0OGFlYWU0YmQ1ZTZjMDJjN2U1MTJmZTBjNjhmNmMyMGY4YmE3NDUxYzdlNTJlZjkyMDVhYzI5NDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1MjhkMTk2ZjE0N2JkZmE0YWY2MDljZGFkMzdlOTQyMzZjYWEwMTZiMmNhOWRkYzEyNzVkNTcyOWI5MzdmZWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_50224dc49d7343a8a989351fc04cc5e1",
+      "statement": "Traversal helpers return sorted parents (with an adoptive flag), children and spouses, and are used as the deterministic base for graph and path results.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/relationship.rs#L155-L223",
+          "version": "repo-lines-v1:sha256:ca43eda114763904a71eeab0dc924f1f3be07ac29bfd19621e558be23037587a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiMThmMDJlN2M1NjNjYjNiZDEwYzYxMTNiMDlmNGYxZmEyZTAxOWQ3MDEzMDU0ZDI4MzQ4YmMxMzdlOGZjYzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0YmE4MzU3YWM4Y2M5MmQ5Yjk0ZTU3NzEzNzdkYzg1ZTM4ZDUwOTBiMTU1N2RjMWU2ZmEwNGRmMGE0ZGNmZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1MjE2MDRiMzVmYzQwYWYwMGNiYTRlZWEyZmQ1ZTJjM2FmMTg2M2IzOTExODVkN2JmNGJiMDllNzJkMGM4YjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_73b932eb7bd54fd9a0e7fe98d731b8e4",
+      "statement": "Siblings are never stored: are_siblings and siblings_of derive them from shared parents, so adding a sibling edge is impossible in the data model.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/kinship.rs#L489-L517",
+          "version": "repo-lines-v1:sha256:b06b7df657be6f17e57c600a23d3da9bc132541eb253ce587537e448cdeeec15:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlN2YwMzk5ZTRmYTVmMGFjNTM0ZDllMTYyOGYwNzFmZGIwNWJkZGIxZDFhMGE5ZDVhMjkzYTdjNGMzMzdmMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwNzE4YmE0YWM4NzU2MDQxODZmODViOTBlMDU4OTNiZTlmMjUyMThlYmNhZjA0ZDVkM2FhYmExYjE3YjU0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhMzEzMWRmNDdiMzE3YjYyNzBkOGEyZGVhOWYxYTMyODZkYzRlNWZlYTMwMDFmZTM0ODRiZjg3YzgxNzc0ZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_52fa5a2420064600ba97a75699a04daa",
+      "statement": "The ancestor graph uses path-based occurrence keys, inserts placeholders instead of fake people for unknown parents, caps generations at 8, and reports truncation and pedigree collapse.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/graph.rs#L117-L214",
+          "version": "repo-lines-v1:sha256:e736d28189f94a7dde51d6a16324b9ac4a69f6ff235e629957ab7200f649bb5e:eyJzZWxlY3RlZExpbmVDb3VudCI6OTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5MTBlNWUzNjViNWM3ZjUwMTJlYTdlYTViMjU4ZTg4N2FiMWNmMDM2ZWU2NDY4ZDdlNTM5M2I5YzVhOTU5ODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxODViZDU5OGI4NjJjMTVhMzY4YThhYWRkNzFkNDUwM2UwNDBlM2JkZmIxM2U2OGViNjc2YzY2OTExM2ZjNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkYjNiM2Y3ODQ2ZWE4MmVjNTAwOTFiYjJlMWUyYzA4Y2VkMjU1NjdiZjc1MWJjOWZiNDAwYzE4MTc2YjhiMjcifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/graph.rs#L17-L47",
+          "version": "repo-lines-v1:sha256:8392d494695dd05aea714ee571ad414b1b7914ea8d389b0c25ee594e2acab6b0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3YzE4Nzk4OTAzNDUzYzYwYTUxN2Y0M2JhYTRlOTNmZGMzYTBmMWQ0ZGQ4N2FhMjNlYjY3MDA5NzNkMTM0MzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlZDBkOGIwYTQzNTEwMDM5YzMxNjc5NmE0M2NjODY4OTJjMGI0OTY1NzZiZjE1NWU3NzJiZWFlOTFjOTVjY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4YjZkNmY3MDQ4ZDRlNGViYmQ1ZTFmZmFkNmViODU2ODJjZjlhYTNjMGU2N2ZjYjUxYzIxYWMzYjJhOWM4NGEifQ"
+        },
+        {
+          "resource": "repo://desktop/crates/core/src/graph.rs#L93-L100",
+          "version": "repo-lines-v1:sha256:d7d4e5094a9f9da95620f07c19239618ce1ef5d5f10f46c9036e0fee749d71e4:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjgyMWQ1NzZhNWIxZTFmNTQzNzE5M2ViNGYzOWM5ZDg1MjlhMjNhNWRhZTk1NDRjOTJjZWZjMzI3MWIwYzg1MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTYyNTQwMmM0Y2RmMmM3MjU4MDFkYWY0MGI2YTYzMDBhNWIzNjlkZGQxN2I2Yzc2NDQyZGM3ZjA4NWU5YzQwMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDJmMzc5NGFjMzc0YzRmNTkzYTU2YThjYTBmYjliNmJmYzM1NWQ2OTZlNDFiMGJmY2E4ZTQwZmMzMjE0YzE4NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGJiNDdhNmZlNTg0OGZiNzlkYzE4YTQ3MmNiOWUwZDQ3MmQ4OTMyNWM5YmVlNmY4ZTNjZWRmODQyM2ZhYjNjZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7f7e623b386644a5bed33c1dda187784",
+      "statement": "Path finding is Dijkstra over parent, child and spouse edges ordered by fewest spouse edges, then fewest nodes, then lexicographic ids, and returns up to two deduplicated alternative routes.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/path.rs#L9-L93",
+          "version": "repo-lines-v1:sha256:a68975457101cee407bff1366ab6a67ce81d699103cb623ee065f650db656f8b:eyJzZWxlY3RlZExpbmVDb3VudCI6ODUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MGMyZmJjMTQzMjA4MWM5Njc4MzNmN2FjYWJkN2U0M2I4ODNiNjBhMDEwYjgxNzgxMTA4ZmRhMmU0Zjg2N2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiZTRlMjczM2ZiZmFhMjAwNmM0ZWIxNjM0ZmZkZGM3MWRmZTA1MTQ2NTI3ZGRjYTU5OGZkOWJjMmIzYjNkNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzNjI5ODExMjQyNDAyNzI0NDBlZDJiZGVhODJjYjBjNjliZjhkMWM3ZmNkMzVhM2NlMGM3M2VlYTIzZGI1ODIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d63e3e29ea5c4406b2ff4b4e84145308",
+      "statement": "Kinship is derived from the shortest path so term and chain agree; classification branches on zero, one or two spouse steps, and unknown or unresolvable chains stay UNKNOWN without localized text.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/kinship.rs#L201-L318",
+          "version": "repo-lines-v1:sha256:640d9c19111584986310fe7202d45449a5f4b345e211e6b2bafcd75456be7696:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMDM4YzEzMGZjNjkyOWRhN2UwMTMzNjgzNTU2N2NmYTBkZjFhODY3MmU3OTFiMWYzM2ZiZDNkODg5NDk4OTdhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxOWU3NjM1NWNmMTE5OTQ4MGMzZjk5ODM2YjE0ODZjODQxZDg5MWZhYWQ5MDRjNjA4ZTA5MzAyMmQzNzU3YWVlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjY2I0Y2RhN2I5ZTI1ZmNkODA0MGQxODEyNTcxYTk1MzdkYTM0OTAwMDVkNzBjYTMwNWNlNzQ2Yjc3NDllZWRmIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_2b6f372c57bb4a69a6e82edff66516af",
+      "statement": "Kinship terms are localized only in the UI: the core returns KinshipKind/KinshipLine/gender codes and the UI renders them through the kinship i18n namespace with per-locale plurals.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/i18n/kinship.test.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:0f262e8b7fadd87bea7d355982b07269849e4896e562eb22961c20ae9539197b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiOTUwNmIyMWY0ODNkYzk1ZGYyZjJiMzVmNzBjMGE0NDNiMDUzYTdiOTY0OWY3NzQ2N2U2ODhhMzMyMDA0MDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxZmIxODE2YmUyNjE3MDE4NWJjYTRkNDBkNjY4YmYyNmQyY2YxOTNiOTc2NmUwN2Q4OTFjYzVhMjQwNzA0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmMzkzZWM5Y2E2NDc4ZGZhMDZmZjZiNzA1OTkzYmZlYThjNGMyOGEzMjhkOGJkMGY4MGNiOTM3YWM4Njk3ZDAifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/i18n/kinship.ts#L301-L330",
+          "version": "repo-lines-v1:sha256:824696325a71202cc2f01e9f38fcc7bf9f69fd159658ea0b53da4b23f5250f4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxNWI5Mzg0ZDE2Mzk1MjdhM2U4ZjllYzljOTU1ZmM1YjNlZTNlYjAxMzI2OGI3YzFmMjA1YjUxMGI1NzNlODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmYzlmY2UxODY5MDA0M2YzY2Q4Y2VlNmFjZjA3Y2UxZDQ3NGFiMWNhMzY4ZGQ3NjBlZTM5ODY2ZTkxMWQ0YTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI5NTA0NWY2NTM1ZDI4ZjI4ZDdkNWQ5ZmNmODYxOWU3NjQzNDE4YzliYzkwZTNiNWNkOWNkOGU0OTAwYWE5YWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1ZDU2ZDk4ZmEzNmUwMTdmMzEwYTRiNDA5N2EyZTNmNDM5OTg3OTZhYjliYTYwZDg3OWQ4MTg0OTBhZDU2M2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_acc2a1ac069143829cea0628fbaa4fda",
+      "statement": "The descendant graph grows breadth-first from generation 0, keeps one occurrence per child (first parent wins, pedigree collapse is reported), sorts children by id, and truncates at 500 nodes or 8 generations.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/crates/core/src/graph.rs#L216-L311",
+          "version": "repo-lines-v1:sha256:283b50635d8a59d938cf2127b3e4fe324333e58ee039de654f61113fd16a876c:eyJzZWxlY3RlZExpbmVDb3VudCI6OTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0OTNiNjc4ODYwNmI3OGNkNDM2MTIzZTdkNjgzMDNhMWVlNjAzZTRlODEyNTlhNzM3MWUzZjM1MmU5YjMzNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjYmE1ODM2NTJmYjA4MThlMDljOTg0NTc5MTNkZWNlNTA1OWUxMWEyYTEzNTMyNGM1YmI5OTE1ODdhMjkxZDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ccad024ca99492ca72dc1dc65dab5fd",
+      "statement": "Kinship is exposed to the UI as a batch: graph_kinship returns one descriptor per requested target relative to the same root, skipping unknown ids and rejecting malformed ones.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/graph.rs#L82-L124",
+          "version": "repo-lines-v1:sha256:949a95e6dbbe6183ff9504c1261a05ef9094c56b913969bf35953568ba6f0a8a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZjdhOTJlMjBiYmQwZjZmNmQ2Y2I0MjZhZGZmYmZhMDlhZGVlY2MzMjdiODNjZDczMmQ0Yjk2ZjVjYjg1ZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwNjNjNGQxYWY4Y2Q4OWJiMGJkZDc2NTdmZmNiZjY4MDZhNjEwZDc5ZDZjOGQ0YzMwN2MyNDFkZjM5MDA1MjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmMzcwNDdiNTkwMGU4ZjNiYWZhMTViMDQxODFiNzA4NDkyNTczMjdmOWRjYWU1ZWFkZGQ0ZDgxMDkyMTg1MWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_64a4198ceb064094b376c40492eb69c0",
+      "statement": "The graph screen derives the wider family on the client without storing sibling edges: features/graph/forest.ts builds a blood-relative forest from parent edges, while the direct ancestor and descendant graphs keep only the vertical line.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/graph/forest.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:63a3ecf8d7ce23b074775eee7fc5edc71aa0f5b33fe81190c6f1afec2c334910:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzYjhmN2U1YTkwN2FhYTZhYmE2ZjFlZjJjZjBmYmI4YTExNzNlMjIxYmRiYzY2MjA3ODAyYWI0ODBmMWYwM2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4NWJkZGVjNmFmMGIzNTA3ODVkYmE2YWQ0OWNhYmMwMGEyNDQ2YTFmN2IzYWQ2YmQ5YzY2NzI3Y2VmNzhkODgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ZmNmOTZkMzgwNGI5NGNiZTAyMDJjNDZkMGZjOGIyODJlY2RkZGYwODhhOTNhYmNmMTMzMzU3ZTM4YWUxNWEifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/graph/parents.ts#L1-L42",
+          "version": "repo-lines-v1:sha256:25e6b5b60e69cb769181099a49f4754507f703fba8bf20e34080cae0f2af9e01:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyZjIzNTcwMDgxNzM5NGVkODI4MGFmNmNiODAyZjc3NzEzYTUwMjZkZjI4ZGYwMzFmN2E4N2YzMjhkZDNmOGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNjlkNDRiZGU4NDczOWZkZWJiMTlkZDBhYTQ3YjUyZDI2NTMyOTE5YzRiYmZjZWJkM2EwZWE3MjRlMTliZWEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-11-02T09:11:48.673Z"
+  }
+}

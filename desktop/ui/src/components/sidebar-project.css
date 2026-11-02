@@ -1,0 +1,179 @@
+/* Project header block of the sidebar. */
+
+/* The Divider replaces the legacy border-top of `.sidebar-project`
+   (styles.css, @layer legacy); unlayered rules here win over that layer. */
+.sidebar-project {
+  padding-top: 0;
+  border-top: none;
+}
+
+.sidebar-project-divider {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.sidebar-project-head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 8px;
+}
+
+.sidebar-project-head .sidebar-project-name {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.sidebar-project-name .sidebar-project-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  text-align: left;
+}
+
+.sidebar-project-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.sidebar-project-edit .sidebar-project-input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The rename field must keep the size/weight of the displayed name; Fluent's
+   small Input defaults to 12 px and the text visibly shrinks on edit. */
+.sidebar-project-edit .sidebar-project-input input {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.sidebar-project-head > .menu-root {
+  flex: none;
+}
+
+.sidebar-project-collapsed {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+}
+
+.sidebar-project-collapsed .sidebar-project-divider {
+  margin-bottom: 4px;
+}
+
+.sidebar-project-badge span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* App shell: rail navigation and breadcrumb back link.
+   These rules are unlayered on purpose: Fluent's Griffel classes are also
+   unlayered, so the extra class in the selector keeps the state styles
+   (selected item, hidden mobile trigger) deterministic. */
+
+.app-breadcrumb {
+  justify-self: start;
+}
+
+.shell .sidebar-nav-item {
+  display: flex;
+  width: 100%;
+  min-height: 36px;
+  gap: 8px;
+  /* Reserve the outline and the left accent so no state shifts the row. */
+  border: 1px solid transparent;
+  border-left-width: 3px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  justify-content: flex-start;
+  padding-block: 6px;
+}
+
+.shell .sidebar-nav-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.875rem;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Fluent has no selected state for aria-current: the rail paints it with a
+   brand left accent only, without a box around the whole row. */
+.shell .sidebar-nav-item[aria-current="page"] {
+  border: 1px solid transparent;
+  border-left: 3px solid var(--colorBrandStroke1);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--colorNeutralForeground1);
+  box-shadow: none;
+}
+
+/* Pin the global "Projects" item above the project block: it stays at the top
+   of the rail while the project tabs scroll. */
+.shell .sidebar-nav > .sidebar-group {
+  order: -1;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-block: 2px;
+  background: var(--legacy-surface);
+}
+
+/* Hover/active must not paint the rest of the outline or drop the accent. */
+.shell .sidebar-nav-item[aria-current="page"]:hover {
+  border-color: transparent;
+  border-left-color: var(--colorBrandStroke1);
+  background-color: var(--colorSubtleBackgroundHover);
+}
+
+.shell .sidebar-nav-item[aria-current="page"]:active {
+  border-color: transparent;
+  border-left-color: var(--colorBrandStroke1);
+  background-color: var(--colorSubtleBackgroundPressed);
+}
+
+.shell.sidebar-collapsed .sidebar-nav-item {
+  justify-content: center;
+  width: 36px;
+  min-height: 32px;
+  margin-inline: auto;
+  padding-block: 4px;
+  padding-inline: 0;
+  border: 0;
+}
+
+/* Keep the accent in the rail without a border that shifts the icon. */
+.shell.sidebar-collapsed .sidebar-nav-item[aria-current="page"] {
+  border: 0;
+  box-shadow: inset 2px 0 0 var(--colorBrandStroke1);
+}
+
+.shell.sidebar-collapsed .sidebar-project-collapsed .sidebar-project-badge {
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+}
+
+.shell.sidebar-collapsed .app-brand {
+  display: none;
+}
+
+/* The overlay-nav trigger exists for the shell contract but the narrow
+   layout collapses to the icon rail, so it stays hidden. */
+.shell .sidebar-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .shell .app-brand,
+  .shell .sidebar-collapse {
+    display: none;
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "title": "Handbuch",
+  "subtitle": "Kurze Antworten zur Arbeitsweise von Gentree. Das Handbuch ist in der App gespeichert und funktioniert offline.",
+  "searchPlaceholder": "Handbuch durchsuchen",
+  "searchLabel": "Handbuch durchsuchen",
+  "topicsLabel": "Handbuchabschnitte",
+  "allTopics": "Alle Abschnitte",
+  "searchResultsLabel": "Suchergebnisse",
+  "startTour": "Einführung starten",
+  "sections": {
+    "basics": "Grundlagen",
+    "explore": "Archiv entdecken",
+    "tools": "Daten und Werkzeuge"
+  },
+  "noResults": "Nichts gefunden. Versuchen Sie ein anderes Wort oder fragen Sie den Assistenten.",
+  "resultsCount": "Gefundene Abschnitte: {{total}}",
+  "openScreen": "„{{screen}}“ öffnen",
+  "openProjectFirst": "Öffnen Sie zuerst ein Projekt",
+  "askAssistant": "Assistenten fragen",
+  "askAssistantHint": "Die Frage wird mit diesem Abschnitt in das Chat-Eingabefeld übernommen. Gesendet wird erst mit „Senden“.",
+  "stepsLabel": "So geht es",
+  "noteLabel": "Hinweis:",
+  "askTopic": "Wie geht das in Gentree: {{title}}? Erkläre es Schritt für Schritt und nenne die Schaltflächen.",
+  "askFree": "Wie geht das in Gentree: {{question}}? Antworte anhand des eingebauten Handbuchs.",
+  "topics": {
+    "start": {
+      "title": "Erste Schritte",
+      "summary": "Ein Projekt ist ein Ordner auf der Festplatte: Personen, Ereignisse, Medien und Sicherungen liegen darin. Es gibt keinen Server und kein Konto.",
+      "step1": "Erstellen Sie auf dem Bildschirm „Projekte“ ein Projekt oder öffnen Sie einen vorhandenen Ordner.",
+      "step2": "Importieren Sie Daten aus AT5 oder GEDCOM: Der Import legt ein neues Projekt an und ändert die Quelldatei nicht.",
+      "step3": "Halten Sie den Projektordner in Ihrer eigenen Sicherung: Die App legt interne Kopien an, eine externe Kopie ist aber sicherer.",
+      "note": "Nur eine Instanz der App schreibt in ein Projekt. Öffnen Sie denselben Ordner nicht in zwei Kopien gleichzeitig."
+    },
+    "people": {
+      "title": "Personen",
+      "summary": "Eine Personenkarte enthält Namen, Geschlecht, Lebensdaten, Foto, Ereignisse und Beziehungen.",
+      "step1": "Drücken Sie auf dem Bildschirm „Personen“ auf „Hinzufügen“ und tragen Sie den Namen ein.",
+      "step2": "Öffnen Sie eine Person im Seitenbereich, um Fakten, Ereignisse, Medien und Beziehungen zu sehen.",
+      "step3": "„Bearbeiten“ öffnet die Karte zum Ändern. Beim Löschen einer Person bleiben Ereignisse mit anderen Beteiligten erhalten.",
+      "note": "Eine Person kann mehrere Namen haben; der Hauptname erscheint in Listen und im Baum."
+    },
+    "relations": {
+      "title": "Beziehungen",
+      "summary": "Beziehungen sind ausdrücklich: Eltern und Kind, Ehepartner, Partner, Adoption. Geschwister werden aus gemeinsamen Eltern abgeleitet.",
+      "step1": "Öffnen Sie den Abschnitt Beziehungen der Personenkarte.",
+      "step2": "Fügen Sie Elternteil, Kind, Ehepartner oder Partner hinzu und wählen Sie die andere Person aus der Liste.",
+      "step3": "Bei einem Adoptivelternteil verwenden Sie den eigenen Beziehungstyp.",
+      "note": "Die App speichert keine Geschwisterverbindungen und lehnt Duplikate, Selbstbezüge und Zyklen ab."
+    },
+    "events": {
+      "title": "Ereignisse",
+      "summary": "Ein Ereignis hat Typ, Datum, Ort, Beteiligte und optionale Detailfelder.",
+      "step1": "Drücken Sie auf dem Bildschirm „Ereignisse“ auf „Hinzufügen“ und wählen Sie den Typ.",
+      "step2": "Geben Sie das Datum ein. Ist nur Jahr oder Monat bekannt, wählen Sie diese Genauigkeit statt eines vollen Datums.",
+      "step3": "Tragen Sie Ort und Beteiligte ein und füllen Sie die Detailfelder des Typs aus.",
+      "note": "Unbekannte Daten werden nie durch erfundene ersetzt: Der Originalwert bleibt mit der Genauigkeit „unbekannt“ erhalten."
+    },
+    "tree": {
+      "title": "Baum und Verwandtschaft",
+      "summary": "Der Baum wird von einer Person aus aufgebaut: Vorfahren, Nachkommen oder der ganze Baum.",
+      "step1": "Wählen Sie auf dem Bildschirm „Baum“ die Person, die zur Wurzel wird.",
+      "step2": "Wechseln Sie Ansicht und Zoomstufe.",
+      "step3": "Um zwei Personen zu verbinden, öffnen Sie „Beziehung“: Die App zeigt den Weg und die Verwandtschaftsbezeichnungen.",
+      "note": "Verwandtschaftsbezeichnungen werden von der gewählten Person aus berechnet."
+    },
+    "find": {
+      "title": "Suche und Prüfung",
+      "summary": "Die Volltextsuche findet Personen und Ereignisse, die Zeitleiste zeigt datierte Ereignisse, die Datenprüfung findet Probleme.",
+      "step1": "Geben Sie in „Suche“ eine Anfrage ein und öffnen Sie eine Person oder ein Ereignis aus den Treffern.",
+      "step2": "Filtern Sie in der „Zeitleiste“ Ereignisse nach Typ, Person und Zeitraum.",
+      "step3": "Starten Sie die Projektprüfung auf der Projektseite und sehen Sie die Warnungen durch.",
+      "note": "Eine Prüfung ändert keine Daten; sie zeigt nur, was sich zu beheben lohnt."
+    },
+    "data": {
+      "title": "Import, Export und Medien",
+      "summary": "Der Import aus AT5 und GEDCOM legt ein Projekt an; der Export schreibt GEDCOM oder ein JSON/ZIP-Archiv. Medien liegen mit Prüfsumme im Projektordner.",
+      "step1": "Importieren Sie eine Datei auf dem Bildschirm „Import“: Zuerst erscheint ein Bericht, geschrieben wird erst nach Ihrer Bestätigung.",
+      "step2": "Exportieren Sie das Projekt als GEDCOM oder JSON/ZIP über das Projektmenü.",
+      "step3": "Hängen Sie Fotos und Dateien in der Personenkarte an; die Datei wird ins Projekt kopiert.",
+      "note": "Ein erneuter Import derselben Datei erzeugt keine Duplikate und überschreibt keine manuellen Änderungen."
+    },
+    "assistant": {
+      "title": "Assistent",
+      "summary": "Der Chat beantwortet Fragen zum Archiv und zur App und nutzt dabei eingebaute Nur-Lese-Werkzeuge.",
+      "step1": "Aktivieren Sie den Chat in „Einstellungen“ und tragen Sie Basis-URL eines OpenAI-kompatiblen Anbieters, Modell und den Namen der Umgebungsvariable mit dem Schlüssel ein.",
+      "step2": "Fragen Sie im „Chat“; gefundene Personen und Ereignisse öffnen sich per Link.",
+      "step3": "Vorgeschlagene Personenänderungen werden zur Prüfung angezeigt und erst nach Bestätigung übernommen.",
+      "note": "Solange kein Anbieter eingerichtet ist, wird nichts gesendet. Der Schlüssel bleibt in einer Umgebungsvariable, nicht im Projekt."
+    }
+  }
+}

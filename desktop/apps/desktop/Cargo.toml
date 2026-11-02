@@ -1,0 +1,33 @@
+[package]
+name = "gentree-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+gentree-chat = { path = "../../crates/chat" }
+gentree-config = { path = "../../crates/config" }
+gentree-core = { path = "../../crates/core" }
+gentree-import = { path = "../../crates/import" }
+gentree-mcp = { path = "../../crates/mcp" }
+gentree-search = { path = "../../crates/search" }
+gentree-storage = { path = "../../crates/storage" }
+serde.workspace = true
+serde_json.workspace = true
+reqwest.workspace = true
+tauri = { version = "2", features = ["protocol-asset"] }
+tauri-plugin-dialog = "2"
+# 2.13+ declares Rust 1.90; keep the workspace MSRV (1.88) honest.
+tauri-plugin-updater = "~2.12"
+time.workspace = true
+uuid = { workspace = true, features = ["v4"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.56"

@@ -1,0 +1,188 @@
+/* Shared filter bar and chips panel layout. */
+
+@layer components {
+  .filter-bar {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Inline mode: the search field and every filter control share one row. */
+  .filter-bar-inline .filter-row {
+    gap: 0.375rem 0.5rem;
+  }
+
+  .filter-bar-inline .filter-search {
+    flex: 1 1 14rem;
+    min-width: 10rem;
+  }
+
+  .filter-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1 1 16rem;
+    min-width: 12rem;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .filter-panel {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--muted);
+  }
+
+  .filter-fieldset {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .filter-fieldset legend {
+    font-size: 0.78rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.15rem;
+  }
+
+  .filter-chip-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  /* Year range: one shared track with two independently draggable handles. */
+  .year-range {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 13rem;
+    max-width: 20rem;
+  }
+
+  .year-range-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--muted-foreground);
+  }
+
+  .year-range-values {
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .year-range-hint {
+    font-size: 0.72rem;
+    color: var(--muted-foreground);
+  }
+
+  /* The neutral segments at both ends are the part of the scale outside the
+     picked range; printing the two ends makes that explicit. */
+  .year-range-ends {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.1rem;
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted-foreground);
+  }
+
+  /* Half a thumb on both sides: the track and the handle-travel layer share
+     the same inline edges, so one percentage is a handle centre in both. */
+  .year-range-slider {
+    position: relative;
+    height: 1.25rem;
+    --year-range-thumb-size: 0.875rem;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .year-range-track {
+    position: absolute;
+    inset-inline: calc(var(--year-range-thumb-size) / 2);
+    top: 50%;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: var(--border);
+    transform: translateY(-50%);
+  }
+
+  /* Painted from handle centre to handle centre; the segments outside the
+     picked range keep the plain track background. */
+  .year-range-fill {
+    position: absolute;
+    inset-block: 0;
+    border-radius: inherit;
+    background: var(--primary);
+  }
+
+  /* Pointer travel of the handles: the inline edges are the two end handle
+     centres, so it is narrower than the track container by half a thumb. */
+  .year-range-travel {
+    position: absolute;
+    inset-inline: calc(var(--year-range-thumb-size) / 2);
+    inset-block: 0;
+  }
+
+  .year-range-thumb {
+    position: absolute;
+    top: 50%;
+    box-sizing: border-box;
+    width: var(--year-range-thumb-size);
+    height: var(--year-range-thumb-size);
+    /* Logical margins centre the circle on its inline start position in both
+       writing directions. */
+    margin-block-start: calc(var(--year-range-thumb-size) / -2);
+    margin-inline-start: calc(var(--year-range-thumb-size) / -2);
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    background: var(--card);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+    cursor: grab;
+    touch-action: none;
+    outline: none;
+  }
+
+  /* A little extra hit area for mouse, touch and pen without enlarging the
+     visible circle. */
+  .year-range-thumb::after {
+    content: "";
+    position: absolute;
+    inset: -0.35rem;
+    border-radius: inherit;
+  }
+
+  .year-range-thumb:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .year-range-thumb[data-dragging="true"] {
+    cursor: grabbing;
+  }
+
+  .year-range-slider[data-disabled="true"] .year-range-thumb {
+    cursor: default;
+    opacity: 0.55;
+  }
+}

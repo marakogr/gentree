@@ -1,0 +1,58 @@
+{
+  "title": "Связь",
+  "fromLabel": "От кого",
+  "toLabel": "К кому",
+  "filterPlaceholder": "Фильтр по имени",
+  "pickPlaceholder": "Выберите человека",
+  "swap": "Поменять местами",
+  "find": "Найти связь",
+  "emptyProject": "В проекте пока нет людей — создайте их на вкладке «Люди».",
+  "samePerson": "Выберите двух разных людей.",
+  "notFound": "Нет родственной связи в данных",
+  "kinshipLabel": "Родство: {{term}}",
+  "resultTitle": "{{from}} → {{to}} — {{term}}",
+  "kinshipUnknown": "родственник",
+  "routesLabel": "Варианты пути",
+  "primaryRoute": "Основной путь",
+  "alternativeRoute": "Вариант {{number}}",
+  "chainLabel": "Цепочка связи",
+  "kinshipPanel": {
+    "title": "Кем приходится выбранному человеку",
+    "searchPlaceholder": "Найти человека",
+    "noMatch": "Ничего не найдено",
+    "empty": "В проекте нет других людей для сравнения.",
+    "direction": "{{from}} → {{to}}"
+  },
+  "commonAncestor": "Общий предок: {{name}}",
+  "noCommonAncestor": "Общего предка нет — путь идёт через супругов.",
+  "distance_one": "{{count}} шаг",
+  "distance_few": "{{count}} шага",
+  "distance_many": "{{count}} шагов",
+  "distance_other": "{{count}} шага",
+  "stepsLabel": "Шаги пути",
+  "openInGraph": "Открыть в дереве",
+  "diagramLabel": "Схема связи",
+  "zoomLabel": "Масштаб схемы",
+  "zoomIn": "Приблизить",
+  "zoomOut": "Отдалить",
+  "zoomReset": "Сбросить масштаб до 100% (сейчас {{percent}}%)",
+  "fit": "Вписать в окно",
+  "clickHint": "Нажмите на человека в схеме, чтобы открыть карточку; тяните мышью, чтобы сдвинуть схему, колесо — масштаб.",
+  "step": {
+    "UP": {
+      "MALE": "отец",
+      "FEMALE": "мать",
+      "UNKNOWN": "родитель"
+    },
+    "DOWN": {
+      "MALE": "сын",
+      "FEMALE": "дочь",
+      "UNKNOWN": "ребёнок"
+    },
+    "SPOUSE": {
+      "MALE": "муж",
+      "FEMALE": "жена",
+      "UNKNOWN": "партнёр"
+    }
+  }
+}

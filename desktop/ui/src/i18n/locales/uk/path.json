@@ -1,0 +1,58 @@
+{
+  "title": "Зв’язок",
+  "fromLabel": "Від",
+  "toLabel": "До",
+  "filterPlaceholder": "Фільтр за ім’ям",
+  "pickPlaceholder": "Виберіть людину",
+  "swap": "Поміняти місцями",
+  "find": "Знайти зв’язок",
+  "emptyProject": "У проєкті ще немає людей — створіть їх на вкладці «Люди».",
+  "samePerson": "Виберіть двох різних людей.",
+  "notFound": "У даних немає родинного зв’язку",
+  "kinshipLabel": "Спорідненість: {{term}}",
+  "resultTitle": "{{from}} → {{to}} — {{term}}",
+  "kinshipUnknown": "родич",
+  "routesLabel": "Варіанти шляху",
+  "primaryRoute": "Основний шлях",
+  "alternativeRoute": "Варіант {{number}}",
+  "chainLabel": "Ланцюжок зв’язку",
+  "kinshipPanel": {
+    "title": "Ким доводиться вибраній людині",
+    "searchPlaceholder": "Знайти людину",
+    "noMatch": "Нічого не знайдено",
+    "empty": "Немає інших людей для порівняння.",
+    "direction": "{{from}} → {{to}}"
+  },
+  "commonAncestor": "Спільний предок: {{name}}",
+  "noCommonAncestor": "Спільного предка немає — шлях проходить через подружжя.",
+  "distance_one": "{{count}} крок",
+  "distance_few": "{{count}} кроки",
+  "distance_many": "{{count}} кроків",
+  "distance_other": "{{count}} кроку",
+  "stepsLabel": "Кроки шляху",
+  "openInGraph": "Відкрити в дереві",
+  "diagramLabel": "Схема зв’язків",
+  "zoomLabel": "Масштаб схеми",
+  "zoomIn": "Збільшити",
+  "zoomOut": "Зменшити",
+  "zoomReset": "Скинути масштаб до 100% (зараз {{percent}}%)",
+  "fit": "За розміром вікна",
+  "clickHint": "Натисніть на людину на схемі, щоб відкрити картку; перетягніть, щоб перемістити схему, прокрутіть, щоб змінити масштаб.",
+  "step": {
+    "UP": {
+      "MALE": "батько",
+      "FEMALE": "мати",
+      "UNKNOWN": "батько або мати"
+    },
+    "DOWN": {
+      "MALE": "син",
+      "FEMALE": "донька",
+      "UNKNOWN": "дитина"
+    },
+    "SPOUSE": {
+      "MALE": "чоловік",
+      "FEMALE": "дружина",
+      "UNKNOWN": "партнер"
+    }
+  }
+}

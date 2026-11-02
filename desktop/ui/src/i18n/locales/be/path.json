@@ -1,0 +1,58 @@
+{
+  "title": "Роднасць",
+  "fromLabel": "Ад",
+  "toLabel": "Да",
+  "filterPlaceholder": "Фільтр па імені",
+  "pickPlaceholder": "Выберыце чалавека",
+  "swap": "Пераставіць",
+  "find": "Знайсці роднасць",
+  "emptyProject": "У праекце пакуль няма людзей — стварыце іх на ўкладцы «Людзі».",
+  "samePerson": "Выберыце двух розных людзей.",
+  "notFound": "У даных няма сямейнай роднасці",
+  "kinshipLabel": "Роднасць: {{term}}",
+  "resultTitle": "{{from}} → {{to}} — {{term}}",
+  "kinshipUnknown": "сваяк",
+  "routesLabel": "Варыянты шляху",
+  "primaryRoute": "Асноўны шлях",
+  "alternativeRoute": "Варыянт {{number}}",
+  "chainLabel": "Ланцужок роднасці",
+  "kinshipPanel": {
+    "title": "Кім даводзіцца выбранаму чалавеку",
+    "searchPlaceholder": "Знайсці чалавека",
+    "noMatch": "Нічога не знойдзена",
+    "empty": "Няма іншых людзей для параўнання.",
+    "direction": "{{from}} → {{to}}"
+  },
+  "commonAncestor": "Агульны продак: {{name}}",
+  "noCommonAncestor": "Агульнага продка няма — шлях ідзе праз сужэнцаў.",
+  "distance_one": "{{count}} крок",
+  "distance_few": "{{count}} крокі",
+  "distance_many": "{{count}} крокаў",
+  "distance_other": "{{count}} крока",
+  "stepsLabel": "Крокі шляху",
+  "openInGraph": "Адкрыць у дрэве",
+  "diagramLabel": "Схема роднасці",
+  "zoomLabel": "Маштаб схемы",
+  "zoomIn": "Павялічыць",
+  "zoomOut": "Паменшыць",
+  "zoomReset": "Скінуць маштаб да 100 % (цяпер {{percent}} %)",
+  "fit": "Упісаць у акно",
+  "clickHint": "Націсніце на чалавека на схеме, каб адкрыць картку; перацягвайце, каб перамясціць схему, пракручвайце, каб змяніць маштаб.",
+  "step": {
+    "UP": {
+      "MALE": "бацька",
+      "FEMALE": "маці",
+      "UNKNOWN": "бацька або маці"
+    },
+    "DOWN": {
+      "MALE": "сын",
+      "FEMALE": "дачка",
+      "UNKNOWN": "дзіця"
+    },
+    "SPOUSE": {
+      "MALE": "муж",
+      "FEMALE": "жонка",
+      "UNKNOWN": "партнёр"
+    }
+  }
+}

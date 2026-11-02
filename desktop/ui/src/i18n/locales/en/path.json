@@ -1,0 +1,58 @@
+{
+  "title": "Relation",
+  "fromLabel": "From",
+  "toLabel": "To",
+  "filterPlaceholder": "Filter by name",
+  "pickPlaceholder": "Select a person",
+  "swap": "Swap",
+  "find": "Find relation",
+  "emptyProject": "The project has no people yet — create them on the People tab.",
+  "samePerson": "Select two different people.",
+  "notFound": "No family relation in the data",
+  "kinshipLabel": "Relation: {{term}}",
+  "resultTitle": "{{from}} → {{to}} — {{term}}",
+  "kinshipUnknown": "relative",
+  "routesLabel": "Route options",
+  "primaryRoute": "Primary route",
+  "alternativeRoute": "Option {{number}}",
+  "chainLabel": "Relation chain",
+  "kinshipPanel": {
+    "title": "How this person is related to the selected person",
+    "searchPlaceholder": "Find a person",
+    "noMatch": "Nothing found",
+    "empty": "There are no other people to compare with.",
+    "direction": "{{from}} → {{to}}"
+  },
+  "commonAncestor": "Common ancestor: {{name}}",
+  "noCommonAncestor": "No common ancestor — the path goes through spouses.",
+  "distance_one": "{{count}} step",
+  "distance_few": "{{count}} steps",
+  "distance_many": "{{count}} steps",
+  "distance_other": "{{count}} steps",
+  "stepsLabel": "Path steps",
+  "openInGraph": "Open in tree",
+  "diagramLabel": "Relation diagram",
+  "zoomLabel": "Diagram zoom",
+  "zoomIn": "Zoom in",
+  "zoomOut": "Zoom out",
+  "zoomReset": "Reset zoom to 100% (now {{percent}}%)",
+  "fit": "Fit to window",
+  "clickHint": "Click a person in the diagram to open the card; drag to move the diagram, scroll to zoom.",
+  "step": {
+    "UP": {
+      "MALE": "father",
+      "FEMALE": "mother",
+      "UNKNOWN": "parent"
+    },
+    "DOWN": {
+      "MALE": "son",
+      "FEMALE": "daughter",
+      "UNKNOWN": "child"
+    },
+    "SPOUSE": {
+      "MALE": "husband",
+      "FEMALE": "wife",
+      "UNKNOWN": "partner"
+    }
+  }
+}

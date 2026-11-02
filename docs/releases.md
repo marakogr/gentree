@@ -1,0 +1,448 @@
+# Releases and in-app updates
+
+Gentree ships Windows installers, a portable Windows archive, and can update
+itself through [`tauri-plugin-updater`](https://tauri.app/plugin/updater/). This
+document covers the release pipeline, the keys and secrets it needs, how the
+update endpoint is wired, and what is verified before a release becomes public.
+
+Releases are Windows-only for now. The macOS bundle can still be built locally
+with `make build` (`desktop/docs/build.md`), but it is neither published nor
+signed and notarized yet.
+
+The release workflow code-signs the artifacts when a certificate is configured
+and verifies the signatures, the checksums and a Microsoft Defender scan while
+the release is still a draft. An unsigned build is still possible and is
+reported as a warning, not a failure; see [Code signing](#code-signing).
+
+The updater is **opt-in**: the app makes no update request until the user turns
+on **Settings → Updates → Check for updates at startup** (`updates.auto_check`,
+off by default) or presses **Check for updates**. There is no telemetry.
+
+## How the app decides whether updates are configured
+
+The release-side settings live in `desktop/apps/desktop/tauri.conf.json`:
+
+```json
+"plugins": {
+  "updater": {
+    "endpoints": [
+      "https://updates.invalid/REPLACE_WITH_RELEASES_HOST/gentree/releases/latest/download/latest.json"
+    ],
+    "pubkey": "REPLACE_WITH_TAURI_UPDATER_PUBLIC_KEY"
+  }
+}
+```
+
+The Rust commands in `desktop/apps/desktop/src/updates.rs` read this section.
+
+- `update_status` never touches the network. It returns the current version and
+  whether both values are real.
+- `update_check` and `update_install` return `UPDATE_NOT_CONFIGURED` and do not
+  create an HTTP client while either value is empty, is an `updates.invalid`
+  placeholder, or the endpoint is not `https://`. A local test build may allow
+  plain HTTP for a loopback host only, and only when its own config overlay sets
+  `dangerousInsecureTransportProtocol`.
+- The startup check runs only when `updates.auto_check` is on **and** the build
+  is configured.
+
+`updates.invalid` is a reserved TLD, so an unreleased build can never reach a
+real host even if a placeholder slips through.
+
+## One-time key generation
+
+The updater verifies every artifact with a minisign key pair. Generate it once
+on a trusted machine and keep the private key out of the repository.
+
+```powershell
+# Windows (PowerShell)
+cd desktop/apps/desktop
+..\..\ui\node_modules\.bin\tauri.cmd signer generate -w "$env:USERPROFILE\.tauri\gentree.key"
+```
+
+```bash
+# macOS / Linux
+cd desktop/apps/desktop
+../../ui/node_modules/.bin/tauri signer generate -w ~/.tauri/gentree.key
+```
+
+The command asks for a password, prints the public key and writes two files:
+
+- `gentree.key` — private key. Never commit, print or paste it anywhere except
+  the CI secret store.
+- `gentree.key.pub` — public key. Paste its contents into
+  `plugins.updater.pubkey` in `tauri.conf.json`.
+
+Keep an offline backup of `gentree.key`: losing it means a new key pair and a
+manually installed build for every existing user, because old clients trust the
+old public key.
+
+## GitHub secrets
+
+Configure these in **Settings → Secrets and variables → Actions** of the
+repository. Only the names are documented here; values never belong in the
+repository, an issue, a PR or an agent message. The preview release workflow
+does not use them yet: it builds unsigned installers without updater artifacts
+while the updater endpoint is a placeholder.
+
+| Secret | Value |
+| --- | --- |
+| `TAURI_SIGNING_PRIVATE_KEY` | full contents of `gentree.key` |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | the password chosen during key generation |
+
+`GITHUB_TOKEN` is provided by Actions; the workflow needs `contents: write` to
+create the draft release, which is already set.
+
+## Code signing
+
+The minisign key above protects the update channel: it proves that an update
+came from the project. It says nothing to Windows SmartScreen or to antivirus
+engines, which check Authenticode (Windows) and Developer ID / notarization
+(macOS) instead. Both layers are independent and both matter.
+
+### Windows (Authenticode)
+
+The workflow supports a `.pfx` code-signing certificate and does not require it:
+
+| Secret | Value |
+| --- | --- |
+| `WINDOWS_CERTIFICATE` | base64 of the `.pfx` (see the command below) |
+| `WINDOWS_CERTIFICATE_PASSWORD` | password that protects the `.pfx` |
+
+```powershell
+# Base64 without header lines; paste the result into the secret.
+[Convert]::ToBase64String([IO.File]::ReadAllBytes('certificate.pfx'))
+```
+
+When both secrets exist, the `Prepare Windows code signing` step imports the
+certificate into the runner's `Cert:\CurrentUser\My` store, writes a
+git-ignored `desktop/apps/desktop/tauri.signing.conf.json` overlay with
+`certificateThumbprint`, `digestAlgorithm: sha256`, `tsp: true` and
+`timestampUrl: http://timestamp.acs.microsoft.com` (RFC 3161), and `tauri-action`
+signs the application executable, the uninstaller and the NSIS installer. The
+portable executable is built separately, so it is signed by an explicit
+`signtool` call before it is archived.
+
+Without the secrets the overlay is `{}`: installers are still built and
+uploaded, the verification step reports `NotSigned` as a warning, and the draft
+release can still be published (not recommended for a public announcement).
+
+For a certificate that cannot be exported as a `.pfx` (HSM-bound subscriptions),
+use Azure Artifact Signing (formerly Azure Trusted Signing) through
+`bundle.windows.signCommand`, for example
+`artifact-signing-cli -e https://<region>.codesigning.azure.net -a <account> -c <profile> -d Gentree %1`.
+The verification steps work unchanged: they read the signature, not the tool.
+
+Two expectations to keep:
+
+- Since 2024 an EV certificate no longer grants instant SmartScreen
+  reputation. OV and EV builds reputation the same way, so a fresh release may
+  still warn until the file and the certificate accumulate downloads.
+- Reputation attaches to the certificate and the file. Sign every release with
+  the same certificate, never rebuild an already published version, and do not
+  rename signed artifacts.
+
+### macOS (not published yet)
+
+The variables are documented in `desktop/docs/build.md`, and the verification
+script already understands `codesign`, `spctl` and `stapler`. Nothing is wired
+into the release workflow while macOS builds are not published: there are no
+`APPLE_*` secrets and no macOS job in the matrix. When the platform is turned
+back on, add those secrets to the build step and pass `--require-signature` to
+the verification step.
+
+### Unsigned preview releases
+
+Until a certificate is configured, every published artifact is unsigned. That
+is a documented limitation, not an accident, and it has three consequences:
+
+- Windows SmartScreen shows **Windows protected your PC** on the first launch.
+  The README, the release body (`releaseBody` in the workflow) and the readme
+  inside the portable archive tell users to click **More info** → **Run anyway**
+  and to verify the checksum first.
+- Windows 11 **Smart App Control** blocks unsigned apps and offers no per-app
+  exception. Turning it off is a system-wide security change, so users must
+  decide for themselves; do not present it as an install step. A signed build is
+  the only fix.
+- Antivirus false positives are more likely and harder to triage without a
+  publisher name. Handle each report as a release incident: ask for the file
+  name, SHA-256, Windows version and the detection name, then follow
+  [When an engine reports a false positive](#when-an-engine-reports-a-false-positive).
+
+Do not rebuild or rename an artifact after publishing it. File reputation is
+tracked by hash, so a new hash starts from zero, and renaming an asset breaks
+the checksums users already collected.
+
+The updater stays disconnected from a real endpoint while builds are unsigned:
+an unsigned application that downloads and silently runs an unsigned installer
+looks like a dropper to behavioural engines. Configure the endpoint only when
+the installer carries a signature.
+
+For an open-source project the cheapest real certificate is
+[SignPath Foundation](https://signpath.org/) (free signing for OSS projects,
+certificate hosted by them). Once any certificate is available, the existing
+secrets turn signing on without further code changes.
+
+## Endpoint
+
+Replace the placeholder endpoint once the release repository is public:
+
+```
+https://github.com/OWNER/REPO/releases/latest/download/latest.json
+```
+
+When updater signing is enabled, `latest.json` is generated by `tauri-action`
+(`includeUpdaterJson: true`) and uploaded to every release. The `/releases/latest/` URL only resolves for a
+**published** release; draft releases are not "latest" and are invisible to the
+updater. That is intentional: publishing is a manual review step.
+
+The endpoint must be HTTPS. The app does not enable
+`dangerousInsecureTransportProtocol`, so a plain `http://` endpoint is reported
+as `UPDATE_NOT_CONFIGURED` instead of being used.
+
+The release publishes the NSIS installer only. It installs per user, needs no
+administrator rights, and the updater can run it silently, so `latest.json` has
+a single `windows-x86_64` entry. The MSI is still produced by a local
+`make build` for managed deployments; it is not a release asset and an MSI
+install is not updated by this pipeline. Upgrade such installations with your
+own tooling.
+
+## Release checklist
+
+1. Bump the version in `desktop/apps/desktop/tauri.conf.json`. Keep
+   `desktop/Cargo.toml` (`[workspace.package] version`) and
+   `desktop/ui/package.json` in step for consistency.
+2. Update `CHANGELOG.md`.
+3. Merge to `main`; `main` must be green.
+4. Tag and push:
+
+   ```bash
+   git tag v0.2.0
+   git push origin v0.2.0
+   ```
+
+5. `.github/workflows/release.yml` builds Windows x64 and uploads to one
+   **draft** release. It first checks that the tag matches `tauri.conf.json`, so
+   a mismatched tag fails before building.
+6. Review the draft assets:
+   - `Gentree_<version>_x64-setup.exe` (NSIS) and its minisign `.sig`;
+   - `Gentree_<version>_x64_portable.zip`;
+   - `SHA256SUMS-windows-x64.txt`;
+   - `latest.json` with the `windows-x86_64` entry.
+7. Read the CI verification log: signature status per artifact, the Defender
+   scan result and the checksum file. CI covers signatures and a single engine;
+   the multi-engine check is manual:
+   - scan the installers and the portable archive with a current multi-engine
+     scanner (VirusTotal or a local suite) and require zero detections;
+   - download the artifacts in a browser on a clean Windows 11 VM, confirm the
+     SmartScreen prompt, complete an install and start the app;
+   - unzip the portable archive outside `%LOCALAPPDATA%`, start it, and confirm
+     that **Check for updates** reports that updates are not configured.
+8. Publish the draft (not "Save draft"). Publishing is what makes
+   `/releases/latest/download/latest.json` resolve.
+9. Verify from a machine that is not the build host:
+
+   ```bash
+   curl -fsSL https://github.com/OWNER/REPO/releases/latest/download/latest.json
+   ```
+
+10. Install the previous version and press **Check for updates** once. Do this
+    before announcing the release.
+
+## Pre-publish verification
+
+`scripts/verify-release.mjs` is the same gate locally and in CI:
+
+```powershell
+node scripts/verify-release.mjs `
+  --asset desktop/target/release/bundle/nsis/Gentree_0.2.0_x64-setup.exe `
+  --asset release-assets/Gentree_0.2.0_x64_portable.zip `
+  --verify-only desktop/target/release/gentree-desktop.exe `
+  --sums release-assets/SHA256SUMS-windows-x64.txt `
+  --require-signature --defender
+```
+
+- `--asset` is a release artifact: its signature is checked and its SHA-256 is
+  written to the checksum file.
+- `--verify-only` checks a file that is not published on its own, such as the
+  portable executable.
+- `--require-signature` turns a missing signature into a failure. CI passes it
+  only when the certificate secrets exist, so the pipeline works before the
+  certificate is bought.
+- `--defender` runs an on-demand Microsoft Defender scan. It is advisory: a
+  runner without Defender produces a warning, not a failed release. It is a
+  smoke test, not proof — one engine is not a multi-engine result.
+
+On macOS the same script verifies `codesign` for an `.app` bundle and `spctl` +
+`stapler` for a `.dmg`. That path is dormant while macOS builds are not
+published; the script reports unsigned artifacts instead of failing until
+`--require-signature` is passed.
+
+### When an engine reports a false positive
+
+1. Re-scan the exact published file, not a local rebuild: a different hash
+   starts with no reputation.
+2. Submit the file to Microsoft through the
+   [Windows Defender file submission](https://www.microsoft.com/en-us/wdsi/filesubmission/)
+   form; ask for a review of the false positive and for reputation.
+3. Submit to the vendor shown in the detection (Avast, ESET, Kaspersky,
+   Bitdefender, McAfee and others have false-positive forms). Keep one message
+   template with the release URL, the SHA-256, the version and a short
+   description.
+4. If the detection is behavioral, note which step triggers it. Installing
+   without a certificate, downloading WebView2 during setup and self-updating
+   are the three usual causes.
+5. Record the outcome in the release notes so users who see the warning know it
+   is being handled.
+
+## Portable archive
+
+`make portable` builds a production executable with
+`--config tauri.portable.conf.json` and packages it as
+`Gentree_<version>_x64_portable.zip` with `scripts/package-portable.mjs`. The
+overlay empties the updater endpoint and public key, so a portable copy reports
+`UPDATE_NOT_CONFIGURED` and can never install itself into `%LOCALAPPDATA%`.
+
+The archive holds one executable and a readme, no installer and no
+self-extracting stub. See [`docs/portable.md`](portable.md) for the user-facing
+details, including the WebView2 requirement and the `%APPDATA%\Gentree` data
+location.
+
+## Updating a bad release
+
+The updater only accepts a version greater than the current one. A broken
+release is fixed by publishing a higher version; there is no downgrade path and
+no "un-publish" for clients that already installed it. Deleting `latest.json`
+from the published release only breaks checks for everyone else.
+
+## Local builds and updater artifacts
+
+`tauri.conf.json` does not create updater artifacts, so `make build` works
+without a signing key and produces ordinary installers. The CI release passes
+the `desktop/apps/desktop/tauri.release.conf.json` overlay, which turns
+`bundle.createUpdaterArtifacts` on and therefore requires the key:
+
+```bash
+# Signed installers plus updater artifacts
+export TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/gentree.key)"
+export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="..."
+cd desktop/apps/desktop
+../../ui/node_modules/.bin/tauri build --config tauri.release.conf.json
+```
+
+```powershell
+# Windows PowerShell
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content "$env:USERPROFILE\.tauri\gentree.key" -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = "..."
+cd desktop\apps\desktop
+..\..\ui\node_modules\.bin\tauri.cmd build --config tauri.release.conf.json
+```
+
+For a plain local run use `make exe`, `make run` or `make dev`.
+
+## Testing updates against a local Gitea
+
+The updater does not depend on GitHub: it downloads a static JSON manifest and
+the artifact it names. A local Gitea works if the app can reach it.
+
+1. Generate a throwaway key pair and keep the private key out of git:
+
+   ```bash
+   npm --prefix desktop/ui exec tauri signer generate -- -w .tauri/gentree-local.key
+   ```
+
+2. Create `desktop/apps/desktop/tauri.local.conf.json` (git-ignored). It merges
+   over `tauri.conf.json`:
+
+   ```json
+   {
+     "bundle": { "createUpdaterArtifacts": true },
+     "plugins": {
+       "updater": {
+         "endpoints": [
+           "http://127.0.0.1:3001/OWNER/gentree/releases/download/v0.2.1/latest.json"
+         ],
+         "pubkey": "<public key from the generated pair>",
+         "dangerousInsecureTransportProtocol": true
+       }
+     }
+   }
+   ```
+
+   Plain HTTP is accepted only for `127.0.0.1`, `localhost` or `[::1]` and only
+   with this flag. Never put the flag in the shipped config.
+
+3. Build with both overlays and the private key in the environment:
+
+   ```bash
+   cd desktop/apps/desktop
+   ../../ui/node_modules/.bin/tauri build --config tauri.release.conf.json \
+     --config tauri.local.conf.json
+   ```
+
+4. The build writes `Gentree_0.2.0_x64-setup.exe` and its `.exe.sig` next to the
+   NSIS installer. Create a Gitea release for `v0.2.1` and upload the installer,
+   the signature and a hand-written `latest.json`:
+
+   ```json
+   {
+     "version": "0.2.1",
+     "notes": "Local update test",
+     "pub_date": "2026-11-01T12:00:00Z",
+     "platforms": {
+       "windows-x86_64": {
+         "signature": "<contents of the .exe.sig file>",
+         "url": "http://127.0.0.1:3001/OWNER/gentree/releases/download/v0.2.1/Gentree_0.2.1_x64-setup.exe"
+       }
+     }
+   }
+   ```
+
+   `tauri-action` writes `latest.json` for GitHub; Gitea does not, so it is
+   assembled by hand or by the release script. The repository and the release
+   must be readable without a token: the updater does not send custom headers
+   from the config.
+
+5. Install an older build, start it, open **Settings → Updates** and press
+   **Check for updates**. The app downloads the artifact, verifies the signature
+   and installs it. A draft/invisible release returns 404, exactly as on GitHub.
+
+`latest.json` is validated as a whole, so every platform entry in it must be
+complete. On macOS the updater artifact is the `.app.tar.gz` and its `.sig`;
+plain HTTP and Gatekeeper make local macOS testing less useful than Windows.
+
+## Why there is no download page yet
+
+The release is not published (the current origin is a local Gitea instance) and
+every release needs a manual review before it becomes public. Until a landing
+page exists, the GitHub Releases page is the download page.
+
+When the page is added, it should not scrape HTML. Two stable options:
+
+- link to `https://github.com/OWNER/REPO/releases/latest` for people;
+- call `GET https://api.github.com/repos/OWNER/REPO/releases/latest` and read
+  `tag_name`, `published_at` and `assets[].browser_download_url`, filtering by
+  asset name for the platform.
+
+`latest.json` is for the updater, not for a download page: it lists updater
+archives and signatures, not the installers a person should download.
+
+If the project is later published on Gitea instead of GitHub, `tauri-action`
+supports `isGitea` and `githubBaseUrl`; the endpoint then points at the Gitea
+release asset URL. The application code does not change.
+
+## Troubleshooting
+
+| Symptom | Cause |
+| --- | --- |
+| `UPDATE_NOT_CONFIGURED` | endpoint or `pubkey` is still a placeholder |
+| `UPDATE_CHECK_FAILED` | endpoint unreachable, 404, or malformed `latest.json`; a draft release is not visible |
+| `UPDATE_INSTALL_FAILED` | signature mismatch, truncated download, or installer failure |
+| Update never offered | remote version is not greater than the installed one, or the target/arch entry is missing from `latest.json` |
+| `NotSigned` in the verification log | no certificate secrets; see [Code signing](#code-signing) |
+| `SignTool not found` on a local signed build | the Windows SDK is not registered in the registry; set `TAURI_WINDOWS_SIGNTOOL_PATH` to `<Windows Kits>\10\bin\<version>\x64\signtool.exe` |
+| `SignTool Error: The specified timestamp server ...` | the TSA is unreachable from the build host; the workflow uses `http://timestamp.acs.microsoft.com` with `tsp: true` |
+| `stapler validate` fails | the DMG was not notarized; check the `APPLE_*` secrets |
+| Portable build offers no updates | expected: `tauri.portable.conf.json` empties the updater endpoint |
+
+Errors are shown through the localized `errors.<code>` strings. The backend
+never logs or returns the endpoint URL, the key or the response body.

@@ -1,0 +1,15 @@
+{
+  "addParent": "Parent",
+  "addChild": "Child",
+  "addSpouse": "Spouse",
+  "addPartner": "Partner",
+  "addAdoptiveParent": "Adoptive parent",
+  "direction": "Relationship type",
+  "add": "Add relationship",
+  "relatedPerson": "Who",
+  "type": "Relationship type",
+  "deleteConfirm": "Delete this relationship?",
+  "conflict": "The data was changed in another window. Reload the relationships.",
+  "empty": "No relationships",
+  "selectPerson": "Select a person"
+}

@@ -1,0 +1,349 @@
+{
+  "kind": {
+    "FATHER": "Vater",
+    "MOTHER": "Mutter",
+    "SON": "Sohn",
+    "DAUGHTER": "Tochter",
+    "HUSBAND": "Ehemann",
+    "WIFE": "Ehefrau",
+    "BROTHER": "Bruder",
+    "SISTER": "Schwester",
+    "GRANDFATHER": "Großvater",
+    "GRANDMOTHER": "Großmutter",
+    "GRANDSON": "Enkel",
+    "GRANDDAUGHTER": "Enkelin",
+    "UNCLE": {
+      "MALE": "Onkel",
+      "FEMALE": "Tante",
+      "UNKNOWN": "Onkel oder Tante"
+    },
+    "AUNT": {
+      "MALE": "Onkel",
+      "FEMALE": "Tante",
+      "UNKNOWN": "Tante"
+    },
+    "NEPHEW": "Neffe",
+    "NIECE": "Nichte",
+    "GREAT_UNCLE": {
+      "MALE": "Großonkel",
+      "FEMALE": "Großtante",
+      "UNKNOWN": "Großonkel oder Großtante"
+    },
+    "GREAT_AUNT": {
+      "MALE": "Großonkel",
+      "FEMALE": "Großtante",
+      "UNKNOWN": "Großonkel oder Großtante"
+    },
+    "GRAND_NEPHEW": {
+      "MALE": "Großneffe",
+      "FEMALE": "Großnichte",
+      "UNKNOWN": "Großneffe oder Großnichte"
+    },
+    "GRAND_NIECE": {
+      "MALE": "Großneffe",
+      "FEMALE": "Großnichte",
+      "UNKNOWN": "Großnichte"
+    },
+    "SPOUSE_OF_SPOUSES_SIBLING": {
+      "MALE": "Schwippschwager",
+      "FEMALE": "Schwippschwägerin",
+      "UNKNOWN": "Schwippschwager oder Schwippschwägerin"
+    },
+    "PARTNER": {
+      "MALE": "Partner",
+      "FEMALE": "Partner",
+      "UNKNOWN": "Partner"
+    },
+    "STEP_PARENT": {
+      "MALE": "Stiefvater",
+      "FEMALE": "Stiefmutter",
+      "UNKNOWN": "Stiefelternteil"
+    },
+    "STEP_CHILD": {
+      "MALE": "Stiefsohn",
+      "FEMALE": "Stieftochter",
+      "UNKNOWN": "Stiefkind"
+    },
+    "STEP_SIBLING": {
+      "MALE": "Stiefbruder",
+      "FEMALE": "Stiefschwester",
+      "UNKNOWN": "Stiefgeschwister"
+    }
+  },
+  "inLaw": {
+    "PARENT_IN_LAW": {
+      "MALE": {
+        "MALE": "Schwiegervater",
+        "FEMALE": "Schwiegermutter",
+        "UNKNOWN": "Schwiegervater oder Schwiegermutter"
+      },
+      "FEMALE": {
+        "MALE": "Schwiegervater",
+        "FEMALE": "Schwiegermutter",
+        "UNKNOWN": "Schwiegervater oder Schwiegermutter"
+      },
+      "UNKNOWN": {
+        "MALE": "Schwiegervater",
+        "FEMALE": "Schwiegermutter",
+        "UNKNOWN": "Schwiegervater oder Schwiegermutter"
+      }
+    },
+    "CHILD_IN_LAW": {
+      "MALE": {
+        "MALE": "Schwiegersohn",
+        "FEMALE": "Schwiegertochter",
+        "UNKNOWN": "Schwiegersohn oder Schwiegertochter"
+      },
+      "FEMALE": {
+        "MALE": "Schwiegersohn",
+        "FEMALE": "Schwiegertochter",
+        "UNKNOWN": "Schwiegersohn oder Schwiegertochter"
+      },
+      "UNKNOWN": {
+        "MALE": "Schwiegersohn",
+        "FEMALE": "Schwiegertochter",
+        "UNKNOWN": "Schwiegersohn oder Schwiegertochter"
+      }
+    },
+    "SIBLING_IN_LAW": {
+      "MALE": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      },
+      "FEMALE": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      },
+      "UNKNOWN": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      }
+    },
+    "SIBLING_OF_SPOUSE": {
+      "FEMALE": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      },
+      "MALE": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      },
+      "UNKNOWN": {
+        "MALE": "Bruder oder Schwester des Ehepartners",
+        "FEMALE": "Bruder oder Schwester des Ehepartners",
+        "UNKNOWN": "Bruder oder Schwester des Ehepartners"
+      }
+    },
+    "SPOUSE_OF_SIBLING": {
+      "FEMALE": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      },
+      "MALE": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      },
+      "UNKNOWN": {
+        "MALE": "Schwager",
+        "FEMALE": "Schwägerin",
+        "UNKNOWN": "Schwager oder Schwägerin"
+      }
+    }
+  },
+  "cousin": {
+    "1": {
+      "peer": {
+        "MALE": "Cousin",
+        "FEMALE": "Cousine",
+        "UNKNOWN": "Cousin oder Cousine"
+      },
+      "elder": {
+        "MALE": "Cousin ersten Grades, eine Generation entfernt",
+        "FEMALE": "Cousine ersten Grades, eine Generation entfernt",
+        "UNKNOWN": "Cousin oder Cousine ersten Grades, eine Generation entfernt"
+      },
+      "younger": {
+        "MALE": "Cousin ersten Grades, eine Generation entfernt",
+        "FEMALE": "Cousine ersten Grades, eine Generation entfernt",
+        "UNKNOWN": "Cousin oder Cousine ersten Grades, eine Generation entfernt"
+      },
+      "far": {
+        "MALE": "entfernter Cousin",
+        "FEMALE": "entfernte Cousine",
+        "UNKNOWN": "entfernter Cousin oder entfernte Cousine"
+      }
+    },
+    "2": {
+      "peer": {
+        "MALE": "Cousin zweiten Grades",
+        "FEMALE": "Cousine zweiten Grades",
+        "UNKNOWN": "Cousin oder Cousine zweiten Grades"
+      },
+      "elder": {
+        "MALE": "Cousin zweiten Grades, eine Generation entfernt",
+        "FEMALE": "Cousine zweiten Grades, eine Generation entfernt",
+        "UNKNOWN": "Cousin oder Cousine zweiten Grades, eine Generation entfernt"
+      },
+      "younger": {
+        "MALE": "Cousin zweiten Grades, eine Generation entfernt",
+        "FEMALE": "Cousine zweiten Grades, eine Generation entfernt",
+        "UNKNOWN": "Cousin oder Cousine zweiten Grades, eine Generation entfernt"
+      },
+      "far": {
+        "MALE": "entfernter Cousin",
+        "FEMALE": "entfernte Cousine",
+        "UNKNOWN": "entfernter Cousin oder entfernte Cousine"
+      }
+    },
+    "3": {
+      "peer": {
+        "MALE": "Cousin dritten Grades",
+        "FEMALE": "Cousine dritten Grades",
+        "UNKNOWN": "Cousin oder Cousine dritten Grades"
+      },
+      "elder": {
+        "MALE": "Cousin dritten Grades, eine Generation entfernt",
+        "FEMALE": "Cousine dritten Grades, eine Generation entfernt",
+        "UNKNOWN": "Cousin oder Cousine dritten Grades, eine Generation entfernt"
+      },
+      "younger": {
+        "MALE": "Cousin dritten Grades, eine Generation entfernt",
+        "FEMALE": "Cousine dritten Grades, eine Generation entfernt",
+        "UNKNOWN": "Cousin oder Cousine dritten Grades, eine Generation entfernt"
+      },
+      "far": {
+        "MALE": "entfernter Cousin",
+        "FEMALE": "entfernte Cousine",
+        "UNKNOWN": "entfernter Cousin oder entfernte Cousine"
+      }
+    },
+    "other": {
+      "peer": {
+        "MALE": "entfernter Cousin",
+        "FEMALE": "entfernte Cousine",
+        "UNKNOWN": "entfernter Cousin oder entfernte Cousine"
+      },
+      "elder": {
+        "MALE": "entfernter Cousin",
+        "FEMALE": "entfernte Cousine",
+        "UNKNOWN": "entfernter Cousin oder entfernte Cousine"
+      },
+      "younger": {
+        "MALE": "entfernter Cousin",
+        "FEMALE": "entfernte Cousine",
+        "UNKNOWN": "entfernter Cousin oder entfernte Cousine"
+      },
+      "far": {
+        "MALE": "entfernter Cousin",
+        "FEMALE": "entfernte Cousine",
+        "UNKNOWN": "entfernter Cousin oder entfernte Cousine"
+      }
+    }
+  },
+  "line": {
+    "PATERNAL": "väterlicherseits",
+    "MATERNAL": "mütterlicherseits"
+  },
+  "base": {
+    "greatGrandparent": {
+      "MALE": "Großvater",
+      "FEMALE": "Großmutter",
+      "UNKNOWN": "Großelternteil"
+    },
+    "greatGrandchild": {
+      "MALE": "Enkel",
+      "FEMALE": "Enkelin",
+      "UNKNOWN": "Enkelkind"
+    }
+  },
+  "chain": {
+    "parent": {
+      "MALE": "Vater",
+      "FEMALE": "Mutter",
+      "UNKNOWN": "Elternteil"
+    },
+    "child": {
+      "MALE": "Sohn",
+      "FEMALE": "Tochter",
+      "UNKNOWN": "Kind"
+    },
+    "sibling": {
+      "MALE": "Bruder",
+      "FEMALE": "Schwester",
+      "UNKNOWN": "Geschwister"
+    },
+    "grandparent": {
+      "MALE": "Großvater",
+      "FEMALE": "Großmutter",
+      "UNKNOWN": "Großelternteil"
+    },
+    "grandchild": {
+      "MALE": "Enkel",
+      "FEMALE": "Enkelin",
+      "UNKNOWN": "Enkelkind"
+    },
+    "spouse": {
+      "MALE": "Ehemann",
+      "FEMALE": "Ehefrau",
+      "UNKNOWN": "Ehepartner"
+    },
+    "partner": {
+      "MALE": "Partner",
+      "FEMALE": "Partner",
+      "UNKNOWN": "Partner"
+    }
+  },
+  "chainStyle": "genitive",
+  "generationalPrefix": "Ur",
+  "chainGenitive": {
+    "adjectives": {
+      "двоюродный": "Cousin",
+      "двоюродная": "Cousine",
+      "троюродный": "Cousin zweiten Grades",
+      "троюродная": "Cousine zweiten Grades",
+      "четвероюродный": "Cousin dritten Grades",
+      "четвероюродная": "Cousine dritten Grades",
+      "дальний": "entfernt",
+      "дальняя": "entfernt",
+      "внучатый": "Groß",
+      "внучатая": "Groß",
+      "сводный": "Stief",
+      "сводная": "Stief"
+    },
+    "nouns": {
+      "отец": "Vater",
+      "мать": "Mutter",
+      "родитель": "Elternteil",
+      "сын": "Sohn",
+      "дочь": "Tochter",
+      "ребёнок": "Kind",
+      "брат": "Bruder",
+      "сестра": "Schwester",
+      "дед": "Großvater",
+      "бабушка": "Großmutter",
+      "бабка": "Großmutter",
+      "внук": "Enkel",
+      "внучка": "Enkelin",
+      "муж": "Ehemann",
+      "жена": "Ehefrau",
+      "супруг": "Ehepartner",
+      "партнёр": "Partner",
+      "партнёрша": "Partnerin",
+      "дядя": "Onkel",
+      "тётя": "Tante",
+      "племянник": "Neffe",
+      "племянница": "Nichte",
+      "родственник": "Verwandter",
+      "родственница": "Verwandte"
+    }
+  },
+  "unknown": "Verwandter",
+  "unknownWithPath": "Verwandter (Pfad: {{path}})"
+}

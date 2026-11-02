@@ -1,0 +1,25 @@
+[package]
+name = "gentree-import"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+gentree-core = { path = "../core" }
+# Backup/restore writer, checksums and atomic writes (ADR-0009, ADR-0013).
+gentree-storage = { path = "../storage" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+zip.workspace = true
+walkdir.workspace = true
+rusqlite.workspace = true
+# GEDCOM 5.5.1/7.0 parser, MIT, no default dependencies.
+ged_io = "0.17"
+# AT5 media checksums (sha256) and their lowercase hex form.
+sha2.workspace = true
+hex.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
