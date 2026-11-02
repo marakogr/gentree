@@ -63,7 +63,6 @@
   "renameHint": "Click to rename the project",
   "renameLabel": "New project name",
   "renamed": "Project renamed: {{name}}",
-  "recent": "Recent projects",
   "projectCount_one": "{{count}} project",
   "projectCount_few": "{{count}} projects",
   "projectCount_many": "{{count}} projects",

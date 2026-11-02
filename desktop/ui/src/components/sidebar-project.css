@@ -66,11 +66,6 @@
   margin-bottom: 4px;
 }
 
-.sidebar-project-badge span {
-  font-size: 14px;
-  font-weight: 600;
-}
-
 /* App shell: rail navigation and breadcrumb back link.
    These rules are unlayered on purpose: Fluent's Griffel classes are also
    unlayered, so the extra class in the selector keeps the state styles
@@ -153,12 +148,6 @@
 .shell.sidebar-collapsed .sidebar-nav-item[aria-current="page"] {
   border: 0;
   box-shadow: inset 2px 0 0 var(--colorBrandStroke1);
-}
-
-.shell.sidebar-collapsed .sidebar-project-collapsed .sidebar-project-badge {
-  width: 36px;
-  min-width: 36px;
-  padding: 0;
 }
 
 .shell.sidebar-collapsed .app-brand {
