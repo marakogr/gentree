@@ -6,7 +6,7 @@
 //
 // This is a review harness, not a gate: specs collect evidence (screenshots,
 // DOM audits) and fail only on a broken session or a crashed screen.
-import { appExe, startDriver, stopDriver } from "./scripts/driver.mjs";
+import { APP_EXE, startDriver, stopDriver } from "./scripts/driver.mjs";
 import { artifactsDir } from "./lib/report.js";
 import fs from "node:fs";
 
@@ -23,7 +23,7 @@ export const config = {
     {
       maxInstances: 1,
       browserName: "wry",
-      "tauri:options": { application: appExe },
+      "tauri:options": { application: APP_EXE },
     },
   ],
   logLevel: process.env.UX_LOG_LEVEL ?? "warn",

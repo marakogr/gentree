@@ -12,9 +12,10 @@ export async function waitForShell() {
 }
 
 export function navButton(label) {
-  return $(
-    `//*[@role="navigation"]//button[normalize-space(.)="${label}"]`,
-  );
+  // `<nav>` carries the navigation role implicitly, so the XPath has to use the
+  // element itself: an attribute selector for `role="navigation"` matches
+  // nothing.
+  return $(`//nav//button[normalize-space(.)="${label}"]`);
 }
 
 export async function clickNav(label) {
@@ -27,7 +28,11 @@ export async function clickNav(label) {
 /** Visible page heading; empty when a screen renders no title at all. */
 export async function headingText() {
   return browser.execute(() => {
-    const heading = document.querySelector("h1, [role='heading']");
+    // Chat is a full-panel card and titles itself with an `h2`, so a page
+    // without an `h1` still reports its first heading.
+    const heading =
+      document.querySelector("h1, [role='heading']") ??
+      document.querySelector("h2");
     return (heading?.textContent || "").replace(/\s+/g, " ").trim();
   });
 }
