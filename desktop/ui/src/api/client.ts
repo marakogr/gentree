@@ -223,8 +223,6 @@ export const chatApi = {
     requestId: string;
     locale: string;
     messages: ChatMessage[];
-    /** Localized built-in guide; appended to the system prompt. */
-    guide?: string;
   }) => invoke<void>("chat_send", { ...params }),
   /** Stops an in-flight stream; unknown ids are `CHAT_CANCELLED`. */
   cancel: (requestId: string) =>

@@ -25,12 +25,8 @@ const CHROME_KEYS = [
   "resultsCount",
   "openScreen",
   "openProjectFirst",
-  "askAssistant",
-  "askAssistantHint",
   "stepsLabel",
   "noteLabel",
-  "askTopic",
-  "askFree",
 ];
 
 describe("guide content", () => {

@@ -2,7 +2,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useMemo,
   useReducer,
   useRef,
   useState,
@@ -54,7 +53,6 @@ import type {
 import { Markdown } from "../../components/Markdown";
 import { EmptyState } from "../../components/ui/empty";
 import { useToast } from "../../components/ui/toast";
-import { buildGuideContext } from "../help/guide";
 import { normalizeError } from "../../lib/errors";
 import { useDateFormatter } from "../../lib/useDateFormatter";
 import type { EntityPerson } from "./entityLinks";
@@ -81,14 +79,7 @@ type Props = {
   active?: boolean;
   /** Chat belongs to one project; the shell remounts the screen on change. */
   projectId?: string;
-  /** Prefills the composer without sending anything. */
-  seed?: ChatSeed | null;
-  /** Called once the seed has been placed into the composer. */
-  onSeedHandled?: () => void;
 };
-
-/** A question handed to the composer; `id` makes an identical repeat distinct. */
-export type ChatSeed = { id: string; text: string };
 
 /** Reasons the backend puts into `CHAT_UNAVAILABLE.params.reason`. */
 type ChatReason =
@@ -153,8 +144,6 @@ export default function ChatPage({
   onOpenPerson,
   active = true,
   projectId,
-  seed = null,
-  onSeedHandled,
 }: Props) {
   const { t, i18n } = useTranslation(["chat", "common"]);
   const toast = useToast();
@@ -188,13 +177,6 @@ export default function ChatPage({
   )
     ? (i18n.language as Locale)
     : "ru";
-  // The guide is interface reference, not user data: it travels with every
-  // request so the assistant can explain screens and buttons. The backend
-  // appends it to the system prompt.
-  const guide = useMemo(
-    () => buildGuideContext((key) => t(key)),
-    [t, i18n.language],
-  );
   const statusReason = status === null ? null : reasonFromStatus(status);
   const ready = status !== null && statusReason === null;
   const streaming = state.activeRequestId !== null;
@@ -444,15 +426,6 @@ export default function ChatPage({
     textarea.style.height = `${Math.max(next, 44)}px`;
   }, [input]);
 
-  // The guide hands over a question: place it in the composer and focus it.
-  // Sending remains the user's own action.
-  useEffect(() => {
-    if (!seed) return;
-    setInput(seed.text);
-    onSeedHandled?.();
-    inputRef.current?.focus();
-  }, [seed, onSeedHandled]);
-
   const errorMessage = (error: AppErrorEnvelope) =>
     t(`errors.${error.code}`, {
       ns: "common",
@@ -472,7 +445,7 @@ export default function ChatPage({
     });
     setInput("");
     void chatApi
-      .send({ requestId, locale, messages: transcript, guide })
+      .send({ requestId, locale, messages: transcript })
       .catch((caught: unknown) => {
         dispatch({
           type: "error",
@@ -672,9 +645,6 @@ export default function ChatPage({
 
         {state.messages.length === 0 && status !== null ? (
           <div className="chat-empty">
-            <Subtitle2 as="p" className="chat-empty-title">
-              {t("chat:emptyTitle")}
-            </Subtitle2>
             <EmptyState compact text={t("chat:empty")} />
             <div
               className="chat-suggestions"

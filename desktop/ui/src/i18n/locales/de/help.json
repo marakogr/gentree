@@ -15,12 +15,8 @@
   "resultsCount": "Gefundene Abschnitte: {{total}}",
   "openScreen": "„{{screen}}“ öffnen",
   "openProjectFirst": "Öffnen Sie zuerst ein Projekt",
-  "askAssistant": "Assistenten fragen",
-  "askAssistantHint": "Die Frage wird mit diesem Abschnitt in das Chat-Eingabefeld übernommen. Gesendet wird erst mit „Senden“.",
   "stepsLabel": "So geht es",
   "noteLabel": "Hinweis:",
-  "askTopic": "Wie geht das in Gentree: {{title}}? Erkläre es Schritt für Schritt und nenne die Schaltflächen.",
-  "askFree": "Wie geht das in Gentree: {{question}}? Antworte anhand des eingebauten Handbuchs.",
   "topics": {
     "start": {
       "title": "Erste Schritte",

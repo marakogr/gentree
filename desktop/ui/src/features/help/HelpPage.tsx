@@ -108,7 +108,6 @@ type ArticleProps = {
   projectOpen: boolean;
   onBack: () => void;
   onNavigate: (screen: ShellTab) => void;
-  onAskAssistant: (question: string) => void;
 };
 
 function HelpArticle({
@@ -116,7 +115,6 @@ function HelpArticle({
   projectOpen,
   onBack,
   onNavigate,
-  onAskAssistant,
 }: ArticleProps) {
   const { t } = useTranslation();
   const Icon = topicIcon(topic);
@@ -124,7 +122,6 @@ function HelpArticle({
   const summary = t(`help:topics.${topic.id}.summary`);
   const steps = HELP_STEPS.map((step) => t(`help:topics.${topic.id}.step${step}`));
   const screenBlocked = !projectOpen && HELP_PROJECT_SCREENS.has(topic.screen);
-  const question = t("help:askTopic", { title });
 
   return (
     <article className="help-article" aria-labelledby={`help-${topic.id}-title`}>
@@ -189,9 +186,6 @@ function HelpArticle({
               })}
               <ArrowRightRegular aria-hidden="true" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => onAskAssistant(question)}>
-              {t("help:askAssistant")}
-            </Button>
           </div>
         </aside>
       </div>
@@ -203,14 +197,12 @@ type Props = {
   /** Project screens stay listed without a project but cannot be opened. */
   projectOpen: boolean;
   onNavigate: (screen: ShellTab) => void;
-  onAskAssistant: (question: string) => void;
   onStartTour?: () => void;
 };
 
 export default function HelpPage({
   projectOpen,
   onNavigate,
-  onAskAssistant,
   onStartTour,
 }: Props) {
   const { t } = useTranslation();
@@ -235,10 +227,6 @@ export default function HelpPage({
   const openTopic = (id: string) => {
     setSelected(id);
     setQuery("");
-  };
-
-  const askAboutQuery = () => {
-    onAskAssistant(t("help:askFree", { question: query.trim() }));
   };
 
   return (
@@ -271,12 +259,6 @@ export default function HelpPage({
           matchingTopics.length === 0 ? (
             <div className="help-empty">
               <EmptyState compact text={t("help:noResults")} />
-              <Button variant="primary" size="sm" onClick={askAboutQuery}>
-                {t("help:askAssistant")}
-              </Button>
-              <Caption1 as="p" className="help-note">
-                {t("help:askAssistantHint")}
-              </Caption1>
             </div>
           ) : (
             <section
@@ -287,9 +269,6 @@ export default function HelpPage({
                 <h2 className="help-results-count">
                   {t("help:resultsCount", { total: matchingTopics.length })}
                 </h2>
-                <Button variant="ghost" size="sm" onClick={askAboutQuery}>
-                  {t("help:askAssistant")}
-                </Button>
               </div>
               <div className="help-cards">
                 {matchingTopics.map((topic) => (
@@ -304,7 +283,6 @@ export default function HelpPage({
             projectOpen={projectOpen}
             onBack={() => setSelected(null)}
             onNavigate={onNavigate}
-            onAskAssistant={onAskAssistant}
           />
         ) : (
           <div className="help-index">

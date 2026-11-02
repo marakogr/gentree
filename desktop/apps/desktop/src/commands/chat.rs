@@ -29,9 +29,8 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 use gentree_chat::{
-    push_application_guide, route, system_prompt, system_prompt_with_skills, CancelToken,
-    ChatConfig, ChatError, ChatMessage, ChatProvider, ChatRole, ChatUsage,
-    OpenAiCompatibleProvider, Skill, ToolSpec,
+    route, system_prompt, system_prompt_with_skills, CancelToken, ChatConfig, ChatError,
+    ChatMessage, ChatProvider, ChatRole, ChatUsage, OpenAiCompatibleProvider, Skill, ToolSpec,
 };
 use gentree_core::error::codes;
 use gentree_core::person::Person;
@@ -52,8 +51,6 @@ use crate::AppState;
 const FALLBACK_PROJECT_NAME: &str = "Gentree";
 /// Fallback locale when the client does not send a usable one.
 const FALLBACK_LOCALE: &str = "ru";
-/// Upper bound for the UI guide appended to the system prompt.
-const MAX_GUIDE_CHARS: usize = 16_000;
 // Tauri 2 event names allow only alphanumeric characters, `-`, `/`, `:` and
 // `_`, so the design's `chat.delta` / `chat.tool` / `chat.done` / `chat.error`
 // names are emitted as hyphenated wire names. The payload contract is unchanged.
@@ -500,7 +497,6 @@ pub fn chat_send(
     request_id: String,
     locale: String,
     messages: Vec<ChatMessageInput>,
-    guide: Option<String>,
 ) -> Result<(), AppError> {
     let request_id = request_id.trim().to_owned();
     if request_id.is_empty() || request_id.len() > 128 {
@@ -514,17 +510,6 @@ pub fn chat_send(
         .any(|message| message.content.trim().is_empty())
     {
         return Err(AppError::validation("messages", "empty"));
-    }
-    // The shell sends its localized built-in guide; the cap keeps a runaway
-    // payload from reaching the provider.
-    let guide = guide
-        .map(|value| value.trim().to_owned())
-        .filter(|value| !value.is_empty());
-    if let Some(guide) = &guide {
-        if guide.chars().count() > MAX_GUIDE_CHARS {
-            return Err(AppError::validation("guide", "tooLong")
-                .with_param("max", MAX_GUIDE_CHARS.to_string()));
-        }
     }
 
     let (chat_config, allow_person_edits) = {
@@ -598,13 +583,12 @@ pub fn chat_send(
         project_id.as_deref(),
         &messages,
         tools_available.then_some(skills.as_slice()),
-        guide.as_deref(),
     );
 
     logging::info(
         "chat",
         format!(
-            "start request={request_id} project_id={} model={} messages={} tools={} timeout_s={} stream={} skills={} guide_chars={}",
+            "start request={request_id} project_id={} model={} messages={} tools={} timeout_s={} stream={} skills={}",
             project_id.as_deref().unwrap_or("-"),
             chat_config.model,
             messages.len(),
@@ -612,7 +596,6 @@ pub fn chat_send(
             chat_config.timeout_seconds,
             chat_config.stream,
             skill_names.join(","),
-            guide.as_deref().map_or(0, |text| text.chars().count())
         ),
     );
 
@@ -1239,22 +1222,19 @@ fn select_skills(message: &str, tools_available: bool) -> Vec<&'static Skill> {
 /// Prepends the system prompt as the first message of the transcript.
 ///
 /// `skills` is `None` when no tool catalogue is available: the prompt then
-/// carries neither the tool contract nor skill blocks. `guide` is the
-/// localized UI guide and may be `None` or blank.
+/// carries neither the tool contract nor skill blocks.
 fn build_transcript(
     locale: &str,
     project_name: &str,
     project_id: Option<&str>,
     messages: &[ChatMessageInput],
     skills: Option<&[&Skill]>,
-    guide: Option<&str>,
 ) -> Vec<ChatMessage> {
     let mut transcript = Vec::with_capacity(messages.len() + 1);
-    let mut system = match skills {
+    let system = match skills {
         Some(skills) => system_prompt_with_skills(locale, project_name, project_id, skills),
         None => system_prompt(locale, project_name, project_id),
     };
-    push_application_guide(&mut system, guide);
     transcript.push(ChatMessage::new(ChatRole::System, system));
     transcript.extend(
         messages
@@ -1519,7 +1499,6 @@ mod tests {
             Some("project-id"),
             &[message(ChatRole::User, " hello ")],
             Some(&skills),
-            None,
         );
         assert_eq!(transcript.len(), 2);
         assert_eq!(transcript[0].role, ChatRole::System);
@@ -1547,7 +1526,6 @@ mod tests {
             None,
             &[message(ChatRole::User, "hello")],
             None,
-            None,
         );
         assert_eq!(without.len(), 2);
         assert!(
@@ -1570,7 +1548,6 @@ mod tests {
             None,
             &[message(ChatRole::User, "hello")],
             Some(selected.as_slice()),
-            None,
         );
         assert!(
             with[0].content.contains("## Skill: core"),
@@ -1582,34 +1559,6 @@ mod tests {
             "{}",
             with[0].content
         );
-    }
-
-    #[test]
-    fn guide_reaches_the_system_prompt_and_stays_reference() {
-        let skills = route("hello");
-        let transcript = build_transcript(
-            "ru",
-            "Synthetic project",
-            None,
-            &[message(ChatRole::User, "Как добавить событие?")],
-            Some(&skills),
-            Some("### События\nНажмите «Добавить»."),
-        );
-        let system = &transcript[0].content;
-        assert!(system.ends_with("\n</application-guide>"), "{system}");
-        assert!(system.contains("## Application guide (UI reference)"));
-        assert!(system.contains("### События\nНажмите «Добавить»."));
-        assert_eq!(transcript[1].content, "Как добавить событие?");
-
-        let blank = build_transcript(
-            "ru",
-            "Synthetic project",
-            None,
-            &[message(ChatRole::User, "hello")],
-            None,
-            Some("  \n "),
-        );
-        assert!(!blank[0].content.contains("<application-guide>"));
     }
 
     #[test]
