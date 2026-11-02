@@ -159,6 +159,33 @@ describe("sortPersons with death and direction", () => {
   });
 });
 
+describe("sortPersons by age", () => {
+  const people = [
+    person("died40", "Anna", "Sidorova", 1950, 1990),
+    person("died30", "Ivan", "Petrov", 1970, 2000),
+    person("alive", "Lev", "Zaytsev", 1960),
+    person("unknown", "Boris", "Ananov"),
+  ];
+
+  it("uses the death date for the deceased and today for the living", () => {
+    expect(sortPersons(people, "age", "asc").map((item) => item.id)).toEqual([
+      "died30",
+      "died40",
+      "alive",
+      "unknown",
+    ]);
+  });
+
+  it("keeps unknown ages last in both directions", () => {
+    expect(sortPersons(people, "age", "desc").map((item) => item.id)).toEqual([
+      "alive",
+      "died40",
+      "died30",
+      "unknown",
+    ]);
+  });
+});
+
 describe("sortPersons birth descending (default order)", () => {
   it("puts the youngest first, ties by name, and undated last", () => {
     const people = [

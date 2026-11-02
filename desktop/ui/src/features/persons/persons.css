@@ -170,6 +170,26 @@
   min-width: 0;
 }
 
+/* Search on the left, the columns gear and the add button on the right. */
+.persons-toolbar-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.persons-toolbar-row > .filter-bar {
+  flex: 1;
+  min-width: 0;
+}
+
+.persons-toolbar-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
 .persons-detail {
   display: grid;
   grid-template-rows: minmax(0, 1fr);

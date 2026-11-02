@@ -15,6 +15,7 @@ import {
   CheckmarkRegular,
   HistoryRegular,
   OrganizationRegular,
+  SettingsRegular,
 } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import {
@@ -287,7 +288,9 @@ function PersonsView({
   // Newest first by default; a stored choice always wins over the default.
   const storedSort = state.sort;
   const sortKey: PersonSort =
-    storedSort?.key === "birth" || storedSort?.key === "death"
+    storedSort?.key === "birth" ||
+    storedSort?.key === "death" ||
+    storedSort?.key === "age"
       ? storedSort.key
       : storedSort
         ? "name"
@@ -747,17 +750,6 @@ function PersonsView({
             {t("person:count", { count: totalPersons })}
           </Badge>
         </div>
-        <div className="persons-head-actions">
-          <MenuButton
-            label={t("person:columnsTitle")}
-            items={columnItems}
-            align="end"
-          />
-          <Button variant="primary" data-tour="persons-add" onClick={startCreate}>
-            <AddRegular fontSize={16} aria-hidden="true" />
-            {t("person:new")}
-          </Button>
-        </div>
       </div>
 
       {error ? (
@@ -797,23 +789,44 @@ function PersonsView({
       >
         <section className="panel persons-panel" aria-label={t("person:title")}>
           <div className="persons-toolbar">
-            <FilterBar
-              query={queryInput}
-              onQueryChange={setQueryInput}
-              queryPlaceholder={t("person:searchPlaceholder")}
-              queryLabel={t("person:searchLabel")}
-              clearLabel={t("person:clearSearch")}
-              filtersLabel={t("person:filters")}
-              activeCount={chips.length}
-              chips={chips}
-              onReset={resetFilters}
-              resetLabel={t("person:resetFilters")}
-              resultLabel={t("common:filters.found", {
-                count: filtered.length,
-                total: totalPersons,
-              })}
-              loading={false}
-            />
+            <div className="persons-toolbar-row">
+              <FilterBar
+                query={queryInput}
+                onQueryChange={setQueryInput}
+                queryPlaceholder={t("person:searchPlaceholder")}
+                queryLabel={t("person:searchLabel")}
+                clearLabel={t("person:clearSearch")}
+                filtersLabel={t("person:filters")}
+                activeCount={chips.length}
+                chips={chips}
+                onReset={resetFilters}
+                resetLabel={t("person:resetFilters")}
+                resultLabel={t("common:filters.found", {
+                  count: filtered.length,
+                  total: totalPersons,
+                })}
+                loading={false}
+                showActiveBadge={false}
+                showReset={false}
+              />
+              <div className="persons-toolbar-actions">
+                <MenuButton
+                  iconOnly
+                  icon={<SettingsRegular fontSize={16} aria-hidden="true" />}
+                  label={t("person:columnsTitle")}
+                  items={columnItems}
+                  align="end"
+                />
+                <Button
+                  variant="primary"
+                  data-tour="persons-add"
+                  onClick={startCreate}
+                >
+                  <AddRegular fontSize={16} aria-hidden="true" />
+                  {t("person:new")}
+                </Button>
+              </div>
+            </div>
 
             {selectedIds.length > 0 ? (
               <BulkBar
@@ -947,7 +960,26 @@ function PersonsView({
                       </TableHeaderCell>
                     ) : null}
                     {columns.includes("age") ? (
-                      <TableHeaderCell aside={columnHandle("age")}>
+                      <TableHeaderCell
+                        sortable
+                        sortDirection={
+                          sortKey === "age"
+                            ? direction === "asc"
+                              ? "ascending"
+                              : "descending"
+                            : undefined
+                        }
+                        sortIcon={
+                          sortKey === "age" ? (
+                            <SortIcon direction={direction} />
+                          ) : undefined
+                        }
+                        button={{
+                          className: styles.sortButton,
+                          onClick: () => toggleSort("age"),
+                        }}
+                        aside={columnHandle("age")}
+                      >
                         {t("person:age")}
                       </TableHeaderCell>
                     ) : null}
