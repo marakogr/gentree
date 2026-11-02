@@ -896,10 +896,6 @@ export default function EventsPage({
                   chips={[]}
                   onReset={resetFilters}
                   resetLabel={t("event:resetFilters")}
-                  resultLabel={t("common:filters.found", {
-                    count: filtered.length,
-                    total: events.length,
-                  })}
                   loading={loading}
                 />
                 <div className="events-person-filter">
@@ -914,6 +910,12 @@ export default function EventsPage({
                     noneLabel={t("event:allPersons")}
                   />
                 </div>
+                <span className="events-result">
+                  {t("common:filters.found", {
+                    count: filtered.length,
+                    total: events.length,
+                  })}
+                </span>
               </div>
               <div className="events-filter-row">
                 <TypeChips

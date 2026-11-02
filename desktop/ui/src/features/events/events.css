@@ -52,6 +52,16 @@
   min-width: 12rem;
 }
 
+/* The "found N of M" counter sits after the person filter, on the input line. */
+.events-result {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
 .events-filter-row {
   display: flex;
   flex-wrap: wrap;
