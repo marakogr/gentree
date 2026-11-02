@@ -612,7 +612,6 @@ export default function App() {
 
           {tab === "settings" ? (
             <SettingsPage
-              onClose={() => selectTab("projects")}
               onOpenHelp={() => selectTab("help")}
               onThemeChange={applyThemeChoice}
               onStyleChange={applyStyleChoice}

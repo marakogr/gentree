@@ -1,7 +1,7 @@
 {
   "title": "Ajustes",
+  "tocLabel": "Secciones de ajustes",
   "open": "Ajustes",
-  "backToProject": "Volver al proyecto",
   "loading": "Cargando los ajustes…",
   "appearance": "Apariencia",
   "language": "Idioma",
@@ -110,7 +110,6 @@
   "mapTileUrl": "URL de mosaicos",
   "mapTileUrlHint": "Plantilla con {z}, {x} e {y}",
   "mapTileUrlInvalid": "La URL debe empezar por http:// o https://",
-  "mapPrivacy": "Los mosaicos se solicitan solo con la pestaña Mapa abierta; el servidor ve la zona aproximada.",
   "historicalEnabled": "Buscar nombres históricos",
   "historicalHint": "Wikidata puede relacionar «Gorki», «Stalingrado» y nombres similares con el lugar actual. La consulta se envía a Wikidata.",
   "historicalTitle": "Nombres históricos"

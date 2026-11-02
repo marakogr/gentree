@@ -1,7 +1,7 @@
 {
   "title": "Einstellungen",
+  "tocLabel": "Einstellungsbereiche",
   "open": "Einstellungen",
-  "backToProject": "Zurück zum Projekt",
   "loading": "Einstellungen werden geladen…",
   "appearance": "Darstellung",
   "language": "Sprache",
@@ -110,7 +110,6 @@
   "mapTileUrl": "Kachel-URL",
   "mapTileUrlHint": "Vorlage mit {z}, {x} und {y}",
   "mapTileUrlInvalid": "Die URL muss mit http:// oder https:// beginnen",
-  "mapPrivacy": "Kacheln werden nur bei geöffneter Karten-Registerkarte angefragt; der Server sieht den ungefähren Ausschnitt.",
   "historicalEnabled": "Historische Namen suchen",
   "historicalHint": "Wikidata ordnet „Gorki“, „Stalingrad“ und ähnliche Namen dem heutigen Ort zu. Die Anfrage geht an Wikidata.",
   "historicalTitle": "Historische Namen"

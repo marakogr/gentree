@@ -53,7 +53,6 @@ import {
 import "./settings.css";
 
 type Props = {
-  onClose: () => void;
   /** Opens the built-in guide; the About block links to it. */
   onOpenHelp: () => void;
   /** Applies and caches the theme immediately; config is saved here too. */
@@ -66,8 +65,33 @@ type Props = {
 const APP_NAME = "Gentree";
 const APP_LICENSE = "MIT";
 
+type SettingsSectionId =
+  | "appearance"
+  | "paths"
+  | "backup"
+  | "updates"
+  | "eventTypes"
+  | "eventFields"
+  | "historical"
+  | "map"
+  | "chat"
+  | "about";
+
+/** Table of contents order; the active section is the only one rendered. */
+const SETTINGS_SECTIONS: { id: SettingsSectionId; labelKey: string }[] = [
+  { id: "appearance", labelKey: "settings:appearance" },
+  { id: "paths", labelKey: "settings:paths" },
+  { id: "backup", labelKey: "settings:backup" },
+  { id: "updates", labelKey: "settings:updates" },
+  { id: "eventTypes", labelKey: "settings:eventTypes" },
+  { id: "eventFields", labelKey: "settings:eventFields" },
+  { id: "historical", labelKey: "settings:historicalTitle" },
+  { id: "map", labelKey: "settings:map" },
+  { id: "chat", labelKey: "settings:chat" },
+  { id: "about", labelKey: "settings:about" },
+];
+
 export default function SettingsPage({
-  onClose,
   onOpenHelp,
   onThemeChange,
   onStyleChange,
@@ -76,6 +100,8 @@ export default function SettingsPage({
   const [snapshot, setSnapshot] = useState<SettingsSnapshot | null>(null);
   const [version, setVersion] = useState<string | null | undefined>(undefined);
   const [draft, setDraft] = useState<SettingsDraft | null>(null);
+  const [activeSection, setActiveSection] =
+    useState<SettingsSectionId>("appearance");
   const { busy, error, setError, run } = useAsyncAction();
   const [saved, setSaved] = useState(false);
   const [customTypeInput, setCustomTypeInput] = useState("");
@@ -392,13 +418,10 @@ export default function SettingsPage({
   );
 
   return (
-    <>
-      <section className="panel">
+    <div className="settings-page">
+      <section className="panel settings-header">
         <Title2 as="h1">{t("settings:title")}</Title2>
         <div className="actions">
-          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
-            {t("settings:backToProject")}
-          </Button>
           <Button
             type="button"
             variant="secondary"
@@ -452,7 +475,25 @@ export default function SettingsPage({
         ) : null}
       </section>
 
-      <section className="panel">
+      <nav className="settings-nav" aria-label={t("settings:tocLabel")}>
+        {SETTINGS_SECTIONS.map((section) => (
+          <Button
+            key={section.id}
+            variant="ghost"
+            size="sm"
+            className="settings-nav-item"
+            aria-current={activeSection === section.id ? "page" : undefined}
+            onClick={() => setActiveSection(section.id)}
+          >
+            <span className="settings-nav-label">
+              {t(section.labelKey)}
+            </span>
+          </Button>
+        ))}
+      </nav>
+
+      <div className="settings-body">
+      <section className="panel" hidden={activeSection !== "appearance"}>
         <Subtitle1 as="h2">{t("settings:appearance")}</Subtitle1>
         <Field
           label={{
@@ -523,7 +564,7 @@ export default function SettingsPage({
         </Text>
       </section>
 
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "eventTypes"}>
         <Subtitle1 as="h2">{t("settings:eventTypes")}</Subtitle1>
         <Text as="p" size={200}>
           {t("settings:eventTypesHint")}
@@ -602,7 +643,7 @@ export default function SettingsPage({
         ) : null}
       </section>
 
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "eventFields"}>
         <Subtitle1 as="h2">{t("settings:eventFields")}</Subtitle1>
         <Text as="p" size={200}>
           {t("settings:eventFieldsHint")}
@@ -786,7 +827,57 @@ export default function SettingsPage({
         ) : null}
       </section>
 
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "historical"}>
+        <Subtitle1 as="h2">{t("settings:historicalTitle")}</Subtitle1>
+        <Switch
+          label={t("settings:historicalEnabled")}
+          checked={draft.historicalEnabled}
+          onChange={(_, data) => update({ historicalEnabled: data.checked })}
+        />
+        <Text as="p" size={200}>
+          {t("settings:historicalHint")}
+        </Text>
+      </section>
+
+      <section className="panel" hidden={activeSection !== "map"}>
+        <Subtitle1 as="h2">{t("settings:map")}</Subtitle1>
+        <Field
+          label={{
+            children: t("settings:mapBasemap"),
+            htmlFor: "settings-map-basemap",
+          }}
+        >
+          <Select
+            id="settings-map-basemap"
+            value={draft.mapBasemap}
+            disabled={busy}
+            onChange={(event) =>
+              update({ mapBasemap: event.target.value as MapBasemap })
+            }
+          >
+            <option value="osm">{t("settings:mapBasemapOsm")}</option>
+            <option value="offline">{t("settings:mapBasemapOffline")}</option>
+          </Select>
+        </Field>
+        <Field
+          label={{
+            children: t("settings:mapTileUrl"),
+            htmlFor: "settings-map-tile-url",
+          }}
+          hint={t("settings:mapTileUrlHint")}
+        >
+          <Input
+            id="settings-map-tile-url"
+            value={draft.mapTileUrl}
+            disabled={busy}
+            onChange={(_, data) => update({ mapTileUrl: data.value })}
+          />
+        </Field>
+        {!mapValid ? (
+          <Text as="p" size={200} className="error">
+            {t("settings:mapTileUrlInvalid")}
+          </Text>
+        ) : null}
         <Subtitle1 as="h2">{t("settings:geocoder")}</Subtitle1>
         <Switch
           label={t("settings:geocoderEnabled")}
@@ -863,63 +954,7 @@ export default function SettingsPage({
         ) : null}
       </section>
 
-      <section className="panel">
-        <Subtitle1 as="h2">{t("settings:historicalTitle")}</Subtitle1>
-        <Switch
-          label={t("settings:historicalEnabled")}
-          checked={draft.historicalEnabled}
-          onChange={(_, data) => update({ historicalEnabled: data.checked })}
-        />
-        <Text as="p" size={200}>
-          {t("settings:historicalHint")}
-        </Text>
-      </section>
-
-      <section className="panel">
-        <Subtitle1 as="h2">{t("settings:map")}</Subtitle1>
-        <Field
-          label={{
-            children: t("settings:mapBasemap"),
-            htmlFor: "settings-map-basemap",
-          }}
-        >
-          <Select
-            id="settings-map-basemap"
-            value={draft.mapBasemap}
-            disabled={busy}
-            onChange={(event) =>
-              update({ mapBasemap: event.target.value as MapBasemap })
-            }
-          >
-            <option value="osm">{t("settings:mapBasemapOsm")}</option>
-            <option value="offline">{t("settings:mapBasemapOffline")}</option>
-          </Select>
-        </Field>
-        <Field
-          label={{
-            children: t("settings:mapTileUrl"),
-            htmlFor: "settings-map-tile-url",
-          }}
-          hint={t("settings:mapTileUrlHint")}
-        >
-          <Input
-            id="settings-map-tile-url"
-            value={draft.mapTileUrl}
-            disabled={busy}
-            onChange={(_, data) => update({ mapTileUrl: data.value })}
-          />
-        </Field>
-        {!mapValid ? (
-          <Text as="p" size={200} className="error">
-            {t("settings:mapTileUrlInvalid")}
-          </Text>
-        ) : null}
-        <MessageBar intent="warning" politeness="polite">
-          <MessageBarBody>{t("settings:mapPrivacy")}</MessageBarBody>
-        </MessageBar>
-      </section>
-
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "paths"}>
         <Subtitle1 as="h2">{t("settings:paths")}</Subtitle1>
         {pathRow(
           "projects",
@@ -935,7 +970,7 @@ export default function SettingsPage({
         {pathRow("config", t("settings:configFile"), snapshot.configPath)}
       </section>
 
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "chat"}>
         <Subtitle1 as="h2">{t("settings:chat")}</Subtitle1>
         <Switch
           label={t("settings:chatEnabled")}
@@ -1001,7 +1036,7 @@ export default function SettingsPage({
         </Text>
       </section>
 
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "backup"}>
         <Subtitle1 as="h2">{t("settings:backup")}</Subtitle1>
         <Field
           label={{
@@ -1019,7 +1054,7 @@ export default function SettingsPage({
         </Field>
       </section>
 
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "updates"}>
         <Subtitle1 as="h2">{t("settings:updates")}</Subtitle1>
         {updateStatus ? (
           <Text as="p" size={200}>
@@ -1129,7 +1164,7 @@ export default function SettingsPage({
         ) : null}
       </section>
 
-      <section className="panel">
+      <section className="panel" hidden={activeSection !== "about"}>
         <Subtitle1 as="h2">{t("settings:about")}</Subtitle1>
         <dl className="facts">
           <dt>{t("settings:aboutApp")}</dt>
@@ -1150,6 +1185,7 @@ export default function SettingsPage({
           {t("settings:openHelp")}
         </Button>
       </section>
-    </>
+      </div>
+    </div>
   );
 }
