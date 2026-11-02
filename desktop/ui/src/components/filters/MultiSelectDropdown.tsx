@@ -152,6 +152,20 @@ export function MultiSelectDropdown({
     return () => cancelAnimationFrame(frame);
   }, [open]);
 
+  // Escape closes the popover even when focus drifted out of the search field
+  // (for example after a pointer click on the surface padding).
+  useEffect(() => {
+    if (!open) return;
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [open]);
+
   useEffect(() => {
     if (!open || active < 0) return;
     const row = document.getElementById(optionId(rows[active]?.id ?? ""));
@@ -187,9 +201,9 @@ export function MultiSelectDropdown({
         break;
       }
       case "Escape":
+        // Handled by the document listener, which also covers focus that left
+        // the search field; only stop the default here.
         event.preventDefault();
-        setOpen(false);
-        triggerRef.current?.focus();
         break;
       case "Tab":
         // Tabbing out is a normal exit; close instead of leaving an orphaned
@@ -262,8 +276,16 @@ export function MultiSelectDropdown({
           autoComplete="off"
           spellCheck={false}
           onChange={(event) => {
-            setQuery(event.target.value);
-            setActive(0);
+            const next = event.target.value;
+            setQuery(next);
+            // Typing narrows the list: the keyboard focus moves to the first
+            // real match, not the fixed "all" row, so Enter does not silently
+            // clear the selection.
+            if (next.trim() === "") {
+              setActive(0);
+            } else {
+              setActive(filterComboItems(options, next).length > 0 ? 1 : 0);
+            }
           }}
           onKeyDown={handleKeyDown}
         />
@@ -285,6 +307,10 @@ export function MultiSelectDropdown({
                 data-active={index === active ? "true" : undefined}
                 className="multi-select-option"
                 onMouseEnter={() => setActive(index)}
+                // Keep the keyboard on the search field: a pointer click must
+                // not move focus to the option (or to `body`), otherwise
+                // Escape/arrows stop working after the first mouse pick.
+                onMouseDown={(event) => event.preventDefault()}
                 onClick={() => toggle(row.id)}
               >
                 <span className="multi-select-check" aria-hidden="true">

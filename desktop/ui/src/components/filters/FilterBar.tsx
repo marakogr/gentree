@@ -130,7 +130,10 @@ export function FilterBar({
       ) : null}
     </div>
   );
-  const showChipsRow = chips.length > 0 || showReset;
+  // A disabled "reset filters" line under the search is noise: keep the row
+  // only while something can actually be reset (or chips are present).
+  const showChipsRow =
+    chips.length > 0 || (showReset && !resetDisabled);
 
   return (
     <div className={inline ? "filter-bar filter-bar-inline" : "filter-bar"}>

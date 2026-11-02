@@ -409,6 +409,12 @@ export default function EventsPage({
     () => readEventFilters(view.filters),
     [filterSignature],
   );
+  // The search text is not counted: it has its own clear button, and the reset
+  // row should not appear for typing alone.
+  const activeFilterCount =
+    (filters.personId === "" ? 0 : 1) +
+    filters.types.length +
+    (filters.fromYear === "" && filters.toYear === "" ? 0 : 1);
   const storedColumns = useMemo(
     () => readEventColumns(view.filters),
     [filterSignature],
@@ -899,10 +905,11 @@ export default function EventsPage({
                   queryLabel={t("event:searchLabel")}
                   clearLabel={t("event:clearSearch")}
                   filtersLabel={t("event:filtersTitle")}
-                  activeCount={0}
+                  activeCount={activeFilterCount}
                   chips={[]}
                   onReset={resetFilters}
                   resetLabel={t("event:resetFilters")}
+                  showReset={activeFilterCount > 0}
                   loading={loading}
                 />
                 <div className="events-person-filter">
@@ -1045,12 +1052,12 @@ export default function EventsPage({
           <EmptyState
             compact
             text={t("event:empty")}
-            actionLabel={persons.length === 0 ? t("event:createPerson") : t("event:new")}
-            onAction={
-              persons.length === 0
-                ? onRequestNewPerson
-                : startCreate
+            // With people in the project the header already offers
+            // "New event"; only the no-people case needs its own action.
+            actionLabel={
+              persons.length === 0 ? t("event:createPerson") : undefined
             }
+            onAction={persons.length === 0 ? onRequestNewPerson : undefined}
           />
         ) : page.rows.length === 0 ? (
           <EmptyState

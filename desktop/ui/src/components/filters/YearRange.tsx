@@ -182,6 +182,25 @@ export function YearRange({
     );
   };
 
+  // Nothing to filter: a dead track and two end labels are just noise, so the
+  // control collapses to its caption and the hint.
+  if (disabled && disabledHint) {
+    return (
+      <div
+        className="year-range year-range-disabled"
+        role="group"
+        aria-labelledby={labelId}
+      >
+        <span className="year-range-head">
+          <span id={labelId} className="year-range-label">
+            {groupLabel}
+          </span>
+        </span>
+        <span className="year-range-hint">{disabledHint}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="year-range" role="group" aria-labelledby={labelId}>
       <span className="year-range-head">
