@@ -317,8 +317,10 @@ from the published release only breaks checks for everyone else.
 ## Local builds and updater artifacts
 
 `tauri.conf.json` does not create updater artifacts, so `make build` works
-without a signing key and produces ordinary installers. The CI release passes
-the `desktop/apps/desktop/tauri.release.conf.json` overlay, which turns
+without a signing key and produces ordinary installers. The preview CI release
+also stays unsigned and does not pass the updater overlay. To build signed
+updater artifacts locally, pass
+`desktop/apps/desktop/tauri.release.conf.json`, which turns
 `bundle.createUpdaterArtifacts` on and therefore requires the key:
 
 ```bash

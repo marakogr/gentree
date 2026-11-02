@@ -44,3 +44,7 @@ coverage/
 # Local-only internal notes and agent configuration
 /docs/research/
 /.opencode/opencode.json
+/.opencode/skills/
+
+# Gitea is no longer used; keep any local mirror config out of git.
+/.gitea/
