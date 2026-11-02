@@ -45,7 +45,7 @@ import type {
   PersonDetail,
   Versioned,
 } from "../../api/types";
-import { FilterBar, type FilterChipModel } from "../../components/filters/FilterBar";
+import { FilterBar } from "../../components/filters/FilterBar";
 import { BulkBar } from "../../components/ui/bulk-bar";
 import { Button } from "../../components/ui/button";
 import { Dialog } from "../../components/ui/dialog";
@@ -600,12 +600,6 @@ function PersonsView({
     }));
   };
 
-  const clearQuery = () => {
-    lastDebounced.current = "";
-    setQueryInput("");
-    patch({ query: "", page: 0 });
-  };
-
   const startCreate = () => {
     setEditing(null);
     setFormOpen(true);
@@ -725,16 +719,6 @@ function PersonsView({
     ready: !listLoading,
   });
 
-  const chips: FilterChipModel[] = [];
-  if (state.query.trim() !== "") {
-    chips.push({
-      id: "query",
-      label: t("person:chipQuery", { query: state.query }),
-      removeLabel: t("person:chipQueryRemove"),
-      onRemove: clearQuery,
-    });
-  }
-
   const shownDetail =
     detail && detail.person.entity.id === state.selectedId ? detail : null;
   // Selecting another row must not flash the empty state before the fetch.
@@ -797,8 +781,8 @@ function PersonsView({
                 queryLabel={t("person:searchLabel")}
                 clearLabel={t("person:clearSearch")}
                 filtersLabel={t("person:filters")}
-                activeCount={chips.length}
-                chips={chips}
+                activeCount={0}
+                chips={[]}
                 onReset={resetFilters}
                 resetLabel={t("person:resetFilters")}
                 resultLabel={t("common:filters.found", {
