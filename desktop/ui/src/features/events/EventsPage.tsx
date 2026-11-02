@@ -52,12 +52,12 @@ import type {
   DateValue,
   EventEntity,
   EventType,
+  MediaItem,
   Person,
   Versioned,
 } from "../../api/types";
 import { FilterBar } from "../../components/filters/FilterBar";
-import { PersonFilter } from "../../components/filters/PersonFilter";
-import { TypeChips } from "../../components/filters/TypeChips";
+import { MultiSelectDropdown } from "../../components/filters/MultiSelectDropdown";
 import { YearRange } from "../../components/filters/YearRange";
 import { BulkBar } from "../../components/ui/bulk-bar";
 import { Button } from "../../components/ui/button";
@@ -77,7 +77,9 @@ import { useDateFormatter } from "../../lib/useDateFormatter";
 import { useDebouncedValue } from "../../lib/useDebouncedValue";
 import { useScrollMemory, useViewState } from "../../lib/useViewState";
 import type { ViewFilters } from "../../lib/viewState";
+import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
+import PersonSearch from "../persons/PersonSearch";
 import EventForm from "./EventForm";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
@@ -261,6 +263,9 @@ export default function EventsPage({
 
   const [events, setEvents] = useState<Versioned<EventEntity>[]>([]);
   const [persons, setPersons] = useState<Versioned<Person>[]>([]);
+  const [photos, setPhotos] = useState<ReadonlyMap<string, MediaItem>>(
+    () => new Map(),
+  );
   const [filesByEvent, setFilesByEvent] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -336,15 +341,19 @@ export default function EventsPage({
     setLoading(true);
     setError(null);
     try {
-      const [rows, personPage, eventCounts] = await Promise.all([
+      const [rows, personPage, eventCounts, media] = await Promise.all([
         eventsApi.list({}),
         personsApi.list({ limit: 1000, sort: "name" }),
         // Small map of event id -> file count; the dialog loads the items.
         mediaApi.eventCounts(),
+        // Profile photos decorate the person filter; a media failure must not
+        // hide the events.
+        mediaApi.list().catch(() => [] as MediaItem[]),
       ]);
       setEvents(rows);
       setPersons(personPage.items);
       setFilesByEvent(eventCounts);
+      setPhotos(photosByPerson(media));
     } catch (caught) {
       setError(normalizeError(caught));
     } finally {
@@ -400,6 +409,12 @@ export default function EventsPage({
     () => readEventFilters(view.filters),
     [filterSignature],
   );
+  // The search text is not counted: it has its own clear button, and the reset
+  // row should not appear for typing alone.
+  const activeFilterCount =
+    (filters.personId === "" ? 0 : 1) +
+    filters.types.length +
+    (filters.fromYear === "" && filters.toYear === "" ? 0 : 1);
   const storedColumns = useMemo(
     () => readEventColumns(view.filters),
     [filterSignature],
@@ -729,16 +744,10 @@ export default function EventsPage({
       withFilterValue(current, "personId", personId),
     );
 
-  const toggleType = (id: string) => {
-    if (!isEventType(id)) return;
-    patchFilters((current) => {
-      const selected = readEventFilters(current).types;
-      const next = selected.includes(id)
-        ? selected.filter((type) => type !== id)
-        : [...selected, id];
-      return withFilterValue(current, "types", next);
-    });
-  };
+  const handleTypeFilter = (types: string[]) =>
+    patchFilters((current) =>
+      withFilterValue(current, "types", types.filter(isEventType)),
+    );
 
   const handleFromYear = (value: string) =>
     patchFilters((current) => withFilterValue(current, "fromYear", value));
@@ -839,10 +848,14 @@ export default function EventsPage({
 
   const typeOptions = useMemo(
     () =>
-      EVENT_TYPES.map((type) => ({
-        id: type,
-        label: t(`enums:eventType.${type}`),
-      })),
+      EVENT_TYPES.map((type) => {
+        const Icon = TYPE_ICONS[type];
+        return {
+          id: type,
+          label: t(`enums:eventType.${type}`),
+          icon: <Icon fontSize={16} aria-hidden="true" />,
+        };
+      }),
     [t],
   );
 
@@ -892,22 +905,26 @@ export default function EventsPage({
                   queryLabel={t("event:searchLabel")}
                   clearLabel={t("event:clearSearch")}
                   filtersLabel={t("event:filtersTitle")}
-                  activeCount={0}
+                  activeCount={activeFilterCount}
                   chips={[]}
                   onReset={resetFilters}
                   resetLabel={t("event:resetFilters")}
+                  showReset={activeFilterCount > 0}
                   loading={loading}
                 />
                 <div className="events-person-filter">
-                  <PersonFilter
+                  <PersonSearch
+                    id="events-person-filter"
+                    label={t("event:person")}
+                    hideLabel
                     persons={personEntities}
+                    photos={photos}
                     value={filters.personId}
                     onChange={handlePersonFilter}
                     placeholder={t("event:personFilterPlaceholder")}
-                    ariaLabel={t("event:person")}
+                    allOptionLabel={t("event:allPersons")}
                     clearLabel={t("event:clearPerson")}
                     emptyLabel={t("event:noPersonMatches")}
-                    noneLabel={t("event:allPersons")}
                   />
                 </div>
                 <span className="events-result">
@@ -918,12 +935,20 @@ export default function EventsPage({
                 </span>
               </div>
               <div className="events-filter-row">
-                <TypeChips
-                  options={typeOptions}
-                  selected={[...filters.types]}
-                  onToggle={toggleType}
-                  legend={t("event:type")}
-                />
+                <div className="events-type-filter">
+                  <MultiSelectDropdown
+                    options={typeOptions}
+                    values={[...filters.types]}
+                    onChange={handleTypeFilter}
+                    label={t("event:type")}
+                    allLabel={t("event:allTypes")}
+                    searchPlaceholder={t("event:typeFilterSearch")}
+                    emptyLabel={t("event:noPersonMatches")}
+                    multipleLabel={(count) =>
+                      t("event:typesSelected", { count })
+                    }
+                  />
+                </div>
                 <YearRange
                   from={filters.fromYear}
                   to={filters.toYear}
@@ -932,9 +957,6 @@ export default function EventsPage({
                   disabled={
                     !yearBounds.hasDated ||
                     yearBounds.minYear >= yearBounds.maxYear
-                  }
-                  disabledHint={
-                    yearBounds.hasDated ? undefined : t("event:yearRangeEmpty")
                   }
                   onFromChange={handleFromYear}
                   onToChange={handleToYear}
@@ -1027,12 +1049,12 @@ export default function EventsPage({
           <EmptyState
             compact
             text={t("event:empty")}
-            actionLabel={persons.length === 0 ? t("event:createPerson") : t("event:new")}
-            onAction={
-              persons.length === 0
-                ? onRequestNewPerson
-                : startCreate
+            // With people in the project the header already offers
+            // "New event"; only the no-people case needs its own action.
+            actionLabel={
+              persons.length === 0 ? t("event:createPerson") : undefined
             }
+            onAction={persons.length === 0 ? onRequestNewPerson : undefined}
           />
         ) : page.rows.length === 0 ? (
           <EmptyState

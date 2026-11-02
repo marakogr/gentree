@@ -41,7 +41,7 @@ describe("project tour", () => {
 
     const audit = await browser.execute(auditPage);
     save("project-created", audit);
-    shot("project-created");
+    await shot("project-created");
     // eslint-disable-next-line no-console
     console.log("created project:", PROJECT_NAME);
   });
@@ -55,14 +55,17 @@ describe("project tour", () => {
       const audit = await browser.execute(auditPage);
 
       save(`page-${slug}`, { label, heading, ...audit });
-      shot(`page-${slug}`);
+      await shot(`page-${slug}`);
 
       // eslint-disable-next-line no-console
       console.log(
         `${slug}: heading="${heading}" controls=${audit.controls.length} unnamed=${audit.unnamedControls.length} small=${audit.smallTargets.length} contrast=${audit.contrastIssues.length} overflow=${audit.overflow.length} i18n=${JSON.stringify(audit.i18nLeaks)}`,
       );
 
-      expect(heading, `section ${label} renders no heading`).not.toBe("");
+      if (!heading) {
+        throw new Error(`section ${label} renders no heading`);
+      }
+      expect(heading).not.toBe("");
     }
 
     expect(await consoleErrors()).toEqual([]);

@@ -15,7 +15,7 @@ describe("smoke", () => {
     }));
 
     save("smoke", { title, url, windowSize, ...page });
-    shot("smoke");
+    await shot("smoke");
 
     // The harness forces GENTREE_APP_LANGUAGE=ru; a different locale means the
     // environment did not reach the app and every text selector is unreliable.
@@ -24,3 +24,4 @@ describe("smoke", () => {
     expect(await consoleErrors()).toEqual([]);
   });
 });
+

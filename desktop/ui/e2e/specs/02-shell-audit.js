@@ -26,7 +26,7 @@ describe("shell audit", () => {
 
     const audit = await browser.execute(auditPage);
     save("shell-1200x800", audit);
-    shot("shell-1200x800");
+    await shot("shell-1200x800");
     summarize("shell-1200x800", audit);
 
     expect(audit.bodyText.length).toBeGreaterThan(20);
@@ -48,7 +48,7 @@ describe("shell audit", () => {
     const actual = await browser.getWindowSize();
     const payload = { requested: { w: 960, h: 600 }, actual, ...audit };
     save("shell-960x600", payload);
-    shot("shell-960x600");
+    await shot("shell-960x600");
     summarize("shell-960x600", audit);
   });
 
@@ -70,7 +70,7 @@ describe("shell audit", () => {
     }
 
     save("focus-order", order);
-    shot("focus-order-last");
+    await shot("focus-order-last");
 
     // eslint-disable-next-line no-console
     console.log(
@@ -84,3 +84,4 @@ describe("shell audit", () => {
     expect(order.length).toBeGreaterThan(0);
   });
 });
+

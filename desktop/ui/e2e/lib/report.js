@@ -21,10 +21,12 @@ export function save(name, data) {
   return file;
 }
 
-export function shot(name) {
+export async function shot(name) {
   const dir = artifactsDir();
   fs.mkdirSync(dir, { recursive: true });
   const file = path.join(dir, `${name}.png`);
-  browser.saveScreenshot(file);
+  // Must be awaited: a pending capture would show whatever the next step puts
+  // on screen.
+  await browser.saveScreenshot(file);
   return file;
 }

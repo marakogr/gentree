@@ -10,7 +10,7 @@ import {
   PersonRegular,
   type FluentIcon,
 } from "@fluentui/react-icons";
-import type { Person, TimelineScope } from "../../api/types";
+import type { MediaItem, Person, TimelineScope } from "../../api/types";
 import { cn } from "../../lib/utils";
 import PersonSearch from "../persons/PersonSearch";
 import { useTimelineTranslate } from "./i18n";
@@ -67,6 +67,8 @@ export interface TimelineFiltersProps {
   scope: TimelineScope;
   personId: string | null;
   persons: Person[];
+  /** Primary photo per person id; initials are the fallback. */
+  photos?: ReadonlyMap<string, MediaItem>;
   generations: number;
   onScopeChange: (scope: TimelineScope) => void;
   onPersonChange: (personId: string | null) => void;
@@ -83,6 +85,7 @@ export function TimelineFilters({
   scope,
   personId,
   persons,
+  photos,
   generations,
   onScopeChange,
   onPersonChange,
@@ -133,6 +136,7 @@ export function TimelineFilters({
             label={scopeLabel(scope, t)}
             hideLabel
             persons={persons}
+            photos={photos}
             value={personId ?? ""}
             placeholder={t("filters.namePlaceholder")}
             onChange={(next) => onPersonChange(next === "" ? null : next)}

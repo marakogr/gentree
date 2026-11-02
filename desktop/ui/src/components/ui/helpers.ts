@@ -18,12 +18,12 @@ export function normalizeSearchText(value: string): string {
  * Case-insensitive substring filter over `label` and `hint`.
  * An empty/whitespace query returns every item in its original order.
  */
-export function filterComboItems(
-  items: ComboItem[],
+export function filterComboItems<T extends ComboItem>(
+  items: readonly T[],
   query: string,
-): ComboItem[] {
+): T[] {
   const needle = normalizeSearchText(query.trim());
-  if (needle === "") return items;
+  if (needle === "") return [...items];
   return items.filter((item) => {
     const label = normalizeSearchText(item.label);
     if (label.includes(needle)) return true;
