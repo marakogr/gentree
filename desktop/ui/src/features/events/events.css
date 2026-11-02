@@ -27,13 +27,29 @@
   min-width: 0;
 }
 
-/* Search and the person filter are full-width rows; type and years share the
-   next row and wrap on narrow windows. */
 .events-filters {
   display: grid;
   gap: 8px;
+  min-width: 0;
+}
+
+/* Search and the person filter share one row: the search grows, the person
+   filter keeps a readable width. Type and years share the row below. */
+.events-filter-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.events-filter-top > .filter-bar {
   flex: 1;
   min-width: 0;
+}
+
+.events-person-filter {
+  flex: 0 1 20rem;
+  min-width: 12rem;
 }
 
 .events-filter-row {

@@ -884,33 +884,37 @@ export default function EventsPage({
         <div className="events-toolbar">
           <div className="events-toolbar-row">
             <div className="events-filters">
-              <FilterBar
-                query={view.query}
-                onQueryChange={handleQueryChange}
-                queryPlaceholder={t("event:searchPlaceholder")}
-                queryLabel={t("event:searchLabel")}
-                clearLabel={t("event:clearSearch")}
-                filtersLabel={t("event:filtersTitle")}
-                activeCount={0}
-                chips={[]}
-                onReset={resetFilters}
-                resetLabel={t("event:resetFilters")}
-                resultLabel={t("common:filters.found", {
-                  count: filtered.length,
-                  total: events.length,
-                })}
-                loading={loading}
-              />
-              <PersonFilter
-                persons={personEntities}
-                value={filters.personId}
-                onChange={handlePersonFilter}
-                placeholder={t("event:personFilterPlaceholder")}
-                ariaLabel={t("event:person")}
-                clearLabel={t("event:clearPerson")}
-                emptyLabel={t("event:noPersonMatches")}
-                noneLabel={t("event:allPersons")}
-              />
+              <div className="events-filter-top">
+                <FilterBar
+                  query={view.query}
+                  onQueryChange={handleQueryChange}
+                  queryPlaceholder={t("event:searchPlaceholder")}
+                  queryLabel={t("event:searchLabel")}
+                  clearLabel={t("event:clearSearch")}
+                  filtersLabel={t("event:filtersTitle")}
+                  activeCount={0}
+                  chips={[]}
+                  onReset={resetFilters}
+                  resetLabel={t("event:resetFilters")}
+                  resultLabel={t("common:filters.found", {
+                    count: filtered.length,
+                    total: events.length,
+                  })}
+                  loading={loading}
+                />
+                <div className="events-person-filter">
+                  <PersonFilter
+                    persons={personEntities}
+                    value={filters.personId}
+                    onChange={handlePersonFilter}
+                    placeholder={t("event:personFilterPlaceholder")}
+                    ariaLabel={t("event:person")}
+                    clearLabel={t("event:clearPerson")}
+                    emptyLabel={t("event:noPersonMatches")}
+                    noneLabel={t("event:allPersons")}
+                  />
+                </div>
+              </div>
               <div className="events-filter-row">
                 <TypeChips
                   options={typeOptions}
