@@ -4,6 +4,43 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] — 2026-11-02
+
+One look across the project screens, calmer settings and help, and a single
+filter row on events.
+
+### Added
+
+- Age sorting on People: living people are measured to today, deceased people to
+  the date of death, and rows with unclear dates stay last.
+- Sorting from the column headers on Projects, with the direction remembered
+  between visits.
+- A sticky section list in Settings; the geocoder now sits inside the Map
+  section.
+- A table toolbar on People and Events with the columns menu and the main action.
+
+### Changed
+
+- One page-title style and one content spacing across People, Events, Tree,
+  Kinship, Map, Timeline and Search.
+- Settings no longer has a "Back to project" button and no longer shows the tile
+  warning.
+- Help is titled "Help" and opens with a full-width search; the "ask the
+  assistant" buttons are gone.
+- The assistant no longer receives the built-in UI guide, so it answers about
+  the archive rather than about screens and buttons.
+- The Projects screen drops the "Recent projects" heading and uses one panel;
+  the collapsed sidebar no longer shows a project initial.
+- Events keep the search, the person filter and the always-open filters in one
+  toolbar; the applied-filter chips and the actions column are gone, and a row
+  click opens the event form.
+- The name column is labelled "Full name" (ФИО); the year filter is labelled
+  "Years".
+
+### Fixed
+
+- Windows no longer suggests previously typed names over the person pickers.
+
 ## [0.2.1] — 2026-11-02
 
 This release connects the in-app update channel to GitHub Releases.
@@ -87,5 +124,6 @@ Windows SmartScreen or macOS Gatekeeper may ask for confirmation on first launch
 - The "Show from selected" and "Show siblings" tree buttons. The root picker
   already chooses the person the tree is built from.
 
+[0.3.0]: ../../releases/tag/v0.3.0
 [0.2.1]: ../../releases/tag/v0.2.1
 [0.2.0]: ../../releases/tag/v0.2.0

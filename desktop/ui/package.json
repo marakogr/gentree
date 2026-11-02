@@ -1,7 +1,7 @@
 {
   "name": "gentree-ui",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Gentree desktop UI — a local-first family archive",
   "license": "MIT",
   "type": "module",
