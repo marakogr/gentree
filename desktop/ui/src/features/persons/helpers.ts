@@ -20,7 +20,7 @@ import {
 } from "../../lib/dates";
 import { EMPTY_VALUE } from "../../lib/formatValue";
 
-export type PersonSort = "name" | "birth" | "death";
+export type PersonSort = "name" | "birth" | "death" | "age";
 export type PersonSortDirection = "asc" | "desc";
 
 export function displayName(person: Person, unknown = ""): string {
@@ -60,6 +60,20 @@ export function sortPersons(
     result.sort((left, right) =>
       applyDirection(byName(left, right), direction),
     );
+    return result;
+  }
+  if (sort === "age") {
+    // Living people age up to today, deceased up to the death date, and an
+    // unusable birth date leaves no key, so those rows stay last.
+    const today = new Date();
+    result.sort((left, right) => {
+      const ages = compareDates(
+        ageInCompletedYears(left, today),
+        ageInCompletedYears(right, today),
+        direction,
+      );
+      return ages !== 0 ? ages : byName(left, right);
+    });
     return result;
   }
   const key = sort === "birth" ? birthKey : deathKey;

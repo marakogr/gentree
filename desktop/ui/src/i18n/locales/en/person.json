@@ -14,7 +14,7 @@
   "sortAsc": "Ascending",
   "sortDesc": "Descending",
   "navigation": "Navigation",
-  "colName": "Name",
+  "colName": "Full name",
   "colYears": "Lifespan",
   "colParents": "Parents",
   "columnsTitle": "Columns",

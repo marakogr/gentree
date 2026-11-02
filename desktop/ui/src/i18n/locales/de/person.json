@@ -14,7 +14,7 @@
   "sortAsc": "Aufsteigend",
   "sortDesc": "Absteigend",
   "navigation": "Navigation",
-  "colName": "Name",
+  "colName": "Vollständiger Name",
   "colYears": "Lebensspanne",
   "colParents": "Eltern",
   "columnsTitle": "Spalten",

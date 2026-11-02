@@ -37,6 +37,8 @@ export type MenuButtonProps = {
   align?: "start" | "end";
   /** Renders a "..." glyph; `label` stays the accessible name. */
   iconOnly?: boolean;
+  /** Replaces the "..." glyph when `iconOnly` is set (e.g. a gear). */
+  icon?: ReactNode;
   /** Optional glyph after a text label, e.g. a chevron. */
   trailingIcon?: ReactNode;
   /** 28px square instead of 32px, for dense table rows. */
@@ -87,6 +89,7 @@ export function MenuButton({
   items,
   align = "start",
   iconOnly = false,
+  icon,
   trailingIcon,
   dense = false,
 }: MenuButtonProps) {
@@ -122,7 +125,7 @@ export function MenuButton({
             title={iconOnly ? label : undefined}
           >
             {iconOnly ? (
-              <MoreHorizontalRegular fontSize={16} aria-hidden="true" />
+              icon ?? <MoreHorizontalRegular fontSize={16} aria-hidden="true" />
             ) : (
               <>
                 {label}

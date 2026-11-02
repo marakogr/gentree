@@ -35,6 +35,10 @@ export type FilterBarProps = {
   resetLabel: string;
   resultLabel?: string;
   loading?: boolean;
+  /** Count badge on the filters toggle; off for screens that hide it. */
+  showActiveBadge?: boolean;
+  /** The "reset filters" action inside the chips row. */
+  showReset?: boolean;
   /**
    * Render the filter controls (children) in the same wrapping row as the
    * search field instead of the collapsible panel. Used by the timeline, where
@@ -71,6 +75,8 @@ export function FilterBar({
   resetLabel,
   resultLabel,
   loading = false,
+  showActiveBadge = true,
+  showReset = true,
   inline = false,
   children,
 }: FilterBarProps) {
@@ -112,16 +118,19 @@ export function FilterBar({
           {chip.label}
         </Chip>
       ))}
-      <FluentButton
-        appearance="transparent"
-        size="small"
-        onClick={onReset}
-        disabled={resetDisabled}
-      >
-        {resetLabel}
-      </FluentButton>
+      {showReset ? (
+        <FluentButton
+          appearance="transparent"
+          size="small"
+          onClick={onReset}
+          disabled={resetDisabled}
+        >
+          {resetLabel}
+        </FluentButton>
+      ) : null}
     </div>
   );
+  const showChipsRow = chips.length > 0 || showReset;
 
   return (
     <div className={inline ? "filter-bar filter-bar-inline" : "filter-bar"}>
@@ -139,7 +148,7 @@ export function FilterBar({
             onClick={() => setOpen((current) => !current)}
           >
             {filtersLabel}
-            {activeCount > 0 ? (
+            {activeCount > 0 && showActiveBadge ? (
               <CounterBadge count={activeCount} size="small" />
             ) : null}
             <ChevronDownRegular aria-hidden="true" />
@@ -153,7 +162,7 @@ export function FilterBar({
         ) : null}
       </div>
 
-      {chipsRow}
+      {showChipsRow ? chipsRow : null}
 
       {!inline && open && children ? (
         <div className="filter-panel" id={panelId}>

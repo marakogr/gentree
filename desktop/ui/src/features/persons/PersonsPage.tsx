@@ -15,6 +15,7 @@ import {
   CheckmarkRegular,
   HistoryRegular,
   OrganizationRegular,
+  SettingsRegular,
 } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import {
@@ -44,7 +45,7 @@ import type {
   PersonDetail,
   Versioned,
 } from "../../api/types";
-import { FilterBar, type FilterChipModel } from "../../components/filters/FilterBar";
+import { FilterBar } from "../../components/filters/FilterBar";
 import { BulkBar } from "../../components/ui/bulk-bar";
 import { Button } from "../../components/ui/button";
 import { Dialog } from "../../components/ui/dialog";
@@ -287,7 +288,9 @@ function PersonsView({
   // Newest first by default; a stored choice always wins over the default.
   const storedSort = state.sort;
   const sortKey: PersonSort =
-    storedSort?.key === "birth" || storedSort?.key === "death"
+    storedSort?.key === "birth" ||
+    storedSort?.key === "death" ||
+    storedSort?.key === "age"
       ? storedSort.key
       : storedSort
         ? "name"
@@ -597,12 +600,6 @@ function PersonsView({
     }));
   };
 
-  const clearQuery = () => {
-    lastDebounced.current = "";
-    setQueryInput("");
-    patch({ query: "", page: 0 });
-  };
-
   const startCreate = () => {
     setEditing(null);
     setFormOpen(true);
@@ -722,16 +719,6 @@ function PersonsView({
     ready: !listLoading,
   });
 
-  const chips: FilterChipModel[] = [];
-  if (state.query.trim() !== "") {
-    chips.push({
-      id: "query",
-      label: t("person:chipQuery", { query: state.query }),
-      removeLabel: t("person:chipQueryRemove"),
-      onRemove: clearQuery,
-    });
-  }
-
   const shownDetail =
     detail && detail.person.entity.id === state.selectedId ? detail : null;
   // Selecting another row must not flash the empty state before the fetch.
@@ -746,17 +733,6 @@ function PersonsView({
           <Badge appearance="tint" color="informative" size="small">
             {t("person:count", { count: totalPersons })}
           </Badge>
-        </div>
-        <div className="persons-head-actions">
-          <MenuButton
-            label={t("person:columnsTitle")}
-            items={columnItems}
-            align="end"
-          />
-          <Button variant="primary" data-tour="persons-add" onClick={startCreate}>
-            <AddRegular fontSize={16} aria-hidden="true" />
-            {t("person:new")}
-          </Button>
         </div>
       </div>
 
@@ -797,23 +773,44 @@ function PersonsView({
       >
         <section className="panel persons-panel" aria-label={t("person:title")}>
           <div className="persons-toolbar">
-            <FilterBar
-              query={queryInput}
-              onQueryChange={setQueryInput}
-              queryPlaceholder={t("person:searchPlaceholder")}
-              queryLabel={t("person:searchLabel")}
-              clearLabel={t("person:clearSearch")}
-              filtersLabel={t("person:filters")}
-              activeCount={chips.length}
-              chips={chips}
-              onReset={resetFilters}
-              resetLabel={t("person:resetFilters")}
-              resultLabel={t("common:filters.found", {
-                count: filtered.length,
-                total: totalPersons,
-              })}
-              loading={false}
-            />
+            <div className="persons-toolbar-row">
+              <FilterBar
+                query={queryInput}
+                onQueryChange={setQueryInput}
+                queryPlaceholder={t("person:searchPlaceholder")}
+                queryLabel={t("person:searchLabel")}
+                clearLabel={t("person:clearSearch")}
+                filtersLabel={t("person:filters")}
+                activeCount={0}
+                chips={[]}
+                onReset={resetFilters}
+                resetLabel={t("person:resetFilters")}
+                resultLabel={t("common:filters.found", {
+                  count: filtered.length,
+                  total: totalPersons,
+                })}
+                loading={false}
+                showActiveBadge={false}
+                showReset={false}
+              />
+              <div className="persons-toolbar-actions">
+                <MenuButton
+                  iconOnly
+                  icon={<SettingsRegular fontSize={16} aria-hidden="true" />}
+                  label={t("person:columnsTitle")}
+                  items={columnItems}
+                  align="end"
+                />
+                <Button
+                  variant="primary"
+                  data-tour="persons-add"
+                  onClick={startCreate}
+                >
+                  <AddRegular fontSize={16} aria-hidden="true" />
+                  {t("person:new")}
+                </Button>
+              </div>
+            </div>
 
             {selectedIds.length > 0 ? (
               <BulkBar
@@ -947,7 +944,26 @@ function PersonsView({
                       </TableHeaderCell>
                     ) : null}
                     {columns.includes("age") ? (
-                      <TableHeaderCell aside={columnHandle("age")}>
+                      <TableHeaderCell
+                        sortable
+                        sortDirection={
+                          sortKey === "age"
+                            ? direction === "asc"
+                              ? "ascending"
+                              : "descending"
+                            : undefined
+                        }
+                        sortIcon={
+                          sortKey === "age" ? (
+                            <SortIcon direction={direction} />
+                          ) : undefined
+                        }
+                        button={{
+                          className: styles.sortButton,
+                          onClick: () => toggleSort("age"),
+                        }}
+                        aside={columnHandle("age")}
+                      >
                         {t("person:age")}
                       </TableHeaderCell>
                     ) : null}
