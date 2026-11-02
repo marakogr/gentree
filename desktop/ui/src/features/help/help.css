@@ -11,23 +11,8 @@
 /* ---------- header ---------- */
 
 .help-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px 24px;
-}
-
-.help-head-text {
   display: grid;
-  gap: 4px;
-  min-width: 15rem;
-}
-
-.help-subtitle {
-  margin: 0;
-  max-width: 46rem;
-  color: var(--muted-foreground);
+  gap: 12px;
 }
 
 .help-head-actions {
@@ -38,8 +23,9 @@
 }
 
 .help-search {
-  width: min(22rem, 100%);
+  flex: 1 1 16rem;
   min-width: 12rem;
+  width: auto;
 }
 
 /* ---------- index ---------- */
