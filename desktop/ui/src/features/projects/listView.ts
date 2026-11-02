@@ -4,6 +4,18 @@
 import type { ProjectInfo } from "../../api/types";
 
 export type ProjectSort = "recent" | "name" | "people";
+export type SortDirection = "asc" | "desc";
+
+/** The active sort column and its direction; the header toggles the latter. */
+export type ProjectSortState = {
+  key: ProjectSort;
+  direction: SortDirection;
+};
+
+/** Default direction when a column is picked for the first time. */
+export function defaultSortDirection(key: ProjectSort): SortDirection {
+  return key === "name" ? "asc" : "desc";
+}
 
 /** Case-insensitive name filter in the active locale. */
 export function matchesQuery(
@@ -35,13 +47,14 @@ function backupTime(
 export function visibleProjects(
   projects: readonly ProjectInfo[],
   query: string,
-  sort: ProjectSort,
+  sort: ProjectSortState,
   locale: string,
   backupOf: (projectId: string) => string | null,
   pinnedProjectId: string | null = null,
 ): ProjectInfo[] {
   const byName = (a: ProjectInfo, b: ProjectInfo) =>
     a.name.localeCompare(b.name, locale, { sensitivity: "base" });
+  const sign = sort.direction === "asc" ? 1 : -1;
 
   const pinned =
     pinnedProjectId === null
@@ -52,16 +65,18 @@ export function visibleProjects(
     .filter((project) => project.projectId !== pinned?.projectId)
     .filter((project) => matchesQuery(project, query, locale))
     .sort((a, b) => {
-      if (sort === "name") return byName(a, b);
-      if (sort === "people") return b.persons - a.persons || byName(a, b);
+      if (sort.key === "name") return sign * byName(a, b);
+      if (sort.key === "people") {
+        return sign * (a.persons - b.persons) || byName(a, b);
+      }
 
       const left = backupTime(a, backupOf);
       const right = backupTime(b, backupOf);
       if (left === right) return byName(a, b);
-      // Missing backups sink to the bottom; the spread never sees infinities.
+      // Missing backups stay last in both directions.
       if (left === Number.NEGATIVE_INFINITY) return 1;
       if (right === Number.NEGATIVE_INFINITY) return -1;
-      return right - left || byName(a, b);
+      return sign * (left - right) || byName(a, b);
     });
 
   return pinned ? [pinned, ...sorted] : sorted;

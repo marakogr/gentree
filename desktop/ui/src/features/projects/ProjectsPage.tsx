@@ -25,8 +25,11 @@ import { useTranslation } from "react-i18next";
 import {
   AlertRegular,
   ArchiveRegular,
+  ArrowDownRegular,
   ArrowDownloadRegular,
   ArrowRightRegular,
+  ArrowSortRegular,
+  ArrowUpRegular,
   DeleteRegular,
   DismissRegular,
   DocumentArrowRightRegular,
@@ -57,7 +60,12 @@ import {
   writeLastBackup,
   writeLastCheck,
 } from "./backupStamp";
-import { visibleProjects, type ProjectSort } from "./listView";
+import {
+  defaultSortDirection,
+  visibleProjects,
+  type ProjectSort,
+  type ProjectSortState,
+} from "./listView";
 import {
   PROJECT_NAME_MAX_LENGTH,
   checkProjectName,
@@ -92,7 +100,37 @@ type PendingAction =
 /** Validation issues shown before the "and N more" hint. */
 const VISIBLE_ISSUES = 5;
 
-const SORT_OPTIONS: readonly ProjectSort[] = ["recent", "name", "people"];
+const SORT_STORAGE_KEY = "gentree.projects.sort";
+
+/** Last chosen column and direction; survives leaving the projects screen. */
+function readSortState(): ProjectSortState {
+  try {
+    const raw = window.localStorage.getItem(SORT_STORAGE_KEY);
+    if (raw !== null) {
+      const [key, direction] = raw.split(":");
+      if (
+        (key === "recent" || key === "name" || key === "people") &&
+        (direction === "asc" || direction === "desc")
+      ) {
+        return { key, direction };
+      }
+    }
+  } catch {
+    // A hardened webview may refuse storage access; the default still works.
+  }
+  return { key: "recent", direction: "desc" };
+}
+
+function writeSortState(sort: ProjectSortState) {
+  try {
+    window.localStorage.setItem(
+      SORT_STORAGE_KEY,
+      `${sort.key}:${sort.direction}`,
+    );
+  } catch {
+    // Ignore: sorting still works for the current visit.
+  }
+}
 
 function stampMap(
   projects: readonly ProjectInfo[],
@@ -122,7 +160,7 @@ export default function ProjectsPage({
   const [error, setError] = useState<AppErrorEnvelope | null>(null);
 
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<ProjectSort>("recent");
+  const [sort, setSort] = useState<ProjectSortState>(readSortState);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [backupStamps, setBackupStamps] = useState<
     Record<string, string | null>
@@ -605,6 +643,45 @@ export default function ProjectsPage({
     : undefined;
   const deleteOne = deleteTargets?.length === 1 ? deleteTargets[0] : null;
 
+  const changeSort = (key: ProjectSort) => {
+    setSort((current) => {
+      const next: ProjectSortState =
+        current.key === key
+          ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
+          : { key, direction: defaultSortDirection(key) };
+      writeSortState(next);
+      return next;
+    });
+  };
+
+  const ariaSort = (key: ProjectSort) =>
+    sort.key === key
+      ? sort.direction === "asc"
+        ? "ascending"
+        : "descending"
+      : "none";
+
+  const sortHeader = (key: ProjectSort, label: string) => {
+    const active = sort.key === key;
+    const Icon = active
+      ? sort.direction === "asc"
+        ? ArrowUpRegular
+        : ArrowDownRegular
+      : ArrowSortRegular;
+    return (
+      <button
+        type="button"
+        className="projects-sort-header"
+        data-active={active ? "true" : undefined}
+        title={t(`project:sort_${key}`)}
+        onClick={() => changeSort(key)}
+      >
+        {label}
+        <Icon fontSize={12} aria-hidden="true" className="projects-sort-icon" />
+      </button>
+    );
+  };
+
   return (
     <div className="projects-page">
       <div className="projects-panel">
@@ -777,25 +854,7 @@ export default function ProjectsPage({
                     {t("project:delete")}
                   </Button>
                 </div>
-              ) : (
-                <label className="projects-sort" htmlFor="projects-sort-select">
-                  <span>{t("project:sortLabel")}</span>
-                  <select
-                    id="projects-sort-select"
-                    value={sort}
-                    disabled={busy}
-                    onChange={(event) =>
-                      setSort(event.target.value as ProjectSort)
-                    }
-                  >
-                    {SORT_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {t(`project:sort_${option}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
+              ) : null}
             </div>
 
             {loading ? (
@@ -843,13 +902,18 @@ export default function ProjectsPage({
                           aria-label={t("project:selectAll")}
                         />
                       </TableHeaderCell>
-                      <TableHeaderCell>{t("project:name")}</TableHeaderCell>
-                      <TableHeaderCell className="projects-persons-header">
-                        {t("person:title")}
+                      <TableHeaderCell aria-sort={ariaSort("name")}>
+                        {sortHeader("name", t("project:name"))}
                       </TableHeaderCell>
-                      <TableHeaderCell>
+                      <TableHeaderCell
+                        className="projects-persons-header"
+                        aria-sort={ariaSort("people")}
+                      >
+                        {sortHeader("people", t("person:title"))}
+                      </TableHeaderCell>
+                      <TableHeaderCell aria-sort={ariaSort("recent")}>
                         <span className="projects-header-info">
-                          {t("project:lastBackup")}
+                          {sortHeader("recent", t("project:lastBackup"))}
                           <span
                             className="projects-header-info-icon"
                             title={t("project:lastBackupHint")}
