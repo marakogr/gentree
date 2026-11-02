@@ -485,7 +485,9 @@ export default function SettingsPage({
             aria-current={activeSection === section.id ? "page" : undefined}
             onClick={() => setActiveSection(section.id)}
           >
-            {t(section.labelKey)}
+            <span className="settings-nav-label">
+              {t(section.labelKey)}
+            </span>
           </Button>
         ))}
       </nav>

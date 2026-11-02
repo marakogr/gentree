@@ -55,6 +55,17 @@
   text-align: left;
 }
 
+/* Fluent centres the button content; the label has to claim the row so every
+   item starts on the same left edge. */
+.settings-nav-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .settings-nav-item[aria-current="page"] {
   background: var(--colorNeutralBackground1Selected);
   color: var(--colorNeutralForeground1);
