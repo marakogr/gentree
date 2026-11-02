@@ -183,6 +183,7 @@ describe("event filters", () => {
       TYPE_TRIGGER,
     );
     expect(iconInValue).toBe(1);
+    await shot("filters-types-one");
 
     await closeTypes();
     expect(await $(TYPE_LIST).isExisting()).toBe(false);
@@ -200,6 +201,7 @@ describe("event filters", () => {
     await browser.pause(300);
     expect((await triggerText()).trim()).toBe("2 типа");
     expect(await selectedCount()).toBe(2);
+    await shot("filters-types-two");
 
     await closeTypes();
 

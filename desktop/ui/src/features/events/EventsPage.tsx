@@ -958,9 +958,6 @@ export default function EventsPage({
                     !yearBounds.hasDated ||
                     yearBounds.minYear >= yearBounds.maxYear
                   }
-                  disabledHint={
-                    yearBounds.hasDated ? undefined : t("event:yearRangeEmpty")
-                  }
                   onFromChange={handleFromYear}
                   onToChange={handleToYear}
                   fromLabel={t("event:yearFrom")}

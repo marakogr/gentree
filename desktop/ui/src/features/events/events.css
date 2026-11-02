@@ -37,8 +37,9 @@
    filter keeps a readable width. Type and years share the row below. */
 .events-filter-top {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px 12px;
   min-width: 0;
 }
 

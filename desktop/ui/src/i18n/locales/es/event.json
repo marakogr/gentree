@@ -138,7 +138,6 @@
   "chipYearTo": "hasta {{year}}",
   "invalidRange": "El límite inferior es posterior al superior",
   "yearRange": "Años",
-  "yearRangeEmpty": "No hay eventos con fechas",
   "noPersons": "El proyecto no tiene personas",
   "noPersonsHint": "Un evento pertenece a una persona. Crea primero una persona.",
   "createPerson": "Crear persona",

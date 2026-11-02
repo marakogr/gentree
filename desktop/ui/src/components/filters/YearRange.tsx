@@ -28,7 +28,6 @@ export function YearRange({
   minYear,
   maxYear,
   disabled = false,
-  disabledHint,
   onFromChange,
   onToChange,
   fromLabel,
@@ -44,8 +43,6 @@ export function YearRange({
   /** Latest year on the scale (end of the track). */
   maxYear: number;
   disabled?: boolean;
-  /** Shown instead of an interactive slider when there is nothing to filter. */
-  disabledHint?: string;
   onFromChange: (value: string) => void;
   onToChange: (value: string) => void;
   fromLabel: string;
@@ -182,25 +179,6 @@ export function YearRange({
     );
   };
 
-  // Nothing to filter: a dead track and two end labels are just noise, so the
-  // control collapses to its caption and the hint.
-  if (disabled && disabledHint) {
-    return (
-      <div
-        className="year-range year-range-disabled"
-        role="group"
-        aria-labelledby={labelId}
-      >
-        <span className="year-range-head">
-          <span id={labelId} className="year-range-label">
-            {groupLabel}
-          </span>
-        </span>
-        <span className="year-range-hint">{disabledHint}</span>
-      </div>
-    );
-  }
-
   return (
     <div className="year-range" role="group" aria-labelledby={labelId}>
       <span className="year-range-head">
@@ -236,10 +214,6 @@ export function YearRange({
         <span>{lowest}</span>
         <span>{highest}</span>
       </div>
-
-      {disabledHint ? (
-        <span className="year-range-hint">{disabledHint}</span>
-      ) : null}
     </div>
   );
 }

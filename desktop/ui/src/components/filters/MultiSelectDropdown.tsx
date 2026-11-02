@@ -70,21 +70,28 @@ const useStyles = makeStyles({
     whiteSpace: "nowrap",
   },
   surface: {
-    display: "grid",
+    display: "flex",
+    flexDirection: "column",
+    boxSizing: "border-box",
+    minWidth: 0,
     gap: tokens.spacingVerticalS,
-    width: "20rem",
-    maxWidth: "min(20rem, calc(100vw - 2rem))",
+    maxWidth: "calc(100vw - 2rem)",
     maxHeight: `${SURFACE_MAX_HEIGHT_PX}px`,
     padding: tokens.spacingHorizontalS,
+    overflowX: "hidden",
   },
   search: {
     width: "100%",
   },
   list: {
-    display: "grid",
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    minWidth: 0,
     gap: "2px",
     maxHeight: "16rem",
     overflowY: "auto",
+    overflowX: "hidden",
     overscrollBehavior: "contain",
   },
 });
@@ -226,7 +233,13 @@ export function MultiSelectDropdown({
     <Popover
       open={open}
       onOpenChange={(_, data) => setOpen(data.open)}
-      positioning={{ position: "below", align: "start", offset: 4 }}
+      positioning={{
+        position: "below",
+        align: "start",
+        offset: 4,
+        // The popup is exactly as wide as its trigger, like a native select.
+        matchTargetSize: "width",
+      }}
       withArrow={false}
     >
       <PopoverTrigger disableButtonEnhancement>
@@ -306,6 +319,7 @@ export function MultiSelectDropdown({
                 aria-selected={checked}
                 data-active={index === active ? "true" : undefined}
                 className="multi-select-option"
+                title={row.label}
                 onMouseEnter={() => setActive(index)}
                 // Keep the keyboard on the search field: a pointer click must
                 // not move focus to the option (or to `body`), otherwise
