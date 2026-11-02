@@ -182,6 +182,9 @@ export function Combobox({
       required={required}
       disabled={disabled}
       positioning={COMBOBOX_POSITIONING}
+      // WebView2 may still show its "saved information" dropdown despite the
+      // window-level switch; the attribute covers the other webviews.
+      autoComplete="off"
       listbox={{
         className: styles.listbox,
         style: {
