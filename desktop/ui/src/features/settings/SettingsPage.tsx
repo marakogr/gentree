@@ -419,7 +419,7 @@ export default function SettingsPage({
 
   return (
     <div className="settings-page">
-      <section className="panel">
+      <section className="panel settings-header">
         <Title2 as="h1">{t("settings:title")}</Title2>
         <div className="actions">
           <Button
@@ -490,6 +490,7 @@ export default function SettingsPage({
         ))}
       </nav>
 
+      <div className="settings-body">
       <section className="panel" hidden={activeSection !== "appearance"}>
         <Subtitle1 as="h2">{t("settings:appearance")}</Subtitle1>
         <Field
@@ -1182,6 +1183,7 @@ export default function SettingsPage({
           {t("settings:openHelp")}
         </Button>
       </section>
+      </div>
     </div>
   );
 }
