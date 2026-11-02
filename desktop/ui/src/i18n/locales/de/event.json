@@ -132,7 +132,7 @@
   "chipYearFrom": "ab {{year}}",
   "chipYearTo": "bis {{year}}",
   "invalidRange": "Die Untergrenze liegt nach der Obergrenze",
-  "yearRange": "Jahresbereich",
+  "yearRange": "Jahre",
   "yearRangeEmpty": "Keine Ereignisse mit Datum",
   "noPersons": "Das Projekt enthält keine Personen",
   "noPersonsHint": "Ein Ereignis gehört zu einer Person. Bitte zuerst eine Person anlegen.",

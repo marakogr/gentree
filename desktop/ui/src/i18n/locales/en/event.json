@@ -132,7 +132,7 @@
   "chipYearFrom": "from {{year}}",
   "chipYearTo": "to {{year}}",
   "invalidRange": "The lower bound is later than the upper one",
-  "yearRange": "Year range",
+  "yearRange": "Years",
   "yearRangeEmpty": "No events with dates",
   "noPersons": "The project has no people",
   "noPersonsHint": "An event belongs to a person. Create a person first.",

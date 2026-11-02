@@ -32,8 +32,6 @@ import {
   CheckmarkRegular,
   ChevronLeftRegular,
   ChevronRightRegular,
-  DeleteRegular,
-  EditRegular,
   HatGraduationRegular,
   HeartBrokenRegular,
   HeartRegular,
@@ -42,6 +40,7 @@ import {
   LinkDismissRegular,
   PersonRegular,
   QuestionCircleRegular,
+  SettingsRegular,
   WarningRegular,
   type FluentIcon,
 } from "@fluentui/react-icons";
@@ -56,7 +55,7 @@ import type {
   Person,
   Versioned,
 } from "../../api/types";
-import { FilterBar, type FilterChipModel } from "../../components/filters/FilterBar";
+import { FilterBar } from "../../components/filters/FilterBar";
 import { PersonFilter } from "../../components/filters/PersonFilter";
 import { TypeChips } from "../../components/filters/TypeChips";
 import { YearRange } from "../../components/filters/YearRange";
@@ -173,10 +172,6 @@ function EventColumnGroup({
           style={columnWidthStyle(widths, column)}
         />
       ))}
-      <col
-        className="events-col events-col-actions"
-        style={columnWidthStyle(widths, "actions")}
-      />
     </colgroup>
   );
 }
@@ -773,58 +768,6 @@ export default function EventsPage({
     }));
   };
 
-  const chips = useMemo<FilterChipModel[]>(() => {
-    const next: FilterChipModel[] = [];
-    const removeLabel = (name: string) => t("event:removeFilter", { name });
-
-    if (filters.personId !== "") {
-      const name = personName(filters.personId);
-      next.push({
-        id: "person",
-        label: name,
-        removeLabel: removeLabel(name),
-        onRemove: () =>
-          patchFilters((current) => withFilterValue(current, "personId", "")),
-      });
-    }
-    for (const type of filters.types) {
-      const name = t(`enums:eventType.${type}`);
-      next.push({
-        id: `type-${type}`,
-        label: name,
-        removeLabel: removeLabel(name),
-        onRemove: () =>
-          patchFilters((current) => {
-            const selected = readEventFilters(current).types.filter(
-              (item) => item !== type,
-            );
-            return withFilterValue(current, "types", selected);
-          }),
-      });
-    }
-    if (filters.fromYear !== "") {
-      const label = t("event:chipYearFrom", { year: filters.fromYear });
-      next.push({
-        id: "fromYear",
-        label,
-        removeLabel: removeLabel(label),
-        onRemove: () =>
-          patchFilters((current) => withFilterValue(current, "fromYear", "")),
-      });
-    }
-    if (filters.toYear !== "") {
-      const label = t("event:chipYearTo", { year: filters.toYear });
-      next.push({
-        id: "toYear",
-        label,
-        removeLabel: removeLabel(label),
-        onRemove: () =>
-          patchFilters((current) => withFilterValue(current, "toYear", "")),
-      });
-    }
-    return next;
-  }, [filters, personName, patchFilters, t]);
-
   const toggleSort = (key: EventSortKey) => {
     patch((previous) => {
       const current =
@@ -934,85 +877,103 @@ export default function EventsPage({
               {t("event:anomaly.check")}
             </Button>
           ) : null}
-          <MenuButton
-            label={t("event:columns.title")}
-            items={columnItems}
-            align="end"
-          />
-          <Button
-            variant="primary"
-            data-tour="events-add"
-            onClick={startCreate}
-            disabled={persons.length === 0}
-            disabledReason={t("event:noPersons")}
-          >
-            {t("event:new")}
-          </Button>
         </div>
       </div>
 
       <section className="panel events-page">
-        <FilterBar
-          query={view.query}
-          onQueryChange={handleQueryChange}
-          queryPlaceholder={t("event:searchPlaceholder")}
-          queryLabel={t("event:searchLabel")}
-          clearLabel={t("event:clearSearch")}
-          filtersLabel={t("event:filtersTitle")}
-          activeCount={chips.length}
-          chips={chips}
-          onReset={resetFilters}
-          resetLabel={t("event:resetFilters")}
-          resultLabel={t("common:filters.found", {
-            count: filtered.length,
-            total: events.length,
-          })}
-          loading={loading}
-        >
-          <PersonFilter
-            persons={personEntities}
-            value={filters.personId}
-            onChange={handlePersonFilter}
-            placeholder={t("event:personFilterPlaceholder")}
-            ariaLabel={t("event:person")}
-            clearLabel={t("event:clearPerson")}
-            emptyLabel={t("event:noPersonMatches")}
-            noneLabel={t("event:allPersons")}
-          />
-          <TypeChips
-            options={typeOptions}
-            selected={[...filters.types]}
-            onToggle={toggleType}
-            legend={t("event:type")}
-          />
-          <YearRange
-            from={filters.fromYear}
-            to={filters.toYear}
-            minYear={yearBounds.minYear}
-            maxYear={yearBounds.maxYear}
-            disabled={
-              !yearBounds.hasDated || yearBounds.minYear >= yearBounds.maxYear
-            }
-            disabledHint={
-              yearBounds.hasDated ? undefined : t("event:yearRangeEmpty")
-            }
-            onFromChange={handleFromYear}
-            onToChange={handleToYear}
-            fromLabel={t("event:yearFrom")}
-            toLabel={t("event:yearTo")}
-            groupLabel={t("event:yearRange")}
-          />
-        </FilterBar>
+        <div className="events-toolbar">
+          <div className="events-toolbar-row">
+            <div className="events-filters">
+              <div className="events-filter-top">
+                <FilterBar
+                  query={view.query}
+                  onQueryChange={handleQueryChange}
+                  queryPlaceholder={t("event:searchPlaceholder")}
+                  queryLabel={t("event:searchLabel")}
+                  clearLabel={t("event:clearSearch")}
+                  filtersLabel={t("event:filtersTitle")}
+                  activeCount={0}
+                  chips={[]}
+                  onReset={resetFilters}
+                  resetLabel={t("event:resetFilters")}
+                  loading={loading}
+                />
+                <div className="events-person-filter">
+                  <PersonFilter
+                    persons={personEntities}
+                    value={filters.personId}
+                    onChange={handlePersonFilter}
+                    placeholder={t("event:personFilterPlaceholder")}
+                    ariaLabel={t("event:person")}
+                    clearLabel={t("event:clearPerson")}
+                    emptyLabel={t("event:noPersonMatches")}
+                    noneLabel={t("event:allPersons")}
+                  />
+                </div>
+                <span className="events-result">
+                  {t("common:filters.found", {
+                    count: filtered.length,
+                    total: events.length,
+                  })}
+                </span>
+              </div>
+              <div className="events-filter-row">
+                <TypeChips
+                  options={typeOptions}
+                  selected={[...filters.types]}
+                  onToggle={toggleType}
+                  legend={t("event:type")}
+                />
+                <YearRange
+                  from={filters.fromYear}
+                  to={filters.toYear}
+                  minYear={yearBounds.minYear}
+                  maxYear={yearBounds.maxYear}
+                  disabled={
+                    !yearBounds.hasDated ||
+                    yearBounds.minYear >= yearBounds.maxYear
+                  }
+                  disabledHint={
+                    yearBounds.hasDated ? undefined : t("event:yearRangeEmpty")
+                  }
+                  onFromChange={handleFromYear}
+                  onToChange={handleToYear}
+                  fromLabel={t("event:yearFrom")}
+                  toLabel={t("event:yearTo")}
+                  groupLabel={t("event:yearRange")}
+                />
+              </div>
+            </div>
+            <div className="events-toolbar-actions">
+              <MenuButton
+                iconOnly
+                icon={<SettingsRegular fontSize={16} aria-hidden="true" />}
+                label={t("event:columns.title")}
+                items={columnItems}
+                align="end"
+              />
+              <Button
+                variant="primary"
+                data-tour="events-add"
+                onClick={startCreate}
+                disabled={persons.length === 0}
+                disabledReason={t("event:noPersons")}
+              >
+                {t("event:new")}
+              </Button>
+            </div>
+          </div>
 
-        {selectedIds.length > 0 ? (
-          <BulkBar
-            selectedLabel={t("common:bulk.selected", {
-              count: selectedIds.length,
-            })}
-            deleteLabel={t("common:actions.delete")}
-            onDelete={() => setBulkDeleteOpen(true)}
-          />
-        ) : null}
+          {selectedIds.length > 0 ? (
+            <BulkBar
+              selectedLabel={t("common:bulk.selected", {
+                count: selectedIds.length,
+              })}
+              deleteLabel={t("common:actions.delete")}
+              onDelete={() => setBulkDeleteOpen(true)}
+            />
+          ) : null}
+        </div>
 
         {error ? (
           <MessageBar intent="error">
@@ -1056,11 +1017,6 @@ export default function EventsPage({
                           </Skeleton>
                         </TableCell>
                       ))}
-                      <TableCell className={styles.skeletonCell}>
-                        <Skeleton>
-                          <SkeletonItem size={16} />
-                        </Skeleton>
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -1195,13 +1151,6 @@ export default function EventsPage({
                         {t("event:place")}
                       </TableHeaderCell>
                     ) : null}
-                    <TableHeaderCell
-                      className={styles.actionsHeader}
-                      button={{ className: styles.actionsHeaderButton }}
-                      aside={columnHandle("actions")}
-                    >
-                      {t("common:fields.actions")}
-                    </TableHeaderCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1224,7 +1173,8 @@ export default function EventsPage({
                         className={selected ? styles.selectedRow : undefined}
                         aria-selected={selected || undefined}
                         onClick={() => {
-                          if (!selected) patch({ selectedId: entity.id });
+                          patch({ selectedId: entity.id });
+                          startEdit(row);
                         }}
                       >
                         <TableCell
@@ -1336,45 +1286,6 @@ export default function EventsPage({
                             </TableCellLayout>
                           </TableCell>
                         ) : null}
-                        <TableCell className={styles.actionsCell}>
-                          <div className="events-actions">
-                            <MenuButton
-                              label={t("event:moreActions")}
-                              align="end"
-                              iconOnly
-                              dense
-                              items={[
-                                {
-                                  id: "edit",
-                                  label: t("event:editEvent"),
-                                  icon: (
-                                    <EditRegular
-                                      fontSize={16}
-                                      aria-hidden="true"
-                                    />
-                                  ),
-                                  onSelect: () => startEdit(row),
-                                },
-                                {
-                                  id: "delete",
-                                  label: t("common:actions.delete"),
-                                  icon: (
-                                    <DeleteRegular
-                                      fontSize={16}
-                                      aria-hidden="true"
-                                    />
-                                  ),
-                                  danger: true,
-                                  disabled: busy,
-                                  disabledReason: busy
-                                    ? t("event:busyReason")
-                                    : undefined,
-                                  onSelect: () => setDeleting(row),
-                                },
-                              ]}
-                            />
-                          </div>
-                        </TableCell>
                       </TableRow>
                     );
                   })}

@@ -132,7 +132,7 @@
   "chipYearFrom": "с {{year}}",
   "chipYearTo": "по {{year}}",
   "invalidRange": "Нижняя граница позже верхней",
-  "yearRange": "Диапазон лет",
+  "yearRange": "Годы",
   "yearRangeEmpty": "Нет событий с датами",
   "noPersons": "В проекте нет людей",
   "noPersonsHint": "Событие принадлежит человеку. Сначала создайте человека.",
