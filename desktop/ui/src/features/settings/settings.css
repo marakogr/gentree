@@ -52,7 +52,17 @@
 
 .settings-nav-item {
   justify-content: flex-start;
+  width: 100%;
   text-align: left;
+}
+
+/* The shared Button wraps children in `.btn-label` (inline-flex, content
+   width), so the label has to claim the row for the text to start at the left
+   edge instead of being centred. */
+.settings-nav .settings-nav-item .btn-label {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
 }
 
 /* Fluent centres the button content; the label has to claim the row so every
