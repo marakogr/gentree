@@ -1,7 +1,7 @@
 {
   "title": "Settings",
+  "tocLabel": "Settings sections",
   "open": "Settings",
-  "backToProject": "Back to project",
   "loading": "Loading settings…",
   "appearance": "Appearance",
   "language": "Language",
@@ -110,7 +110,6 @@
   "mapTileUrl": "Tile URL",
   "mapTileUrlHint": "Template with {z}, {x} and {y}",
   "mapTileUrlInvalid": "The URL must start with http:// or https://",
-  "mapPrivacy": "Tiles are requested only while the Map tab is open; the server sees the approximate viewport.",
   "historicalEnabled": "Look up historical names",
   "historicalHint": "Wikidata can match “Gorky”, “Stalingrad” and similar names to today's place. The query goes to Wikidata.",
   "historicalTitle": "Historical names"

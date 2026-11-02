@@ -4,6 +4,35 @@
  * stacks on narrow panels instead of forcing horizontal scroll.
  */
 
+.settings-page {
+  display: grid;
+  gap: 16px;
+  max-width: 840px;
+  min-width: 0;
+}
+
+/* One active section: the panel is the only visible block. `.panel` sets
+   `display: grid`, which would override the browser's `[hidden]` rule. */
+.settings-page .panel[hidden] {
+  display: none;
+}
+
+.settings-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.settings-nav-item {
+  justify-content: flex-start;
+}
+
+.settings-nav-item[aria-current="page"] {
+  background: var(--colorNeutralBackground1Selected);
+  color: var(--colorNeutralForeground1);
+  box-shadow: inset 0 -2px 0 var(--colorBrandStroke1);
+}
+
 .settings-event-field-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) auto;
