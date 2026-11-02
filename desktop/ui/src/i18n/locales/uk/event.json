@@ -132,7 +132,7 @@
   "chipYearFrom": "від {{year}}",
   "chipYearTo": "до {{year}}",
   "invalidRange": "Нижня межа пізніша за верхню",
-  "yearRange": "Діапазон років",
+  "yearRange": "Роки",
   "yearRangeEmpty": "Немає подій з датами",
   "noPersons": "У проєкті немає людей",
   "noPersonsHint": "Подія належить особі. Спершу створіть особу.",
