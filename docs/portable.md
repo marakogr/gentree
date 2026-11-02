@@ -20,10 +20,12 @@ The checksum above is what tells you the file is the one that was published.
 
 ## Requirements
 
-- Windows 10 version 1803 or newer, or Windows 11, with the Microsoft Edge
-  WebView2 Runtime. Windows 11 and current Windows 10 updates already include
-  it; otherwise install it from
-  <https://developer.microsoft.com/microsoft-edge/webview2/>.
+- Windows 10 version 1803 (build 17134) or newer, or Windows 11, x64, with the
+  Microsoft Edge WebView2 Runtime. Windows 11 and current Windows 10 updates
+  already include it; otherwise install it from
+  <https://developer.microsoft.com/microsoft-edge/webview2/>. The archive
+  cannot install the runtime itself — the NSIS installer can, because it embeds
+  the bootstrapper.
 - Keep the folder together. Renaming or moving `Gentree.exe` is fine. A
   portable copy shares `%APPDATA%\Gentree` with an installed copy, so both see
   the same settings and project list.

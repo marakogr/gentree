@@ -182,6 +182,13 @@ Preview builds are not code-signed yet, so Windows SmartScreen may ask you to
 confirm on first launch. The portable archive is described in
 [`docs/portable.md`](docs/portable.md).
 
+Both need Windows 10 version 1803 (build 17134) or newer, or Windows 11, on
+x64. The NSIS installer embeds the Microsoft Edge WebView2 bootstrapper and
+downloads the runtime when it is missing, so that step needs a network
+connection. The portable archive cannot install WebView2: on a machine without
+it, run the installer once or install the runtime from Microsoft. After that
+the app works offline.
+
 #### Windows says "Windows protected your PC"
 
 The builds are not code-signed yet, so SmartScreen warns about an unknown
@@ -382,7 +389,9 @@ docs/
   confirmed map points and event media links. Older development builds refuse to
   open a newer project rather than drop that data. An older project is upgraded
   the first time you change something in it.
-- Supported platforms: Windows 10/11 (x64) and macOS 11+.
+- Supported platforms: Windows 10 version 1803 (build 17134) or newer and
+  Windows 11, x64; macOS 11+. Windows also needs the Microsoft Edge WebView2
+  Runtime; see [Install a build](#install-a-build).
 
 ## Contributing
 
