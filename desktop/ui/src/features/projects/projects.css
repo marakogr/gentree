@@ -73,29 +73,40 @@
   min-width: 10rem;
 }
 
-.projects-sort {
-  display: flex;
+.projects-sort-header {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-  white-space: nowrap;
-}
-
-.projects-sort select {
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--card);
-  color: var(--foreground);
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   font: inherit;
-  font-weight: 500;
+  font-weight: 600;
+  text-align: left;
   cursor: pointer;
 }
 
-.projects-sort select:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 1px;
+.projects-sort-header:hover,
+.projects-sort-header:focus-visible {
+  color: var(--foreground);
+  outline: none;
+}
+
+/* The neutral sort glyph appears on hover; the active column keeps its arrow. */
+.projects-sort-icon {
+  flex: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.projects-sort-header:hover .projects-sort-icon,
+.projects-sort-header:focus-visible .projects-sort-icon {
+  opacity: 0.6;
+}
+
+.projects-sort-header[data-active="true"] .projects-sort-icon {
+  opacity: 1;
 }
 
 .projects-selection {
@@ -182,7 +193,8 @@
 
 /* Fluent buttons default to a 96px minimum; row actions size to their label. */
 .projects-row-actions .projects-row-primary {
-  min-width: 0;
+  min-width: 8.5rem;
+  justify-content: center;
   padding-inline: 12px;
   white-space: nowrap;
 }

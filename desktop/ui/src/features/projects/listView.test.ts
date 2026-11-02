@@ -43,7 +43,7 @@ describe("matchesQuery", () => {
 describe("visibleProjects", () => {
   it("sorts by backup date and puts projects without a backup last", () => {
     expect(
-      visibleProjects(LIST, "", "recent", "ru", backupOf).map(
+      visibleProjects(LIST, "", { key: "recent", direction: "desc" }, "ru", backupOf).map(
         (item) => item.projectId,
       ),
     ).toEqual(["b", "a", "c"]);
@@ -51,7 +51,7 @@ describe("visibleProjects", () => {
 
   it("sorts by people, then name", () => {
     expect(
-      visibleProjects(LIST, "", "people", "ru", backupOf).map(
+      visibleProjects(LIST, "", { key: "people", direction: "desc" }, "ru", backupOf).map(
         (item) => item.projectId,
       ),
     ).toEqual(["b", "a", "c"]);
@@ -59,7 +59,7 @@ describe("visibleProjects", () => {
 
   it("sorts alphabetically in the active locale", () => {
     expect(
-      visibleProjects(LIST, "", "name", "ru", backupOf).map(
+      visibleProjects(LIST, "", { key: "name", direction: "asc" }, "ru", backupOf).map(
         (item) => item.projectId,
       ),
     ).toEqual(["a", "b", "c"]);
@@ -72,7 +72,7 @@ describe("visibleProjects", () => {
       c: STAMPS.b,
     };
     expect(
-      visibleProjects(LIST, "", "recent", "ru", (id) => same[id] ?? null).map(
+      visibleProjects(LIST, "", { key: "recent", direction: "desc" }, "ru", (id) => same[id] ?? null).map(
         (item) => item.projectId,
       ),
     ).toEqual(["a", "b", "c"]);
@@ -80,20 +80,20 @@ describe("visibleProjects", () => {
 
   it("filters before sorting and keeps the input untouched", () => {
     const input = [B, A, C];
-    const visible = visibleProjects(input, "сем", "name", "ru", backupOf);
+    const visible = visibleProjects(input, "сем", { key: "name", direction: "asc" }, "ru", backupOf);
     expect(visible.map((item) => item.projectId)).toEqual(["b"]);
     expect(input.map((item) => item.projectId)).toEqual(["b", "a", "c"]);
   });
 
   it("pins the open project first and keeps it when the query misses", () => {
     expect(
-      visibleProjects(LIST, "", "name", "ru", backupOf, "c").map(
+      visibleProjects(LIST, "", { key: "name", direction: "asc" }, "ru", backupOf, "c").map(
         (item) => item.projectId,
       ),
     ).toEqual(["c", "a", "b"]);
 
     expect(
-      visibleProjects(LIST, "сем", "name", "ru", backupOf, "a").map(
+      visibleProjects(LIST, "сем", { key: "name", direction: "asc" }, "ru", backupOf, "a").map(
         (item) => item.projectId,
       ),
     ).toEqual(["a", "b"]);
@@ -101,9 +101,22 @@ describe("visibleProjects", () => {
 
   it("ignores a pinned id that is not in the list", () => {
     expect(
-      visibleProjects(LIST, "", "name", "ru", backupOf, "missing").map(
+      visibleProjects(LIST, "", { key: "name", direction: "asc" }, "ru", backupOf, "missing").map(
         (item) => item.projectId,
       ),
     ).toEqual(["a", "b", "c"]);
+  });
+
+  it("reverses the order when the direction flips", () => {
+    expect(
+      visibleProjects(LIST, "", { key: "name", direction: "desc" }, "ru", backupOf).map(
+        (item) => item.projectId,
+      ),
+    ).toEqual(["c", "b", "a"]);
+    expect(
+      visibleProjects(LIST, "", { key: "people", direction: "asc" }, "ru", backupOf).map(
+        (item) => item.projectId,
+      ),
+    ).toEqual(["c", "a", "b"]);
   });
 });
