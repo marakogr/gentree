@@ -228,9 +228,9 @@ More in [`desktop/docs/build.md`](desktop/docs/build.md). Plain `cargo build`
 is not enough: in dev mode Tauri waits for Vite on `localhost:1420`.
 
 Release signing and in-app updates are described in
-[`docs/releases.md`](docs/releases.md). Preview builds are unsigned, and the
-updater stays disconnected until a signing key and a public endpoint are
-configured.
+[`docs/releases.md`](docs/releases.md). Preview builds are not code-signed yet;
+updates arrive through GitHub Releases and every package is verified with the
+project's minisign key.
 
 ### Your first project
 

@@ -4,6 +4,14 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- In-app updates now come from the project's GitHub Releases: every release
+  publishes `latest.json` and a minisign signature for the NSIS installer.
+  The portable build still ships without updates.
+
 ## [0.2.0] — 2026-11-02
 
 The first public preview. Gentree is usable, but the interface and the project

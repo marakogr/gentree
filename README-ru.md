@@ -232,8 +232,9 @@ make run      # release-сборка и запуск
 `localhost:1420`.
 
 Подпись релизов и автообновление описаны в
-[`docs/releases.md`](docs/releases.md). Preview-сборки не подписаны, а updater
-остаётся отключённым, пока не настроены ключ подписи и публичный endpoint.
+[`docs/releases.md`](docs/releases.md). Preview-сборки пока без подписи
+Authenticode; обновления приходят через GitHub Releases, и каждый пакет
+проверяется ключом minisign проекта.
 
 ### Первый проект
 
