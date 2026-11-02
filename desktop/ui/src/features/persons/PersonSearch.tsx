@@ -27,6 +27,16 @@ type Props = {
   placeholder: string;
   disabled?: boolean;
   /**
+   * Optional first row that clears the selection ("All people"). Filter strips
+   * where an empty value already means "everyone" use it instead of leaving the
+   * field blank.
+   */
+  allOptionLabel?: string;
+  /** Overrides the clear-button title (`common:filters.clearSearch`). */
+  clearLabel?: string;
+  /** Overrides the "nothing found" row (`person:noMatches`). */
+  emptyLabel?: string;
+  /**
    * Render only the combobox, without the visible `Field` label. The
    * accessible name still comes from `aria-label`, so compact filter strips
    * can drop the caption line without losing the label semantics.
@@ -43,6 +53,9 @@ export default function PersonSearch({
   onChange,
   placeholder,
   disabled = false,
+  allOptionLabel,
+  clearLabel,
+  emptyLabel,
   hideLabel = false,
 }: Props) {
   const { t } = useTranslation(["person", "enums", "common"]);
@@ -61,17 +74,18 @@ export default function PersonSearch({
 
   // `hint` carries the second line and doubles as searchable text, so typing a
   // year or a gender label narrows the list as well.
-  const items = useMemo<ComboItem[]>(
-    () =>
-      ordered.map((person) => ({
-        id: person.id,
-        label: displayName(person, unknownName),
-        hint: `${lifeYears(person)} \u00b7 ${t(
-          `enums:gender.${person.gender}`,
-        )}`,
-      })),
-    [ordered, unknownName, t],
-  );
+  const items = useMemo<ComboItem[]>(() => {
+    const people: ComboItem[] = ordered.map((person) => ({
+      id: person.id,
+      label: displayName(person, unknownName),
+      hint: `${lifeYears(person)} \u00b7 ${t(
+        `enums:gender.${person.gender}`,
+      )}`,
+    }));
+    return allOptionLabel
+      ? [{ id: "", label: allOptionLabel }, ...people]
+      : people;
+  }, [allOptionLabel, ordered, unknownName, t]);
 
   const renderOption = (item: ComboItem): ReactNode => {
     const person = personsById.get(item.id);
@@ -120,8 +134,8 @@ export default function PersonSearch({
       onChange={onChange}
       placeholder={placeholder}
       ariaLabel={label}
-      clearLabel={t("common:filters.clearSearch")}
-      emptyLabel={t("person:noMatches")}
+      clearLabel={clearLabel ?? t("common:filters.clearSearch")}
+      emptyLabel={emptyLabel ?? t("person:noMatches")}
       renderOption={renderOption}
       disabled={disabled}
     />

@@ -15,8 +15,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { personsApi, timelineApi } from "../../api/client";
+import { mediaApi, personsApi, timelineApi } from "../../api/client";
 import type {
+  MediaItem,
   Person,
   TimelineEntry,
   TimelineScope,
@@ -26,6 +27,7 @@ import type { Translate } from "../../lib/dates";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { cn } from "../../lib/utils";
 import { useScrollMemory, useViewState } from "../../lib/useViewState";
+import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
 import { toTimelineEvents } from "./adapter";
 import type { TimelineWindow } from "./dates";
@@ -311,6 +313,9 @@ export default function TimelinePage({
   const [window, setWindow] = useState<TimelineWindow | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [persons, setPersons] = useState<Person[]>([]);
+  const [photos, setPhotos] = useState<ReadonlyMap<string, MediaItem>>(
+    () => new Map(),
+  );
 
   /** Backend rows may send `personGender`; the loaded list is the fallback. */
   const genderById = useMemo(
@@ -340,11 +345,15 @@ export default function TimelinePage({
 
   useEffect(() => {
     let active = true;
-    personsApi
-      .list({ limit: 1000, sort: "name" })
-      .then((page) => {
+    Promise.all([
+      personsApi.list({ limit: 1000, sort: "name" }),
+      // Photos are decoration: a media failure must not hide the picker.
+      mediaApi.list().catch(() => [] as MediaItem[]),
+    ])
+      .then(([page, media]) => {
         if (active) {
           setPersons(page.items.map((item) => item.entity));
+          setPhotos(photosByPerson(media));
         }
       })
       .catch(() => undefined);
@@ -631,6 +640,7 @@ export default function TimelinePage({
           scope={scope}
           personId={personId}
           persons={persons}
+          photos={photos}
           generations={generations}
           onScopeChange={handleScopeChange}
           onPersonChange={handlePersonChange}

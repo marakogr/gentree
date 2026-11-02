@@ -185,4 +185,84 @@
     cursor: default;
     opacity: 0.55;
   }
+
+  /* Searchable multi-select dropdown (filters/MultiSelectDropdown.tsx). */
+  .multi-select-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding: 0 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    color: var(--foreground);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .multi-select-option[data-active="true"] {
+    background: var(--muted);
+  }
+
+  .multi-select-option[aria-selected="true"] {
+    font-weight: 600;
+  }
+
+  .multi-select-option[aria-selected="true"] .multi-select-check {
+    color: var(--primary);
+  }
+
+  .multi-select-check {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    color: var(--muted-foreground);
+  }
+
+  .multi-select-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    color: var(--muted-foreground);
+  }
+
+  .multi-select-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .multi-select-hint {
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+
+  .multi-select-empty {
+    padding: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+  }
+
+  /* Trigger: icon, summary text, then the chevron pinned to the far edge. */
+  .multi-select-trigger .btn-label {
+    width: 100%;
+  }
+
+  .multi-select-trigger-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    color: var(--muted-foreground);
+  }
+
+  .multi-select-trigger-chevron {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    color: var(--muted-foreground);
+  }
 }

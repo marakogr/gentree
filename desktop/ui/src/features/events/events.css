@@ -48,8 +48,21 @@
 }
 
 .events-person-filter {
-  flex: 0 1 20rem;
+  flex: 0 1 18rem;
   min-width: 12rem;
+  max-width: 18rem;
+}
+
+/* The type dropdown keeps one width whatever the summary says ("All types",
+   one type or "N types"), so the row never jumps when the selection changes. */
+.events-type-filter {
+  flex: 0 0 auto;
+  width: 14rem;
+  max-width: 100%;
+}
+
+.events-type-filter > * {
+  width: 100%;
 }
 
 /* The "found N of M" counter sits after the person filter, on the input line. */
