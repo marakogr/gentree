@@ -780,16 +780,16 @@ export default function GraphPage({
 
   return (
     <>
-      <section className={`panel ${styles.screen}`}>
-        <div className="card-head">
-          <h1 className="page-title">{t("graph:title")}</h1>
-          {rootPerson ? (
-            <span className="badge">
-              {t("graph:rootValue", { name: displayName(rootPerson, t("person:unknownName")) })}
-            </span>
-          ) : null}
-        </div>
+      <div className="card-head">
+        <h1 className="page-title">{t("graph:title")}</h1>
+        {rootPerson ? (
+          <span className="badge">
+            {t("graph:rootValue", { name: displayName(rootPerson, t("person:unknownName")) })}
+          </span>
+        ) : null}
+      </div>
 
+      <section className={`panel ${styles.screen}`}>
         <ErrorBanner error={error} />
 
         {!personsLoaded ? <p className="meta">{t("common:loading")}</p> : null}

@@ -4,7 +4,7 @@
 .map-page {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   min-height: calc(100vh - 48px);
   min-width: 0;
 }
@@ -15,13 +15,6 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-}
-
-.map-title {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--colorNeutralForeground1, #1b1b1b);
 }
 
 .map-subtitle {
