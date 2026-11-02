@@ -13,7 +13,6 @@ import {
   Subtitle1,
   Subtitle2,
   Text,
-  Title2,
   makeStyles,
   tokens,
 } from "@fluentui/react-components";
@@ -328,7 +327,7 @@ export default function SearchPage({
   return (
     <section className="panel search-page">
       <div className="card-head">
-        <Title2 as="h1">{t("search:title")}</Title2>
+        <h1 className="page-title">{t("search:title")}</h1>
         <Button
           appearance="subtle"
           size="small"

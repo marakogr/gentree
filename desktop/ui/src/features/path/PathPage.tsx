@@ -13,7 +13,6 @@ import {
   MessageBarBody,
   Spinner,
   Text,
-  Title2,
   makeStyles,
   mergeClasses,
   tokens,
@@ -451,16 +450,16 @@ export default function PathPage({
 
   return (
     <>
-      <section className="panel path-page">
-        <div className="card-head">
-          <Title2 as="h1">{t("path:title")}</Title2>
-          {term ? (
-            <Badge appearance="tint" color="brand">
-              {t("path:kinshipLabel", { term })}
-            </Badge>
-          ) : null}
-        </div>
+      <div className="card-head">
+        <h1 className="page-title">{t("path:title")}</h1>
+        {term ? (
+          <Badge appearance="tint" color="brand">
+            {t("path:kinshipLabel", { term })}
+          </Badge>
+        ) : null}
+      </div>
 
+      <section className="panel path-page">
         {error ? (
           <MessageBar intent="error">
             <MessageBarBody>

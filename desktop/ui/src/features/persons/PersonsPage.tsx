@@ -33,7 +33,6 @@ import {
   TableHeader,
   TableHeaderCell,
   TableRow,
-  Title2,
   makeStyles,
   mergeClasses,
   tokens,
@@ -743,7 +742,7 @@ function PersonsView({
     <section className="panel persons-page">
       <div className="card-head persons-head">
         <div className="persons-head-title">
-          <Title2 as="h1">{t("person:title")}</Title2>
+          <h1 className="page-title">{t("person:title")}</h1>
           <Badge appearance="tint" color="informative" size="small">
             {t("person:count", { count: totalPersons })}
           </Badge>
@@ -796,7 +795,7 @@ function PersonsView({
           { "--persons-list-width": `${listWidth}%` } as CSSProperties
         }
       >
-        <section className="persons-panel" aria-label={t("person:title")}>
+        <section className="panel persons-panel" aria-label={t("person:title")}>
           <div className="persons-toolbar">
             <FilterBar
               query={queryInput}

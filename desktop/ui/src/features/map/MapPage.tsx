@@ -374,7 +374,7 @@ export default function MapPage({
     <section className="map-page">
       <header className="map-header">
         <div>
-          <h1 className="map-title">{t("title")}</h1>
+          <h1 className="page-title">{t("title")}</h1>
           <p className="map-subtitle">{t("subtitle")}</p>
         </div>
         <div className="map-counts">

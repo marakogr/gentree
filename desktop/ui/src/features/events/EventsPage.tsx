@@ -913,45 +913,45 @@ export default function EventsPage({
 
   return (
     <>
-      <section className="panel events-page">
-        <div className="events-head">
-          <div className="events-head-title">
-            <h1 className="page-title">{t("event:title")}</h1>
-            <Badge appearance="tint" color="informative" size="small">
-              {t("event:count", { count: events.length })}
-            </Badge>
-          </div>
-
-          <div className="events-head-actions">
-            {anomalyCount > 0 ? (
-              <span className="events-anomalies" title={anomalyTitle}>
-                <WarningRegular aria-hidden="true" />
-                {t("event:anomaly.count", { count: anomalyCount })}
-                <span className="ui-sr-only">{anomalyTitle}</span>
-              </span>
-            ) : null}
-            {onValidateData && anomalyCount > 0 ? (
-              <Button size="sm" variant="ghost" onClick={onValidateData}>
-                {t("event:anomaly.check")}
-              </Button>
-            ) : null}
-            <MenuButton
-              label={t("event:columns.title")}
-              items={columnItems}
-              align="end"
-            />
-            <Button
-              variant="primary"
-              data-tour="events-add"
-              onClick={startCreate}
-              disabled={persons.length === 0}
-              disabledReason={t("event:noPersons")}
-            >
-              {t("event:new")}
-            </Button>
-          </div>
+      <div className="events-head">
+        <div className="events-head-title">
+          <h1 className="page-title">{t("event:title")}</h1>
+          <Badge appearance="tint" color="informative" size="small">
+            {t("event:count", { count: events.length })}
+          </Badge>
         </div>
 
+        <div className="events-head-actions">
+          {anomalyCount > 0 ? (
+            <span className="events-anomalies" title={anomalyTitle}>
+              <WarningRegular aria-hidden="true" />
+              {t("event:anomaly.count", { count: anomalyCount })}
+              <span className="ui-sr-only">{anomalyTitle}</span>
+            </span>
+          ) : null}
+          {onValidateData && anomalyCount > 0 ? (
+            <Button size="sm" variant="ghost" onClick={onValidateData}>
+              {t("event:anomaly.check")}
+            </Button>
+          ) : null}
+          <MenuButton
+            label={t("event:columns.title")}
+            items={columnItems}
+            align="end"
+          />
+          <Button
+            variant="primary"
+            data-tour="events-add"
+            onClick={startCreate}
+            disabled={persons.length === 0}
+            disabledReason={t("event:noPersons")}
+          >
+            {t("event:new")}
+          </Button>
+        </div>
+      </div>
+
+      <section className="panel events-page">
         <FilterBar
           query={view.query}
           onQueryChange={handleQueryChange}

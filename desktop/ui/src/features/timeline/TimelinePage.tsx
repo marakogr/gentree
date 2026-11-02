@@ -565,9 +565,7 @@ export default function TimelinePage({
         )}
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="page-title text-lg font-semibold tracking-tight sm:text-xl">
-            {t("line.title")}
-          </h1>
+          <h1 className="page-title">{t("line.title")}</h1>
           <div className="relative flex shrink-0 items-center gap-1">
           <button
             type="button"

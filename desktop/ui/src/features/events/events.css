@@ -24,10 +24,6 @@
   min-width: 0;
 }
 
-.events-head-title h2 {
-  margin: 0;
-}
-
 .events-head-actions {
   display: flex;
   flex-wrap: wrap;
