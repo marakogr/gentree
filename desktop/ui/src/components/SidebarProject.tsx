@@ -22,7 +22,7 @@ import { PROJECT_NAME_MAX_LENGTH } from "../features/projects/nameRules";
 import { ProjectExportDialog } from "../features/projects/ProjectExportDialog";
 import { ProjectMergeDialog } from "../features/projects/ProjectMergeDialog";
 import { ProjectRestoreDialog } from "../features/projects/ProjectRestoreDialog";
-import { ValidationSummary } from "../features/projects/ProjectsPage";
+import { ValidationSummary } from "../features/projects/ValidationSummary";
 import { writeLastCheck } from "../features/projects/backupStamp";
 import { Dialog } from "./ui/dialog";
 import { MenuButton } from "./ui/menu";
