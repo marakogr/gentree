@@ -11,6 +11,8 @@
   "empty": "No events yet",
   "noResults": "No events match the current filters",
   "person": "Person",
+  "participants": "Participants",
+  "openInWindow": "Open in a window",
   "rolePerson": "Person",
   "roleChild": "Child",
   "roleDeceased": "Deceased",

@@ -28,21 +28,11 @@ import {
   ArrowDownRegular,
   ArrowUpRegular,
   AttachRegular,
-  BriefcaseRegular,
   CheckmarkRegular,
   ChevronLeftRegular,
   ChevronRightRegular,
-  HatGraduationRegular,
-  HeartBrokenRegular,
-  HeartRegular,
-  HomeRegular,
-  LeafThreeRegular,
-  LinkDismissRegular,
-  PersonRegular,
-  QuestionCircleRegular,
   SettingsRegular,
   WarningRegular,
-  type FluentIcon,
 } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import { eventsApi, mediaApi, personsApi, projectsApi } from "../../api/client";
@@ -83,6 +73,8 @@ import { displayName } from "../persons/helpers";
 import PersonSearch from "../persons/PersonSearch";
 import { ValidationSummary } from "../projects/ValidationSummary";
 import EventForm from "./EventForm";
+import { EventCard } from "./EventCard";
+import { EVENT_TYPE_ICONS } from "./typeIcons";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
   EVENT_COLUMNS,
@@ -112,18 +104,6 @@ import "./events.css";
 
 // Newest events on top by default; a stored `view.sort` still wins.
 const DEFAULT_SORT: EventSortState = { key: "date", direction: "desc" };
-
-const TYPE_ICONS: Record<EventType, FluentIcon> = {
-  BIRTH: PersonRegular,
-  DEATH: HeartBrokenRegular,
-  MARRIAGE: HeartRegular,
-  DIVORCE: LinkDismissRegular,
-  BURIAL: LeafThreeRegular,
-  RESIDENCE: HomeRegular,
-  OCCUPATION: BriefcaseRegular,
-  EDUCATION: HatGraduationRegular,
-  OTHER: QuestionCircleRegular,
-};
 
 /** Year-first table dates: `2016 · 1 October`. */
 const DATE_YEAR_SEPARATOR = " \u00b7 ";
@@ -280,6 +260,7 @@ export default function EventsPage({
     useState<ValidationReport | null>(null);
   const [validationBusy, setValidationBusy] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [formSize, setFormSize] = useState<"lg" | "full">("lg");
   const [editing, setEditing] = useState<Editing | null>(null);
   const [createDefaults, setCreateDefaults] = useState<{
     type: EventType;
@@ -483,6 +464,13 @@ export default function EventsPage({
     [sorted, view.page],
   );
 
+  // The card follows the persisted selection, so a deep link that sets
+  // `selectedId` opens it even when the row is on another page.
+  const selectedRow = useMemo(
+    () => events.find((row) => row.entity.id === view.selectedId) ?? null,
+    [events, view.selectedId],
+  );
+
   const pageKey = page.rows.map((row) => row.entity.id).join("|");
   const versionById = useMemo(
     () => new Map(events.map((item) => [item.entity.id, item.version])),
@@ -609,23 +597,30 @@ export default function EventsPage({
 
   const closeForm = () => {
     setFormOpen(false);
+    setFormSize("lg");
     setEditing(null);
     setCreateDefaults(null);
   };
 
   const startCreate = () => {
+    setFormSize("lg");
     setEditing(null);
     setCreateDefaults(null);
     setFormOpen(true);
   };
 
   const startRelated = (request: { type: EventType; personId: string }) => {
+    setFormSize("lg");
     setEditing(null);
     setCreateDefaults(request);
     setFormOpen(true);
   };
 
-  const startEdit = (row: Versioned<EventEntity>) => {
+  const startEdit = (
+    row: Versioned<EventEntity>,
+    size: "lg" | "full" = "lg",
+  ) => {
+    setFormSize(size);
     setEditing({ event: row.entity, version: row.version });
     setCreateDefaults(null);
     setFormOpen(true);
@@ -634,6 +629,7 @@ export default function EventsPage({
   const handleSaved = (saved: Versioned<EventEntity>) => {
     const created = editing === null;
     setFormOpen(false);
+    setFormSize("lg");
     setEditing(null);
     setCreateDefaults(null);
     toast.success(t(created ? "event:createdToast" : "event:updatedToast"));
@@ -658,6 +654,7 @@ export default function EventsPage({
 
   const handleDeletedFromForm = (id: string) => {
     setFormOpen(false);
+    setFormSize("lg");
     setEditing(null);
     setCreateDefaults(null);
     if (view.selectedId === id) patch({ selectedId: null });
@@ -870,7 +867,7 @@ export default function EventsPage({
   const typeOptions = useMemo(
     () =>
       EVENT_TYPES.map((type) => {
-        const Icon = TYPE_ICONS[type];
+        const Icon = EVENT_TYPE_ICONS[type];
         return {
           id: type,
           label: t(`enums:eventType.${type}`),
@@ -1087,13 +1084,14 @@ export default function EventsPage({
             onAction={resetFilters}
           />
         ) : (
-          <>
-            <div
-              className={
-                resizingColumn
-                  ? "events-table-wrap events-table-wrap-resizing"
-                  : "events-table-wrap"
-              }
+          <div className="events-body">
+            <div className="events-list">
+              <div
+                className={
+                  resizingColumn
+                    ? "events-table-wrap events-table-wrap-resizing"
+                    : "events-table-wrap"
+                }
               ref={setScrollNode}
             >
               <Table
@@ -1201,7 +1199,7 @@ export default function EventsPage({
                 <TableBody>
                   {page.rows.map((row) => {
                     const entity = row.entity;
-                    const TypeIcon = TYPE_ICONS[entity.type];
+                    const TypeIcon = EVENT_TYPE_ICONS[entity.type];
                     const codes = anomalies.get(entity.id);
                     const anomalyLabel = codes
                       ? codes
@@ -1219,7 +1217,6 @@ export default function EventsPage({
                         aria-selected={selected || undefined}
                         onClick={() => {
                           patch({ selectedId: entity.id });
-                          startEdit(row);
                         }}
                       >
                         <TableCell
@@ -1371,7 +1368,17 @@ export default function EventsPage({
                 </Button>
               </div>
             </div>
-          </>
+            </div>
+            {selectedRow ? (
+              <EventCard
+                event={selectedRow}
+                persons={personEntities}
+                onEdit={() => startEdit(selectedRow)}
+                onExpand={() => startEdit(selectedRow, "full")}
+                onClose={() => patch({ selectedId: null })}
+              />
+            ) : null}
+          </div>
         )}
       </section>
 
@@ -1380,6 +1387,7 @@ export default function EventsPage({
           key={editing?.event.id ?? "new"}
           initial={editing?.event ?? null}
           version={editing?.version ?? null}
+          size={formSize}
           persons={persons}
           defaultPersonId={createDefaults?.personId ?? filters.personId}
           defaultType={createDefaults?.type}

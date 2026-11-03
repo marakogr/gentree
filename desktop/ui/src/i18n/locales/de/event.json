@@ -11,6 +11,8 @@
   "empty": "Noch keine Ereignisse",
   "noResults": "Keine Ereignisse entsprechen den aktuellen Filtern",
   "person": "Person",
+  "participants": "Teilnehmer",
+  "openInWindow": "In einem Fenster öffnen",
   "rolePerson": "Person",
   "roleChild": "Kind",
   "roleDeceased": "Verstorbene Person",
