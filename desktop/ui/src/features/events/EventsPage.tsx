@@ -240,6 +240,8 @@ type Props = {
   onOpenPerson?: (personId: string) => void;
   /** Shown in the "no people yet" note; the shell wires it later. */
   onRequestNewPerson?: () => void;
+  /** Jump to the timeline with the current filters and search. */
+  onOpenTimeline?: () => void;
 };
 
 export default function EventsPage({
@@ -250,6 +252,7 @@ export default function EventsPage({
   onEventFocusHandled,
   onOpenPerson,
   onRequestNewPerson,
+  onOpenTimeline,
 }: Props) {
   const { t, i18n } = useTranslation([
     "event",
@@ -1005,6 +1008,15 @@ export default function EventsPage({
                 activeCount={activeFilterCount}
               />
             <div className="events-toolbar-actions">
+              {onOpenTimeline ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onOpenTimeline}
+                >
+                  {t("event:openTimeline")}
+                </Button>
+              ) : null}
               <MenuButton
                 iconOnly
                 icon={<SettingsRegular fontSize={16} aria-hidden="true" />}

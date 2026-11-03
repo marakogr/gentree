@@ -509,6 +509,12 @@ export default function App() {
                 onEventFocusHandled={() => setEventFocus(null)}
                 onOpenPerson={(personId) => openPerson(personId, "events")}
                 onRequestNewPerson={() => selectTab("persons")}
+                onOpenTimeline={() => {
+                  setBack(backOrigin("events", "timeline"));
+                  setTimelinePersonId(null);
+                  setTab("timeline");
+                  setNavOpen(false);
+                }}
               />
             ) : (
               <section className="panel">

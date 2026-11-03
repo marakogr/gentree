@@ -182,5 +182,6 @@
     "ancestors": "Ancestors",
     "descendants": "Descendants",
     "both": "Ancestors and descendants"
-  }
+  },
+  "openTimeline": "Open timeline"
 }

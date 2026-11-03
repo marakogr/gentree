@@ -182,5 +182,6 @@
     "ancestors": "Antepasados",
     "descendants": "Descendientes",
     "both": "Antepasados y descendientes"
-  }
+  },
+  "openTimeline": "Abrir la cronología"
 }

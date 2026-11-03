@@ -216,6 +216,20 @@ describe("buildTimelineListParams", () => {
   it("requests the whole tree without extra parameters", () => {
     expect(buildTimelineListParams(view())).toEqual({ scope: "all" });
   });
+
+  it("adds the shared types and whole-year bounds", () => {
+    expect(
+      buildTimelineListParams(view(), ["BIRTH", "DEATH"], "1900", "1950"),
+    ).toEqual({
+      scope: "all",
+      types: ["BIRTH", "DEATH"],
+      from: "1900-01-01",
+      to: "1950-12-31",
+    });
+    expect(
+      buildTimelineListParams(view(), [], "", "1950"),
+    ).toEqual({ scope: "all", to: "1950-12-31" });
+  });
 });
 
 describe("canRequestScope", () => {

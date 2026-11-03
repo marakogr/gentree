@@ -182,5 +182,6 @@
     "ancestors": "Vorfahren",
     "descendants": "Nachkommen",
     "both": "Vorfahren und Nachkommen"
-  }
+  },
+  "openTimeline": "Zur Zeitleiste"
 }
