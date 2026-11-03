@@ -85,6 +85,8 @@ export type RelatedEventRequest = { type: EventType; personId: string };
 type Props = {
   initial: EventEntity | null;
   version: string | null;
+  /** Dialog width; the card's maximize action asks for the full window. */
+  size?: "lg" | "full";
   persons: readonly { entity: Person }[];
   defaultPersonId?: string;
   /** Type of a new event, e.g. a burial created from a death event. */
@@ -105,6 +107,7 @@ type Props = {
 export default function EventForm({
   initial,
   version,
+  size = "full",
   persons,
   defaultPersonId,
   defaultType,
@@ -515,7 +518,7 @@ export default function EventForm({
         else onCancel();
       }}
       busy={busy}
-      size="lg"
+      size={size}
       footer={footer}
     >
       {confirmDelete ? (

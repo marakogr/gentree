@@ -4,6 +4,9 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   Badge,
@@ -28,21 +31,9 @@ import {
   ArrowDownRegular,
   ArrowUpRegular,
   AttachRegular,
-  BriefcaseRegular,
   CheckmarkRegular,
-  ChevronLeftRegular,
-  ChevronRightRegular,
-  HatGraduationRegular,
-  HeartBrokenRegular,
-  HeartRegular,
-  HomeRegular,
-  LeafThreeRegular,
-  LinkDismissRegular,
-  PersonRegular,
-  QuestionCircleRegular,
   SettingsRegular,
   WarningRegular,
-  type FluentIcon,
 } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import { eventsApi, mediaApi, personsApi, projectsApi } from "../../api/client";
@@ -83,6 +74,8 @@ import { displayName } from "../persons/helpers";
 import PersonSearch from "../persons/PersonSearch";
 import { ValidationSummary } from "../projects/ValidationSummary";
 import EventForm from "./EventForm";
+import { EventCard } from "./EventCard";
+import { EVENT_TYPE_ICONS } from "./typeIcons";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
   EVENT_COLUMNS,
@@ -113,17 +106,24 @@ import "./events.css";
 // Newest events on top by default; a stored `view.sort` still wins.
 const DEFAULT_SORT: EventSortState = { key: "date", direction: "desc" };
 
-const TYPE_ICONS: Record<EventType, FluentIcon> = {
-  BIRTH: PersonRegular,
-  DEATH: HeartBrokenRegular,
-  MARRIAGE: HeartRegular,
-  DIVORCE: LinkDismissRegular,
-  BURIAL: LeafThreeRegular,
-  RESIDENCE: HomeRegular,
-  OCCUPATION: BriefcaseRegular,
-  EDUCATION: HatGraduationRegular,
-  OTHER: QuestionCircleRegular,
-};
+/** Splitter bounds in percent of the layout width. */
+const EVENTS_LIST_DEFAULT = 62;
+const EVENTS_LIST_MIN = 35;
+const EVENTS_LIST_MAX = 75;
+
+function clampEventsListWidth(value: number): number {
+  return Math.min(EVENTS_LIST_MAX, Math.max(EVENTS_LIST_MIN, value));
+}
+
+/** Stored splitter position in percent, clamped to the allowed range. */
+function readEventsListWidth(filters: ViewFilters): number {
+  const raw = filters.listWidth;
+  if (typeof raw !== "string" || raw === "") return EVENTS_LIST_DEFAULT;
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed)
+    ? clampEventsListWidth(parsed)
+    : EVENTS_LIST_DEFAULT;
+}
 
 /** Year-first table dates: `2016 · 1 October`. */
 const DATE_YEAR_SEPARATOR = " \u00b7 ";
@@ -290,6 +290,69 @@ export default function EventsPage({
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [focusRequestId, setFocusRequestId] = useState<string | null>(null);
   const debouncedQuery = useDebouncedValue(view.query);
+
+  /* ---------- master-detail splitter ---------- */
+
+  const [listWidth, setListWidth] = useState(() =>
+    readEventsListWidth(view.filters),
+  );
+  const [resizing, setResizing] = useState(false);
+  const layoutRef = useRef<HTMLDivElement | null>(null);
+  const listWidthRef = useRef(listWidth);
+  listWidthRef.current = listWidth;
+
+  const clampListWidth = clampEventsListWidth;
+
+  // The width is layout state, not a filter: it lives next to the filters and
+  // survives a reset because `clearEventFilterValues` keeps unknown keys.
+  const commitListWidth = (value: number) => {
+    const next = Math.round(clampListWidth(value));
+    setListWidth(next);
+    patch((previous) => ({
+      ...previous,
+      filters: { ...previous.filters, listWidth: String(next) },
+    }));
+  };
+
+  const widthFromPointer = (clientX: number) => {
+    const rect = layoutRef.current?.getBoundingClientRect();
+    if (!rect || rect.width <= 0) return;
+    setListWidth(clampListWidth(((clientX - rect.left) / rect.width) * 100));
+  };
+
+  const onSplitterPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setResizing(true);
+    widthFromPointer(event.clientX);
+  };
+
+  const onSplitterPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!resizing) return;
+    widthFromPointer(event.clientX);
+  };
+
+  const endSplitterDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!resizing) return;
+    setResizing(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    commitListWidth(listWidthRef.current);
+  };
+
+  const onSplitterKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const step = event.shiftKey ? 5 : 2;
+    let next: number | null = null;
+    if (event.key === "ArrowLeft") next = listWidth - step;
+    else if (event.key === "ArrowRight") next = listWidth + step;
+    else if (event.key === "Home") next = EVENTS_LIST_MIN;
+    else if (event.key === "End") next = EVENTS_LIST_MAX;
+    if (next === null) return;
+    event.preventDefault();
+    commitListWidth(next);
+  };
 
   /* ---------- date display ---------- */
 
@@ -481,6 +544,13 @@ export default function EventsPage({
   const page = useMemo(
     () => paginateEventRows(sorted, view.page),
     [sorted, view.page],
+  );
+
+  // The card follows the persisted selection, so a deep link that sets
+  // `selectedId` opens it even when the row is on another page.
+  const selectedRow = useMemo(
+    () => events.find((row) => row.entity.id === view.selectedId) ?? null,
+    [events, view.selectedId],
   );
 
   const pageKey = page.rows.map((row) => row.entity.id).join("|");
@@ -870,7 +940,7 @@ export default function EventsPage({
   const typeOptions = useMemo(
     () =>
       EVENT_TYPES.map((type) => {
-        const Icon = TYPE_ICONS[type];
+        const Icon = EVENT_TYPE_ICONS[type];
         return {
           id: type,
           label: t(`enums:eventType.${type}`),
@@ -885,12 +955,10 @@ export default function EventsPage({
     [persons],
   );
 
-  const pageFrom = page.total === 0 ? 0 : page.offset + 1;
-  const pageTo = page.offset + page.rows.length;
-
   return (
     <>
-      <div className="events-head">
+      <section className="panel events-page">
+      <div className="card-head events-head">
         <div className="events-head-title">
           <h1 className="page-title">{t("event:title")}</h1>
           <Badge appearance="tint" color="informative" size="small">
@@ -916,14 +984,25 @@ export default function EventsPage({
         </div>
       </div>
 
-      <section className="panel events-page">
-        <div className="events-toolbar">
-          <div className="events-toolbar-row">
-            <div className="events-filters">
-              <div className="events-filter-top">
-                <FilterBar
-                  query={view.query}
-                  onQueryChange={handleQueryChange}
+      <div
+        ref={layoutRef}
+        className={[
+          "events-layout",
+          selectedRow ? "" : "events-layout-solo",
+          resizing ? "events-layout-resizing" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={{ "--events-list-width": `${listWidth}%` } as CSSProperties}
+      >
+        <section className="panel events-panel">
+          <div className="events-toolbar">
+            <div className="events-toolbar-row">
+              <div className="events-filters">
+                <div className="events-filter-top">
+                  <FilterBar
+                    query={view.query}
+                    onQueryChange={handleQueryChange}
                   queryPlaceholder={t("event:searchPlaceholder")}
                   queryLabel={t("event:searchLabel")}
                   clearLabel={t("event:clearSearch")}
@@ -932,9 +1011,15 @@ export default function EventsPage({
                   chips={[]}
                   onReset={resetFilters}
                   resetLabel={t("event:resetFilters")}
-                  showReset={activeFilterCount > 0}
+                  showReset={false}
+                  resultLabel={t("common:filters.found", {
+                    count: filtered.length,
+                    total: events.length,
+                  })}
                   loading={loading}
                 />
+              </div>
+              <div className="events-filter-row">
                 <div className="events-person-filter">
                   <PersonSearch
                     id="events-person-filter"
@@ -950,14 +1035,6 @@ export default function EventsPage({
                     emptyLabel={t("event:noPersonMatches")}
                   />
                 </div>
-                <span className="events-result">
-                  {t("common:filters.found", {
-                    count: filtered.length,
-                    total: events.length,
-                  })}
-                </span>
-              </div>
-              <div className="events-filter-row">
                 <div className="events-type-filter">
                   <MultiSelectDropdown
                     options={typeOptions}
@@ -987,6 +1064,16 @@ export default function EventsPage({
                   toLabel={t("event:yearTo")}
                   groupLabel={t("event:yearRange")}
                 />
+                {activeFilterCount > 0 ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="events-reset-filters"
+                    onClick={resetFilters}
+                  >
+                    {t("event:resetFilters")}
+                  </Button>
+                ) : null}
               </div>
             </div>
             <div className="events-toolbar-actions">
@@ -1088,12 +1175,12 @@ export default function EventsPage({
           />
         ) : (
           <>
-            <div
-              className={
-                resizingColumn
-                  ? "events-table-wrap events-table-wrap-resizing"
-                  : "events-table-wrap"
-              }
+              <div
+                className={
+                  resizingColumn
+                    ? "events-table-wrap events-table-wrap-resizing"
+                    : "events-table-wrap"
+                }
               ref={setScrollNode}
             >
               <Table
@@ -1201,7 +1288,7 @@ export default function EventsPage({
                 <TableBody>
                   {page.rows.map((row) => {
                     const entity = row.entity;
-                    const TypeIcon = TYPE_ICONS[entity.type];
+                    const TypeIcon = EVENT_TYPE_ICONS[entity.type];
                     const codes = anomalies.get(entity.id);
                     const anomalyLabel = codes
                       ? codes
@@ -1219,7 +1306,6 @@ export default function EventsPage({
                         aria-selected={selected || undefined}
                         onClick={() => {
                           patch({ selectedId: entity.id });
-                          startEdit(row);
                         }}
                       >
                         <TableCell
@@ -1339,41 +1425,60 @@ export default function EventsPage({
             </div>
 
             <div className="events-pager">
-              <span className="events-pager-info">
-                {t("event:pageInfo", {
-                  page: page.page + 1,
-                  pages: page.totalPages,
-                })}
-                {page.total > 0
-                  ? ` \u00b7 ${t("event:rangeInfo", {
-                      from: pageFrom,
-                      to: pageTo,
-                      total: page.total,
-                    })}`
-                  : null}
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={page.page === 0 || busy}
+                onClick={() => patch({ page: Math.max(0, page.page - 1) })}
+              >
+                {t("common:actions.previous")}
+              </Button>
+              <span className="meta">
+                {t("common:page", { page: page.page + 1 })} /{" "}
+                {page.totalPages}
               </span>
-              <div className="events-pager-actions">
-                <Button
-                  size="sm"
-                  disabled={page.page === 0 || busy}
-                  onClick={() => patch({ page: Math.max(0, page.page - 1) })}
-                >
-                  <ChevronLeftRegular fontSize={16} aria-hidden="true" />
-                  {t("common:actions.previous")}
-                </Button>
-                <Button
-                  size="sm"
-                  disabled={page.page + 1 >= page.totalPages || busy}
-                  onClick={() => patch({ page: page.page + 1 })}
-                >
-                  {t("common:actions.next")}
-                  <ChevronRightRegular fontSize={16} aria-hidden="true" />
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={page.page + 1 >= page.totalPages || busy}
+                onClick={() => patch({ page: page.page + 1 })}
+              >
+                {t("common:actions.next")}
+              </Button>
             </div>
           </>
         )}
-      </section>
+        </section>
+
+        {selectedRow ? (
+          <>
+            <div
+              className="events-splitter"
+              role="separator"
+              aria-orientation="vertical"
+              aria-label={t("event:resizeList")}
+              aria-valuenow={Math.round(listWidth)}
+              aria-valuemin={EVENTS_LIST_MIN}
+              aria-valuemax={EVENTS_LIST_MAX}
+              tabIndex={0}
+              onPointerDown={onSplitterPointerDown}
+              onPointerMove={onSplitterPointerMove}
+              onPointerUp={endSplitterDrag}
+              onPointerCancel={endSplitterDrag}
+              onKeyDown={onSplitterKeyDown}
+            />
+            <section className="panel events-panel events-card-panel">
+              <EventCard
+                event={selectedRow}
+                persons={personEntities}
+                onEdit={() => startEdit(selectedRow)}
+                onClose={() => patch({ selectedId: null })}
+              />
+            </section>
+          </>
+        ) : null}
+      </div>
+    </section>
 
       {formOpen ? (
         <EventForm
