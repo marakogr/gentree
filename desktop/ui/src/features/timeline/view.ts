@@ -2,6 +2,7 @@
 // and state -> `timeline_list` parameters. No React, no DOM.
 
 import type {
+  EventType,
   TimelineListParams,
   TimelineScope,
 } from "../../api/types";
@@ -10,7 +11,6 @@ import type {
   SortDirection,
   ViewFilters,
 } from "../../lib/viewState";
-import type { LineIconKind } from "./line";
 import {
   DEFAULT_GENERATIONS,
   LINE_SCOPES,
@@ -21,19 +21,10 @@ import {
 /** Sort keys persisted by older builds; only the stored state shape remains. */
 const LEGACY_SORT_KEYS = ["date", "type", "person"] as const;
 
-/** Icon families shown by the canvas legend. */
-const LINE_ICON_KINDS: readonly LineIconKind[] = [
-  "birth",
-  "marriage",
-  "death",
-  "other",
-];
-
 export type TimelineView = {
   scope: TimelineScope;
   personId: string | null;
   generations: number;
-  hiddenTypes: LineIconKind[];
   /** Persisted sort of the removed list; kept for state compatibility. */
   sort: string;
   sortDirection: SortDirection;
@@ -43,7 +34,6 @@ export const DEFAULT_TIMELINE_VIEW: TimelineView = {
   scope: "all",
   personId: null,
   generations: DEFAULT_GENERATIONS,
-  hiddenTypes: [],
   sort: "date",
   sortDirection: "asc",
 };
@@ -67,13 +57,6 @@ function stringFilter(filters: ViewFilters, key: string): string {
   return typeof value === "string" ? value : "";
 }
 
-function hiddenTypeList(
-  value: ViewFilters[string] | undefined,
-): LineIconKind[] {
-  const list = Array.isArray(value) ? value : value === undefined ? [] : [value];
-  return LINE_ICON_KINDS.filter((kind) => list.includes(kind));
-}
-
 /**
  * Validates persisted state and falls back to the defaults field by field. An
  * old state may still carry the removed `place` scope or the removed search
@@ -94,7 +77,6 @@ export function timelineViewFromState(state: SectionViewState): TimelineView {
     generations: Number.isFinite(generations)
       ? clampGenerations(generations)
       : DEFAULT_GENERATIONS,
-    hiddenTypes: hiddenTypeList(filters.hiddenTypes),
     sort: isSortKey(sortKey) ? sortKey : "date",
     sortDirection: state.sort?.direction === "desc" ? "desc" : "asc",
   };
@@ -108,9 +90,6 @@ export function timelineFilters(view: TimelineView): ViewFilters {
     filters.personId = view.personId;
   }
   filters.generations = String(view.generations);
-  if (view.hiddenTypes.length > 0) {
-    filters.hiddenTypes = [...view.hiddenTypes];
-  }
   return filters;
 }
 
@@ -125,9 +104,8 @@ export function timelineViewPatch(
 }
 
 /**
- * Clears every filter and focus field (scope, person, hidden types,
- * generations) while keeping the legacy persisted sort, which no longer has a
- * UI.
+ * Clears every filter and focus field (scope, person, generations) while
+ * keeping the legacy persisted sort, which no longer has a UI.
  */
 export function resetTimelineView(view: TimelineView): TimelineView {
   return {
@@ -162,11 +140,16 @@ export function resolveInitialTimelineView({
   };
 }
 
-/** Scope-specific parameters; the line screen has no year filter. */
-export function buildTimelineListParams(view: TimelineView): TimelineListParams {
-  return buildTimelineEventsOptions({
+/** Scope-specific parameters plus the shared event-type filter. */
+export function buildTimelineListParams(
+  view: TimelineView,
+  types: readonly EventType[] = [],
+): TimelineListParams {
+  const params = buildTimelineEventsOptions({
     scope: view.scope,
     personId: view.personId,
     generations: view.generations,
   });
+  if (types.length > 0) params.types = [...types];
+  return params;
 }

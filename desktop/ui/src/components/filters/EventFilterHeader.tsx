@@ -6,8 +6,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { EventType, MediaItem, Person } from "../../api/types";
-import { EVENT_TYPES } from "../../features/events/helpers";
-import { EVENT_TYPE_ICONS } from "../../features/events/typeIcons";
+import { eventTypeOptions } from "../../features/events/typeOptions";
 import { Button } from "../ui/button";
 import { FilterBar } from "./FilterBar";
 import { MultiSelectDropdown } from "./MultiSelectDropdown";
@@ -59,15 +58,7 @@ export function EventFilterHeader({
 }: EventFilterHeaderProps) {
   const { t } = useTranslation(["event", "common", "enums"]);
   const typeOptions = useMemo(
-    () =>
-      EVENT_TYPES.map((type) => {
-        const Icon = EVENT_TYPE_ICONS[type];
-        return {
-          id: type,
-          label: t(`enums:eventType.${type}`),
-          icon: <Icon fontSize={16} aria-hidden="true" />,
-        };
-      }),
+    () => eventTypeOptions((type) => t(`enums:eventType.${type}`)),
     [t],
   );
 

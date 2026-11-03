@@ -27,6 +27,7 @@ import type { Translate } from "../../lib/dates";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { cn } from "../../lib/utils";
 import { useScrollMemory, useViewState } from "../../lib/useViewState";
+import { useEventFilterState } from "../events/useEventFilterState";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
 import { toTimelineEvents } from "./adapter";
@@ -43,7 +44,6 @@ import {
   personEventIds,
   positionOnLine,
   relatedEventIds,
-  type LineIconKind,
 } from "./line";
 import {
   LineCanvas,
@@ -274,6 +274,9 @@ export default function TimelinePage({
     viewKey,
     "timeline",
   );
+  // Event types are shared with the events and map screens.
+  const eventFilters = useEventFilterState(viewKey);
+  const eventTypes = eventFilters.filters.types;
 
   // The stored view is the base; a one-shot person deep link from another
   // screen overrides the focus for this mount only.
@@ -288,7 +291,6 @@ export default function TimelinePage({
     scope,
     personId,
     generations,
-    hiddenTypes: hiddenTypeList,
   } = view;
 
   // Every view change is persisted by the section view state hook.
@@ -334,12 +336,12 @@ export default function TimelinePage({
   );
 
   const focus = useMemo(
-    () => buildTimelineListParams(view),
+    () => buildTimelineListParams(view, eventTypes),
     // Only these fields reach the request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [scope, personId, generations],
+    [scope, personId, generations, eventTypes],
   );
-  const focusKey = `${scope}|${personId ?? ""}|${generations}`;
+  const focusKey = `${scope}|${personId ?? ""}|${generations}|${eventTypes.join(",")}`;
   const lastFocusRef = useRef<string | null>(null);
   const requestable = canRequestScope({ scope, personId, generations });
 
@@ -516,15 +518,6 @@ export default function TimelinePage({
     [applyView],
   );
 
-  const toggleType = useCallback((kind: LineIconKind) => {
-    setView((previous) => ({
-      ...previous,
-      hiddenTypes: previous.hiddenTypes.includes(kind)
-        ? previous.hiddenTypes.filter((value) => value !== kind)
-        : [...previous.hiddenTypes, kind],
-    }));
-  }, []);
-
   const handleEventSaved = useCallback(() => {
     setReloadKey((current) => current + 1);
   }, []);
@@ -538,11 +531,6 @@ export default function TimelinePage({
     onScrollTop: saveScroll,
     ready: line.status === "ready",
   });
-
-  const hiddenTypes = useMemo(
-    () => new Set<LineIconKind>(hiddenTypeList),
-    [hiddenTypeList],
-  );
 
   const showLine =
     line.status === "ready" && markers.length > 0 && window !== null;
@@ -642,13 +630,13 @@ export default function TimelinePage({
           persons={persons}
           photos={photos}
           generations={generations}
-          hiddenTypes={hiddenTypeList}
+          types={eventTypes}
           onScopeChange={handleScopeChange}
           onPersonChange={handlePersonChange}
           onGenerationsChange={(value) =>
             applyView({ generations: clampGenerations(value) })
           }
-          onHiddenTypesChange={(hidden) => applyView({ hiddenTypes: hidden })}
+          onTypesChange={(types) => eventFilters.setFilter("types", types)}
         />
 
         {line.truncated && (
@@ -729,8 +717,6 @@ export default function TimelinePage({
                 rootPersonId={personId}
                 focusPersonId={personId}
                 highlightIds={highlightIds}
-                hiddenTypes={hiddenTypes}
-                onToggleType={toggleType}
                 onSelectEvent={selectEvent}
                 onWindowChange={commitWindow}
                 onFit={handleFit}
