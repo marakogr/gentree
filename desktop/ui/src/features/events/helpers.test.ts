@@ -97,6 +97,7 @@ function contextOf(entity: EventEntity): EventRowContext {
 
 const noFilters: EventListFilters = {
   personId: "",
+  personScope: "person",
   types: [],
   fromYear: "",
   toYear: "",
@@ -716,6 +717,28 @@ describe("filterEventRows", () => {
     ).toEqual(["2", "3"]);
   });
 
+  it("filters by a resolved person set", () => {
+    const both = new Set(["a", "b"]);
+    expect(
+      filterEventRows(rows, "", noFilters, contextOf, both).map(
+        (item) => item.entity.id,
+      ),
+    ).toEqual(["1", "2", "4"]);
+    expect(
+      filterEventRows(rows, "", noFilters, contextOf, new Set(["b"])).map(
+        (item) => item.entity.id,
+      ),
+    ).toEqual(["2"]);
+    expect(
+      filterEventRows(rows, "", noFilters, contextOf, new Set(["c"])).map(
+        (item) => item.entity.id,
+      ),
+    ).toEqual(["3"]);
+    expect(
+      filterEventRows(rows, "", noFilters, contextOf, new Set(["z"])),
+    ).toHaveLength(0);
+  });
+
   it("keeps undated rows only while the year range is open", () => {
     expect(filterEventRows(rows, "", noFilters, contextOf)).toHaveLength(4);
     expect(
@@ -985,18 +1008,21 @@ describe("view-state helpers", () => {
     expect(
       readEventFilters({
         personId: "p1",
+        personScope: "ancestors",
         types: ["BIRTH", "NOPE", "DEATH"],
         fromYear: "1900",
         toYear: "1920",
       }),
     ).toEqual({
       personId: "p1",
+      personScope: "ancestors",
       types: ["BIRTH", "DEATH"],
       fromYear: "1900",
       toYear: "1920",
     });
     expect(readEventFilters({})).toEqual({
       personId: "",
+      personScope: "person",
       types: [],
       fromYear: "",
       toYear: "",

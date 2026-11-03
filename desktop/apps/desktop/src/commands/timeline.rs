@@ -48,6 +48,8 @@ pub enum TimelineScope {
     Person,
     Ancestors,
     Descendants,
+    /// The root plus both directions (the tree around one person).
+    Both,
     Place,
 }
 
@@ -58,6 +60,14 @@ impl TimelineScope {
 
     fn is_descendants(self) -> bool {
         matches!(self, Self::Descendants)
+    }
+
+    fn is_both(self) -> bool {
+        matches!(self, Self::Both)
+    }
+
+    fn is_walk(self) -> bool {
+        self.is_ancestors() || self.is_descendants() || self.is_both()
     }
 }
 
@@ -243,6 +253,35 @@ fn directional_persons(
     (kept, truncated)
 }
 
+/// Persons touched by a walk scope. `both` unites the two directions around
+/// the same root; the union is capped like a single walk.
+fn walk_scope_persons(
+    scope: TimelineScope,
+    root: Uuid,
+    generations: u32,
+    relationships: &RelationshipSet,
+) -> (BTreeSet<Uuid>, bool) {
+    let (mut persons, mut truncated) = directional_persons(
+        root,
+        generations,
+        MAX_SCOPE_PERSONS,
+        !scope.is_descendants(),
+        relationships,
+    );
+    if scope.is_both() {
+        let (descendants, descendants_truncated) =
+            directional_persons(root, generations, MAX_SCOPE_PERSONS, false, relationships);
+        persons.extend(descendants);
+        truncated |= descendants_truncated;
+    }
+    // The union may exceed the cap even when each walk fits.
+    if persons.len() > MAX_SCOPE_PERSONS {
+        truncated = true;
+        persons = persons.into_iter().take(MAX_SCOPE_PERSONS).collect();
+    }
+    (persons, truncated)
+}
+
 fn require_person(person_id: Option<Uuid>) -> AppResult<Uuid> {
     person_id.ok_or_else(|| AppError::validation("personId", "required"))
 }
@@ -289,6 +328,7 @@ fn parse_scope(raw: &str) -> AppResult<TimelineScope> {
         "person" => Ok(TimelineScope::Person),
         "ancestors" => Ok(TimelineScope::Ancestors),
         "descendants" => Ok(TimelineScope::Descendants),
+        "both" => Ok(TimelineScope::Both),
         "place" => Ok(TimelineScope::Place),
         _ => Err(AppError::validation("scope", "unknown").with_param("value", raw)),
     }
@@ -336,16 +376,10 @@ pub fn timeline_list(
     with_store(&state, |store| {
         let person_names = display_names(&store.persons()?);
 
-        let filter = if scope.is_ancestors() || scope.is_descendants() {
+        let filter = if scope.is_walk() {
             let root = require_person(person_id)?;
             let relationships = store.relationship_set()?;
-            let (persons, truncated) = directional_persons(
-                root,
-                generations,
-                MAX_SCOPE_PERSONS,
-                scope.is_ancestors(),
-                &relationships,
-            );
+            let (persons, truncated) = walk_scope_persons(scope, root, generations, &relationships);
             ScopeFilter {
                 persons: Some(persons),
                 place: None,
@@ -599,6 +633,19 @@ mod tests {
     }
 
     #[test]
+    fn both_scope_unites_ancestors_and_descendants() {
+        let (root, parent, child, grandchild) = (id(1), id(2), id(3), id(4));
+        let mut set = RelationshipSet::default();
+        edge(&mut set, parent, root);
+        edge(&mut set, root, child);
+        edge(&mut set, child, grandchild);
+
+        let (walked, truncated) = walk_scope_persons(TimelineScope::Both, root, 10, &set);
+        assert!(!truncated);
+        assert_eq!(ids(&walked), vec![root, parent, child, grandchild]);
+    }
+
+    #[test]
     fn person_cap_marks_the_scope_truncated() {
         let (root, parent, grand) = (id(1), id(2), id(3));
         let mut set = RelationshipSet::default();
@@ -660,6 +707,7 @@ mod tests {
             parse_scope("descendants").unwrap(),
             TimelineScope::Descendants
         );
+        assert_eq!(parse_scope("both").unwrap(), TimelineScope::Both);
         assert_eq!(parse_scope("place").unwrap(), TimelineScope::Place);
 
         let error = parse_scope("friends").unwrap_err();

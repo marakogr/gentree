@@ -175,5 +175,12 @@
   "pageInfo": "Страница {{page}} из {{pages}}",
   "rangeInfo": "{{from}}–{{to}} из {{total}}",
   "sourceWikidata": "Wikidata · историческое",
-  "placeModernName": "современное название: {{name}}"
+  "placeModernName": "современное название: {{name}}",
+  "personScope": {
+    "label": "Связь",
+    "person": "Только человек",
+    "ancestors": "Предки",
+    "descendants": "Потомки",
+    "both": "Предки и потомки"
+  }
 }

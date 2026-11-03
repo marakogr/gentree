@@ -6,10 +6,16 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { EventType, MediaItem, Person } from "../../api/types";
+import {
+  EVENT_PERSON_SCOPES,
+  isEventPersonScope,
+  type EventPersonScope,
+} from "../../features/events/helpers";
 import { eventTypeOptions } from "../../features/events/typeOptions";
 import { Button } from "../ui/button";
 import { FilterBar } from "./FilterBar";
 import { MultiSelectDropdown } from "./MultiSelectDropdown";
+import { SelectDropdown } from "./SelectDropdown";
 import { YearRange } from "./YearRange";
 import PersonSearch from "../../features/persons/PersonSearch";
 import "./filters.css";
@@ -21,6 +27,9 @@ export type EventFilterHeaderProps = {
   loading?: boolean;
   personId: string;
   onPersonChange: (id: string) => void;
+  /** Relatives included with the chosen person. */
+  personScope: EventPersonScope;
+  onPersonScopeChange: (scope: EventPersonScope) => void;
   /** Input id for the person picker; each screen keeps its own. */
   personFilterId?: string;
   persons: Person[];
@@ -43,6 +52,8 @@ export function EventFilterHeader({
   loading = false,
   personId,
   onPersonChange,
+  personScope,
+  onPersonScopeChange,
   personFilterId = "events-person-filter",
   persons,
   photos,
@@ -59,6 +70,14 @@ export function EventFilterHeader({
   const { t } = useTranslation(["event", "common", "enums"]);
   const typeOptions = useMemo(
     () => eventTypeOptions((type) => t(`enums:eventType.${type}`)),
+    [t],
+  );
+  const scopeOptions = useMemo(
+    () =>
+      EVENT_PERSON_SCOPES.map((scope) => ({
+        id: scope,
+        label: t(`event:personScope.${scope}`),
+      })),
     [t],
   );
 
@@ -91,11 +110,29 @@ export function EventFilterHeader({
             persons={persons}
             photos={photos}
             value={personId}
-            onChange={onPersonChange}
+            onChange={(id) => {
+              onPersonChange(id);
+              // With nobody chosen the relation no longer applies.
+              if (id === "") onPersonScopeChange("person");
+            }}
             placeholder={t("event:personFilterPlaceholder")}
             allOptionLabel={t("event:allPersons")}
             clearLabel={t("event:clearPerson")}
             emptyLabel={t("event:noPersonMatches")}
+          />
+        </div>
+
+        <div className="event-filter-scope">
+          <SelectDropdown
+            options={scopeOptions}
+            value={personScope}
+            onChange={(id) => {
+              if (isEventPersonScope(id)) onPersonScopeChange(id);
+            }}
+            label={t("event:personScope.label")}
+            placeholder={t("event:personScope.label")}
+            disabled={personId === ""}
+            id={`${personFilterId}-scope`}
           />
         </div>
 
@@ -107,6 +144,7 @@ export function EventFilterHeader({
             label={t("event:type")}
             allLabel={t("event:allTypes")}
             multipleLabel={(count) => t("event:typesSelected", { count })}
+            id="event-type-filter"
           />
         </div>
 

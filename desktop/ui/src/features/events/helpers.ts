@@ -464,8 +464,31 @@ export type EventRowContext = {
   typeLabel: string;
 };
 
+/** Which relatives of the chosen person take part in the event filter. */
+export type EventPersonScope =
+  | "person"
+  | "ancestors"
+  | "descendants"
+  | "both";
+
+export const EVENT_PERSON_SCOPES: readonly EventPersonScope[] = [
+  "person",
+  "ancestors",
+  "descendants",
+  "both",
+];
+
+export function isEventPersonScope(value: unknown): value is EventPersonScope {
+  return (
+    typeof value === "string" &&
+    (EVENT_PERSON_SCOPES as readonly string[]).includes(value)
+  );
+}
+
 export type EventListFilters = {
   personId: string;
+  /** Relatives included with `personId`; ignored when no person is chosen. */
+  personScope: EventPersonScope;
   /** Empty list means "every type". */
   types: readonly EventType[];
   /** `YYYY` strings; empty means "no bound". */
@@ -599,8 +622,14 @@ export function isYearRangeInvalid(
 export function matchesEventListFilters(
   event: EventEntity,
   filters: EventListFilters,
+  personIds?: ReadonlySet<string> | null,
 ): boolean {
-  if (
+  if (personIds && personIds.size > 0) {
+    const involved =
+      personIds.has(event.personId) ||
+      (event.participantIds ?? []).some((personId) => personIds.has(personId));
+    if (!involved) return false;
+  } else if (
     filters.personId !== "" &&
     event.personId !== filters.personId &&
     !(event.participantIds ?? []).includes(filters.personId)
@@ -619,10 +648,11 @@ export function filterEventRows<T extends { entity: EventEntity }>(
   query: string,
   filters: EventListFilters,
   context: (event: EventEntity) => EventRowContext,
+  personIds?: ReadonlySet<string> | null,
 ): T[] {
   return rows.filter(
     (row) =>
-      matchesEventListFilters(row.entity, filters) &&
+      matchesEventListFilters(row.entity, filters, personIds) &&
       matchesEventQuery(row.entity, context(row.entity), query),
   );
 }
@@ -758,6 +788,9 @@ export function readEventFilters(filters: ViewFilters): EventListFilters {
     : [];
   return {
     personId,
+    personScope: isEventPersonScope(filters.personScope)
+      ? filters.personScope
+      : "person",
     types,
     fromYear: typeof filters.fromYear === "string" ? filters.fromYear : "",
     toYear: typeof filters.toYear === "string" ? filters.toYear : "",
@@ -780,7 +813,7 @@ export function readEventColumns(
  */
 export function clearEventFilterValues(filters: ViewFilters): ViewFilters {
   let next: ViewFilters = { ...filters };
-  for (const key of ["personId", "types", "fromYear", "toYear"]) {
+  for (const key of ["personId", "personScope", "types", "fromYear", "toYear"]) {
     next = withFilterValue(next, key, "");
   }
   return next;

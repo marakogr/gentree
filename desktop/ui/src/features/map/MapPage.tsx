@@ -28,8 +28,10 @@ import {
   isEventType,
   matchesEventListFilters,
   matchesEventQuery,
+  type EventPersonScope,
 } from "../events/helpers";
 import { useEventFilterState } from "../events/useEventFilterState";
+import { usePersonScopeIds } from "../persons/usePersonScopeIds";
 import { photosByPerson } from "../media/helpers";
 import { toApiDate, toTimelineEvent } from "../timeline/adapter";
 import { formatTimelineDate } from "../timeline/dates";
@@ -261,6 +263,10 @@ export default function MapPage({
   );
   const debouncedQuery = useDebouncedValue(sharedFilters.query);
   const filters = sharedFilters.filters;
+  const scopePersonIds = usePersonScopeIds(
+    filters.personId,
+    filters.personScope,
+  );
   const personEntities = useMemo(
     () => persons.map((item) => item.entity),
     [persons],
@@ -280,7 +286,7 @@ export default function MapPage({
     () =>
       inRange.filter(
         (entry) =>
-          matchesEventListFilters(entry.event, filters) &&
+          matchesEventListFilters(entry.event, filters, scopePersonIds) &&
           matchesEventQuery(
             entry.event,
             {
@@ -290,7 +296,7 @@ export default function MapPage({
             debouncedQuery,
           ),
       ),
-    [inRange, filters, debouncedQuery, tm],
+    [inRange, filters, scopePersonIds, debouncedQuery, tm],
   );
 
   // The map position is per screen; only the filter values are shared.
@@ -443,6 +449,10 @@ export default function MapPage({
           loading={state.status === "loading"}
           personId={filters.personId}
           onPersonChange={(id) => setSharedFilter("personId", id)}
+          personScope={filters.personScope}
+          onPersonScopeChange={(scope: EventPersonScope) =>
+            setSharedFilter("personScope", scope)
+          }
           personFilterId="map-person-filter"
           persons={personEntities}
           photos={photos}

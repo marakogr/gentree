@@ -66,7 +66,10 @@ describe("project tour", () => {
       if (slug === "timeline") {
         // The ancestors scope asks for a person first; the picker shares the
         // full-name placeholder with the people table.
-        await (await $('//button[contains(., "Предки")]')).click();
+        await (await $("#timeline-scope-filter")).click();
+        await (
+          await $('//*[@role="option"][normalize-space(.)="Предки"]')
+        ).click();
         const person = await $("#timeline-focus-person");
         await person.waitForDisplayed({ timeout: 5000 });
         expect(await person.getAttribute("placeholder")).toBe(

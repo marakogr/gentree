@@ -67,7 +67,8 @@
     "person": "Persona",
     "ancestors": "Antepasados",
     "descendants": "Descendientes",
-    "place": "Lugar"
+    "place": "Lugar",
+    "both": "Antepasados y descendientes"
   },
   "type": {
     "birth": "Nacimiento",

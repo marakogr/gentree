@@ -4,13 +4,6 @@ import {
   shorthands,
   tokens,
 } from "@fluentui/react-components";
-import {
-  ArrowDownRegular,
-  ArrowUpRegular,
-  GlobeRegular,
-  PersonRegular,
-  type FluentIcon,
-} from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import type {
   EventType,
@@ -19,6 +12,7 @@ import type {
   TimelineScope,
 } from "../../api/types";
 import { MultiSelectDropdown } from "../../components/filters/MultiSelectDropdown";
+import { SelectDropdown } from "../../components/filters/SelectDropdown";
 import { cn } from "../../lib/utils";
 import { eventTypeOptions } from "../events/typeOptions";
 import PersonSearch from "../persons/PersonSearch";
@@ -30,13 +24,6 @@ import {
   scopeRequiresPerson,
 } from "./scope";
 import "./timeline-filters.css";
-
-const SCOPE_ICONS: Record<(typeof LINE_SCOPES)[number], FluentIcon> = {
-  all: GlobeRegular,
-  person: PersonRegular,
-  ancestors: ArrowUpRegular,
-  descendants: ArrowDownRegular,
-};
 
 // Fluent tokens for the compact filter strip; layout stays on Tailwind.
 const useStyles = makeStyles({
@@ -114,40 +101,28 @@ export function TimelineFilters({
       eventTypeOptions((type) => String(tShared(`enums:eventType.${type}`))),
     [tShared],
   );
+  const scopeOptions = useMemo(
+    () => LINE_SCOPES.map((value) => ({ id: value, label: scopeLabel(value, t) })),
+    [t],
+  );
 
   return (
     <div
       data-testid="line-filters"
       className="timeline-filter-row flex flex-wrap items-center gap-x-3 gap-y-2"
     >
-      <div
-        role="group"
-        aria-label={t("filters.focusAria")}
-        className="timeline-filter-group"
-      >
-        {LINE_SCOPES.map((value) => {
-          const active = value === scope;
-          const Icon = SCOPE_ICONS[value];
-          return (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={active}
-              onClick={() => {
-                if (!active) {
-                  onScopeChange(value);
-                }
-              }}
-              className={cn(
-                "inline-flex h-7 items-center gap-1 rounded-full px-2.5 py-0 text-[11px] transition-colors",
-                active ? styles.scopeOptionActive : styles.scopeOption,
-              )}
-            >
-              <Icon fontSize={14} aria-hidden="true" />
-              {scopeLabel(value, t)}
-            </button>
-          );
-        })}
+      <div className="timeline-filter-scope">
+        <SelectDropdown
+          options={scopeOptions}
+          value={scope}
+          onChange={(value) => {
+            if ((LINE_SCOPES as readonly string[]).includes(value)) {
+              onScopeChange(value as (typeof LINE_SCOPES)[number]);
+            }
+          }}
+          label={t("filters.focusAria")}
+          id="timeline-scope-filter"
+        />
       </div>
 
       <div className="timeline-filter-types">
@@ -179,7 +154,9 @@ export function TimelineFilters({
         </div>
       )}
 
-      {(scope === "ancestors" || scope === "descendants") && (
+      {(scope === "ancestors" ||
+        scope === "descendants" ||
+        scope === "both") && (
         <label className="timeline-filter-label">
           <span className="shrink-0">{t("filters.generations")}</span>
           <input
