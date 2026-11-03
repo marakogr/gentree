@@ -113,7 +113,7 @@ export function TimelineFilters({
   onHiddenTypesChange,
 }: TimelineFiltersProps) {
   const t = useTimelineTranslate();
-  const { t: tShared } = useTranslation(["event"]);
+  const { t: tShared } = useTranslation(["event", "person"]);
   const styles = useStyles();
 
   const typeOptions = useMemo(
@@ -197,7 +197,7 @@ export function TimelineFilters({
             persons={persons}
             photos={photos}
             value={personId ?? ""}
-            placeholder={t("filters.namePlaceholder")}
+            placeholder={String(tShared("person:searchPlaceholder"))}
             onChange={(next) => onPersonChange(next === "" ? null : next)}
           />
         </div>

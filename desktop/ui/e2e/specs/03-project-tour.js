@@ -63,6 +63,18 @@ describe("project tour", () => {
         `${slug}: heading="${heading}" controls=${audit.controls.length} unnamed=${audit.unnamedControls.length} small=${audit.smallTargets.length} contrast=${audit.contrastIssues.length} overflow=${audit.overflow.length} i18n=${JSON.stringify(audit.i18nLeaks)}`,
       );
 
+      if (slug === "timeline") {
+        // The ancestors scope asks for a person first; the picker shares the
+        // full-name placeholder with the people table.
+        await (await $('//button[contains(., "Предки")]')).click();
+        const person = await $("#timeline-focus-person");
+        await person.waitForDisplayed({ timeout: 5000 });
+        expect(await person.getAttribute("placeholder")).toBe(
+          "Имя, фамилия или отчество",
+        );
+        await shot("timeline-ancestors-empty");
+      }
+
       if (!heading) {
         throw new Error(`section ${label} renders no heading`);
       }

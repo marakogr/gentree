@@ -133,7 +133,6 @@
   },
   "filters": {
     "focusAria": "Фокус храналогіі",
-    "namePlaceholder": "Імя або прозвішча",
     "clearPerson": "Ачысціць фокус «{{chip}}»",
     "reset": "Скінуць фільтры",
     "generations": "Пакаленні",
