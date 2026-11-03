@@ -30,7 +30,6 @@ describe("timelineViewFromState", () => {
           scope: "ancestors",
           personId: "p1",
           generations: "4",
-          hiddenTypes: ["death", "other"],
         },
         sort: { key: "person", direction: "desc" },
         scrollTop: 120,
@@ -42,7 +41,6 @@ describe("timelineViewFromState", () => {
       scope: "ancestors",
       personId: "p1",
       generations: 4,
-      hiddenTypes: ["death", "other"],
       sort: "person",
       sortDirection: "desc",
     });
@@ -53,7 +51,6 @@ describe("timelineViewFromState", () => {
       stored({
         filters: {
           scope: "galaxy",
-          hiddenTypes: ["birth", "nope"],
           generations: "999",
         },
         sort: { key: "colour", direction: "desc" },
@@ -61,7 +58,6 @@ describe("timelineViewFromState", () => {
     );
 
     expect(restored.scope).toBe("all");
-    expect(restored.hiddenTypes).toEqual(["birth"]);
     expect(restored.generations).toBe(50);
     expect(restored.sort).toBe("date");
     expect(restored.sortDirection).toBe("desc");
@@ -148,7 +144,6 @@ describe("resetTimelineView", () => {
       scope: "ancestors",
       personId: "p1",
       generations: 3,
-      hiddenTypes: ["death", "other"],
     });
 
     expect(resetTimelineView(dirty)).toEqual(DEFAULT_TIMELINE_VIEW);
@@ -178,14 +173,12 @@ describe("timelineFilters and timelineViewPatch", () => {
           scope: "person",
           personId: "p1",
           generations: 3,
-          hiddenTypes: ["death"],
         }),
       ),
     ).toEqual({
       scope: "person",
       personId: "p1",
       generations: "3",
-      hiddenTypes: ["death"],
     });
   });
 
@@ -194,7 +187,6 @@ describe("timelineFilters and timelineViewPatch", () => {
       scope: "ancestors",
       personId: "p1",
       generations: 5,
-      hiddenTypes: ["birth"],
       sort: "type",
       sortDirection: "desc",
     });

@@ -133,7 +133,6 @@
   },
   "filters": {
     "focusAria": "Enfoque de la cronología",
-    "namePlaceholder": "Nombre o apellido",
     "clearPerson": "Quitar el enfoque «{{chip}}»",
     "reset": "Restablecer filtros",
     "generations": "Generaciones",

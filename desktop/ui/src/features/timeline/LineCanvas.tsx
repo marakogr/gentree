@@ -123,16 +123,6 @@ const useStyles = makeStyles({
     border: `1px solid ${tokens.colorNeutralStroke2}`,
     boxShadow: tokens.shadow8,
   },
-  legendHidden: {
-    backgroundColor: tokens.colorNeutralBackground2,
-    color: tokens.colorNeutralForeground2,
-    ...shorthands.borderColor(tokens.colorNeutralStroke2),
-  },
-  legendShown: {
-    backgroundColor: tokens.colorNeutralBackground1,
-    color: tokens.colorNeutralForeground1,
-    ...shorthands.borderColor(tokens.colorNeutralStroke2),
-  },
   markerBorder: {
     ...shorthands.borderColor(tokens.colorNeutralBackground1),
   },
@@ -267,13 +257,6 @@ export function lineTypeMeta(
     },
   };
 }
-
-export const LINE_TYPES: LineIconKind[] = [
-  "birth",
-  "marriage",
-  "death",
-  "other",
-];
 
 // Fluent has no Mars/Venus glyphs; the gender stays readable through the
 // marker colour and the accessible name built in `formatMarkerAria`.
@@ -419,9 +402,7 @@ export interface LineCanvasProps {
   rootPersonId: string | null;
   focusPersonId: string | null;
   highlightIds: ReadonlySet<string>;
-  hiddenTypes: ReadonlySet<LineIconKind>;
   loadingMore?: boolean;
-  onToggleType: (kind: LineIconKind) => void;
   onSelectEvent: (eventId: string) => void;
   onWindowChange: (window: TimelineWindow) => void;
   onFit: () => void;
@@ -441,9 +422,7 @@ export function LineCanvas({
   rootPersonId,
   focusPersonId,
   highlightIds,
-  hiddenTypes,
   loadingMore = false,
-  onToggleType,
   onSelectEvent,
   onWindowChange,
   onFit,
@@ -535,31 +514,13 @@ export function LineCanvas({
     );
   }, []);
 
-  const visibleMarkers = useMemo(
-    () => markers.filter((marker) => !hiddenTypes.has(marker.icon)),
-    [hiddenTypes, markers],
-  );
-
-  const kindCounts = useMemo(() => {
-    const counts: Record<LineIconKind, number> = {
-      birth: 0,
-      marriage: 0,
-      death: 0,
-      other: 0,
-    };
-    for (const marker of markers) {
-      counts[marker.icon] += 1;
-    }
-    return counts;
-  }, [markers]);
-
   const clusters = useMemo(
     () =>
-      clusterLineMarkers(visibleMarkers, window, size.width, {
+      clusterLineMarkers(markers, window, size.width, {
         thresholdPx: 17,
         isolateId: selectedEventId,
       }),
-    [selectedEventId, size.width, visibleMarkers, window],
+    [selectedEventId, size.width, markers, window],
   );
 
   const axisY = size.height / 2;
@@ -829,7 +790,7 @@ export function LineCanvas({
       : null;
   const hoveredMarker =
     hover?.kind === "marker"
-      ? (visibleMarkers.find((marker) => marker.event.id === hover.id) ?? null)
+      ? (markers.find((marker) => marker.event.id === hover.id) ?? null)
       : null;
 
   const tooltip =
@@ -1009,51 +970,6 @@ export function LineCanvas({
           ))}
         </svg>
 
-        <div className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1">
-          {LINE_TYPES.map((kind) => {
-            const meta = typeMeta[kind];
-            const hidden = hiddenTypes.has(kind);
-            const Icon = meta.Icon;
-            return (
-              <button
-                key={kind}
-                type="button"
-                data-testid={`line-legend-${kind}`}
-                aria-pressed={!hidden}
-                aria-label={t("canvas.layerAria", {
-                  label: meta.label,
-                  state: t(hidden ? "canvas.hidden" : "canvas.shown"),
-                })}
-                title={`${meta.label} · ${kindCounts[kind]}`}
-                onPointerDown={(event) => event.stopPropagation()}
-                onClick={() => onToggleType(kind)}
-                className={cn(
-                  styles.focusRing,
-                  "inline-flex h-8 items-center gap-1.5 rounded-full border px-2.5 py-0 text-[12px] shadow-sm transition-opacity",
-                  hidden ? styles.legendHidden : styles.legendShown,
-                  hidden && "opacity-55",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex size-4 items-center justify-center rounded-full",
-                    meta.swatch,
-                  )}
-                  aria-hidden="true"
-                >
-                  <Icon fontSize={10} />
-                </span>
-                <span className={hidden ? "line-through" : undefined}>
-                  {meta.label}
-                </span>
-                <span className={cn(styles.muted, "tabular-nums")}>
-                  {kindCounts[kind]}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
         {markers.length === 0 && (
           <div
             className={cn(
@@ -1065,7 +981,7 @@ export function LineCanvas({
           </div>
         )}
 
-        {visibleMarkers.map((marker) => {
+        {markers.map((marker) => {
           const startFraction = positionOnLine(marker.time, window);
           if (startFraction === null) {
             return null;

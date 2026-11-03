@@ -78,7 +78,6 @@ import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
   EVENT_COLUMNS,
   EVENT_PAGE_SIZE,
-  EVENT_TYPES,
   eventDateLabel,
   eventPersonIds,
   eventTypeLabel,
@@ -914,19 +913,6 @@ export default function EventsPage({
     onSelect: () => toggleColumn(column),
   }));
 
-  const typeOptions = useMemo(
-    () =>
-      EVENT_TYPES.map((type) => {
-        const Icon = EVENT_TYPE_ICONS[type];
-        return {
-          id: type,
-          label: t(`enums:eventType.${type}`),
-          icon: <Icon fontSize={16} aria-hidden="true" />,
-        };
-      }),
-    [t],
-  );
-
   const personEntities = useMemo(
     () => persons.map((item) => item.entity),
     [persons],
@@ -986,7 +972,6 @@ export default function EventsPage({
                 photos={photos}
                 types={filters.types}
                 onTypesChange={handleTypeFilter}
-                typeOptions={typeOptions}
                 fromYear={filters.fromYear}
                 toYear={filters.toYear}
                 onFromYearChange={handleFromYear}

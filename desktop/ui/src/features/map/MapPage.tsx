@@ -10,12 +10,27 @@ import {
   DismissRegular,
   LocationRegular,
 } from "@fluentui/react-icons";
-import { eventsApi, timelineApi } from "../../api/client";
-import type { TimelineEntry } from "../../api/types";
+import { eventsApi, mediaApi, personsApi, timelineApi } from "../../api/client";
+import type {
+  MediaItem,
+  Person,
+  TimelineEntry,
+  Versioned,
+} from "../../api/types";
 import { ErrorBanner } from "../../components/feedback";
+import { EventFilterHeader } from "../../components/filters/EventFilterHeader";
+import { normalizeYearRange } from "../../components/filters/yearRangeRules";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
+import { useDebouncedValue } from "../../lib/useDebouncedValue";
 import { useViewState } from "../../lib/useViewState";
 import type { ViewFilters } from "../../lib/viewState";
+import {
+  isEventType,
+  matchesEventListFilters,
+  matchesEventQuery,
+} from "../events/helpers";
+import { useEventFilterState } from "../events/useEventFilterState";
+import { photosByPerson } from "../media/helpers";
 import { toApiDate, toTimelineEvent } from "../timeline/adapter";
 import { formatTimelineDate } from "../timeline/dates";
 import { EventPopover } from "../timeline/EventPopover";
@@ -32,7 +47,7 @@ import { useMapTranslate } from "./i18n";
 import { MapCanvas, type MapView } from "./MapCanvas";
 import { ClarifyPanel } from "./ClarifyPanel";
 import { groupUnresolved, type UnresolvedPlace } from "./unresolved";
-import { filterByYears, yearBounds, type YearBounds } from "./range";
+import { filterByYears, yearBounds } from "./range";
 import "./map.css";
 
 const DEFAULT_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -74,16 +89,11 @@ function storedNumber(filters: ViewFilters, key: string): number | null {
 
 /** Restores the last year range and viewport of this project, if valid. */
 function parseStoredMapView(filters: ViewFilters): {
-  range: YearBounds | null;
   view: MapView | null;
 } {
-  const min = storedNumber(filters, "from");
-  const max = storedNumber(filters, "to");
   const lat = storedNumber(filters, "lat");
   const lon = storedNumber(filters, "lon");
   const zoom = storedNumber(filters, "zoom");
-  const range =
-    min !== null && max !== null && min <= max ? { min, max } : null;
   const view =
     lat !== null &&
     lon !== null &&
@@ -96,7 +106,7 @@ function parseStoredMapView(filters: ViewFilters): {
     zoom <= 18
       ? { lat, lon, zoom }
       : null;
-  return { range, view };
+  return { view };
 }
 
 export default function MapPage({
@@ -109,15 +119,22 @@ export default function MapPage({
   const t = useMapTranslate();
   const tm = useTimelineTranslate();
   const { state: storedView, patch: patchView } = useViewState(projectId, "map");
+  // Query and the person/type/year filters are shared with the events screen.
+  const sharedFilters = useEventFilterState(projectId);
+  const { setFilter: setSharedFilter, reset: resetSharedFilters } =
+    sharedFilters;
   const initialStored = useRef(parseStoredMapView(storedView.filters));
   const [state, setState] = useState<MapLoadState>(INITIAL_STATE);
+  const [persons, setPersons] = useState<Versioned<Person>[]>([]);
+  const [photos, setPhotos] = useState<ReadonlyMap<string, MediaItem>>(
+    () => new Map(),
+  );
   const [settings, setSettings] = useState<MapSettings>({
     basemap: "osm",
     tileUrl: DEFAULT_TILE_URL,
     geocoderEnabled: true,
     historicalEnabled: true,
   });
-  const [range, setRange] = useState<YearBounds | null>(null);
   const [view, setView] = useState<MapView>(
     () => initialStored.current.view ?? { lat: 25, lon: 15, zoom: 3 },
   );
@@ -163,6 +180,28 @@ export default function MapPage({
     void load();
   }, [load, projectId]);
 
+  // The map receives entries only, so load people and their profile photos for
+  // the shared person picker. A media failure must not hide the map.
+  useEffect(() => {
+    if (projectId === "") return;
+    let alive = true;
+    void Promise.all([
+      personsApi.list({ limit: 1000, sort: "name" }),
+      mediaApi.list().catch(() => [] as MediaItem[]),
+    ])
+      .then(([page, media]) => {
+        if (!alive) return;
+        setPersons(page.items);
+        setPhotos(photosByPerson(media));
+      })
+      .catch(() => {
+        // The picker still works without photos.
+      });
+    return () => {
+      alive = false;
+    };
+  }, [projectId]);
+
   useEffect(() => {
     invoke<{
       config?: {
@@ -207,56 +246,65 @@ export default function MapPage({
   );
 
   const bounds = useMemo(() => yearBounds(placed), [placed]);
-  useEffect(() => {
-    setRange((current) => {
-      if (bounds === null) return null;
-      if (current === null) {
-        const stored = initialStored.current.range;
-        if (stored === null) return bounds;
-        return {
-          min: Math.max(bounds.min, Math.min(stored.min, bounds.max)),
-          max: Math.min(bounds.max, Math.max(stored.max, bounds.min)),
-        };
-      }
-      // Keep the user's chosen window and clamp it when the archive changed.
-      return {
-        min: Math.max(bounds.min, Math.min(current.min, bounds.max)),
-        max: Math.min(bounds.max, Math.max(current.max, bounds.min)),
-      };
-    });
-  }, [bounds]);
+  // The year window lives in the shared filters now; clamp it to the archive.
+  const yearState = useMemo(
+    () =>
+      bounds
+        ? normalizeYearRange(
+            sharedFilters.filters.fromYear,
+            sharedFilters.filters.toYear,
+            bounds.min,
+            bounds.max,
+          )
+        : null,
+    [bounds, sharedFilters.filters.fromYear, sharedFilters.filters.toYear],
+  );
+  const debouncedQuery = useDebouncedValue(sharedFilters.query);
+  const filters = sharedFilters.filters;
+  const personEntities = useMemo(
+    () => persons.map((item) => item.entity),
+    [persons],
+  );
+  const activeFilterCount =
+    (filters.personId === "" ? 0 : 1) +
+    filters.types.length +
+    (filters.fromYear === "" && filters.toYear === "" ? 0 : 1);
+  const inRange = useMemo(
+    () =>
+      yearState
+        ? filterByYears(placed, yearState.lower, yearState.upper)
+        : [],
+    [placed, yearState?.lower, yearState?.upper],
+  );
+  const filtered = useMemo(
+    () =>
+      inRange.filter(
+        (entry) =>
+          matchesEventListFilters(entry.event, filters) &&
+          matchesEventQuery(
+            entry.event,
+            {
+              personName: entry.personName,
+              typeLabel: eventTypeLabel(entry.event.type, tm),
+            },
+            debouncedQuery,
+          ),
+      ),
+    [inRange, filters, debouncedQuery, tm],
+  );
 
-  const activeRange = range ?? bounds;
+  // The map position is per screen; only the filter values are shared.
   useEffect(() => {
-    // Wait until the stored range was applied; otherwise the first render
-    // would overwrite it with the full archive bounds.
-    if (!range) return;
     patchView((previous) => ({
       ...previous,
       filters: {
         ...previous.filters,
-        from: String(range.min),
-        to: String(range.max),
         lat: String(view.lat),
         lon: String(view.lon),
         zoom: String(view.zoom),
       },
     }));
-  }, [
-    range?.min,
-    range?.max,
-    view.lat,
-    view.lon,
-    view.zoom,
-    patchView,
-  ]);
-  const filtered = useMemo(
-    () =>
-      activeRange
-        ? filterByYears(placed, activeRange.min, activeRange.max)
-        : [],
-    [placed, activeRange],
-  );
+  }, [view.lat, view.lon, view.zoom, patchView]);
   const groups = useMemo(() => groupByPlace(filtered), [filtered]);
   const clusters = useMemo(
     () => clusterPlaces(groups, view.zoom, { selectedKey: selectedGroupKey }),
@@ -375,7 +423,6 @@ export default function MapPage({
       <header className="map-header">
         <div>
           <h1 className="page-title">{t("title")}</h1>
-          <p className="map-subtitle">{t("subtitle")}</p>
         </div>
         <div className="map-counts">
           <Text size={300}>{t("event:count", { count: filtered.length })}</Text>
@@ -389,17 +436,32 @@ export default function MapPage({
       </header>
 
       <div className="map-toolbar">
-        {bounds && activeRange ? (
-          <YearRange
-            bounds={bounds}
-            value={activeRange}
-            onChange={setRange}
-            label={t("rangeLabel")}
-            fromLabel={t("rangeFrom")}
-            toLabel={t("rangeTo")}
-            resetLabel={t("rangeReset")}
-          />
-        ) : null}
+        <EventFilterHeader
+          query={sharedFilters.query}
+          onQueryChange={sharedFilters.setQuery}
+          onReset={resetSharedFilters}
+          loading={state.status === "loading"}
+          personId={filters.personId}
+          onPersonChange={(id) => setSharedFilter("personId", id)}
+          personFilterId="map-person-filter"
+          persons={personEntities}
+          photos={photos}
+          types={filters.types}
+          onTypesChange={(types) =>
+            setSharedFilter("types", types.filter(isEventType))
+          }
+          fromYear={filters.fromYear}
+          toYear={filters.toYear}
+          onFromYearChange={(value) => setSharedFilter("fromYear", value)}
+          onToYearChange={(value) => setSharedFilter("toYear", value)}
+          yearBounds={{
+            minYear: bounds?.min ?? 0,
+            maxYear: bounds?.max ?? 0,
+            hasDated: bounds !== null,
+          }}
+          resultLabel={t("event:count", { count: filtered.length })}
+          activeCount={activeFilterCount}
+        />
         <Button
           appearance="subtle"
           icon={<ArrowClockwiseRegular />}
@@ -476,8 +538,8 @@ export default function MapPage({
         ) : null}
 
         {state.status === "ready" &&
-        activeRange &&
-        filtered.length === 0 &&
+        yearState &&
+        inRange.length === 0 &&
         placed.length > 0 ? (
           <div className="map-overlay">
             <LocationRegular fontSize={32} aria-hidden="true" />
@@ -563,73 +625,6 @@ export default function MapPage({
         ) : null}
       </div>
     </section>
-  );
-}
-
-function YearRange({
-  bounds,
-  value,
-  onChange,
-  label,
-  fromLabel,
-  toLabel,
-  resetLabel,
-}: {
-  bounds: YearBounds;
-  value: YearBounds;
-  onChange: (value: YearBounds) => void;
-  label: string;
-  fromLabel: string;
-  toLabel: string;
-  resetLabel: string;
-}) {
-  const disabled = bounds.min === bounds.max;
-  return (
-    <div className="map-range" role="group" aria-label={label}>
-      <label className="map-range-field">
-        <span>{fromLabel}</span>
-        <input
-          type="range"
-          min={bounds.min}
-          max={bounds.max}
-          value={value.min}
-          disabled={disabled}
-          aria-label={fromLabel}
-          onChange={(event) => {
-            const next = Number(event.target.value);
-            onChange({ min: Math.min(next, value.max), max: value.max });
-          }}
-        />
-        <output>{value.min}</output>
-      </label>
-      <span className="map-range-separator" aria-hidden="true">
-        —
-      </span>
-      <label className="map-range-field">
-        <span>{toLabel}</span>
-        <input
-          type="range"
-          min={bounds.min}
-          max={bounds.max}
-          value={value.max}
-          disabled={disabled}
-          aria-label={toLabel}
-          onChange={(event) => {
-            const next = Number(event.target.value);
-            onChange({ min: value.min, max: Math.max(next, value.min) });
-          }}
-        />
-        <output>{value.max}</output>
-      </label>
-      <Button
-        appearance="subtle"
-        size="small"
-        onClick={() => onChange(bounds)}
-        disabled={disabled || (value.min === bounds.min && value.max === bounds.max)}
-      >
-        {resetLabel}
-      </Button>
-    </div>
   );
 }
 

@@ -133,7 +133,6 @@
   },
   "filters": {
     "focusAria": "Фокус хронології",
-    "namePlaceholder": "Ім’я або прізвище",
     "clearPerson": "Очистити фокус «{{chip}}»",
     "reset": "Скинути фільтри",
     "generations": "Покоління",

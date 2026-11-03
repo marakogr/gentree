@@ -133,7 +133,6 @@
   },
   "filters": {
     "focusAria": "Timeline focus",
-    "namePlaceholder": "Name or surname",
     "clearPerson": "Clear the focus \"{{chip}}\"",
     "reset": "Reset filters",
     "generations": "Generations",

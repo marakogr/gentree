@@ -1,10 +1,5 @@
 {
   "title": "Карта",
-  "subtitle": "Події з підтвердженим місцем",
-  "rangeLabel": "Діапазон років",
-  "rangeFrom": "Від",
-  "rangeTo": "До",
-  "rangeReset": "Усі роки",
   "placesCount": "Місць: {{count}}",
   "pointCount": "Точок: {{count}}",
   "noPoints": "На карті поки немає подій",

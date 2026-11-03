@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   makeStyles,
   shorthands,
@@ -10,8 +11,16 @@ import {
   PersonRegular,
   type FluentIcon,
 } from "@fluentui/react-icons";
-import type { MediaItem, Person, TimelineScope } from "../../api/types";
+import { useTranslation } from "react-i18next";
+import type {
+  EventType,
+  MediaItem,
+  Person,
+  TimelineScope,
+} from "../../api/types";
+import { MultiSelectDropdown } from "../../components/filters/MultiSelectDropdown";
 import { cn } from "../../lib/utils";
+import { eventTypeOptions } from "../events/typeOptions";
 import PersonSearch from "../persons/PersonSearch";
 import { useTimelineTranslate } from "./i18n";
 import {
@@ -70,9 +79,12 @@ export interface TimelineFiltersProps {
   /** Primary photo per person id; initials are the fallback. */
   photos?: ReadonlyMap<string, MediaItem>;
   generations: number;
+  /** Event types shown on the timeline; empty means every type. */
+  types: readonly EventType[];
   onScopeChange: (scope: TimelineScope) => void;
   onPersonChange: (personId: string | null) => void;
   onGenerationsChange: (generations: number) => void;
+  onTypesChange: (types: string[]) => void;
 }
 
 /**
@@ -87,12 +99,21 @@ export function TimelineFilters({
   persons,
   photos,
   generations,
+  types,
   onScopeChange,
   onPersonChange,
   onGenerationsChange,
+  onTypesChange,
 }: TimelineFiltersProps) {
   const t = useTimelineTranslate();
+  const { t: tShared } = useTranslation(["event", "person", "enums"]);
   const styles = useStyles();
+
+  const typeOptions = useMemo(
+    () =>
+      eventTypeOptions((type) => String(tShared(`enums:eventType.${type}`))),
+    [tShared],
+  );
 
   return (
     <div
@@ -129,6 +150,20 @@ export function TimelineFilters({
         })}
       </div>
 
+      <div className="timeline-filter-types">
+        <MultiSelectDropdown
+          options={typeOptions}
+          values={[...types]}
+          onChange={onTypesChange}
+          label={String(tShared("event:type"))}
+          allLabel={String(tShared("event:allTypes"))}
+          multipleLabel={(count) =>
+            String(tShared("event:typesSelected", { count }))
+          }
+          id="timeline-type-filter"
+        />
+      </div>
+
       {scopeRequiresPerson(scope) && (
         <div className="timeline-filter-person">
           <PersonSearch
@@ -138,7 +173,7 @@ export function TimelineFilters({
             persons={persons}
             photos={photos}
             value={personId ?? ""}
-            placeholder={t("filters.namePlaceholder")}
+            placeholder={String(tShared("person:searchPlaceholder"))}
             onChange={(next) => onPersonChange(next === "" ? null : next)}
           />
         </div>

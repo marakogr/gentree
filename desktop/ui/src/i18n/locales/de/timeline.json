@@ -133,7 +133,6 @@
   },
   "filters": {
     "focusAria": "Fokus der Zeitleiste",
-    "namePlaceholder": "Name oder Nachname",
     "clearPerson": "Fokus „{{chip}}“ entfernen",
     "reset": "Filter zurücksetzen",
     "generations": "Generationen",
