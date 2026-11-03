@@ -4,6 +4,48 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] — 2026-11-03
+
+One filter row across Events, Map and Timeline, a card for every event, and a
+straight path from a person's events to the timeline.
+
+### Added
+
+- An event card: a row click selects the event and shows it in a side panel with
+  every field, the participants and the files; **Edit** opens the full form.
+- A **relation** filter shared by Events, Map and Timeline: only the person,
+  ancestors, descendants, or ancestors and descendants. It is built from the
+  existing parent-child links, with no invented relations.
+- **Go to timeline** on Events carries the current search and filters into the
+  timeline, and the breadcrumb returns to Events with the same filters.
+- An **Occupation** fact on a person, collected from occupation events as plain
+  text in timeline order.
+- The data check opens in a dialog from the problem badge, so Events stays on
+  screen.
+- The ancestors and descendants walk on the timeline has a depth limit.
+
+### Changed
+
+- Events, Map and Timeline share one filter header and one filter model, so a
+  filter set once follows the user between the three views.
+- Event types are one searchable multi-select with the table icons, keyboard
+  navigation and the same "All types" semantics everywhere.
+- The timeline's scope pills are replaced by the shared relation select; the
+  Map is drawn inside the same panel as Events, with the title and counters
+  above the filters.
+- The resizable split between the list and the card is shared with People and
+  its width is remembered.
+- The project menu is ordered People, Events, Map, Timeline, Tree, Search,
+  Kinship, Chat; the tour follows the same order.
+
+### Fixed
+
+- The keyboard stays in the type dropdown after a mouse click, so arrows and
+  Escape keep working.
+- Person filter photos load once per screen, and a broken media library no
+  longer hides the events.
+- Empty year ranges collapse to a single label instead of a dead slider.
+
 ## [0.3.0] — 2026-11-02
 
 One look across the project screens, calmer settings and help, and a single
@@ -124,6 +166,7 @@ Windows SmartScreen or macOS Gatekeeper may ask for confirmation on first launch
 - The "Show from selected" and "Show siblings" tree buttons. The root picker
   already chooses the person the tree is built from.
 
+[0.4.0]: ../../releases/tag/v0.4.0
 [0.3.0]: ../../releases/tag/v0.3.0
 [0.2.1]: ../../releases/tag/v0.2.1
 [0.2.0]: ../../releases/tag/v0.2.0
