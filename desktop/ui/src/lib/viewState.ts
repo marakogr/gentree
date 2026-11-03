@@ -11,6 +11,7 @@
 export type SectionKey =
   | "persons"
   | "events"
+  | "filters"
   | "timeline"
   | "map"
   | "search"
@@ -19,6 +20,7 @@ export type SectionKey =
 export const SECTION_KEYS: readonly SectionKey[] = [
   "persons",
   "events",
+  "filters",
   "timeline",
   "map",
   "search",

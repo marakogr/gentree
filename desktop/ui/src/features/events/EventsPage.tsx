@@ -48,9 +48,7 @@ import type {
   ValidationReport,
   Versioned,
 } from "../../api/types";
-import { FilterBar } from "../../components/filters/FilterBar";
-import { MultiSelectDropdown } from "../../components/filters/MultiSelectDropdown";
-import { YearRange } from "../../components/filters/YearRange";
+import { EventFilterHeader } from "../../components/filters/EventFilterHeader";
 import { BulkBar } from "../../components/ui/bulk-bar";
 import { Button } from "../../components/ui/button";
 import { Dialog } from "../../components/ui/dialog";
@@ -71,17 +69,16 @@ import { useScrollMemory, useViewState } from "../../lib/useViewState";
 import type { ViewFilters } from "../../lib/viewState";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
-import PersonSearch from "../persons/PersonSearch";
 import { ValidationSummary } from "../projects/ValidationSummary";
 import EventForm from "./EventForm";
 import { EventCard } from "./EventCard";
 import { EVENT_TYPE_ICONS } from "./typeIcons";
+import { useEventFilterState } from "./useEventFilterState";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
   EVENT_COLUMNS,
   EVENT_PAGE_SIZE,
   EVENT_TYPES,
-  clearEventFilterValues,
   eventDateLabel,
   eventPersonIds,
   eventTypeLabel,
@@ -92,7 +89,6 @@ import {
   isYearRangeInvalid,
   paginateEventRows,
   readEventColumns,
-  readEventFilters,
   resolveEventColumns,
   sortEventRows,
   withFilterValue,
@@ -265,6 +261,11 @@ export default function EventsPage({
   const toast = useToast();
   const styles = useStyles();
   const { state: view, patch } = useViewState(projectId, "events");
+  // Query and the person/type/year filters live in the shared section, so the
+  // map and timeline see the same values once they use this header.
+  const sharedFilters = useEventFilterState(projectId);
+  const { setFilter: setSharedFilter, reset: resetSharedFilters } =
+    sharedFilters;
 
   const [events, setEvents] = useState<Versioned<EventEntity>[]>([]);
   const [persons, setPersons] = useState<Versioned<Person>[]>([]);
@@ -289,7 +290,7 @@ export default function EventsPage({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [focusRequestId, setFocusRequestId] = useState<string | null>(null);
-  const debouncedQuery = useDebouncedValue(view.query);
+  const debouncedQuery = useDebouncedValue(sharedFilters.query);
 
   /* ---------- master-detail splitter ---------- */
 
@@ -443,30 +444,21 @@ export default function EventsPage({
   // Deep link from search: apply the person once and reset the shell's focus.
   useEffect(() => {
     if (!focusPersonId) return;
-    patch((previous) => ({
-      ...previous,
-      filters: withFilterValue(previous.filters, "personId", focusPersonId),
-      page: 0,
-      selectedId: null,
-    }));
+    setSharedFilter("personId", focusPersonId);
+    patch({ page: 0, selectedId: null });
     onFocusHandled?.();
-  }, [focusPersonId, onFocusHandled, patch]);
+  }, [focusPersonId, onFocusHandled, patch, setSharedFilter]);
 
   // Deep link from the validation report: the issue points at an event. Drop
   // the search and every filter that could hide it, then hand the id to the
   // existing `focusRequestId` path, which picks the page and the row.
   useEffect(() => {
     if (!focusEventId) return;
-    patch((previous) => ({
-      ...previous,
-      query: "",
-      filters: clearEventFilterValues(previous.filters),
-      page: 0,
-      selectedId: null,
-    }));
+    resetSharedFilters();
+    patch({ page: 0, selectedId: null });
     setFocusRequestId(focusEventId);
     onEventFocusHandled?.();
-  }, [focusEventId, onEventFocusHandled, patch]);
+  }, [focusEventId, onEventFocusHandled, patch, resetSharedFilters]);
 
   /* ---------- derived list ---------- */
 
@@ -476,10 +468,7 @@ export default function EventsPage({
     () => JSON.stringify(view.filters),
     [view.filters],
   );
-  const filters = useMemo(
-    () => readEventFilters(view.filters),
-    [filterSignature],
-  );
+  const filters = sharedFilters.filters;
   // The search text is not counted: it has its own clear button, and the reset
   // row should not appear for typing alone.
   const activeFilterCount =
@@ -817,55 +806,43 @@ export default function EventsPage({
 
   /* ---------- filters ---------- */
 
-  const patchFilters = useCallback(
-    (next: (current: ViewFilters) => ViewFilters) => {
-      patch((previous) => ({
-        ...previous,
-        filters: next(previous.filters),
-        page: 0,
-      }));
-    },
-    [patch],
-  );
+  const handleQueryChange = (value: string) => {
+    sharedFilters.setQuery(value);
+    patch({ page: 0 });
+  };
 
-  const handleQueryChange = (value: string) => patch({ query: value, page: 0 });
+  const handlePersonFilter = (personId: string) => {
+    setSharedFilter("personId", personId);
+    patch({ page: 0 });
+  };
 
-  const handlePersonFilter = (personId: string) =>
-    patchFilters((current) =>
-      withFilterValue(current, "personId", personId),
-    );
+  const handleTypeFilter = (types: string[]) => {
+    setSharedFilter("types", types.filter(isEventType));
+    patch({ page: 0 });
+  };
 
-  const handleTypeFilter = (types: string[]) =>
-    patchFilters((current) =>
-      withFilterValue(current, "types", types.filter(isEventType)),
-    );
+  const handleFromYear = (value: string) => {
+    setSharedFilter("fromYear", value);
+    patch({ page: 0 });
+  };
 
-  const handleFromYear = (value: string) =>
-    patchFilters((current) => withFilterValue(current, "fromYear", value));
-
-  const handleToYear = (value: string) =>
-    patchFilters((current) => withFilterValue(current, "toYear", value));
+  const handleToYear = (value: string) => {
+    setSharedFilter("toYear", value);
+    patch({ page: 0 });
+  };
 
   // A stored `from` later than `to` can only come from the old number inputs;
   // the slider cannot draw that pair, so swap the bounds once after loading.
   useEffect(() => {
     if (!isYearRangeInvalid(filters.fromYear, filters.toYear)) return;
-    patchFilters((current) =>
-      withFilterValue(
-        withFilterValue(current, "fromYear", filters.toYear),
-        "toYear",
-        filters.fromYear,
-      ),
-    );
-  }, [filters.fromYear, filters.toYear, patchFilters]);
+    setSharedFilter("fromYear", filters.toYear);
+    setSharedFilter("toYear", filters.fromYear);
+    patch({ page: 0 });
+  }, [filters.fromYear, filters.toYear, patch, setSharedFilter]);
 
   const resetFilters = () => {
-    patch((previous) => ({
-      ...previous,
-      query: "",
-      filters: clearEventFilterValues(previous.filters),
-      page: 0,
-    }));
+    sharedFilters.reset();
+    patch({ page: 0 });
   };
 
   const toggleSort = (key: EventSortKey) => {
@@ -998,84 +975,29 @@ export default function EventsPage({
         <section className="panel events-panel">
           <div className="events-toolbar">
             <div className="events-toolbar-row">
-              <div className="events-filters">
-                <div className="events-filter-top">
-                  <FilterBar
-                    query={view.query}
-                    onQueryChange={handleQueryChange}
-                  queryPlaceholder={t("event:searchPlaceholder")}
-                  queryLabel={t("event:searchLabel")}
-                  clearLabel={t("event:clearSearch")}
-                  filtersLabel={t("event:filtersTitle")}
-                  activeCount={activeFilterCount}
-                  chips={[]}
-                  onReset={resetFilters}
-                  resetLabel={t("event:resetFilters")}
-                  showReset={false}
-                  resultLabel={t("common:filters.found", {
-                    count: filtered.length,
-                    total: events.length,
-                  })}
-                  loading={loading}
-                />
-              </div>
-              <div className="events-filter-row">
-                <div className="events-person-filter">
-                  <PersonSearch
-                    id="events-person-filter"
-                    label={t("event:person")}
-                    hideLabel
-                    persons={personEntities}
-                    photos={photos}
-                    value={filters.personId}
-                    onChange={handlePersonFilter}
-                    placeholder={t("event:personFilterPlaceholder")}
-                    allOptionLabel={t("event:allPersons")}
-                    clearLabel={t("event:clearPerson")}
-                    emptyLabel={t("event:noPersonMatches")}
-                  />
-                </div>
-                <div className="events-type-filter">
-                  <MultiSelectDropdown
-                    options={typeOptions}
-                    values={[...filters.types]}
-                    onChange={handleTypeFilter}
-                    label={t("event:type")}
-                    allLabel={t("event:allTypes")}
-                    searchPlaceholder={t("event:typeFilterSearch")}
-                    emptyLabel={t("event:noPersonMatches")}
-                    multipleLabel={(count) =>
-                      t("event:typesSelected", { count })
-                    }
-                  />
-                </div>
-                <YearRange
-                  from={filters.fromYear}
-                  to={filters.toYear}
-                  minYear={yearBounds.minYear}
-                  maxYear={yearBounds.maxYear}
-                  disabled={
-                    !yearBounds.hasDated ||
-                    yearBounds.minYear >= yearBounds.maxYear
-                  }
-                  onFromChange={handleFromYear}
-                  onToChange={handleToYear}
-                  fromLabel={t("event:yearFrom")}
-                  toLabel={t("event:yearTo")}
-                  groupLabel={t("event:yearRange")}
-                />
-                {activeFilterCount > 0 ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="events-reset-filters"
-                    onClick={resetFilters}
-                  >
-                    {t("event:resetFilters")}
-                  </Button>
-                ) : null}
-              </div>
-            </div>
+              <EventFilterHeader
+                query={sharedFilters.query}
+                onQueryChange={handleQueryChange}
+                onReset={resetFilters}
+                loading={loading}
+                personId={filters.personId}
+                onPersonChange={handlePersonFilter}
+                persons={personEntities}
+                photos={photos}
+                types={filters.types}
+                onTypesChange={handleTypeFilter}
+                typeOptions={typeOptions}
+                fromYear={filters.fromYear}
+                toYear={filters.toYear}
+                onFromYearChange={handleFromYear}
+                onToYearChange={handleToYear}
+                yearBounds={yearBounds}
+                resultLabel={t("common:filters.found", {
+                  count: filtered.length,
+                  total: events.length,
+                })}
+                activeCount={activeFilterCount}
+              />
             <div className="events-toolbar-actions">
               <MenuButton
                 iconOnly

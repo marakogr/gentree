@@ -269,4 +269,54 @@
     margin-inline-start: auto;
     color: var(--muted-foreground);
   }
+
+  /* Shared event filter header: search row, then person / type / years. */
+  .event-filter-header {
+    display: grid;
+    flex: 1;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .event-filter-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+    min-width: 0;
+  }
+
+  .event-filter-top > .filter-bar {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .event-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+    min-width: 0;
+  }
+
+  .event-filter-person {
+    flex: 0 1 15rem;
+    min-width: 13rem;
+    max-width: 15rem;
+  }
+
+  .event-filter-type {
+    flex: 0 0 auto;
+    width: 14rem;
+    max-width: 100%;
+  }
+
+  .event-filter-type > * {
+    width: 100%;
+  }
+
+  .event-filter-reset {
+    margin-top: 4px;
+    margin-inline-start: auto;
+  }
 }
