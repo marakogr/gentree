@@ -25,30 +25,30 @@ describe("sidebarModel", () => {
       "persons",
       "events",
       "map",
-      "graph",
       "timeline",
-      "path",
+      "graph",
       "search",
+      "path",
       "chat",
     ]);
     expect(open.project.map((item) => item.labelKey)).toEqual([
       "app.navPersons",
       "app.navEvents",
       "app.navMap",
-      "app.navTree",
       "app.navTimeline",
-      "app.navRelation",
+      "app.navTree",
       "app.navSearch",
+      "app.navRelation",
       "app.navChat",
     ]);
     expect(open.project.map((item) => item.icon)).toEqual([
       "persons",
       "events",
       "map",
-      "tree",
       "timeline",
-      "relation",
+      "tree",
       "search",
+      "relation",
       "chat",
     ]);
     expect(open.global.map((item) => item.id)).toEqual(["projects"]);

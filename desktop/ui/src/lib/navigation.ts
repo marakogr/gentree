@@ -46,10 +46,10 @@ export const PROJECT_NAV: readonly NavItem[] = [
   { id: "persons", labelKey: "app.navPersons", icon: "persons" },
   { id: "events", labelKey: "app.navEvents", icon: "events" },
   { id: "map", labelKey: "app.navMap", icon: "map" },
-  { id: "graph", labelKey: "app.navTree", icon: "tree" },
   { id: "timeline", labelKey: "app.navTimeline", icon: "timeline" },
-  { id: "path", labelKey: "app.navRelation", icon: "relation" },
+  { id: "graph", labelKey: "app.navTree", icon: "tree" },
   { id: "search", labelKey: "app.navSearch", icon: "search" },
+  { id: "path", labelKey: "app.navRelation", icon: "relation" },
   { id: "chat", labelKey: "app.navChat", icon: "chat" },
 ];
 

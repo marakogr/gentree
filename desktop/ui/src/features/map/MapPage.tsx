@@ -419,7 +419,7 @@ export default function MapPage({
     state.status === "ready" && placed.length === 0 && hasAnyPlace;
 
   return (
-    <section className="map-page">
+    <section className="panel map-page">
       <header className="map-header">
         <div>
           <h1 className="page-title">{t("title")}</h1>

@@ -27,10 +27,10 @@ describe("tourSteps", () => {
       "persons",
       "events",
       "map",
-      "graph",
       "timeline",
-      "path",
+      "graph",
       "search",
+      "path",
       "chat",
     ] as const) {
       expect(ids).toContain(id);
