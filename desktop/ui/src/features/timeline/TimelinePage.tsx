@@ -28,6 +28,7 @@ import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { cn } from "../../lib/utils";
 import { useScrollMemory, useViewState } from "../../lib/useViewState";
 import { useEventFilterState } from "../events/useEventFilterState";
+import type { EventPersonScope } from "../events/helpers";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
 import { toTimelineEvents } from "./adapter";
@@ -277,6 +278,9 @@ export default function TimelinePage({
   // Event types are shared with the events and map screens.
   const eventFilters = useEventFilterState(viewKey);
   const eventTypes = eventFilters.filters.types;
+  const sharedPersonId = eventFilters.filters.personId;
+  const sharedPersonScope = eventFilters.filters.personScope;
+  const { setFilter: setSharedFilter } = eventFilters;
 
   // The stored view is the base; a one-shot person deep link from another
   // screen overrides the focus for this mount only.
@@ -292,6 +296,34 @@ export default function TimelinePage({
     personId,
     generations,
   } = view;
+
+  // Deep link from another screen: seed the shared person filter once, then
+  // the sync effect below turns it into the timeline focus.
+  useEffect(() => {
+    if (!initialPersonId) return;
+    setSharedFilter("personId", initialPersonId);
+    setSharedFilter(
+      "personScope",
+      initialScope === "ancestors" ||
+        initialScope === "descendants" ||
+        initialScope === "both"
+        ? initialScope
+        : "person",
+    );
+  }, [initialPersonId, initialScope, setSharedFilter]);
+
+  // The person and the relation are the same filter as on the events/map
+  // screens: opening the timeline keeps the chosen person and scope.
+  useEffect(() => {
+    const nextPersonId = sharedPersonId === "" ? null : sharedPersonId;
+    const nextScope: TimelineScope =
+      sharedPersonId === "" ? "all" : sharedPersonScope;
+    setView((previous) =>
+      previous.personId === nextPersonId && previous.scope === nextScope
+        ? previous
+        : { ...previous, personId: nextPersonId, scope: nextScope },
+    );
+  }, [sharedPersonId, sharedPersonScope]);
 
   // Every view change is persisted by the section view state hook.
   useEffect(() => {
@@ -502,20 +534,28 @@ export default function TimelinePage({
     setSelectedEventId(null);
   }, []);
 
-  const handleScopeChange = useCallback(
-    (next: TimelineScope) => {
-      // `applyView` already turns a repeated click on the active scope into a
-      // no-op, so the loaded rows and the fitted window stay in place.
-      applyView({ scope: next });
+  const handlePersonChange = useCallback(
+    (nextPersonId: string) => {
+      setSharedFilter("personId", nextPersonId);
+      if (nextPersonId === "") {
+        setSharedFilter("personScope", "person");
+        applyView({ personId: null, scope: "all" });
+        return;
+      }
+      applyView({
+        personId: nextPersonId,
+        scope: scope === "all" ? "person" : scope,
+      });
     },
-    [applyView],
+    [applyView, scope, setSharedFilter],
   );
 
-  const handlePersonChange = useCallback(
-    (nextPersonId: string | null) => {
-      applyView({ personId: nextPersonId });
+  const handlePersonScopeChange = useCallback(
+    (next: EventPersonScope) => {
+      setSharedFilter("personScope", next);
+      applyView({ scope: next });
     },
-    [applyView],
+    [applyView, setSharedFilter],
   );
 
   const handleEventSaved = useCallback(() => {
@@ -625,18 +665,18 @@ export default function TimelinePage({
         </div>
 
         <TimelineFilters
-          scope={scope}
-          personId={personId}
+          personId={sharedPersonId}
+          personScope={sharedPersonScope}
           persons={persons}
           photos={photos}
           generations={generations}
           types={eventTypes}
-          onScopeChange={handleScopeChange}
           onPersonChange={handlePersonChange}
+          onPersonScopeChange={handlePersonScopeChange}
           onGenerationsChange={(value) =>
             applyView({ generations: clampGenerations(value) })
           }
-          onTypesChange={(types) => eventFilters.setFilter("types", types)}
+          onTypesChange={(types) => setSharedFilter("types", types)}
         />
 
         {line.truncated && (

@@ -64,18 +64,15 @@ describe("project tour", () => {
       );
 
       if (slug === "timeline") {
-        // The ancestors scope asks for a person first; the picker shares the
-        // full-name placeholder with the people table.
-        await (await $("#timeline-scope-filter")).click();
-        await (
-          await $('//*[@role="option"][normalize-space(.)="Предки"]')
-        ).click();
+        // The person filter is shared with the events screen and defaults to
+        // "all people"; the full-name placeholder matches the people table.
         const person = await $("#timeline-focus-person");
         await person.waitForDisplayed({ timeout: 5000 });
+        expect(await person.getValue()).toBe("Все люди");
         expect(await person.getAttribute("placeholder")).toBe(
           "Имя, фамилия или отчество",
         );
-        await shot("timeline-ancestors-empty");
+        await shot("timeline-filters-empty");
       }
 
       if (!heading) {
