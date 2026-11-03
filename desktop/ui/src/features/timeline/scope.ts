@@ -7,6 +7,7 @@ export const LINE_SCOPES = [
   "person",
   "ancestors",
   "descendants",
+  "both",
 ] as const satisfies readonly TimelineScope[];
 
 /** Depth of the ancestors/descendants walk; mirrors the backend default. */
@@ -28,9 +29,14 @@ export function scopeLabel(scope: TimelineScope, t: Translate): string {
   return t(`scope.${scope}`);
 }
 
-/** `person`/`ancestors`/`descendants` need a focus person. */
+/** `person`/`ancestors`/`descendants`/`both` need a focus person. */
 export function scopeRequiresPerson(scope: TimelineScope): boolean {
-  return scope === "person" || scope === "ancestors" || scope === "descendants";
+  return (
+    scope === "person" ||
+    scope === "ancestors" ||
+    scope === "descendants" ||
+    scope === "both"
+  );
 }
 
 /** The committed focus that drives one `timeline_list` request. */
@@ -53,7 +59,9 @@ export function buildTimelineEventsOptions(
     options.personId = state.personId;
   }
   if (
-    (state.scope === "ancestors" || state.scope === "descendants") &&
+    (state.scope === "ancestors" ||
+      state.scope === "descendants" ||
+      state.scope === "both") &&
     state.generations !== undefined
   ) {
     options.generations = state.generations;

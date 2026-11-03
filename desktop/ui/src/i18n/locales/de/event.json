@@ -175,5 +175,12 @@
   "pageInfo": "Seite {{page}} von {{pages}}",
   "rangeInfo": "{{from}}–{{to}} von {{total}}",
   "sourceWikidata": "Wikidata · historisch",
-  "placeModernName": "moderner Name: {{name}}"
+  "placeModernName": "moderner Name: {{name}}",
+  "personScope": {
+    "label": "Beziehung",
+    "person": "Nur die Person",
+    "ancestors": "Vorfahren",
+    "descendants": "Nachkommen",
+    "both": "Vorfahren und Nachkommen"
+  }
 }

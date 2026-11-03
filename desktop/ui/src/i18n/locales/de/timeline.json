@@ -67,7 +67,8 @@
     "person": "Person",
     "ancestors": "Vorfahren",
     "descendants": "Nachkommen",
-    "place": "Ort"
+    "place": "Ort",
+    "both": "Vorfahren und Nachkommen"
   },
   "type": {
     "birth": "Geburt",

@@ -1,63 +1,36 @@
+// Compact one-row filter strip for the line screen. The person and the relation
+// scope are the same shared filter values as the events and map screens, so a
+// person chosen there opens the timeline with the same focus; types are shared
+// too. Generations and the sort stay local to the timeline.
+
 import { useMemo } from "react";
 import {
   makeStyles,
   shorthands,
   tokens,
 } from "@fluentui/react-components";
-import {
-  ArrowDownRegular,
-  ArrowUpRegular,
-  GlobeRegular,
-  PersonRegular,
-  type FluentIcon,
-} from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import type {
   EventType,
   MediaItem,
   Person,
-  TimelineScope,
 } from "../../api/types";
+import {
+  EVENT_PERSON_SCOPES,
+  isEventPersonScope,
+  type EventPersonScope,
+} from "../events/helpers";
 import { MultiSelectDropdown } from "../../components/filters/MultiSelectDropdown";
+import { SelectDropdown } from "../../components/filters/SelectDropdown";
 import { cn } from "../../lib/utils";
 import { eventTypeOptions } from "../events/typeOptions";
 import PersonSearch from "../persons/PersonSearch";
 import { useTimelineTranslate } from "./i18n";
-import {
-  LINE_SCOPES,
-  MAX_GENERATIONS,
-  scopeLabel,
-  scopeRequiresPerson,
-} from "./scope";
+import { MAX_GENERATIONS } from "./scope";
 import "./timeline-filters.css";
-
-const SCOPE_ICONS: Record<(typeof LINE_SCOPES)[number], FluentIcon> = {
-  all: GlobeRegular,
-  person: PersonRegular,
-  ancestors: ArrowUpRegular,
-  descendants: ArrowDownRegular,
-};
 
 // Fluent tokens for the compact filter strip; layout stays on Tailwind.
 const useStyles = makeStyles({
-  scopeOption: {
-    color: tokens.colorNeutralForeground2,
-    backgroundColor: "transparent",
-    border: `1px solid ${tokens.colorNeutralStroke2}`,
-    ":hover": {
-      backgroundColor: tokens.colorSubtleBackgroundHover,
-      color: tokens.colorNeutralForeground1,
-    },
-    ":focus-visible": {
-      outline: `2px solid ${tokens.colorStrokeFocus2}`,
-      outlineOffset: "2px",
-    },
-  },
-  scopeOptionActive: {
-    color: tokens.colorNeutralForeground1,
-    backgroundColor: tokens.colorNeutralBackground1Selected,
-    border: `1px solid ${tokens.colorNeutralStroke1}`,
-  },
   field: {
     color: tokens.colorNeutralForeground1,
     backgroundColor: tokens.colorNeutralBackground1,
@@ -73,35 +46,31 @@ const useStyles = makeStyles({
 });
 
 export interface TimelineFiltersProps {
-  scope: TimelineScope;
-  personId: string | null;
+  /** Shared person filter; empty means every person. */
+  personId: string;
+  /** Relatives included with the chosen person. */
+  personScope: EventPersonScope;
   persons: Person[];
   /** Primary photo per person id; initials are the fallback. */
   photos?: ReadonlyMap<string, MediaItem>;
   generations: number;
   /** Event types shown on the timeline; empty means every type. */
   types: readonly EventType[];
-  onScopeChange: (scope: TimelineScope) => void;
-  onPersonChange: (personId: string | null) => void;
+  onPersonChange: (personId: string) => void;
+  onPersonScopeChange: (scope: EventPersonScope) => void;
   onGenerationsChange: (generations: number) => void;
   onTypesChange: (types: string[]) => void;
 }
 
-/**
- * Compact one-row filter strip for the line screen: the focus scope, the
- * shared person picker (only when the scope needs a root person) and the walk
- * depth. The active state lives in the scope buttons, so there are no chips and
- * no reset action; event types are switched on the canvas legend only.
- */
 export function TimelineFilters({
-  scope,
   personId,
+  personScope,
   persons,
   photos,
   generations,
   types,
-  onScopeChange,
   onPersonChange,
+  onPersonScopeChange,
   onGenerationsChange,
   onTypesChange,
 }: TimelineFiltersProps) {
@@ -114,40 +83,47 @@ export function TimelineFilters({
       eventTypeOptions((type) => String(tShared(`enums:eventType.${type}`))),
     [tShared],
   );
+  const scopeOptions = useMemo(
+    () =>
+      EVENT_PERSON_SCOPES.map((scope) => ({
+        id: scope,
+        label: String(tShared(`event:personScope.${scope}`)),
+      })),
+    [tShared],
+  );
 
   return (
     <div
       data-testid="line-filters"
       className="timeline-filter-row flex flex-wrap items-center gap-x-3 gap-y-2"
     >
-      <div
-        role="group"
-        aria-label={t("filters.focusAria")}
-        className="timeline-filter-group"
-      >
-        {LINE_SCOPES.map((value) => {
-          const active = value === scope;
-          const Icon = SCOPE_ICONS[value];
-          return (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={active}
-              onClick={() => {
-                if (!active) {
-                  onScopeChange(value);
-                }
-              }}
-              className={cn(
-                "inline-flex h-7 items-center gap-1 rounded-full px-2.5 py-0 text-[11px] transition-colors",
-                active ? styles.scopeOptionActive : styles.scopeOption,
-              )}
-            >
-              <Icon fontSize={14} aria-hidden="true" />
-              {scopeLabel(value, t)}
-            </button>
-          );
-        })}
+      <div className="timeline-filter-person">
+        <PersonSearch
+          id="timeline-focus-person"
+          label={String(tShared("event:person"))}
+          hideLabel
+          persons={persons}
+          photos={photos}
+          value={personId}
+          placeholder={String(tShared("person:searchPlaceholder"))}
+          allOptionLabel={String(tShared("event:allPersons"))}
+          clearLabel={String(tShared("event:clearPerson"))}
+          onChange={onPersonChange}
+        />
+      </div>
+
+      <div className="timeline-filter-scope">
+        <SelectDropdown
+          options={scopeOptions}
+          value={personScope}
+          onChange={(id) => {
+            if (isEventPersonScope(id)) onPersonScopeChange(id);
+          }}
+          label={String(tShared("event:personScope.label"))}
+          placeholder={String(tShared("event:personScope.label"))}
+          disabled={personId === ""}
+          id="timeline-scope-filter"
+        />
       </div>
 
       <div className="timeline-filter-types">
@@ -164,22 +140,7 @@ export function TimelineFilters({
         />
       </div>
 
-      {scopeRequiresPerson(scope) && (
-        <div className="timeline-filter-person">
-          <PersonSearch
-            id="timeline-focus-person"
-            label={scopeLabel(scope, t)}
-            hideLabel
-            persons={persons}
-            photos={photos}
-            value={personId ?? ""}
-            placeholder={String(tShared("person:searchPlaceholder"))}
-            onChange={(next) => onPersonChange(next === "" ? null : next)}
-          />
-        </div>
-      )}
-
-      {(scope === "ancestors" || scope === "descendants") && (
+      {personScope !== "person" && (
         <label className="timeline-filter-label">
           <span className="shrink-0">{t("filters.generations")}</span>
           <input

@@ -297,6 +297,16 @@
     max-width: 100%;
   }
 
+  .event-filter-scope {
+    flex: 0 0 auto;
+    width: 11.5rem;
+    max-width: 100%;
+  }
+
+  .event-filter-scope > * {
+    width: 100%;
+  }
+
   .event-filter-type > * {
     width: 100%;
   }

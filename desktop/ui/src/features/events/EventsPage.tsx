@@ -74,6 +74,7 @@ import EventForm from "./EventForm";
 import { EventCard } from "./EventCard";
 import { EVENT_TYPE_ICONS } from "./typeIcons";
 import { useEventFilterState } from "./useEventFilterState";
+import { usePersonScopeIds } from "../persons/usePersonScopeIds";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
   EVENT_COLUMNS,
@@ -86,6 +87,7 @@ import {
   isEventSortKey,
   isEventType,
   isYearRangeInvalid,
+  type EventPersonScope,
   paginateEventRows,
   readEventColumns,
   resolveEventColumns,
@@ -468,6 +470,10 @@ export default function EventsPage({
     [view.filters],
   );
   const filters = sharedFilters.filters;
+  const scopePersonIds = usePersonScopeIds(
+    filters.personId,
+    filters.personScope,
+  );
   // The search text is not counted: it has its own clear button, and the reset
   // row should not appear for typing alone.
   const activeFilterCount =
@@ -520,8 +526,15 @@ export default function EventsPage({
   }, [sortKey, sortDirection]);
 
   const filtered = useMemo(
-    () => filterEventRows(events, debouncedQuery, filters, rowContext),
-    [events, debouncedQuery, filters, rowContext],
+    () =>
+      filterEventRows(
+        events,
+        debouncedQuery,
+        filters,
+        rowContext,
+        scopePersonIds,
+      ),
+    [events, debouncedQuery, filters, rowContext, scopePersonIds],
   );
 
   const sorted = useMemo(
@@ -705,6 +718,7 @@ export default function EventsPage({
         debouncedQuery,
         filters,
         rowContext,
+        scopePersonIds,
       ).length > 0;
     if (visible) {
       setFocusRequestId(saved.entity.id);
@@ -812,6 +826,11 @@ export default function EventsPage({
 
   const handlePersonFilter = (personId: string) => {
     setSharedFilter("personId", personId);
+    patch({ page: 0 });
+  };
+
+  const handlePersonScope = (scope: EventPersonScope) => {
+    setSharedFilter("personScope", scope);
     patch({ page: 0 });
   };
 
@@ -968,6 +987,8 @@ export default function EventsPage({
                 loading={loading}
                 personId={filters.personId}
                 onPersonChange={handlePersonFilter}
+                personScope={filters.personScope}
+                onPersonScopeChange={handlePersonScope}
                 persons={personEntities}
                 photos={photos}
                 types={filters.types}

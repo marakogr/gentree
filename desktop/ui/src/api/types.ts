@@ -336,6 +336,7 @@ export type TimelineScope =
   | "person"
   | "ancestors"
   | "descendants"
+  | "both"
   | "place";
 
 /** Dated rows are ordered by date; undated rows follow them. */

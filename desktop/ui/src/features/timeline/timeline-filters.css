@@ -26,7 +26,17 @@
     max-width: 18rem;
   }
 
-  /* The shared type dropdown keeps one width whatever the summary says. */
+  /* The scope and type selects keep one width whatever the summary says. */
+  .timeline-filter-scope {
+    flex: 0 0 auto;
+    width: 10.5rem;
+    max-width: 100%;
+  }
+
+  .timeline-filter-scope > * {
+    width: 100%;
+  }
+
   .timeline-filter-types {
     flex: 0 0 auto;
     width: 12.5rem;

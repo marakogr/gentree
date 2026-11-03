@@ -8,7 +8,7 @@ import { clickNav, consoleErrors, headingText, waitForShell } from "../lib/ui.js
 
 const PROJECT_NAME = `UX filters ${new Date().toISOString().slice(0, 19)}`;
 
-const TYPE_TRIGGER = 'button[aria-haspopup="listbox"]';
+const TYPE_TRIGGER = "#event-type-filter";
 const TYPE_LIST = '[role="listbox"][aria-multiselectable="true"]';
 const PERSON_INPUT = "#events-person-filter";
 
