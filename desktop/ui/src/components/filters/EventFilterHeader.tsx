@@ -99,8 +99,6 @@ export function EventFilterHeader({
             onChange={onTypesChange}
             label={t("event:type")}
             allLabel={t("event:allTypes")}
-            searchPlaceholder={t("event:typeFilterSearch")}
-            emptyLabel={t("event:noPersonMatches")}
             multipleLabel={(count) => t("event:typesSelected", { count })}
           />
         </div>

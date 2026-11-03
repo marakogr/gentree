@@ -10,7 +10,6 @@ const PROJECT_NAME = `UX filters ${new Date().toISOString().slice(0, 19)}`;
 
 const TYPE_TRIGGER = 'button[aria-haspopup="listbox"]';
 const TYPE_LIST = '[role="listbox"][aria-multiselectable="true"]';
-const TYPE_SEARCH = 'input[aria-label="Поиск типов"]';
 const PERSON_INPUT = "#events-person-filter";
 
 async function bodyText() {
@@ -168,12 +167,10 @@ describe("event filters", () => {
     );
     expect(icons).toBe(9);
 
-    const search = await $(TYPE_SEARCH);
-    await search.setValue("рожд");
-    await browser.pause(300);
-    expect(await optionTexts()).toEqual(["Все типы", "Рождение"]);
-
-    // Enter takes the first real match, not the fixed "all" row.
+    // The listbox takes focus: one ArrowDown reaches the first real type and
+    // Enter toggles it, no search field needed.
+    await browser.pause(200);
+    await browser.keys(["ArrowDown"]);
     await browser.keys(["Enter"]);
     await browser.pause(300);
     expect((await triggerText()).trim()).toBe("Рождение");
@@ -194,7 +191,7 @@ describe("event filters", () => {
     );
     expect(focusOnTrigger).toBe(true);
 
-    // Reopening starts from an empty search, so the whole list is back.
+    // Reopening shows the whole list again.
     await openTypes();
     expect(await optionTexts()).toHaveLength(10);
     const death = await $('//*[@role="option"][contains(., "Смерть")]');

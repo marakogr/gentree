@@ -17,6 +17,7 @@ import {
   mergeClasses,
   tokens,
 } from "@fluentui/react-components";
+import { ChevronDownRegular } from "@fluentui/react-icons";
 import type {
   OptionOnSelectData,
   SelectionEvents,
@@ -185,6 +186,14 @@ export function Combobox({
       selectedOptions={value === "" ? [] : [value]}
       clearable={clearLabel !== undefined}
       clearIcon={clearLabel ? { title: clearLabel } : undefined}
+      expandIcon={{
+        children: (
+          <ChevronDownRegular
+            fontSize={14}
+            style={{ color: "var(--muted-foreground)" }}
+          />
+        ),
+      }}
       placeholder={placeholder}
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}

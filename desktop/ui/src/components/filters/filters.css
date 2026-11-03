@@ -67,8 +67,8 @@
     gap: 0.35rem;
   }
 
-  /* Year range: the caption and the picked span sit left of the track; the
-     two end labels stay under it. */
+  /* Year range: the track takes the whole width; the two end labels stay under
+     it and the accessible group name is rendered visually hidden. */
   .year-range {
     display: flex;
     align-items: flex-start;
@@ -76,20 +76,6 @@
     min-width: 18rem;
     max-width: 26rem;
     padding-top: 2px;
-  }
-
-  .year-range-caption {
-    display: grid;
-    flex: 0 0 auto;
-    gap: 2px;
-    font-size: 0.78rem;
-    color: var(--muted-foreground);
-  }
-
-  .year-range-values {
-    color: var(--foreground);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
   }
 
   .year-range-track-block {
