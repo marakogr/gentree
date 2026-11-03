@@ -72,6 +72,42 @@ and `docs/screenshots/en/` (English README). The capture script deliberately
 does not screenshot the Settings screen: it reads the user's real config and may
 show local paths.
 
+## Recording
+
+The README hero animations are recorded frame by frame from the real app, not
+captured from the screen:
+
+```powershell
+npm --prefix desktop/ui run ux:build      # isolated UX app (first run is slow)
+make ux-setup                             # tauri-driver + msedgedriver
+
+# Only for the assistant part; the app reads this variable, never the repo.
+$env:GENTREE_CHAT_API_KEY = "<provider key>"
+make demo-gif
+```
+
+`node scripts/record-demo.mjs` starts on an empty isolated library, imports a
+GEDCOM generated from `demo/project-en` (or `demo/project`) through the real
+**Import** screen, then walks the tree, kinship, events, timeline, map, search
+and chat. Every frame is a WebDriver screenshot of the window content, so no OS
+cursor, taskbar or other window ends up in the clip. The script needs `ffmpeg`
+(`choco install ffmpeg`) and, for a much smaller GIF, `gifsicle`
+(`choco install gifsicle`); without gifsicle it falls back to one palette for the
+whole clip. It stops at the first failed step and writes:
+
+- `docs/assets/demo.gif` and `docs/assets/demo-ru.gif` — light theme, the ones
+  the READMEs use;
+- `docs/assets/demo-dark.gif` and `docs/assets/demo-ru-dark.gif` — the same
+  clips in the dark theme;
+- `desktop/ui/e2e/artifacts/demo-video/demo.mp4` — not committed; attach it to a
+  release or upload it by hand.
+
+`CAPTURE_LANG=en|ru` and `CAPTURE_THEME=light|dark` narrow the run,
+`CAPTURE_KEEP_FRAMES=1` keeps the PNG frames, `CAPTURE_DEMO` overrides the demo
+folder. The generated GEDCOM is written to `%PUBLIC%\GentreeDemo`, and the
+imported project stays under the isolated `com.gentree.desktop.ux` app data.
+The assistant part sends only this synthetic demo to the configured provider.
+
 ## Open it manually
 
 For a manual tour, copy the project folder into the isolated review app data
