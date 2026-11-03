@@ -63,14 +63,13 @@ const STEPS: readonly TourStep[] = [
     projectOnly: true,
   },
   { id: "map", target: "nav-map", screen: "map", projectOnly: true },
-  { id: "graph", target: "nav-graph", screen: "graph", projectOnly: true },
   {
     id: "timeline",
     target: "nav-timeline",
     screen: "timeline",
     projectOnly: true,
   },
-  { id: "path", target: "nav-path", screen: "path", projectOnly: true },
+  { id: "graph", target: "nav-graph", screen: "graph", projectOnly: true },
   {
     id: "search",
     target: "search-input",
@@ -78,6 +77,7 @@ const STEPS: readonly TourStep[] = [
     placement: "top-right",
     projectOnly: true,
   },
+  { id: "path", target: "nav-path", screen: "path", projectOnly: true },
   { id: "chat", target: "nav-chat", screen: "chat", projectOnly: true },
   { id: "help", target: "nav-help", screen: "help", projectOnly: true },
   { id: "finish" },
