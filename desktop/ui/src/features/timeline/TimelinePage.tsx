@@ -642,11 +642,13 @@ export default function TimelinePage({
           persons={persons}
           photos={photos}
           generations={generations}
+          hiddenTypes={hiddenTypeList}
           onScopeChange={handleScopeChange}
           onPersonChange={handlePersonChange}
           onGenerationsChange={(value) =>
             applyView({ generations: clampGenerations(value) })
           }
+          onHiddenTypesChange={(hidden) => applyView({ hiddenTypes: hidden })}
         />
 
         {line.truncated && (

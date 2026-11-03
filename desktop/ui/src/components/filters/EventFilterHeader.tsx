@@ -3,11 +3,14 @@
 // view of the event data (events now, map and timeline next), so switching a
 // view keeps the filters.
 
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { EventType, MediaItem, Person } from "../../api/types";
+import { EVENT_TYPES } from "../../features/events/helpers";
+import { EVENT_TYPE_ICONS } from "../../features/events/typeIcons";
 import { Button } from "../ui/button";
 import { FilterBar } from "./FilterBar";
-import { MultiSelectDropdown, type MultiSelectOption } from "./MultiSelectDropdown";
+import { MultiSelectDropdown } from "./MultiSelectDropdown";
 import { YearRange } from "./YearRange";
 import PersonSearch from "../../features/persons/PersonSearch";
 import "./filters.css";
@@ -19,11 +22,12 @@ export type EventFilterHeaderProps = {
   loading?: boolean;
   personId: string;
   onPersonChange: (id: string) => void;
+  /** Input id for the person picker; each screen keeps its own. */
+  personFilterId?: string;
   persons: Person[];
   photos?: ReadonlyMap<string, MediaItem>;
   types: readonly EventType[];
   onTypesChange: (types: string[]) => void;
-  typeOptions: MultiSelectOption[];
   fromYear: string;
   toYear: string;
   onFromYearChange: (value: string) => void;
@@ -40,11 +44,11 @@ export function EventFilterHeader({
   loading = false,
   personId,
   onPersonChange,
+  personFilterId = "events-person-filter",
   persons,
   photos,
   types,
   onTypesChange,
-  typeOptions,
   fromYear,
   toYear,
   onFromYearChange,
@@ -53,7 +57,19 @@ export function EventFilterHeader({
   resultLabel,
   activeCount,
 }: EventFilterHeaderProps) {
-  const { t } = useTranslation(["event", "common"]);
+  const { t } = useTranslation(["event", "common", "enums"]);
+  const typeOptions = useMemo(
+    () =>
+      EVENT_TYPES.map((type) => {
+        const Icon = EVENT_TYPE_ICONS[type];
+        return {
+          id: type,
+          label: t(`enums:eventType.${type}`),
+          icon: <Icon fontSize={16} aria-hidden="true" />,
+        };
+      }),
+    [t],
+  );
 
   return (
     <div className="event-filter-header">
@@ -78,7 +94,7 @@ export function EventFilterHeader({
       <div className="event-filter-row">
         <div className="event-filter-person">
           <PersonSearch
-            id="events-person-filter"
+            id={personFilterId}
             label={t("event:person")}
             hideLabel
             persons={persons}

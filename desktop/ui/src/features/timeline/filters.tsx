@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   makeStyles,
   shorthands,
@@ -6,11 +7,16 @@ import {
 import {
   ArrowDownRegular,
   ArrowUpRegular,
+  DocumentRegular,
+  FireRegular,
   GlobeRegular,
+  HeartRegular,
   PersonRegular,
   type FluentIcon,
 } from "@fluentui/react-icons";
+import { useTranslation } from "react-i18next";
 import type { MediaItem, Person, TimelineScope } from "../../api/types";
+import { MultiSelectDropdown } from "../../components/filters/MultiSelectDropdown";
 import { cn } from "../../lib/utils";
 import PersonSearch from "../persons/PersonSearch";
 import { useTimelineTranslate } from "./i18n";
@@ -20,6 +26,8 @@ import {
   scopeLabel,
   scopeRequiresPerson,
 } from "./scope";
+import { LINE_TYPES } from "./LineCanvas";
+import type { LineIconKind } from "./line";
 import "./timeline-filters.css";
 
 const SCOPE_ICONS: Record<(typeof LINE_SCOPES)[number], FluentIcon> = {
@@ -27,6 +35,14 @@ const SCOPE_ICONS: Record<(typeof LINE_SCOPES)[number], FluentIcon> = {
   person: PersonRegular,
   ancestors: ArrowUpRegular,
   descendants: ArrowDownRegular,
+};
+
+/** Icons of the timeline marker families, the same set the legend draws. */
+const TYPE_ICONS: Record<LineIconKind, FluentIcon> = {
+  birth: PersonRegular,
+  marriage: HeartRegular,
+  death: FireRegular,
+  other: DocumentRegular,
 };
 
 // Fluent tokens for the compact filter strip; layout stays on Tailwind.
@@ -70,9 +86,12 @@ export interface TimelineFiltersProps {
   /** Primary photo per person id; initials are the fallback. */
   photos?: ReadonlyMap<string, MediaItem>;
   generations: number;
+  /** Marker families the user switched off in the legend or the dropdown. */
+  hiddenTypes: LineIconKind[];
   onScopeChange: (scope: TimelineScope) => void;
   onPersonChange: (personId: string | null) => void;
   onGenerationsChange: (generations: number) => void;
+  onHiddenTypesChange: (hiddenTypes: LineIconKind[]) => void;
 }
 
 /**
@@ -87,12 +106,32 @@ export function TimelineFilters({
   persons,
   photos,
   generations,
+  hiddenTypes,
   onScopeChange,
   onPersonChange,
   onGenerationsChange,
+  onHiddenTypesChange,
 }: TimelineFiltersProps) {
   const t = useTimelineTranslate();
+  const { t: tShared } = useTranslation(["event"]);
   const styles = useStyles();
+
+  const typeOptions = useMemo(
+    () =>
+      LINE_TYPES.map((kind) => {
+        const Icon = TYPE_ICONS[kind];
+        return {
+          id: kind,
+          label: t(`type.${kind}`),
+          icon: <Icon fontSize={16} aria-hidden="true" />,
+        };
+      }),
+    [t],
+  );
+  const visibleTypes =
+    hiddenTypes.length === 0
+      ? []
+      : LINE_TYPES.filter((kind) => !hiddenTypes.includes(kind));
 
   return (
     <div
@@ -127,6 +166,26 @@ export function TimelineFilters({
             </button>
           );
         })}
+      </div>
+
+      <div className="timeline-filter-types">
+        <MultiSelectDropdown
+          options={typeOptions}
+          values={visibleTypes}
+          onChange={(values) =>
+            onHiddenTypesChange(
+              values.length === 0
+                ? []
+                : LINE_TYPES.filter((kind) => !values.includes(kind)),
+            )
+          }
+          label={String(tShared("event:type"))}
+          allLabel={String(tShared("event:allTypes"))}
+          multipleLabel={(count) =>
+            String(tShared("event:typesSelected", { count }))
+          }
+          id="timeline-type-filter"
+        />
       </div>
 
       {scopeRequiresPerson(scope) && (

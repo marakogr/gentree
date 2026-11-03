@@ -1,10 +1,5 @@
 {
   "title": "Mapa",
-  "subtitle": "Eventos con un lugar confirmado",
-  "rangeLabel": "Rango de años",
-  "rangeFrom": "Desde",
-  "rangeTo": "Hasta",
-  "rangeReset": "Todos los años",
   "placesCount": "Lugares: {{count}}",
   "pointCount": "Puntos: {{count}}",
   "noPoints": "Aún no hay eventos en el mapa",

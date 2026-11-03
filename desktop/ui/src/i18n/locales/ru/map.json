@@ -1,10 +1,5 @@
 {
   "title": "Карта",
-  "subtitle": "События с подтверждённым местом",
-  "rangeLabel": "Диапазон лет",
-  "rangeFrom": "С",
-  "rangeTo": "По",
-  "rangeReset": "Все годы",
   "placesCount": "Мест: {{count}}",
   "pointCount": "Точек: {{count}}",
   "noPoints": "На карте пока нет событий",

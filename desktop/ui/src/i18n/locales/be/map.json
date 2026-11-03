@@ -1,10 +1,5 @@
 {
   "title": "Карта",
-  "subtitle": "Падзеі з пацверджаным месцам",
-  "rangeLabel": "Дыяпазон гадоў",
-  "rangeFrom": "Ад",
-  "rangeTo": "Да",
-  "rangeReset": "Усе гады",
   "placesCount": "Месцаў: {{count}}",
   "pointCount": "Кропак: {{count}}",
   "noPoints": "На карце пакуль няма падзей",

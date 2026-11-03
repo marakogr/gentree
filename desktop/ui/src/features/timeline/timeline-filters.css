@@ -26,6 +26,17 @@
     max-width: 18rem;
   }
 
+  /* The shared type dropdown keeps one width whatever the summary says. */
+  .timeline-filter-types {
+    flex: 0 0 auto;
+    width: 12.5rem;
+    max-width: 100%;
+  }
+
+  .timeline-filter-types > * {
+    width: 100%;
+  }
+
   .timeline-filter-label {
     display: inline-flex;
     align-items: center;

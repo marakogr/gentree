@@ -13,6 +13,7 @@ const PROJECT_NAME = `UX review ${new Date().toISOString().slice(0, 19)}`;
 const PAGES = [
   ["Люди", "persons"],
   ["События", "events"],
+  ["Карта", "map"],
   ["Хронология", "timeline"],
   ["Дерево", "graph"],
   ["Родство", "kinship"],

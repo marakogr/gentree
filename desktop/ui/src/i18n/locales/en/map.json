@@ -1,10 +1,5 @@
 {
   "title": "Map",
-  "subtitle": "Events with a confirmed place",
-  "rangeLabel": "Year range",
-  "rangeFrom": "From",
-  "rangeTo": "To",
-  "rangeReset": "All years",
   "placesCount": "Places: {{count}}",
   "pointCount": "Points: {{count}}",
   "noPoints": "No events on the map yet",
