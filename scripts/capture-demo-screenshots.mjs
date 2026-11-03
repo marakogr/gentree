@@ -50,6 +50,7 @@ const SHORT_NAMES = {
   "07-tree-descendants": "tree-descendants",
   "08-kinship": "kinship",
   "09-search-biography": "search-biography",
+  "10-event-card": "event-card",
 };
 
 const COPY =
@@ -375,6 +376,37 @@ async function main() {
     await waitHeading(COPY.events);
     await new Promise((resolve) => setTimeout(resolve, 1200));
     await shot("03-events");
+
+    // The event card: a row click opens the read-only card next to the table.
+    // The window is wider here so the shared filter row keeps its two-row
+    // layout next to the card, as it does at a normal desktop width.
+    await request("POST", `/session/${sessionId}/window/rect`, {
+      x: 20,
+      y: 20,
+      width: 1920,
+      height: 1080,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    const cardOpened = await exec(
+      `const row=document.querySelector('[id^="event-row-"]');
+       if (!row) return false;
+       row.click();
+       return true;`,
+    );
+    if (!cardOpened) throw new Error("no event row to open");
+    await waitFor(
+      `return Boolean(document.querySelector(".events-card .events-card-title"));`,
+      "the event card",
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await shot("10-event-card");
+    await request("POST", `/session/${sessionId}/window/rect`, {
+      x: 20,
+      y: 20,
+      width: 1600,
+      height: 1000,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 700));
 
     await clickText(COPY.timeline, "nav button");
     await new Promise((resolve) => setTimeout(resolve, 2800));

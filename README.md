@@ -55,8 +55,10 @@ project folder, your data.
 - **A tree that stays readable.** Ancestors, descendants and blood relatives
   are laid out as separate families instead of one tangle of lines, and any
   person can be labelled with their kinship to the root you pick.
-- **A timeline.** Dated events sit on a zoomable scale with
-  filters by person, type, place and year. Undated facts stay in their own list
+- **A timeline.** Dated events sit on a zoomable scale, and Events, Map and
+  Timeline share one filter row: person, relation (ancestors, descendants or
+  both), event types and years. Jump from a person's events straight to the
+  timeline and back with the same filters. Undated facts stay in their own list
   instead of being guessed into place.
 - **Bring your existing research.** Import AT5 archives and GEDCOM 5.5.1 or
   7.0 files, merge projects, export to either GEDCOM version, and exchange
@@ -68,16 +70,16 @@ project folder, your data.
 
 | Area | What you get |
 | --- | --- |
-| **People** | Several names per person (including birth surnames), patronymics, gender, notes, external IDs, avatars, and a fast sortable table with a detail card. |
-| **Events** | Birth, death, marriage, divorce, burial, residence, occupation, education and your own types. Day, month, year or unknown precision, places with address suggestions and historical-name matching, extra fields per event type, participants. |
-| **Timeline** | A zoomable timeline of dated events, filterable by person, type, place and year. Events without a date go into a separate list rather than being guessed into place. |
-| **Map** | Events with a confirmed place on a pan/zoom map, filtered by a year range. Points group by place and cluster when zoomed out; opening the map makes no network request. |
+| **People** | Several names per person (including birth surnames), patronymics, gender, notes, external IDs, avatars, and a fast sortable table with a detail card that collects facts such as occupations from occupation events. |
+| **Events** | Birth, death, marriage, divorce, burial, residence, occupation, education and your own types. Day, month, year or unknown precision, places with address suggestions and historical-name matching, extra fields per event type, participants. A row click opens a read-only card with every field, the people and the files, and **Edit** opens the full form. |
+| **Timeline** | A zoomable timeline of dated events, filtered by person, relation, event type and year; the same filter row works on Events, Map and Timeline, and **Go to timeline** carries it over from Events. Events without a date go into a separate list rather than being guessed into place. |
+| **Map** | Events with a confirmed place on a pan/zoom map, filtered by person, relation, type, year and the search phrase. Points group by place and cluster when zoomed out; opening the map makes no network request. |
 | **Tree and kinship** | Ancestor, descendant and blood-relative views, spouse pairs, adoption links, and kinship labels relative to any root. The rootless whole-project forest is an experimental mode behind a settings flag. |
 | **Kinship mode** | Pick two people and see how they are related: the term, common ancestor, path length, alternative paths and a diagram. |
 | **Search** | Instant search over names, biographies, event descriptions, places and sources, backed by a local Tantivy index. |
 | **Media** | Attach photos and documents, pick a profile photo, open files in your system viewer, save copies. Files are checksummed, and removing a link never deletes the file itself. |
 | **Import and exchange** | Read-only AT5 import (the Drevo Zhizni program format), GEDCOM 5.5.1/7.0 import and export (5.5.1 by default), project merge with a review step, JSON/ZIP export and import, automatic backups with restore. |
-| **Data quality** | Checks for duplicate IDs, dangling references, relationship rules, duplicate birth and death events, and a lifespan check when you add or edit an event. |
+| **Data quality** | Checks for duplicate IDs, dangling references, relationship rules, duplicate birth and death events, and a lifespan check when you add or edit an event; the results open in a dialog from the problem badge. |
 | **AI assistant (optional)** | Any OpenAI-compatible endpoint, streaming answers, 14 in-process read tools (search, people, events, sources, ancestors, timeline, path, kinship, validation, backups) and an opt-in person-edit tool. 12 embedded skills guide the model through genealogy tasks; every write is dry-run and confirmed first. |
 | **Guide and version** | An offline user guide with search and an "ask the assistant" hand-off, plus the installed version in Settings → About. |
 | **Languages** | Russian, Ukrainian, Belarusian, English, German and Spanish. |
@@ -89,23 +91,22 @@ project folder, your data.
 | People | Person card |
 | --- | --- |
 | ![People list with green and red ages, parents and actions](docs/screenshots/en/people.png) | ![Person card with facts, events and family sections](docs/screenshots/en/person-card.png) |
+| **Events** | **Event card** |
+| ![Event table with the shared filter row, types, dates, people and places](docs/screenshots/en/events.png) | ![Event card with date, place, participants and files](docs/screenshots/en/event-card.png) |
 | **Ancestors** | **Descendants** |
 | ![Ancestor tree with kinship labels and spouse lines](docs/screenshots/en/tree-ancestors.png) | ![Descendant tree with each family in its own branch](docs/screenshots/en/tree-descendants.png) |
-| **Events** | **Timeline** |
-| ![Event table with types, dates, people and places](docs/screenshots/en/events.png) | ![Zoomable timeline of dated events](docs/screenshots/en/timeline.png) |
+| **Timeline** | **Map** |
+| ![Zoomable timeline of dated events with the shared filters](docs/screenshots/en/timeline.png) | ![Map of the synthetic demo project with clustered event points around Kazan, Moscow and Saint Petersburg](docs/screenshots/en/map.png) |
 | **Kinship** | **Search a biography** |
 | ![Kinship mode: term, common ancestor, path and diagram](docs/screenshots/en/kinship.png) | ![Search by a phrase from a biography, with the match highlighted](docs/screenshots/en/search-biography.png) |
 
+Events, Map and Timeline keep the same filter row, so a person, a relation, a
+type or a year range survives switching between them. Map points group by place
+and cluster when zoomed out; opening the map makes no network request until it
+draws the optional online tiles.
+
 In the English demo project, searching for `keeper` finds the biography of the
 family's archive keeper; searching for `missing` also finds the death record.
-
-### Map
-
-Events with a confirmed point on a pan-and-zoom map, filtered by year. Points
-group by place and cluster when zoomed out; opening the tab makes no network
-request until it draws the optional online tiles.
-
-<p align="center"><img src="docs/screenshots/en/map.png" alt="Map of the synthetic demo project with clustered event points around Kazan, Moscow and Saint Petersburg" width="100%"></p>
 
 ## An AI assistant, built in
 
