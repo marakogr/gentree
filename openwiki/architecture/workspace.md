@@ -36,10 +36,10 @@ sources:
     resource: repo://desktop/crates/storage/Cargo.toml
   - id: openwiki-source-ba67a2844f3cdb93304b3fae
     resource: repo://desktop/crates/storage/src/lib.rs
-generated: { by: "opencode", at: "2026-11-02T09:11:48.673Z" }
+generated: { by: "opencode", at: "2026-11-03T10:50:52.373Z" }
 verified:
   - by: openwiki/0.7.0
-    at: 2026-11-02T09:11:48.673Z
+    at: 2026-11-03T10:50:52.373Z
 ---
 
 # Workspace layout and crate dependencies
@@ -114,7 +114,7 @@ The shell also carries platform glue: an asset-protocol scope narrowed to the op
 
 ## Build constraints
 
-The workspace pins `rust-version = "1.88"`, uses edition 2021, sets `unsafe_code = "forbid"` for every crate and warns on all Clippy lints. The pinned toolchain lives in `desktop/rust-toolchain.toml`. Version `0.2.0` is shared by every crate through `[workspace.package]`.
+The workspace pins `rust-version = "1.88"`, uses edition 2021, sets `unsafe_code = "forbid"` for every crate and warns on all Clippy lints. The pinned toolchain lives in `desktop/rust-toolchain.toml`. Version `0.4.0` is shared by every crate through `[workspace.package]`.
 
 ## Related pages
 

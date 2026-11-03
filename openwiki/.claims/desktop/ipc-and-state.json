@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:af23b074fdd273b640414fd06574e1f6d18b13a8559a2a0a3c74e5a907950b5b",
+  "pageVersion": "sha256:18bcd8a58a7f4d748d2fbd421f052e0e3a578e3d456cf675b16fd6d70b509d4b",
   "claims": [
     {
       "id": "claim_b606bdba01fa4c90a8f8eb5affcfb14c",
@@ -11,8 +11,8 @@
           "version": "repo-lines-v1:sha256:0333aefffefbf7b32606964d57a2d3a7a13759aa70d6ff83c997999386f5dafe:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjE5ZjE3ODA2ZGFiYTM5MzhhNTUxYzg1ODNlZTMwZGViMjRlNjc0NDJhYTI1NGI2ZjI2N2Q4NjJlYzg4YmNiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTllNzYzNTVjZjExOTk0ODBjM2Y5OTgzNmIxNDg2Yzg0MWQ4OTFmYWFkOTA0YzYwOGUwOTMwMjJkMzc1N2FlZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTVhNDQ2ZDNhNTdhNmRjMmI1YTdiZGNiZTI4MTZjNmZmODQzYjU5MDFlMzA1MTA5NDZlZmRiYWMzYWI5MmVmYiJ9"
         },
         {
-          "resource": "repo://desktop/apps/desktop/tauri.conf.json#L12-L30",
-          "version": "repo-lines-v1:sha256:ab5cac7ffe913eabc9283885bde66f8691851fc255b3ae1866f7e44a53306ec6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5MzZhYjhlMjQ4MjhiMWZhYTRkNjMzNzZlOGQxMmIwODlkNGQ0YzMzYzRiZmRiMThmNmNjZWQ1MmQ2YzY2MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjODJhMTIwZDE1MTdjOTk5NWMxNjc3MTI5YzEwODFkNjdjM2VjMzljZmU3YmQxYzZjZWQ5MTNjNDhhODYwYzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiZDFhZGRkYWZjNWIwZTI3YWE3NmQ4MjljNWYzMjQ5ZWRjZDMwZjY0ZmQ3YmVmMDUxNWQ1NGExMTMwODZhZGIifQ"
+          "resource": "repo://desktop/apps/desktop/tauri.conf.json#L12-L31",
+          "version": "repo-lines-v1:sha256:31bfc37645e3f01bfd4e963177e4859ae71e4b9f581584cecf1f35339236313c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5MzZhYjhlMjQ4MjhiMWZhYTRkNjMzNzZlOGQxMmIwODlkNGQ0YzMzYzRiZmRiMThmNmNjZWQ1MmQ2YzY2MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjODJhMTIwZDE1MTdjOTk5NWMxNjc3MTI5YzEwODFkNjdjM2VjMzljZmU3YmQxYzZjZWQ5MTNjNDhhODYwYzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiZDFhZGRkYWZjNWIwZTI3YWE3NmQ4MjljNWYzMjQ5ZWRjZDMwZjY0ZmQ3YmVmMDUxNWQ1NGExMTMwODZhZGIifQ"
         }
       ]
     },
@@ -31,7 +31,7 @@
       "statement": "The open ProjectStore is held in a shared Arc<Mutex<Option<ProjectStore>>> so Tauri commands and the chat tool backend operate on the same project instance.",
       "evidence": [
         {
-          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L619-L642",
+          "resource": "repo://desktop/apps/desktop/src/commands/chat.rs#L602-L625",
           "version": "repo-lines-v1:sha256:a75be1508eb410b185a3d991a67ea08b2a82175af9f5cd03ba9ae16e3ead3984:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlY2IyNTBiMGVkMmM1YWE3NDU5YzhkMWJhNTgxMzNmNjlmYTkxOGY2NjQ5NTM3NjQxNTM1YTQ5NmUxNDgwZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNjJmYTNhNGMxMmNhZjM4MjlmNWE5MDJmYWU1YmFmMjA2NTUwOWM0NjdjMzA0ZjFlM2RkNTQ3YzkyNWI4NDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzMzk4MzQ3ZmYxZTRhNjBhMWVlMmJiZDEyZTJlMjE5MzE0YWI2MWFjNGI0ZGVjNmEwMmVhZjgzOWE1MTkyMzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NmFhNjc3ZjRjOGIwN2QwMjEyMjUxM2RmNzYwMTM0OTc3ZWRmMjU2NTk4ZjNlYTNlOGRmOGI1NzJhOGMyNGIifQ"
         },
         {
@@ -129,10 +129,24 @@
           "version": "repo-lines-v1:sha256:20656bae697f6f2492f9a2fd09171c42e66296d4d8a8a958396ecf7f79129708:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxYTdmMjIwNmI3NWM3ZmJiNWIxN2IxM2Q1ODRkZGY3N2E5NmMyNWJhOTliMWMyYTM3YTI4ZmQ0OGYzODA2ZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiMWM5OTZkY2E1YzkxNGNiZDE5MzM2MTM0YzkzZjA2MmRkNWEzMWE5MTU2MjgzZmNjOTU1ZDRmMzhjM2Y1NDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNmYzhhNGNiZDJlYmI3MzdmZjEwYmQwZWNkM2I2YjlmODZmOTQ5MWYyNmUyZTRmMTAwYmUwMjY2Y2FlMDU0NjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU4YmI0MTkwMWY2NDdkOTNlN2JhNjZjMWExZGQ2NTA1NmM1MTQ5ZWI3ZDk2OGU3MDA1Y2QxNTkyYmIxN2VkYmMifQ"
         }
       ]
+    },
+    {
+      "id": "claim_7fead03e7b4c455d8f8fe2389cc2a271",
+      "statement": "The `timeline_list` command filters by a `scope` parameter (`all`, `person`, `ancestors`, `descendants`, `both`, `place`); the `ancestors`/`descendants`/`both` scopes resolve a person set via a capped BFS over parent/child edges from a required `personId` root, and `scope_truncated` is set when the walk exceeds `MAX_SCOPE_PERSONS`.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/timeline.rs#L32-L54",
+          "version": "repo-lines-v1:sha256:5b0693370b4dc44c18ea61f265adf40365ca8a9cc96b29876674044d6623f0a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3MzdjMDRhNWViODc4ZTRhM2Y0MzIyYzhhZTg1YjE1ZjY2MDQxMjg0YWFkM2Q5MDE2YzNiYTI5OTJlZjRkMGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU3MjU3OWQ1OTg2Y2JmNTA1YTIyYzFlYWU4NTUzYmFhODI0ZjY0ZjMwOThmOWQ4YjdkYjg4YmM0MTc5MDA4MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk2YmEzZjUxYWJmODNmZWMwOTM4ZWE0ZmRlOTcxZTk5NTVjNTc2MDE5ZmYyMDlhODJiNjA1MDhmMzQzYmE2YmEifQ"
+        },
+        {
+          "resource": "repo://desktop/apps/desktop/src/commands/timeline.rs#L343-L401",
+          "version": "repo-lines-v1:sha256:1cc9b748e2a5824152350b04470f9bdf56106cee2277716b76a10987914105c9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMWVlMzNlZTk1ZmFlZTFjMTBlOWViZjNkM2RlNDFiYjE5MjUxNWNhZDc3Y2RhMjA1ZTU0NmRhMTcwMDFhNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1YWIyM2RmNjEyMDRiZjYwZDA5YTZhZTNjYjcyYzljYjJhOWM3Yjg0ZGExNmVlNzlhNjUyZDNjZmEwNTQyNWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiYzk4ZDZiMGRjNDkyYzUwMTZkZjEwODA1YTNhNTRlYjljMTg0YTVhNjEzN2U3ZjRiZWNmYTBjMjIwNTUwZDAifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.0",
-    "at": "2026-11-02T09:11:48.673Z"
+    "at": "2026-11-03T10:50:52.373Z"
   }
 }

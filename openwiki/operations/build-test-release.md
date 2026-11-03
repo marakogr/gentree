@@ -8,8 +8,6 @@ sources:
     resource: repo://.githooks/commit-msg
   - id: openwiki-source-bf5be0c9253ed1d07b502e10
     resource: repo://.githooks/pre-commit
-  - id: openwiki-source-6d4b4e707b8d60b6ccfa3425
-    resource: repo://.github/workflows/openwiki-update.yml
   - id: openwiki-source-b44a8027ffdbd67cec7a542d
     resource: repo://desktop/docs/build.md
   - id: openwiki-source-fb9602341b89c516f9c15ec6
@@ -22,10 +20,10 @@ sources:
     resource: repo://scripts/doctor.mjs
   - id: openwiki-source-6c1e6679adf9b50d263823d2
     resource: repo://scripts/setup.mjs
-generated: { by: "opencode", at: "2026-11-02T09:11:48.673Z" }
+generated: { by: "opencode", at: "2026-11-03T10:50:52.373Z" }
 verified:
   - by: openwiki/0.7.0
-    at: 2026-11-02T09:11:48.673Z
+    at: 2026-11-03T10:50:52.373Z
 ---
 
 # Build, quality gates and release
@@ -67,6 +65,7 @@ Everything runs locally; there is no backend deployment. The Makefile is the sin
 | `make hooks` | set `core.hooksPath=.githooks` |
 | `make demo-project` | regenerate the synthetic demo project |
 | `make demo-screenshots` | capture the README gallery from that demo |
+| `make release` | tag the version in `tauri.conf.json` and push it; CI builds a draft release |
 
 ## Quality gates
 
@@ -113,13 +112,11 @@ Replacing the release binary requires the app to be closed: while `gentree-deskt
 
 ## Release pipeline
 
-The GitHub release workflow runs on a `v*` tag and creates a draft release. It builds the NSIS installer and the portable archive, writes `SHA256SUMS-windows-x64.txt`, signs the artifacts when a Windows certificate is configured, and runs an advisory Defender scan. The MSI stays a local `make build` target. The portable build uses `tauri.portable.conf.json`, which empties the updater endpoint and key so a portable copy can never install itself. In-app updates are opt-in and remain disconnected while `tauri.conf.json` keeps the placeholder endpoint or public key; `docs/releases.md` documents the key generation, endpoint and verification steps.
+The GitHub release workflow runs on a `v*` tag and creates a draft release. `make release` (which calls `scripts/release.mjs`) tags the version from `desktop/apps/desktop/tauri.conf.json` and pushes the tag; the workflow then verifies that the tag matches that version before building. It builds the NSIS installer and the portable archive, writes `SHA256SUMS-windows-x64.txt`, signs the artifacts when a Windows certificate is configured, and runs an advisory Defender scan. The MSI stays a local `make build` target. The portable build uses `tauri.portable.conf.json`, which empties the updater endpoint and key so a portable copy can never install itself. In-app updates are opt-in and remain disconnected while `tauri.conf.json` keeps the placeholder endpoint or public key; `docs/releases.md` documents the key generation, endpoint and verification steps.
 
 ## Documentation automation
 
-The repository carries a manual OpenWiki workflow (`.github/workflows/openwiki-update.yml`): `workflow_dispatch` only, Node 22, `openwiki code --update`, then a commit/PR of `openwiki/`, `AGENTS.md` and the workflow itself. It requires an `OPENAI_API_KEY` repository secret (and optional LangSmith secrets), removes transient `openwiki/.run.json` state, and uses full git history so updates can diff against the last documented commit.
-
-Because the workflow refreshes the wiki from source, do not hand-edit generated OpenWiki pages; change code/docs and let the update run, or run the same update locally.
+There is no CI workflow for the wiki. A maintainer refreshes `openwiki/` locally with `openwiki code --update`, which rewrites the generated pages and the OpenWiki block in `AGENTS.md` from current source, then commits the result by hand. Because the wiki is generated from source, do not hand-edit OpenWiki pages unless explicitly asked; change code/docs and regenerate.
 
 ## Privacy hygiene
 

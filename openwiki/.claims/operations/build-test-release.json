@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:3ba4b71a5bc95fc4892c2c1de2a6bbc1cc3ac70fc92dc5d5b549ea314d710304",
+  "pageVersion": "sha256:8eefc873b97d9100c14e4f50fc884613275110bffe7ba901259598e063ee5276",
   "claims": [
     {
       "id": "claim_13e444ae5af14a88a7bddfe34a1e0b5d",
       "statement": "The Makefile is the single build entry point: fmt-check, workspace clippy with -D warnings, workspace tests, UI typecheck/test/build/i18n:check, optional ux-setup/ux-review targets, plus dev, exe, run, build, portable, rebuild, clean, hooks and demo targets.",
       "evidence": [
         {
-          "resource": "repo://Makefile#L1-L110",
-          "version": "repo-lines-v1:sha256:64a126a05485c2c1852f50196e4de3e8cc05bfed1e2294163d426b5e3a67d9f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmMjAyZTM2ZTE3NDg1M2MyODYwNGM2N2EzOGVmODJiNDRlNmNlNmRmYWE5OWFkOWI2NzE4ODYwYmQ4MmM3ZmNmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhMGM4OTU5MjFjYjRhNGI5MWIyZTVhNTlhMGEwMTNjZGIwNTMwMjk0MDBmMGYyZWUyYWEwZjY2YzE0ZWUxOWYyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+          "resource": "repo://Makefile#L1-L113",
+          "version": "repo-lines-v1:sha256:ce522011cf7ea60a4423262fb665cb863ec9f95cf456727780053d20396272ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmMjAyZTM2ZTE3NDg1M2MyODYwNGM2N2EzOGVmODJiNDRlNmNlNmRmYWE5OWFkOWI2NzE4ODYwYmQ4MmM3ZmNmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhMGM4OTU5MjFjYjRhNGI5MWIyZTVhNTlhMGEwMTNjZGIwNTMwMjk0MDBmMGYyZWUyYWEwZjY2YzE0ZWUxOWYyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
     },
@@ -77,16 +77,6 @@
       ]
     },
     {
-      "id": "claim_713d518f09c848b39b372ae55cf2f008",
-      "statement": "A scheduled OpenWiki workflow runs openwiki code --update daily and on demand, then commits openwiki/, AGENTS.md and the workflow itself, using an OPENAI_API_KEY secret and full git history.",
-      "evidence": [
-        {
-          "resource": "repo://.github/workflows/openwiki-update.yml#L1-L60",
-          "version": "repo-lines-v1:sha256:f381f3886321205311c890d19e6eeb66d5eca9069188d52151502b4dc957db68:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5NDNlNzZlZDg3Nzg0MGZkMzU2MjZjOTg4NzFmZTg0MzYyMDc0NWQ4MmIxN2U2YzE4NDJjMDcxNjM4YzFkZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBiZTFhZGFkYTE3YWUyZjRmM2Q4ZDQ3OTdkYjM2ZDUyNjc1OGJmNDlhOGM0YTc0OTg5ODY0YTQzY2NiMThlMTUifQ"
-        }
-      ]
-    },
-    {
       "id": "claim_5d4266f7427a4a4783914dad04c77bd5",
       "statement": "The WebdriverIO UI review harness is optional and outside make check: it builds into desktop/target/ux from a config that renames the bundle identifier to com.gentree.desktop.ux and points WebView2 at e2e/.cache, so review runs start empty and leave the user's project folders untouched.",
       "evidence": [
@@ -107,6 +97,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.0",
-    "at": "2026-11-02T09:11:48.673Z"
+    "at": "2026-11-03T10:50:52.373Z"
   }
 }

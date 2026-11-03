@@ -20,16 +20,32 @@ sources:
     resource: repo://desktop/ui/src/components/ui/combobox.tsx
   - id: openwiki-source-bd69d1cd6fbb3edb0044f1eb
     resource: repo://desktop/ui/src/components/ui/helpers.ts
+  - id: openwiki-source-3cae3f1e1aaabee6f01aa068
+    resource: repo://desktop/ui/src/features/events/EventCard.tsx
+  - id: openwiki-source-e8c1d87b4b4090adc7cb1585
+    resource: repo://desktop/ui/src/features/events/EventsPage.tsx
+  - id: openwiki-source-e08a1eee3b161d38fcb8cb3c
+    resource: repo://desktop/ui/src/features/events/useEventFilterState.ts
   - id: openwiki-source-296b674e85c82c04d1d93998
     resource: repo://desktop/ui/src/features/graph/layout.ts
+  - id: openwiki-source-83a7690ee472e471716bca60
+    resource: repo://desktop/ui/src/features/persons/occupations.ts
+  - id: openwiki-source-9d22e840d00d02cbeb38054a
+    resource: repo://desktop/ui/src/features/persons/PersonCard.tsx
+  - id: openwiki-source-a515dac2ac03696c3c12a13f
+    resource: repo://desktop/ui/src/features/persons/usePersonScopeIds.ts
+  - id: openwiki-source-abe41956257a536438f1e0fe
+    resource: repo://desktop/ui/src/features/projects/ValidationSummary.tsx
   - id: openwiki-source-7f66fd9f6969fa765b7e19a4
     resource: repo://desktop/ui/src/i18n/index.ts
   - id: openwiki-source-acdfbd17f9e5f50099153b83
     resource: repo://desktop/ui/src/lib/navigation.ts
-generated: { by: "opencode", at: "2026-11-02T09:11:48.673Z" }
+  - id: openwiki-source-00a389f8e9828bab6cc4e203
+    resource: repo://desktop/ui/src/lib/viewState.ts
+generated: { by: "opencode", at: "2026-11-03T10:50:52.373Z" }
 verified:
   - by: openwiki/0.7.0
-    at: 2026-11-02T09:11:48.673Z
+    at: 2026-11-03T10:50:52.373Z
 ---
 
 # React UI structure and localization
@@ -40,7 +56,7 @@ verified:
 
 There is no routing library. `App.tsx` keeps the current `ShellTab` in state and derives the sidebar from the pure model in `src/lib/navigation.ts` (`ShellTab`, `ProjectsSection`, `GLOBAL_NAV`, `PROJECT_NAV`, `sidebarModel`, `activeNavId`, `backOrigin`, `backLabelKey`).
 
-The available destinations are Project, Persons, Events, Map, Tree (graph), Relation (path), Timeline, Search, Chat and Settings. Project-scoped tabs are only reachable when a project is open; the default project tab is `persons`. Navigation state also carries one-shot focus targets (a person, an event, a graph root, a timeline person), which is how the validation report and chat links jump into a screen without a global router.
+The available destinations are Project (global), the project-scoped tabs in order People, Events, Map, Timeline, Tree (graph), Search, Kinship (Relation), Chat, and Help plus Settings pinned to the footer. Project-scoped tabs are only reachable when a project is open; the default project tab is `persons`. Navigation state also carries one-shot focus targets (a person, an event, a graph root, a timeline person), which is how the validation report and chat links jump into a screen without a global router.
 
 The sidebar collapses to icons below 900 px and can be toggled manually; a manual choice wins until the next media-query change. Theme preference is `system | light | dark`, persisted locally for instant first paint, then reconciled with `settings_get` because the config file is the source of truth.
 
@@ -72,10 +88,26 @@ Node cards are plain buttons positioned over an SVG edge layer; panning is a tra
 
 ## Other feature screens
 
-- **People and events** share the filter bar and support bulk selection; the event form, place autocomplete and event-file section live under `src/features/events`.
+- **People and events** support bulk selection; the event form, place autocomplete and event-file section live under `src/features/events`. Events and People also share the event filter model described below.
 - **Map** (`src/features/map`) filters events by year, groups and clusters confirmed points and draws optional OSM tiles or the bundled Natural Earth outline; see [Event places, coordinates and the map](../domain/places-and-map.md).
 - **Onboarding** (`src/features/onboarding`) renders the first-run tour from pure step/storage helpers and keeps the bubble clear of search results.
 - **Import** is a drop-zone modal that reports unparsed rows; **projects** owns the start screen, backup/restore and merge dialogs.
+
+## Shared event filters
+
+The Events, Map and Timeline screens share one event filter model. The query and the person/type/year values live in the common `filters` view-state section (`useEventFilterState` in `src/features/events/useEventFilterState.ts`), so switching views keeps the filters; each screen keeps its own sort, page and selection next to it. `EventFilterHeader` (`src/components/filters/EventFilterHeader.tsx`) is the shared header: a search box, a person picker with a relation-scope select, a type multi-select and a year range.
+
+The person-scope filter offers `person`, `ancestors`, `descendants` and `both`. `usePersonScopeIds` (`src/features/persons/usePersonScopeIds.ts`) resolves the relative set by calling the graph `ancestors`/`descendants` commands at a capped depth, so the scope is built from real parent-child links and never invents a node; a failed walk falls back to the chosen person alone. The pure filter/sort/paging logic lives in `src/features/events/helpers.ts` (`EventListFilters`, `filterEventRows`, `yearInRange`, `paginateEventRows`), covered by Vitest.
+
+## Events screen: card, timeline jump and data check
+
+Selecting an event row opens a read-only `EventCard` beside the table; its read mode mirrors the timeline popover (type kicker, title, icon-labelled rows for date, precision, qualifier, place, participants, description, type-specific details and files), and a pencil opens `EventForm` for editing. A toolbar button ("Go to timeline") jumps to the timeline carrying the same shared person and type filters.
+
+The anomaly badge (derived by `detectAnomalies`/`anomalySummary` in `src/features/events/anomalies.ts`) opens a data-check dialog built on `ValidationSummary` (`src/features/projects/ValidationSummary.tsx`), the same report body the project check screen renders; an `EVENT_OUT_OF_LIFESPAN` issue names the event first and renders an "open" action that jumps to that row.
+
+## Person card facts
+
+The person card's Facts section includes an Occupation fact derived from the person's `OCCUPATION` events: `occupationPositions` (`src/features/persons/occupations.ts`) collects the distinct positions in the same oldest-first order as the events timeline, skipping blank positions and other event types, and case-insensitive duplicates count once.
 
 ## Pickers and popups
 

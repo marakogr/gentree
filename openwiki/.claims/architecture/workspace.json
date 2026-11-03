@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:5c2535a6425976bd944ef930c7da966cd07820754525ed63fc47cabbb4d56391",
+  "pageVersion": "sha256:87bba6cd1869108213cd9e48fa9b4c3ed77cd04cbe7d095bd161c2f6782161f0",
   "claims": [
     {
       "id": "claim_00a008cc032e469db0338fd427de4013",
@@ -104,11 +104,15 @@
     },
     {
       "id": "claim_11da7827776140d1953af74f3df405a5",
-      "statement": "The workspace forbids unsafe code, warns on all Clippy lints and shares version 0.2.0 plus edition 2021 across every crate.",
+      "statement": "The workspace forbids unsafe code, warns on all Clippy lints and shares version 0.4.0 plus edition 2021 across every crate.",
       "evidence": [
         {
-          "resource": "repo://desktop/Cargo.toml#L1-L41",
-          "version": "repo-lines-v1:sha256:588b644e8be152cbc943d7e9b66980688f00bed3c070cce695c82ea366473744:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzNGUxMDJjODYxZjk5NGQyYWFjZTkxMTRkMzkyZGJjMTYyMTkwZTAwYmU4ZmUzNTdkNDcyMTUwY2E0Mzk2MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0ZWU2OTFkY2I4ZGE1OTcxODNlNmNmYzhhNzAwYTI3NDQ2NDY4Y2RhNzNmMmY4ZTRjMjZmNmY4Njk4MWI3YjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1NWJhZDgwYTMyNmM1ODYwYzYwZGY3ZGRhMTNkZTcyYTdlNWVjZjZiNjI3ODYzMDkyZjhhNzk5NjQ5ZTdiYjQifQ"
+          "resource": "repo://desktop/Cargo.toml#L16-L18",
+          "version": "repo-lines-v1:sha256:becef51cd37dc630f78b48741a627de125aa04b4cd7b652a4122bc08a6ae611c:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2ExODk2M2IzZDA3YTA5MTkxNDQ4ZjdlMjUwZDllODdmZDAwNmMxY2IyZmJhYTZjMmI0ZjNlOTI5NGQyMWM5YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWZhODY4NDBhOWFkZTE5M2U2NmJlZjk4NzcxODA3YzExOTdlOWE4YmFmYWE0MjIyMmQ1NzZmODU2YzUyOGQ1ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2JjZTVhMDRmYWYwODI3MjhjZGZiODA3NGM3NzZmMzg4MTk5ZjY1Yjk4OThiN2ZjMWExMjQ1Y2ViMmY4OTllOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWEyMjY5MGNkMThhMWQwYWQzMDA3ZmFjZGU1ODQ2YTA3ODZjMzE2M2VhMDcwZjBhMDAzMDA3ZmRlMmU1YWIyOCJ9"
+        },
+        {
+          "resource": "repo://desktop/Cargo.toml#L41-L45",
+          "version": "repo-lines-v1:sha256:3b50ee460ac61bad365896986720da66109a88b4f649f49a06c9bb1a62fd47c6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzRlZTY5MWRjYjhkYTU5NzE4M2U2Y2ZjOGE3MDBhMjc0NDY0NjhjZGE3M2YyZjhlNGMyNmY2Zjg2OTgxYjdiMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWM3NmQxMDhmZmY5YjA1NTFkZTVlYTk5YzQwMDBlYzBmMzJkMGRmZDlhYmI4Mjg0MzBmYjYzNzhiNWUzZTg3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzFiMWIxZTNjMzVjNzE5ZWFhZDg0ODEwZmIyYTExYzVjM2MzMjlkZTZkOWZlZjViOTRjMDRlZGE1M2QyMDZiNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
         }
       ]
     },
@@ -143,6 +147,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.0",
-    "at": "2026-11-02T09:11:48.673Z"
+    "at": "2026-11-03T10:50:52.373Z"
   }
 }

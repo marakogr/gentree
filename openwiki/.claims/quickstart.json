@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b75ee30dac1e75a83c60fee9f0a3ba332f2058be0bf86b2f22f8d06d22eb11a6",
+  "pageVersion": "sha256:25af40c729eb9c0a59a9c31ba69909ef08edb47f5fd1ce8669d7d118790bf180",
   "claims": [
     {
       "id": "claim_16f7c1c56c5f4aae82135e6c899429f4",
@@ -17,7 +17,7 @@
       "statement": "The repository is a Rust workspace with core/storage/search/import/config/chat/mcp crates, desktop and launcher Tauri apps, a React UI, and docs for build, exchange, map and release behavior.",
       "evidence": [
         {
-          "resource": "repo://README.md#L352-L380",
+          "resource": "repo://README.md#L349-L377",
           "version": "repo-lines-v1:sha256:c899d51ab58d0d7437ef2b88af36211dd5ebeaeeb6d55628fecc7086e049373d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1ODAxZDVlMDQ2Y2E0OTUzYjU1NzFmOTI0MjE5NjA0ZjNhZDJjMTUxYjljODdiM2QzNjhkNzY2YTQxODVlYWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwYjEwN2QyODI1MzZjNDY4Nzk0OWExODA2ODFlNjZhNjM1YjZkZTFkMWVjZDY4ZDNiMDNhYzM3NWZlMGJjMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhNTBlNzkxOGRjODg4NDUzZTgwY2FmNWU5ZGRkNWQ5NDJjNDkyYTBmMDFhMmIyNTA1YjBjMjViMWE5OTY2MzUifQ"
         }
       ]
@@ -27,18 +27,18 @@
       "statement": "The documented entry points are make setup, make check, make dev, make run, make exe and make build, and plain cargo build is insufficient because Tauri then waits for Vite on localhost:1420.",
       "evidence": [
         {
-          "resource": "repo://README.md#L218-L232",
+          "resource": "repo://README.md#L214-L228",
           "version": "repo-lines-v1:sha256:7e94f7b1eb4478cd7e6d4837b7bfd3102f36f094ef0e8b402a26ffb8899839bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3ZDNmZTkwOGFiMzk5ZTc1NzZhZWM1NjU0YmViNWZkODkxMDg3MDE3ZGQxNWFkZTg3MzU4ODM3YzljYWNmOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlOWFlOWY5YjhhYzFkZTYyM2U2ZDFlNDdmYmRhNDM0MDFjMzJhNTg1MDFmMjlhYWJjYTMwOTBmNTE5NmEyMWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjNGE1OGFlM2NmYTc3NDVmZTA4YTRhMjQ1MTMyMTc3NzE0MDM0NGY2ZDM1M2RlMDY3YWU5YmEyMDdmYTQ3M2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxODQyOTNjODA5NGZhZTk3MGNiYmQ4MmE2ZWM2ZjU3YzU0MjBlY2E0NGZlZjFlOTYzNjUzNGI5MzJiNWFlNmIifQ"
         }
       ]
     },
     {
       "id": "claim_9b7031f946684217af6a1511e35824fb",
-      "statement": "AGENTS.md defines the source-of-truth priority: invariants first, then contract tests, then current documentation under docs/, then README, and requires stopping instead of silently changing either side when they disagree.",
+      "statement": "AGENTS.md defines the source-of-truth priority: invariants first, then code and contract tests, then OpenSpec specs when the directory exists, then current documentation under docs/ and desktop/docs/, then README, and requires stopping and asking instead of silently changing either side when code contradicts an invariant or contract test.",
       "evidence": [
         {
-          "resource": "repo://AGENTS.md#L10-L18",
-          "version": "repo-lines-v1:sha256:49d24efaa5e103773f906ae06a23da85cdc5033b71eab324d1ea6637c5c5989b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzdiMTMwZjI5OGVlN2FhNDc4Y2I4ODdmMmFlMTQyZmNkOTY4NDViOGRjMjk1NWUyYjQ4OTA2NjBkMzE4ZjlhNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTU0NzYyNjFlMzdmNWQ2YTQwYTlmNzk0YjNkYzYyMmIwOGJmMjQwY2ZkMzU3NzQ1N2E4ZDliODI3ZDk1ZGI0ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjExYmRmN2YwYWEwYmYzZDJmNDNmZjFjM2UyOTIxM2E4ZWQxNWQyM2JlNTQ1NDAyM2IyMzVmMGUzNTQ4MzY5ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTdhNzU3OTk3M2ZiMDZkZGEzZjcwYzIyMzhjNDIxYTFlMDBkZjE2MjEwZGUzMjY3ZGJhYTgyZDRhZTZmNjJkYSJ9"
+          "resource": "repo://AGENTS.md#L10-L19",
+          "version": "repo-lines-v1:sha256:2ded9d67c03f7631073768f526c5412132ffa3be1a76ad406e022284b7fd5776:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3YjEzMGYyOThlZTdhYTQ3OGNiODg3ZjJhZTE0MmZjZDk2ODQ1YjhkYzI5NTVlMmI0ODkwNjYwZDMxOGY5YTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlOGUxMTIzM2FjNTA5Nzg3N2M0NTU1NmMxNTNjMjI5ZGExNmE5NGQyNTVlMjEwOTVhNjMzNGNlMmY1OTE1ZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4YjYwY2Y0NmQzYjM1NGRmMTIwNzRkZjY2MDBmZmYyNWY2ZDZjY2Q4OGEwYjZjNGYxYmNjYzhlNmZjZDI3MmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE3YTc1Nzk5NzNmYjA2ZGRhM2Y3MGMyMjM4YzQyMWExZTAwZGYxNjIxMGRlMzI2N2RiYWE4MmQ0YWU2ZjYyZGEifQ"
         }
       ]
     },
@@ -47,12 +47,8 @@
       "statement": "The invariants ban fabricated dates, sibling edges, self-links/duplicates/cycles, cascade deletion of shared events, media file deletion on unlink, network MCP servers, secret logging and chat traffic before provider configuration.",
       "evidence": [
         {
-          "resource": "repo://AGENTS.md#L136-L155",
-          "version": "repo-lines-v1:sha256:fe91705f8d548970352d6ba499d1f9b606ab40efe21cb3aac9a65ec6963c2762:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjM2M0ZTE4MDNhYzZlYzEwNGFhMTVlZTI3YzljNzgzZmQ1ZTFhYTliZjZiMWE1MmIzNzA4Mjg5MDI1MzhjOWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlOWMxYTZmZjQ1ZGYzMWYxNjNkOTQ5MGM4N2IyNTc0Zjk5YjUyY2RmNTdkN2M3YzJmYWQ5NGQzYTcxMWM2MTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5YjQ4YzFjOTNhZjYzMmQwZDU0ZjM3NWYzNGJlNjNiZmUwODRkYTIxZGJmOThkODlmMmM1MTc0ZjRmNTY2ZWEifQ"
-        },
-        {
-          "resource": "repo://AGENTS.md#L24-L45",
-          "version": "repo-lines-v1:sha256:e1a1e17ddcdc6b3a5da30a9ef369902fff32882bb250d89da6b2faf53ca10c3b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhODEyMDNjMDExNTI5NjU0NTg3ZjU5NmVhYTk1NTU4MTVkNDk3MjUzODdlOWMyYjNhODYzNGQxMjk4NzQxYTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhYmNhNTc4NmQyYzVjYjc2MWQ2MDdkZjBmZDEzYzI0NjQxNmFiZTQzMjc2OTZlNDAzNzVkNzE2ZDM2ZDAwODYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyMGNkMDIzNDdhMjc5MmQ0ZWY3MzE0OGU1MzRhOWQ4MTRkYmFmYjEyMmM4ODc5OGI5MGVmZGQ3MWY3ODc1NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzODhlODU4MDFmYjI5MmViNDRjZTE0ZmRjODE5ZDU5OGNhYWI0YThkYWU5M2M3OWI4NDFkMzM2OTFkZjIwNTIifQ"
+          "resource": "repo://AGENTS.md#L31-L40",
+          "version": "repo-lines-v1:sha256:22b492a058b6a29424adcbba740ca0dda09bede6d9245417eddc934cc1f39e1d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4ZjY4MjQzMjZiMDUzYWY2NmZiYWJiNjE4ZTc2NzFhMjE0NTQ0MGVjMjM1NDNhMjMyNDllZDQ4YjJiNmQ3MjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNlZWE5NGU1OWFmZWU5NmE0ZTY5OTE5NzMxYTljMTQyNDA4NGVlNzkxOWM0YjA4OWI4YmJmMzkwMjhmODFjNTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzYWU2ODNhOGU2MzhjZGVlMTU3ODNhNWFiNzAyZjFiZjQ3NjRhOGU4MmE4NGM0MDkzZGYwNTY0MWUyZTgwZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYwNzdhZTQzNWI4YWE4ZmVkNDVhNGQyMGE3NTFmODI2MmE4MjI2YjczMTYyMGE1ZGRhMWI3OWFlOGU1ODUwNGIifQ"
         }
       ]
     },
@@ -83,6 +79,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.0",
-    "at": "2026-11-02T09:11:48.673Z"
+    "at": "2026-11-03T10:50:52.373Z"
   }
 }

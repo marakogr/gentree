@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:42af574bd14abba69b6a70f7b1035893a65cc95867596361b7523fe9ded02e62",
+  "pageVersion": "sha256:6642688116690d6a3e9cb63b1a9f7b19b134765db92140a7d1581cc0290c4ae7",
   "claims": [
     {
       "id": "claim_c0b83cbee0ef4366a8be027440b8de58",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://desktop/ui/package.json#L1-L51",
-          "version": "repo-lines-v1:sha256:cb78c75d237b1c3cdd1d79f19a98b0c64146a307e02b958b1c1a4c01d91166b9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "version": "repo-lines-v1:sha256:e4b141a9beb2b9d58d8d53e3b8457ec1d4b87cf0ad815bddf5aeb80b402bf790:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://desktop/ui/src/app/providers.tsx#L1-L37",
@@ -32,15 +32,11 @@
     },
     {
       "id": "claim_ff81ccff519c48378950a615297de025",
-      "statement": "Navigation is local shell state derived from pure helpers in src/lib/navigation.ts rather than a router, and covers Project, Persons, Events, Map, Tree, Relation, Timeline, Search, Chat and Settings.",
+      "statement": "Navigation is local shell state derived from pure helpers in `src/lib/navigation.ts` rather than a router; the project tabs are ordered People, Events, Map, Timeline, Tree (graph), Search, Kinship (Relation), Chat, with Project global and Help/Settings pinned to the footer.",
       "evidence": [
         {
-          "resource": "repo://desktop/ui/src/App.tsx#L130-L230",
-          "version": "repo-lines-v1:sha256:7c5ee16f770889f0cf7910416ed14190a2c8fa84de398e8c11f64414a85b626b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0ODFmMjRhNTM0ZTFmNTZhOGRlNjQ1OWRkNjAyZGYzMWY3OWVmMzAwNmYyODY1NTM2Njk3ZTRjNjFmNTJmNWU5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkYmFkZDMwZDE0MDkwYWFlMmE4MGRkYTEyOWE5OTYwOTM1ZjRhMWE5MDY0Y2M1ODI3ZjEzNDdiN2MxY2ZkYzg3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1YjFhZjg2NGJlYWMyZjc0ZmNjMGNhZmFmNDVhNGM0MzNlYzUwNTkxZDJiY2YxMzgyOGEwZWJiMGU3NWY1N2YzIn0"
-        },
-        {
-          "resource": "repo://desktop/ui/src/lib/navigation.ts#L1-L107",
-          "version": "repo-lines-v1:sha256:d127a780997336da68f472fb9934212cfc2e2b87d489ca8afc3d96835e5478f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5Yjg0NTkxY2UyNGIwYTRiN2QzZTRiODA5NDA1YTExYmMyZjQ0MGJiY2ZjNzVmNjYwZTc5ZGY5M2EyZDBkZDAxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyYWNkY2ViOWJjMzg4ODBkYzZkNDlhYjVkOTk0YjVmNTYyOGFhNWViZmRkNmVjYTZkOWQ3NjFjMTQwOWE0OTI4IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4ZGE5YmYwN2IwODE4ZGM5YzU3Yjc5MDQ0ZTkzYjI4MGY4ZTg5NGE2NzA5YThmZTM0NDAxMTAyMjcyMWQ2Y2RhIn0"
+          "resource": "repo://desktop/ui/src/lib/navigation.ts#L41-L68",
+          "version": "repo-lines-v1:sha256:d41498c291f815b84973e3f7f3c6de7e384705a1405a7d31955c325d84461899:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1ZDhjMDA2NWM5YjM5ZTk1MGI0OTY5M2NlYTZmYTdkNzRmM2FhNzVkOTdhMTE4MTQwNGU1OTdlNjRmMjE1NzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2NTliZjFhMzQxMGNiOTk0YThhOTNjMTYwODRhNGJlMzU3ZWFkODI5MzJmZjgxMTFmZGI0Yzg4YjFlMTAwZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1MzUxNDNhYTJmMWMxNmMzMDczMjYyYjVhOTU0YjgwYTI3OTJlZDI4MDE2MmI5MDRjYTA2ZTI0N2VkMWViMDAifQ"
         }
       ]
     },
@@ -49,7 +45,7 @@
       "statement": "The sidebar collapses to icons below 900 pixels and a manual toggle wins until the next media-query change.",
       "evidence": [
         {
-          "resource": "repo://desktop/ui/src/App.tsx#L183-L194",
+          "resource": "repo://desktop/ui/src/App.tsx#L180-L191",
           "version": "repo-lines-v1:sha256:749956ccc5ab3c744a08b996d52b972c75ef1cb9982b7f36e68fa463f993821d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1NTQyYWQ5MTMzZjQxYjkzMGUyMGMxNGY5MzYwMGFhNGE3N2YwYzAxMDYwYmI0YWE1MTU5YTA1MTQxMjNkNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkYzUyZjA4YjM5YjA4YjAxYzhkMzA4YmY4ODBiMGJlZjAyZmQxZGZjYzlkOWFhOTNhNGQxYjVmNGQ1OGI2Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0MDg0MmI2YWZjODM5NWU4ZTQ3OWYyYmExZGE5Mzc0MWJiMGJkOWZkMmYwNzUyMjA5OGJkZTc4MmFmYTU0NzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyZDdmNWY1ZDY1ZTM2YzIzMDc1MGY3YjY4YjEzZjMxZWU2NzEzMzFkMzFiNjE5NWVjOTM3ZmYzZWRhM2M0NmQifQ"
         }
       ]
@@ -59,7 +55,7 @@
       "statement": "Theme preference (system, light, dark) is cached locally for first paint and then reconciled with settings_get, because the config file is the source of truth.",
       "evidence": [
         {
-          "resource": "repo://desktop/ui/src/App.tsx#L137-L229",
+          "resource": "repo://desktop/ui/src/App.tsx#L134-L226",
           "version": "repo-lines-v1:sha256:cecf844258766ea517462e239972bd90f4f28ab6f1a47b62633c5bc44e89a816:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0YTFhOTA1OTNhZmViZTg3OTRiNGM3ZWE4NjIwNDM2NmU1N2ViZGE0ZmI2Y2NlMGU5MWU2ZjM1Y2YwMTAyZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlNGViMTIyYzE3ZWZmYzhiNThlNjZlNTM4ODFkZmE4MGZlM2I1NGE2MzRiNzM0NzBmNTY4M2Q2Mjg4MjI0YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYmFjNjhmZjdkODY3ZjY1MTE2Mzc0MjczZGQ1Y2RhYTYwZGJmZWY2YjIyZWE0Yjc2MmJjZGFjYmM1MGJmNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNWFhYTI1OTU1NzA5YjgwZjdiYTI0Y2VjY2RiYTQ3ODc4NjE2NWNkNjYzODM1YTQyY2QxOTAyZmNhNTdhYWIifQ"
         }
       ]
@@ -94,11 +90,11 @@
       "evidence": [
         {
           "resource": "repo://desktop/ui/package.json#L1-L20",
-          "version": "repo-lines-v1:sha256:0969499192f0857db57d9d53240548278bde0ecf15b65e83ec6e72d9f8117680:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhM2I0NjlkOWUwOTc1NzIyNDY2NjczNGM5ZWY3YjI1NGQ4ODUzNGY1ZDViYjcwOTg5NjA4MDVjNTUzZGMzMDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxNzIyYjhkZTM0ZjczNzc2OWMyZjc4NzQ1ZDM0MjM0YWVhNmQyYzgxMDg0OTMxODQ0NWIwYzA0ZWU5NTg3MGUifQ"
+          "version": "repo-lines-v1:sha256:08e45ff970e81385df479de8db576785eb265b784165122d81066092e7aa97d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhM2I0NjlkOWUwOTc1NzIyNDY2NjczNGM5ZWY3YjI1NGQ4ODUzNGY1ZDViYjcwOTg5NjA4MDVjNTUzZGMzMDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxNzIyYjhkZTM0ZjczNzc2OWMyZjc4NzQ1ZDM0MjM0YWVhNmQyYzgxMDg0OTMxODQ0NWIwYzA0ZWU5NTg3MGUifQ"
         },
         {
           "resource": "repo://desktop/ui/src/lib/navigation.ts#L1-L107",
-          "version": "repo-lines-v1:sha256:d127a780997336da68f472fb9934212cfc2e2b87d489ca8afc3d96835e5478f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5Yjg0NTkxY2UyNGIwYTRiN2QzZTRiODA5NDA1YTExYmMyZjQ0MGJiY2ZjNzVmNjYwZTc5ZGY5M2EyZDBkZDAxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyYWNkY2ViOWJjMzg4ODBkYzZkNDlhYjVkOTk0YjVmNTYyOGFhNWViZmRkNmVjYTZkOWQ3NjFjMTQwOWE0OTI4IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4ZGE5YmYwN2IwODE4ZGM5YzU3Yjc5MDQ0ZTkzYjI4MGY4ZTg5NGE2NzA5YThmZTM0NDAxMTAyMjcyMWQ2Y2RhIn0"
+          "version": "repo-lines-v1:sha256:d08c82b775a080db7ae7962c8573cd1d1d4cc2a1b1b24ec9ef2ed4f2a9de1660:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5Yjg0NTkxY2UyNGIwYTRiN2QzZTRiODA5NDA1YTExYmMyZjQ0MGJiY2ZjNzVmNjYwZTc5ZGY5M2EyZDBkZDAxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyYWNkY2ViOWJjMzg4ODBkYzZkNDlhYjVkOTk0YjVmNTYyOGFhNWViZmRkNmVjYTZkOWQ3NjFjMTQwOWE0OTI4IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4ZGE5YmYwN2IwODE4ZGM5YzU3Yjc5MDQ0ZTkzYjI4MGY4ZTg5NGE2NzA5YThmZTM0NDAxMTAyMjcyMWQ2Y2RhIn0"
         }
       ]
     },
@@ -121,12 +117,12 @@
       "statement": "Pickers cap their popup at five 48px rows plus listbox padding and pass autoSize 'width' to Fluent's positioning, because Fluent's default autoSize true writes its own max-height and lets the list stretch to the rest of the window.",
       "evidence": [
         {
-          "resource": "repo://desktop/ui/src/components/ui/combobox.tsx#L183-L190",
-          "version": "repo-lines-v1:sha256:7b2a642080a0d777d6b44d8c01e542869ab0000e77d2afef4cd43ba4ff2a84eb:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmI0M2M3NDI5NTIzMDlhNjBiMzkxOTBhYmVhYmM1YjA1ZTBhODQwMWNhNThlNDgzMzk1YWM4MmUwMzgyMThiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWU2NzNhYmQ0NTdhOTdlZWExN2E2MDA2MmViMGZhZWE2YmRmMDk0ODY4Y2M2YjhmOGMwZWJkYTJmNjFlZDQyZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjNmMTc1MDFkOTIxOTliZWMwNDRmMmM0YTNmNDJjMDQ2YzhhYjliMGE5M2FkNGZjMmU1YTRjYTFkMDk0ZjBhYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjgzNjA2MDlhNGEyOWZkOGZjMTExZjhlMDY4ODlhZTJiMDNkMTRlNzFhYzkwMmQyMzZiOTdjZmU0ZjU2YWJhNiJ9"
+          "resource": "repo://desktop/ui/src/components/ui/combobox.tsx#L202-L212",
+          "version": "repo-lines-v1:sha256:ac5b6019217de1a89982752463acf020a5b118a534a4e3332b6bcd76976e5b86:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiNDNjNzQyOTUyMzA5YTYwYjM5MTkwYWJlYWJjNWIwNWUwYTg0MDFjYTU4ZTQ4MzM5NWFjODJlMDM4MjE4YjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlNjczYWJkNDU3YTk3ZWVhMTdhNjAwNjJlYjBmYWVhNmJkZjA5NDg2OGNjNmI4ZjhjMGViZGEyZjYxZWQ0MmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzZjE3NTAxZDkyMTk5YmVjMDQ0ZjJjNGEzZjQyYzA0NmM4YWI5YjBhOTNhZDRmYzJlNWE0Y2ExZDA5NGYwYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4MzYwNjA5YTRhMjlmZDhmYzExMWY4ZTA2ODg5YWUyYjAzZDE0ZTcxYWM5MDJkMjM2Yjk3Y2ZlNGY1NmFiYTYifQ"
         },
         {
-          "resource": "repo://desktop/ui/src/components/ui/combobox.tsx#L99-L113",
-          "version": "repo-lines-v1:sha256:c408e3a9544b988f1ff32be55271dc48cf8769de5048188ffff1f3a4001aea37:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmMTAwM2ViMjY1MTU3YzU0ZDQwZDViNTgxMGQ3ZjIxZDY2ZTY4OGI5YjAxZDY5NTk4NjU4Y2NkNDMxOTlmNjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OWQ4NmMxOGIwMmM5NTM0NDBiMTQ0ZjZhYmEzYjE2ZDhjNDZiYTkyMTcyMGEzMzJjMThlZGY1N2U5ZTJlMWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3ZTc5N2U4YmE4Njk5Y2VlODQ1OGE0ZTRhMWNmZmFiYjJkNDEyZWIyNTM5OThkMzlmODAzMGY4NzllMDk4YjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzODNhYzE5OThhZDg4Mjg4NDVjNzBlZGZmOWQyNWZjYzc4OTU3ZjU1MzBhNzk4MzhkNTE4NGExZTE3MGZlNDIifQ"
+          "resource": "repo://desktop/ui/src/components/ui/combobox.tsx#L105-L124",
+          "version": "repo-lines-v1:sha256:b26b9fc8faa4ecf9ec073037c5d125bada230a2ce3a6d0b9fc1695381ea2dfa9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmMTAwM2ViMjY1MTU3YzU0ZDQwZDViNTgxMGQ3ZjIxZDY2ZTY4OGI5YjAxZDY5NTk4NjU4Y2NkNDMxOTlmNjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OWQ4NmMxOGIwMmM5NTM0NDBiMTQ0ZjZhYmEzYjE2ZDhjNDZiYTkyMTcyMGEzMzJjMThlZGY1N2U5ZTJlMWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3ZTc5N2U4YmE4Njk5Y2VlODQ1OGE0ZTRhMWNmZmFiYjJkNDEyZWIyNTM5OThkMzlmODAzMGY4NzllMDk4YjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzODNhYzE5OThhZDg4Mjg4NDVjNzBlZGZmOWQyNWZjYzc4OTU3ZjU1MzBhNzk4MzhkNTE4NGExZTE3MGZlNDIifQ"
         },
         {
           "resource": "repo://desktop/ui/src/components/ui/helpers.ts#L68-L100",
@@ -143,10 +139,86 @@
           "version": "repo-lines-v1:sha256:1aef970b75ca048d8c9269912e13e6469713361c3e1781b4fa81029a03675b77:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGY3Y2NlZTczZGI2YTIwMzhkNDk1NzdmNmU4NDE3ZGE5NzU3ZWUyOTk2MjAwZWI5NTdlOGQzMWUyYjEyZjQ1YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmFkMzcxYzgzMmY4ZjQ5NTE1YTViMzhhZjUyOWUwNTNmNjI5YzkyNDY1ZjU1ODFmNWFhNTI4YjVhODZiNmZiNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDk5MjgxY2VjNDhhMzQyYjc1MGI2MzIyN2NhMmY4ZjNmZTgzZWJjZDZmZTA1ZDU1ODExZTNiN2U5NzA2ODBmZCJ9"
         }
       ]
+    },
+    {
+      "id": "claim_b9abeb8c58534e77a2def974cd0dcfbf",
+      "statement": "The Events, Map and Timeline screens share one event filter model: the query and person/type/year values live in the common `filters` view-state section, so switching views keeps them, while each screen keeps its own sort, page and selection.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/events/useEventFilterState.ts#L25-L66",
+          "version": "repo-lines-v1:sha256:3812645855b8a510902d2e955052346c142828db95520fd95452b20c2ab32107:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiZTA1OWQyOGI0MmNmZTM0NTMzYmM5ZDA2MGM4YjlhMWNjYTAzNDg2Mjk3M2MxMmU0Y2JhNzg0NWM5NDUzZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzZWU3ZWMwMjdmM2NhNDU3OGM4YWI1MmMxOGY3ODY2YjNmN2VhMWVkNGZjY2I1NTNiYWMwZWE2YmVkYjc2ZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/lib/viewState.ts#L11-L28",
+          "version": "repo-lines-v1:sha256:3412e45d7ef5496a7603a7198b3b8fff88de0776ddab9f769cf156ff64061743:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0YjNjMmNjNTBkZWYxODIzYWM1YTIyYmRmODMzZWVlYjVlYmJhZWYxYmJmMjVjYmVlYWUwZWVmODkzMjY0ODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMmQyYzBkNmRjNWU3NGQ5MmZhMTRiOTFkYmVhMjY0MDkwYmViMzVmZGI5MTg4ZDliMzQxMTgxZGNlOWY0Y2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5Y2I1MjM4OTg4MThiZGU0MTM5YzU5YzAyN2E3Mzk4MGYxMjMwNTYxYTVlNGFiMjhiNDFiMzdiOWY1ZWRhMDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxNjIwZjNmYjM2ZWRkN2U2YWE3NDhiYTI0ZjhiNGNiYzNkNGU0MTc4YjRlOGU0NzAwMDBkY2FiZjk1ZGY0YzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9980e0b8856a47f7ba57783936bf9ce1",
+      "statement": "The person-scope filter (`person`, `ancestors`, `descendants`, `both`) resolves its relative set from real parent-child links via the graph ancestors/descendants commands at a capped depth, falling back to the chosen person alone when the walk fails.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/persons/usePersonScopeIds.ts#L12-L64",
+          "version": "repo-lines-v1:sha256:88eb162d6fbce85f575b79943e92654c3f69e2630a022d1e3f3ad9acae47dccf:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiZWJiZGVmZTQ3NDJmMmYwZGZjZjJlMDcwNjg4ODE5MTFhODRkMGY3YTRiNDNhNjhiOTJhNGRiZDJkZmEzMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwM2ZmNDJkMDcyNGI0NjhlMjJjMzgyMWZiM2VhNjVmZDEzYzdhZmU2OTViOGY3MTNkNjllZDBkYzNhMmE3NmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3d4cfb56cc7f462090fa6d8e862a4e95",
+      "statement": "Selecting an event row opens a read-only `EventCard` beside the table whose read mode mirrors the timeline popover (type kicker, title, icon-labelled rows and media), with a pencil that opens the event form for editing.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/events/EventCard.tsx#L104-L197",
+          "version": "repo-lines-v1:sha256:a75a67bbad0bafb6f4a06f10dfa89edc6b6cc052dc2a8f325d816d98c5d2f51c:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3MjE2ZThlOWMwYTFhNjhkMDZjMmZiYWE1ZmQyMTM5NDgyYjhlZmQwYTE5MzE1YjkxNWU2Y2NlODQ5ZDg5ZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5ZjJkN2I3Mzg3YWMyMjQwYmUzNTU2M2MwY2U0ZTgxMzMyMWNhZmUzYzcwOGVkNzk0NzM1OGYxNzkxYzlmZWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ3Yjc2Zjg5Y2NkYzhmZDE5ZjA4NDUwNDMyYTdjZTg5YjA5YjM0Y2EzMTgzNzkyYWUwZmZlZTZjZDM0ZTAxZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5ZWQyMTVlY2RiOTc5NmE5ODUzZTZjNGYzMGRkMDE3ZGYzYzRkYTVjMTQ2NjUzYTg2MWFjNjBjZTQxOWUwZTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_545eb66ab08d469dab95cd5d6bbd71f9",
+      "statement": "The Events screen offers a 'Go to timeline' jump that carries the shared person and type filters into the timeline.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/App.tsx#L512-L515",
+          "version": "repo-lines-v1:sha256:2c3e9b19249969231c40aeb339f3e405d72f04c08c9bc1e1ae8592c13be8fffa:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNmZjhjNTMzZWMyNDUzZTg2NTgxMjhjOWJhNWU1YzEwYmQyYjI4NzUxNjk2ZDAwNWEyOGFmZGJhYmIzODFjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZjOWUzMzZjMWM2NjcyNjZhMGU3ZWZjYWQ2ZGYxZTVmODA4MDk1MzM4ODlkY2FkMmY2NGU2NDExNTUzYzM2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjFjMjY3M2I4NmVhY2Y5ZDc2Mzk5MzNhOTc2OTJmNjhiN2RlZTczZjMxNzc2YWE3YTg1YjkxZmQyYWZkODVhYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDM0YTk0Njc1ZWI5ZGJjMmUyYjk3MTBjZjY1OGQyZmRlM2VhMTA4NGUyZDY2ZjhjMmIxZmQyYzA4MDkwOWNmNiJ9"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/events/EventsPage.tsx#L1011-L1019",
+          "version": "repo-lines-v1:sha256:87bdc644c86afe959dd0937796c13d694458df45ec12ec4e2830bcb2af0bd365:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2EzMzhjMzU0ZTQ3ZWNmNWM2YmJjY2ZkNGI5OWI3YzA5NTFhMDE1ZGY0MTEwMDMzYTUzNGQ4YmIzMGI5YzA1YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjg1NDFiOWE4MDJiZmMyNWYxYTk4ODQ3NjM0NTg3MGI3OTQ5MWNhOTBmMjE4YmM0OThlODNjZjk2Y2U1NGZkOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTMyZjg2ZjZjMGZhMWMyMTM3ZmFkMTAxOGY2MmNmMjlmMjViZDdjMDE4NGJhOTdjM2RlMzg1YzFkZWQ5OWI1ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTU4MWM3ZWM4MDFkOGQ2MWI0NzBmN2VmNjUwNjg2NWU3MjJlZjE4NGUwMTNiZmRhZjAzMzY0YzBhMjFhYmY3ZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5d39ab2947754ab681e054cc57638630",
+      "statement": "The person card's Facts section shows an Occupation fact derived from the person's OCCUPATION events: distinct positions in oldest-first timeline order, skipping blank positions and other event types, with case-insensitive duplicates counted once.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/persons/PersonCard.tsx#L883-L892",
+          "version": "repo-lines-v1:sha256:02234638d80499bbcaa4447bb5cbcea674092237b6635d514e6b4f715770ddb2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxOWIyNTNmOGZkNWVlNTczMmJhMGQwOWJjYTRmODZjM2FiMzM2M2Y4NjliOWM2YjM3ODExNjM5YzY3ZDU2ZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMzI1ZGMwZWE2ODQ3MTQ0MjcxNjI3MGM3YWQ4NjEwMDU1ODQwNzcxZTZlMjg1YjFkZDIxZWNjZDE0NDE1NzEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4YjI0MTY4YzhlZGY3NDdiMTY1YmEwZmExYTk0MjRlNDU1OThhMmU5NTJmNWU2YTc2M2FkNDdkZTVjYmY2ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4YjI0MTY4YzhlZGY3NDdiMTY1YmEwZmExYTk0MjRlNDU1OThhMmU5NTJmNWU2YTc2M2FkNDdkZTVjYmY2ZWMifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/persons/occupations.ts#L16-L30",
+          "version": "repo-lines-v1:sha256:fbd0ffcef96b538ee33bb1df3db1639754d1a546916f963a5c63958b13cae2d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyYjg3MTc2YjFiOTQ4NWQ1MWJiMjFmNzRmZTA0MTc0YzQwZWRiZGFjMThhZTcxYmZiZTc4YTJiZjVjZmNjOTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhOGM2MDMzYjk1MmI5MGI0ZmFmMDk3MGQzMDk4MWE4MDk2NmM1NzJlYWZhNGE1NTQyYmNiYjEzMGY0NGNjOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ3NzBlNWFmYzE4YjQ3YjU5ZWFlMTNmZmNkYjQ3OThiNTBjMmY3MmU4NTdlOWM5NTc2YWEzOTA0N2I4NTc3NzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cd7e3a5d0434913bef1378926170123",
+      "statement": "The events anomaly badge opens a data-check dialog built on the shared `ValidationSummary` report body, and an `EVENT_OUT_OF_LIFESPAN` issue renders an open action that jumps to the affected event row.",
+      "evidence": [
+        {
+          "resource": "repo://desktop/ui/src/features/events/EventsPage.tsx#L955-L968",
+          "version": "repo-lines-v1:sha256:63d9ea19b1c2381a19977b0df98b5f20925309b02feb9d13e9899f19df6a4743:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3ZDZiZjUyZDkxNDEwOTlmNTc1YzBkNjRlNWM0ODAyODcxNjA2MjQxYzI0YTU1NjIyNjVlNzRiNzEwZTYzY2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0MjBkNjYxODhlOWMzYzdmOWMxZGEwN2U2ODVlZDVjNDM1YjQwYmQyNmU0OTY4MjgxODc0ZjRhZDhlYjdkNzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmY2Y1NmMyODNjYjRkODZmOWQxNjg5NWJmYjc0YmM1M2I2YmFiOTBkNzY1N2I3NGU1YTVkODFhOTE4YzI2NDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3YzI1MDFiZDAwN2FlNzM2Y2Y4ZjlhOGVkMjk4YzY3MDYyMjg1MDM0ZmU1N2Y4NjVjODQ2ZDVhOWI1OGZiYjYifQ"
+        },
+        {
+          "resource": "repo://desktop/ui/src/features/projects/ValidationSummary.tsx#L43-L85",
+          "version": "repo-lines-v1:sha256:f62fc87db6596f8cd2d13977914ff7e3574b43ee23273a95a3442d64d3e85308:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViMDBmNTQ5NDcxMjViZjliYzg3MGQ4MjVhMmM3NDEyNWY3ZTM1YjVlNjQ2OTMwOTE1NmIzZGZlZmE3MTA3NjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3OTdkYTM3MTI3OGI4NTE2ZjRhYWU3YmRmOTE2YzIxYWIxZWRiYWIwMzlmYzk3NmU0YzliMWM1M2I3NzdhNDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4NTNjNWQwZTNlNThlNzA5ODBiNzM5ZWQwYmZlMDBhN2QyMzk4MGUxMWJiNDg4NWMzMWNiYjdlMWVjOTUyMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyZDgyMjhlYzNhYTE3NTg1MTg5ODA1MzMzZGQ1YjY4NzNiNjQ3ODQyYjgzMDRmYTQ3MzNiYzJkNDU5MjM0OWQifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.0",
-    "at": "2026-11-02T09:11:48.673Z"
+    "at": "2026-11-03T10:50:52.373Z"
   }
 }

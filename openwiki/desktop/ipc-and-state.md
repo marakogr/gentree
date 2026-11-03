@@ -12,6 +12,8 @@ sources:
     resource: repo://desktop/apps/desktop/src/commands/event.rs
   - id: openwiki-source-7d68a90bb68afdbad43e2741
     resource: repo://desktop/apps/desktop/src/commands/mod.rs
+  - id: openwiki-source-43f47bb2a948a982176d65a3
+    resource: repo://desktop/apps/desktop/src/commands/timeline.rs
   - id: openwiki-source-56a42ce8a8be0e685e7eea83
     resource: repo://desktop/apps/desktop/src/logging.rs
   - id: openwiki-source-a84e5d6f68ad36850840a35c
@@ -20,10 +22,10 @@ sources:
     resource: repo://desktop/apps/desktop/tauri.conf.json
   - id: openwiki-source-652b594f0a99d5c5858f82f4
     resource: repo://desktop/crates/core/src/validation.rs
-generated: { by: "opencode", at: "2026-11-02T09:11:48.673Z" }
+generated: { by: "opencode", at: "2026-11-03T10:50:52.373Z" }
 verified:
   - by: openwiki/0.7.0
-    at: 2026-11-02T09:11:48.673Z
+    at: 2026-11-03T10:50:52.373Z
 ---
 
 # Tauri shell, IPC commands and app state
@@ -58,7 +60,7 @@ The `Arc` around the project store is the important part: the chat builds its `A
 
 ## Command modules
 
-`commands/mod.rs` re-exports one module per area: `chat`, `event`, `export`, `geocode`, `graph`, `import`, `media`, `merge`, `path`, `person`, `relationship`, `search`, `timeline`. The graph module exposes `graph_ancestors`, `graph_descendants` and `graph_kinship`; `merge` exposes the preview/apply pair. Project lifecycle, validation, settings, the opt-in updater and the legacy `person_add` live in `main.rs`. The invoke handler in `main` is the single registry; adding a command means adding it there as well.
+`commands/mod.rs` re-exports one module per area: `chat`, `event`, `export`, `geocode`, `graph`, `import`, `media`, `merge`, `path`, `person`, `relationship`, `search`, `timeline`. The graph module exposes `graph_ancestors`, `graph_descendants` and `graph_kinship`; `merge` exposes the preview/apply pair. The `timeline` module's `timeline_list` takes a `scope` filter (`all`, `person`, `ancestors`, `descendants`, `both`, `place`); the walk scopes run a capped BFS over parent/child edges from a required `personId` root and report `scope_truncated` when the walk hits the person cap, which is how the shared person-scope filter resolves its relative set. Project lifecycle, validation, settings, the opt-in updater and the legacy `person_add` live in `main.rs`. The invoke handler in `main` is the single registry; adding a command means adding it there as well.
 
 Shared helpers in `commands/mod.rs` define the IPC contract used everywhere:
 
