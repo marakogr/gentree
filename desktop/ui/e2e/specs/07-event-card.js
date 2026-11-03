@@ -82,28 +82,23 @@ describe("event card", () => {
 
     const card = await $(".events-card");
     await card.waitForDisplayed({ timeout: 10000 });
-    const cardText = await card.getText();
-    expect(cardText).toContain("Место жительства");
-    expect(cardText).toContain("Казань");
-    expect(cardText).toContain("Тестовая запись");
-    expect(cardText).toContain("Иванов Иван Иванович");
-    expect(cardText).toContain("Файлы");
+    // The kicker is uppercased in CSS, which also uppercases the rendered text.
+    const cardText = (await card.getText()).toLowerCase();
+    expect(cardText).toContain("место жительства");
+    expect(cardText).toContain("казань");
+    expect(cardText).toContain("тестовая запись");
+    expect(cardText).toContain("иванов иван иванович");
+    expect(cardText).toContain("файлы");
 
-    // The form opens from the card and closes back to the card.
-    await (await card.$('button[aria-label="Изменить событие"]')).click();
+    // The form opens from the card in the full window and closes back to it.
+    await $('//button[normalize-space(.)="Изменить"]').click();
     await (await $("#event-type")).waitForDisplayed({ timeout: 10000 });
-    await $('//button[normalize-space(.)="Отмена"]').click();
-    await browser.pause(400);
-    expect(await $(".events-card").isExisting()).toBe(true);
-
-    // The maximize action opens the same form in the full window.
-    await (await card.$('button[aria-label="Открыть в окне"]')).click();
     const surface = await $(".fui-DialogSurface");
-    await surface.waitForDisplayed({ timeout: 10000 });
     const size = await surface.getSize();
     expect(size.width).toBeGreaterThan(800);
     await $('//button[normalize-space(.)="Отмена"]').click();
     await browser.pause(400);
+    expect(await $(".events-card").isExisting()).toBe(true);
 
     save("event-card", { text: cardText, fullWidth: size.width });
     await shot("event-card");

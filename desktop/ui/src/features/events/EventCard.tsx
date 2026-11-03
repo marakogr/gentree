@@ -1,14 +1,18 @@
-// Read-only event card shown next to the events table. It mirrors the person
-// card's facts block, keeps editing one click away and opens the event form in
-// a full window from the maximize action.
+// Read-only event card shown next to the events table. Its read mode mirrors
+// the timeline popover: a type kicker, a title, text actions and icon-labelled
+// rows. The pencil opens the event form for editing.
 
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { Text } from "@fluentui/react-components";
+import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowMaximizeRegular,
+  BookOpenRegular,
+  CalendarLtrRegular,
   DismissRegular,
+  DocumentRegular,
   EditRegular,
+  LocationRegular,
+  PeopleRegular,
 } from "@fluentui/react-icons";
+import { convertFileSrc } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import { mediaApi } from "../../api/client";
 import type {
@@ -17,14 +21,14 @@ import type {
   Person,
   Versioned,
 } from "../../api/types";
+import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
 import { EMPTY_VALUE } from "../../lib/formatValue";
 import { useDateFormatter } from "../../lib/useDateFormatter";
-import { mediaLabel } from "../media/helpers";
+import { isImageMedia, mediaLabel } from "../media/helpers";
 import { displayName } from "../persons/helpers";
-import { eventDetailEntries } from "./fields";
+import { resolveEventFields } from "./fields";
 import { eventDateLabel, eventTypeLabel } from "./helpers";
-import { EVENT_TYPE_ICONS } from "./typeIcons";
 import { useEventConfig } from "./useEventConfig";
 import "./events.css";
 
@@ -32,7 +36,6 @@ export type EventCardProps = {
   event: Versioned<EventEntity>;
   persons: readonly Person[];
   onEdit: () => void;
-  onExpand: () => void;
   onClose: () => void;
 };
 
@@ -40,7 +43,6 @@ export function EventCard({
   event,
   persons,
   onEdit,
-  onExpand,
   onClose,
 }: EventCardProps) {
   const { t } = useTranslation(["event", "common", "enums", "person"]);
@@ -48,16 +50,28 @@ export function EventCard({
   const { fieldGroups } = useEventConfig();
   const [files, setFiles] = useState<MediaItem[]>([]);
   const entity = event.entity;
-  const TypeIcon = EVENT_TYPE_ICONS[entity.type];
   const typeLabel = eventTypeLabel(entity.type, entity.originalType, t);
   const dateText = eventDateLabel(entity.date, formatDate);
-  const details = useMemo(
-    () =>
-      eventDetailEntries(entity, fieldGroups, (key) =>
-        t(`event:fields.${key}`),
-      ),
-    [entity, fieldGroups, t],
-  );
+  const details = useMemo(() => {
+    const specs = resolveEventFields(
+      entity.type,
+      entity.originalType,
+      fieldGroups,
+      (key) => t(`event:fields.${key}`),
+    );
+    const rows = specs.map((spec) => ({
+      key: spec.key,
+      label: spec.label,
+      value: (entity.details?.[spec.key] ?? "").trim() || EMPTY_VALUE,
+    }));
+    const known = new Set(specs.map((spec) => spec.key));
+    for (const [key, raw] of Object.entries(entity.details ?? {})) {
+      if (known.has(key)) continue;
+      const value = raw.trim();
+      if (value !== "") rows.push({ key, label: key, value });
+    }
+    return rows;
+  }, [entity, fieldGroups, t]);
   const personsById = useMemo(
     () => new Map(persons.map((person) => [person.id, person])),
     [persons],
@@ -84,66 +98,165 @@ export function EventCard({
   const personName = (person: Person) =>
     displayName(person, t("person:unknownName"));
 
+  const images = files.filter(isImageMedia);
+  const documents = files.filter((item) => !isImageMedia(item));
+
   return (
-    <aside className="events-card" aria-label={t("event:detailsTitle")}>
-      <header className="events-card-head">
-        <span className="events-card-title">
-          <TypeIcon fontSize={18} aria-hidden="true" />
-          {typeLabel}
-        </span>
-        <span className="events-card-actions">
-          <IconButton label={t("event:editEvent")} onClick={onEdit}>
-            <EditRegular />
-          </IconButton>
-          <IconButton label={t("event:openInWindow")} onClick={onExpand}>
-            <ArrowMaximizeRegular />
-          </IconButton>
+    <aside className="events-card" aria-label={typeLabel}>
+      <div className="events-card-head">
+        <div className="events-card-titles">
+          <span className="events-card-kicker">{typeLabel}</span>
+          <h3 className="events-card-title">
+            {owner ? personName(owner) : typeLabel}
+          </h3>
+        </div>
+        <div className="events-card-actions">
+          <Button variant="secondary" size="sm" onClick={onEdit}>
+            <EditRegular fontSize={12} aria-hidden="true" />
+            {t("common:actions.edit")}
+          </Button>
           <IconButton label={t("common:actions.close")} onClick={onClose}>
             <DismissRegular />
           </IconButton>
-        </span>
-      </header>
+        </div>
+      </div>
 
-      <Text size={200} className="events-card-date">
-        {dateText}
-      </Text>
+      <dl className="events-card-list">
+        <div className="events-card-row">
+          <CalendarLtrRegular
+            className="events-card-icon"
+            fontSize={16}
+            aria-hidden="true"
+          />
+          <div>
+            <dt>{t("event:date")}</dt>
+            <dd>{dateText}</dd>
+          </div>
+        </div>
 
-      <dl className="facts events-card-facts">
-        <dt>{t("event:person")}</dt>
-        <dd>{owner ? personName(owner) : EMPTY_VALUE}</dd>
+        <div className="events-card-row">
+          <div>
+            <dt>{t("event:precision")}</dt>
+            <dd>{t(`enums:datePrecision.${entity.date.precision}`)}</dd>
+          </div>
+        </div>
 
-        {participants.length > 0 ? (
-          <>
+        <div className="events-card-row">
+          <div>
+            <dt>{t("event:qualifier")}</dt>
+            <dd>{t(`enums:dateQualifier.${entity.date.qualifier}`)}</dd>
+          </div>
+        </div>
+
+        <div className="events-card-row">
+          <LocationRegular
+            className="events-card-icon"
+            fontSize={16}
+            aria-hidden="true"
+          />
+          <div>
+            <dt>{t("event:place")}</dt>
+            <dd className="events-card-break">
+              {entity.place?.trim() || EMPTY_VALUE}
+            </dd>
+          </div>
+        </div>
+
+        <div className="events-card-row">
+          <PeopleRegular
+            className="events-card-icon"
+            fontSize={16}
+            aria-hidden="true"
+          />
+          <div>
             <dt>{t("event:participants")}</dt>
-            <dd>{participants.map(personName).join(", ")}</dd>
-          </>
-        ) : null}
+            <dd>
+              {participants.length > 0
+                ? participants.map(personName).join(", ")
+                : EMPTY_VALUE}
+            </dd>
+          </div>
+        </div>
 
-        <dt>{t("event:place")}</dt>
-        <dd>{entity.place?.trim() || EMPTY_VALUE}</dd>
-
-        <dt>{t("event:description")}</dt>
-        <dd>{entity.description?.trim() || EMPTY_VALUE}</dd>
+        <div className="events-card-row">
+          <div>
+            <dt>{t("event:description")}</dt>
+            <dd className="events-card-description">
+              {entity.description?.trim() || EMPTY_VALUE}
+            </dd>
+          </div>
+        </div>
 
         {details.map((entry) => (
-          <Fragment key={entry.key}>
-            <dt>{entry.label}</dt>
-            <dd>{entry.value}</dd>
-          </Fragment>
+          <div className="events-card-row" key={entry.key}>
+            <div>
+              <dt>{entry.label}</dt>
+              <dd>{entry.value}</dd>
+            </div>
+          </div>
         ))}
 
-        <dt>{t("event:filesTitle")}</dt>
-        <dd>
-          {files.length === 0 ? (
-            EMPTY_VALUE
-          ) : (
-            <ul className="events-card-files">
-              {files.map((item) => (
-                <li key={item.id}>{mediaLabel(item)}</li>
-              ))}
-            </ul>
-          )}
-        </dd>
+        <div className="events-card-row events-card-separator">
+          <BookOpenRegular
+            className="events-card-icon"
+            fontSize={16}
+            aria-hidden="true"
+          />
+          <div>
+            <dt>{t("event:filesTitle")}</dt>
+            <dd>
+              {files.length === 0 ? (
+                EMPTY_VALUE
+              ) : (
+                <div className="person-media">
+                  {images.length > 0 ? (
+                    <ul className="person-media-grid">
+                      {images.map((item) => (
+                        <li key={item.id}>
+                          <button
+                            type="button"
+                            className="events-card-thumb"
+                            title={mediaLabel(item)}
+                            aria-label={mediaLabel(item)}
+                            onClick={() => {
+                              void mediaApi.open(item.id).catch(() => undefined);
+                            }}
+                          >
+                            <img
+                              src={convertFileSrc(item.path)}
+                              alt={mediaLabel(item)}
+                              loading="lazy"
+                            />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {documents.length > 0 ? (
+                    <ul className="plain person-media-files">
+                      {documents.map((item) => (
+                        <li key={item.id}>
+                          <button
+                            type="button"
+                            className="person-media-file events-card-file"
+                            onClick={() => {
+                              void mediaApi.open(item.id).catch(() => undefined);
+                            }}
+                          >
+                            <DocumentRegular aria-hidden="true" />
+                            <span className="person-media-file-name">
+                              {mediaLabel(item)}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              )}
+            </dd>
+          </div>
+        </div>
       </dl>
     </aside>
   );

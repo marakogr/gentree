@@ -107,7 +107,7 @@ type Props = {
 export default function EventForm({
   initial,
   version,
-  size = "lg",
+  size = "full",
   persons,
   defaultPersonId,
   defaultType,

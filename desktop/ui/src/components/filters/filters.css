@@ -67,19 +67,21 @@
     gap: 0.35rem;
   }
 
-  /* Year range: one shared track with two independently draggable handles. */
+  /* Year range: the caption and the picked span sit left of the track; the
+     two end labels stay under it. */
   .year-range {
-    display: grid;
-    gap: 0.15rem;
-    min-width: 13rem;
-    max-width: 20rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 18rem;
+    max-width: 26rem;
+    padding-top: 2px;
   }
 
-  .year-range-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.5rem;
+  .year-range-caption {
+    display: grid;
+    flex: 0 0 auto;
+    gap: 2px;
     font-size: 0.78rem;
     color: var(--muted-foreground);
   }
@@ -90,9 +92,11 @@
     white-space: nowrap;
   }
 
-  .year-range-hint {
-    font-size: 0.72rem;
-    color: var(--muted-foreground);
+  .year-range-track-block {
+    display: grid;
+    flex: 1 1 auto;
+    gap: 0.15rem;
+    min-width: 10rem;
   }
 
   /* The neutral segments at both ends are the part of the scale outside the

@@ -5,7 +5,13 @@
  */
 
 .events-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   min-width: 0;
+  /* Match the people screen: the panels use the window height, so the table
+     scrolls inside its own panel. */
+  height: calc(100vh - 48px);
 }
 
 /* Toolbar row: search and filters on the left, table actions on the right. */
@@ -44,14 +50,14 @@
 }
 
 .events-filter-top > .filter-bar {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
 .events-person-filter {
-  flex: 0 1 18rem;
-  min-width: 12rem;
-  max-width: 18rem;
+  flex: 0 1 15rem;
+  min-width: 13rem;
+  max-width: 15rem;
 }
 
 /* The type dropdown keeps one width whatever the summary says ("All types",
@@ -82,6 +88,12 @@
   align-items: flex-start;
   gap: 8px 12px;
   min-width: 0;
+}
+
+/* The reset action sits after the filters, at the right end of their row. */
+.events-reset-filters {
+  margin-top: 4px;
+  margin-inline-start: auto;
 }
 
 .events-toolbar-actions {
@@ -761,62 +773,215 @@
   margin: 0.75rem 0 0;
 }
 
-/* Card beside the table: the list keeps the remaining width, the card scrolls
-   on its own and matches the table viewport height. */
-.events-body {
-  display: flex;
-  align-items: flex-start;
+/* Master-detail layout, mirroring the people screen: the list panel, a
+   splitter and the event card on its own panel. */
+.events-layout {
+  --events-list-width: 62%;
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns:
+    minmax(0, var(--events-list-width))
+    8px
+    minmax(0, 1fr);
+  /* One full-height row: both panels end at the same line, like the people
+     screen, instead of shrinking to their content. */
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   gap: 12px;
   min-width: 0;
+  min-height: 0;
 }
 
-.events-list {
-  flex: 1 1 auto;
+.events-layout-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.events-layout-resizing {
+  user-select: none;
+  cursor: col-resize;
+}
+
+.events-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
+/* The table takes the free height; its own wrapper keeps the scroll. */
+.events-panel > .events-table-wrap {
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 0;
+}
+
+.events-card-panel {
+  overflow-y: auto;
+}
+
+/* Vertical splitter between the table and the card. */
+.events-splitter {
+  position: relative;
+  align-self: stretch;
+  min-height: 120px;
+  border-radius: 999px;
+  cursor: col-resize;
+  outline: none;
+  touch-action: none;
+}
+
+.events-splitter::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 50%;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--border);
+  transform: translateX(-50%);
+  transition:
+    background-color 120ms ease,
+    width 120ms ease;
+}
+
+.events-splitter:hover::before,
+.events-splitter:focus-visible::before,
+.events-layout-resizing .events-splitter::before {
+  width: 3px;
+  background: var(--primary);
+}
+
+.events-splitter:focus-visible::before {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 35%, transparent);
+}
+
+@media (max-width: 1100px) {
+  .events-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .events-splitter {
+    display: none;
+  }
+}
+
+/* The card sits on the panel's own backing and mirrors the timeline popover:
+   a type kicker, a title, text actions and icon-labelled rows. */
 .events-card {
   display: grid;
-  flex: 0 0 360px;
-  max-width: 45%;
-  max-height: min(62vh, 680px);
-  overflow-y: auto;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--card);
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .events-card-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
 }
 
-.events-card-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.events-card-titles {
   min-width: 0;
+}
+
+.events-card-kicker {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.events-card-title {
+  margin: 2px 0 0;
+  font-size: 1.0625rem;
   font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .events-card-actions {
   display: inline-flex;
   flex: none;
-  gap: 2px;
+  align-items: center;
+  gap: 4px;
 }
 
-.events-card-date {
+.events-card-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.events-card-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.events-card-icon {
+  flex: none;
+  margin-top: 2px;
   color: var(--muted-foreground);
 }
 
-.events-card-facts {
-  margin-top: 8px;
+.events-card-row dt {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
 }
 
-.events-card-files {
+.events-card-row dd {
   margin: 0;
-  padding-left: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.events-card-description {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.events-card-break {
+  overflow-wrap: anywhere;
+}
+
+.events-card-separator {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.events-card-thumb {
+  display: block;
+  width: 96px;
+  height: 96px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  background: var(--muted);
+  cursor: pointer;
+}
+
+.events-card-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.events-card-file {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }

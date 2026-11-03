@@ -62,6 +62,11 @@ const useStyles = makeStyles({
   root: {
     width: "100%",
     minWidth: 0,
+    // The expand/clear icons live in the same grid row; a hard input min-width
+    // would push them past the field border on narrow filter slots.
+    "& .fui-Combobox__input": {
+      minWidth: 0,
+    },
   },
   optionText: {
     display: "flex",
@@ -102,6 +107,11 @@ const useStyles = makeStyles({
     minHeight: `${COMBOBOX_OPTION_HEIGHT_PX}px`,
     maxHeight: `${COMBOBOX_OPTION_HEIGHT_PX}px`,
     overflow: "hidden",
+    // Fluent reserves a check-mark slot in every option; person rows carry
+    // their own avatar, so drop the slot and start the content near the edge.
+    "& .fui-Option__checkIcon": {
+      display: "none",
+    },
   },
   // Long lists used to grow over the whole window. Fluent still anchors the
   // listbox to the input and scrolls the active option into view. The inline

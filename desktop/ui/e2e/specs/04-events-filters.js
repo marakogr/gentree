@@ -109,6 +109,7 @@ describe("event filters", () => {
 
     await input.setValue("Иван");
     await browser.pause(500);
+    await shot("filters-person-open");
 
     const avatars = await browser.execute(
       () => document.querySelectorAll(".person-search-avatar").length,

@@ -20,7 +20,6 @@ import {
 import "./filters.css";
 
 /** Visual separator between the two current years: `1900 — 2026`. */
-const RANGE_SEPARATOR = " \u2014 ";
 
 export function YearRange({
   from,
@@ -181,38 +180,37 @@ export function YearRange({
 
   return (
     <div className="year-range" role="group" aria-labelledby={labelId}>
-      <span className="year-range-head">
+      <span className="year-range-caption">
         <span id={labelId} className="year-range-label">
           {groupLabel}
         </span>
-        <span className="year-range-values" aria-hidden="true">
-          {`${lower}${RANGE_SEPARATOR}${upper}`}
-        </span>
       </span>
 
-      <div
-        className="year-range-slider"
-        data-disabled={disabled ? "true" : undefined}
-      >
-        <span className="year-range-track" aria-hidden="true">
-          <span
-            className="year-range-fill"
-            style={{
-              insetInlineStart: `${fill.start}%`,
-              insetInlineEnd: `${100 - fill.end}%`,
-            }}
-          />
-        </span>
+      <div className="year-range-track-block">
+        <div
+          className="year-range-slider"
+          data-disabled={disabled ? "true" : undefined}
+        >
+          <span className="year-range-track" aria-hidden="true">
+            <span
+              className="year-range-fill"
+              style={{
+                insetInlineStart: `${fill.start}%`,
+                insetInlineEnd: `${100 - fill.end}%`,
+              }}
+            />
+          </span>
 
-        <div className="year-range-travel" ref={travelRef}>
-          {renderHandle("from")}
-          {renderHandle("to")}
+          <div className="year-range-travel" ref={travelRef}>
+            {renderHandle("from")}
+            {renderHandle("to")}
+          </div>
         </div>
-      </div>
 
-      <div className="year-range-ends" aria-hidden="true">
-        <span>{lowest}</span>
-        <span>{highest}</span>
+        <div className="year-range-ends" aria-hidden="true">
+          <span>{lower}</span>
+          <span>{upper}</span>
+        </div>
       </div>
     </div>
   );
