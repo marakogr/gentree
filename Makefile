@@ -78,6 +78,9 @@ demo-project: ## Regenerate the synthetic demo project
 demo-screenshots: ## Capture README screenshots from the demo project
 	$(NODE) scripts/capture-demo-screenshots.mjs
 
+demo-gif: ## Record the README demo GIFs (light and dark, en and ru)
+	$(NODE) scripts/record-demo.mjs
+
 check: fmt-check lint test ui-check ## Run all quality gates
 
 ci: check ## Local CI: quality gates and whitespace check
