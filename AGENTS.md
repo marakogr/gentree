@@ -1,194 +1,106 @@
-# AGENTS.md — Gentree Desktop
+# AGENTS.md — Gentree
 
 Read at session start.
 
 Local desktop app for a family archive.
-Stack: Rust + Tauri 2 + React/Vite/Tailwind, Tantivy, rusqlite (read-only AT5 import), OpenAI-compatible chat with built-in tools.
+Stack: Rust + Tauri 2, React/Vite/Tailwind, Tantivy, rusqlite (read-only AT5 import), OpenAI-compatible chat with in-process tools.
 
-Setup, commands and layout: `README.md`. Read only relevant sections.
+Setup, commands and layout: `README.md` (read only the relevant sections). All paths below are relative to the repo root.
 
 ## Sources of truth
 
 Priority:
 1. Invariants in this file.
-2. Code and contract tests in `desktop/crates/*/tests/`.
-3. OpenSpec specs in `openspec/specs/` (once adopted, from milestone 0.4.0; intent and scenarios).
+2. Code and contract tests: `desktop/crates/*/tests/*_contract.rs` (plus `merge_contract.rs`, `prompt_snapshot.rs` snapshots).
+3. OpenSpec specs in `openspec/specs/`, if the directory exists (intent and scenarios).
 4. Current documentation in `docs/` and `desktop/docs/`.
-5. `README.md` / `README.ru.md` (keep both in sync).
+5. `README.md` / `README-ru.md` (keep both in sync).
 
-If behavior contradicts an invariant or contract test, stop and ask a human. Never silently change either side. A spec that contradicts a contract test is a spec bug: fix the spec, not the test. Generated docs are derived, not authoritative.
+If behavior contradicts an invariant or a contract test, stop and ask a human. Never silently change either side. A spec that contradicts a contract test is a spec bug: fix the spec, not the test. Generated docs (`openwiki/`) are derived, not authoritative.
 
 ## Architecture
 
-`apps/desktop` (Tauri shell/IPC), `crates/core` (pure domain, no I/O), `storage`, `search`, `import`, `config`, `chat`, `mcp` (in-process read-only chat tool catalog and DTOs, not a server), `ui` (React).
+- `desktop/apps/desktop`: Tauri shell and IPC. `desktop/apps/launcher`: launcher.
+- `desktop/crates/core`: pure domain, no I/O, depends on no other workspace crate.
+- `desktop/crates/{storage,search,import,config,chat,mcp}`: each depends on `core`; the only allowed cross-crate edge is `import → storage`.
+- `desktop/crates/mcp`: the in-process, read-only catalog of chat tools and DTOs. It is not a server (`rmcp` supplies the JSON Schemas only).
+- `desktop/ui`: React UI.
 
-Dependencies point toward `core`; `core` depends on no other crate.
+Adding a crate or another cross-crate dependency is an architecture decision (see HITL).
 
 ## Invariants
 
-- **Storage:** Project folder is the only source of truth. No backend server, PostgreSQL, accounts, or remote sync. One writer per project. Writes are atomic and include a checksum in the manifest.
+- **Storage:** The project folder is the only source of truth. No backend server, PostgreSQL, accounts, or remote sync. One writer per project (exclusive `.lock` in the project folder). Writes are atomic and include a checksum in the manifest.
 - **Dates:** Never invent timestamps for unknown dates. Use `DateValue` with `precision` and `qualifier`. Preserve unknown values in `original` with `precision = UNKNOWN`. Normalize only according to precision rules.
-- **Relations:** Explicit types: `PARENT_CHILD`, `SPOUSE`, `PARTNER`, `ADOPTIVE_PARENT_CHILD`. For `PARENT_CHILD`, `person_id` is the parent and `related_person_id` the child. Siblings are derived from shared parents and never stored. No self-links, duplicates, or cycles.
+- **Relations:** Explicit types: `PARENT_CHILD`, `SPOUSE`, `PARTNER`, `ADOPTIVE_PARENT_CHILD`. For `PARENT_CHILD`, `person_id` is the parent and `related_person_id` the child. Siblings are derived from shared parents and never stored (no sibling edges). No self-links, duplicates, or cycles.
 - **Deletion:** Deleting a person must not cascade-delete events with other participants. Removing a media link must not delete the file. Preserve provenance and external IDs.
 - **Import:** Re-import is idempotent. Never silently overwrite manual edits. Report all unparsed data.
 - **Media:** Checksum is mandatory. Errors must not expose absolute paths.
-- **Chat/tools:** Never start an MCP server; tools run inside the app. Send no chat data until a provider is explicitly configured. Secrets and keys must never reach logs, UI, git, or agent messages.
-- **UI:** Russian, Ukrainian, English. All user-facing strings belong in i18n dictionaries; no Cyrillic outside them. Errors use stable codes and are localized in the UI.
+- **Chat/tools:** Never start an MCP server or listen on a socket; chat tools run inside the app. Send no chat data until a provider is explicitly configured. Secrets and keys must never reach logs, UI, git, or agent messages. (`opencode.jsonc` configures the OpenWiki MCP for developer agents; that is tooling, not the app.)
+- **UI:** Russian, Ukrainian, English. All user-facing strings live in `desktop/ui/src/i18n/locales`; no Cyrillic elsewhere in `desktop/ui/src` (enforced by `make i18n`). Errors use stable codes and are localized in the UI. Docs, `README-ru.md` and issue bodies may be Russian.
 
 ## Privacy
 
 Real AT5 trees contain personal data of living people.
 
-- Real baselines are local only and never in git. `GENTREE_AT5_BASELINE` is opt-in for diagnostic tests.
+- Real baselines are local only and never in git. `GENTREE_AT5_BASELINE` is opt-in for `#[ignore]` diagnostic tests.
 - Never read raw `.at5`, `.atdb`, `.env`, or other secret files into agent context.
-- Never expose names, dates, places, paths, or field values from real baselines in context, logs, PRs, issues, or docs.
-- Tests use synthetic data only. Baseline diagnostics return aggregates only: counts, codes, distributions.
+- Never expose names, dates, places, paths, or field values from real baselines in context, logs, PRs, issues, project fields, comments, or docs.
+- Tests use synthetic data only. Baseline diagnostics return aggregates only (counts, codes, distributions); do not paste full output of a baseline run, report only the aggregates.
 - Never pass baseline content to other agents or messages.
 
-## Research and file access
+## Working with code
 
-- For non-trivial tasks, use OpenWiki to discover relevant architecture, contracts, components, and source files. Do not read the entire wiki.
-- For trivial, localized changes, skip wiki research if the affected code is already known.
-- Treat wiki content as navigation and context, not proof of current behavior. Verify relevant details in source code and tests.
-- If wiki findings conflict with source or tests, trust current source and tests; investigate material discrepancies before proceeding.
-- Search for target symbols, callers, and tests before opening source files.
-- Prefer narrow source excerpts (typically 50–150 lines) around relevant symbols. Expand only when necessary.
-- For files over 300 lines, search first and read targeted ranges. Read whole files only when needed to understand cross-cutting behavior.
-- Do not reread unchanged content already available in context unless verification requires it.
-- Avoid dumping entire files, directories, locale dictionaries, or large command outputs into context.
-- Inspect README and relevant `docs/` sections only when the task needs them.
-
-## Token-efficient tool usage
-
-- Prefer RTK-wrapped commands for supported shell operations. Use actual available RTK commands; do not assume unsupported subcommands exist.
-- Prefer `rg`/`rg.exe` for code search. On Windows, fall back to `Select-String` and `Get-Content` with line ranges if needed.
-- Never recursively list the entire repository unless necessary. Restrict searches to relevant directories and file types.
-- Prefer focused `git diff`, symbol searches, and targeted tests over full file dumps or complete history.
-- Keep output minimal: request relevant matches, changed lines, failures, and summaries.
-- Batch independent read-only searches into one tool call where practical.
-- Group related changes into a single patch. Use safe scripted bulk edits for repetitive changes across files.
-- Before bulk replacement, verify the match count and scope; inspect the resulting diff afterward.
-- Do not create separate edits for individual occurrences when one safe replacement can handle them.
-- After a failed command, diagnose the cause before retrying. Never repeat the same failing command with unchanged arguments without a reason.
-- Ensure compressed test output preserves failure details and the actual process exit status.
+- Use OpenWiki as described in the OpenWiki block below; it is not startup reading.
+- Search for target symbols, callers, and tests before opening files. Read narrow excerpts (50–150 lines); for files over 300 lines, search first and read targeted ranges.
+- Do not dump whole files, directories, locale dictionaries, or large command output into context. Do not reread unchanged content unless verification requires it.
+- Prefer RTK-wrapped commands for supported shell operations. Use actual available RTK commands; do not assume unsupported subcommands exist. Compressed output must keep failure details and the real exit status.
+- Prefer `rg` for search (on Windows fall back to `Select-String` and `Get-Content` with line ranges). Restrict searches to relevant directories; never list the whole repository without need.
+- Prefer focused `git diff`, symbol searches, and targeted tests. Batch independent read-only searches into one call.
+- Group related edits into one patch. For bulk replacement, verify the match count first and inspect the diff afterward.
+- After a failed command, diagnose before retrying; never rerun the same command unchanged without a reason.
 
 ## Environment
 
-- Use the repository's native shell and existing scripts.
-- On Windows, assume PowerShell; do not assume Bash syntax or Unix utilities.
-- Use separate PowerShell statements instead of `&&`.
-- Check tool availability once per session if needed. Do not repeatedly retry unavailable tools.
-- If Rust tools are missing from `PATH`, locate the installed toolchain and update the session environment once. If unavailable, report the blocker and use available alternatives.
-- Do not switch to WSL solely for search or token savings. Keep commands consistent with the environment used for project builds and tests.
-- Use `make` targets rather than duplicating their commands.
+- Use the repository's native shell and existing scripts. On Windows assume PowerShell: no Bash syntax or Unix utilities, and separate statements instead of `&&`.
+- Check tool availability once per session. If Rust tools are missing from `PATH`, locate the installed toolchain and update the session environment once; otherwise report the blocker.
+- Do not switch to WSL for search or token savings.
+- Use `make` targets, not their underlying commands (`make help` lists them).
 
 ## Workflow
 
-1. **Scope:** Identify requirements, affected layers, relevant contracts, and acceptance criteria.
-2. **Research:** Use OpenWiki when useful, then search source symbols, callers, and tests.
-3. **Plan:** Establish the smallest coherent set of changes. For large tasks, split work by independently verifiable phases.
-4. **Implement:** Make related changes together, including callers, types, tests, translations, and docs where needed.
-5. **Validate:** Run targeted tests first; run broader checks when the implementation is ready.
-6. **Review:** Inspect the diff for unintended changes, missing tests, contract violations, and accidental exposure of sensitive data.
-7. **Report:** Summarize changes and checks, including failures and blockers.
+1. **Scope:** requirements, affected layers, contracts, acceptance criteria.
+2. **Research:** search symbols, callers, tests; OpenWiki only per its rules.
+3. **Plan:** the smallest coherent change set. Split large tasks into independently verifiable phases, preferably by layer.
+4. **Implement:** include callers, types, tests, translations, and docs. Before changing shared symbols or contracts, inspect their dependents. Never generate UI from a mockup without identifying the underlying data and IPC commands.
+5. **Validate:** targeted tests first, then broader checks. For UI changes run `make ui-check`.
+6. **Review:** inspect the diff for unintended changes, missing tests, contract violations, and leaked sensitive data.
+7. **Report:** summarize changes and checks, including failures and blockers. A red run is partial: report failing tests and never claim unverified checks passed.
 
-Additional rules:
+Rules:
 
-- Work within the assigned scope; do not edit unrelated files.
-- Before changing shared symbols or contracts, inspect their dependents.
-- For UI changes, run `make ui-check`.
-- Do not rerun unchanged failing commands without a reason. Fix the cause or report the blocker.
-- A red run is partial: report failing tests and do not claim unverified checks passed.
+- Stay within the assigned scope; do not edit unrelated files.
 - Delete temporary diagnostic files; never reference them in PRs.
 - Never delete or overwrite others' uncommitted changes.
-
-## Large tasks and context
-
-- Split large features into independently verifiable phases, preferably by architectural layer.
-- Complete and validate a phase before moving to the next.
-- Use a new session at a meaningful phase boundary or when accumulated context makes continued work inefficient.
-- When handing work to a new session, create a concise `HANDOFF.md` containing:
-  - Goal and acceptance criteria.
-  - Completed changes and relevant files.
-  - Decisions and constraints.
-  - Remaining work and known failures.
-  - Tests and commands already run, with results.
-- Keep the handoff factual and concise. Do not copy full source files or conversation history into it.
-- The GitHub issue and project board carry status and scope; `HANDOFF.md` only adds context that is not already in the issue.
-- In a new session, read the handoff and inspect current git state before continuing. Do not reread the entire previous implementation history.
 
 ## Quality gates
 
 ```powershell
 make check    # fmt-check + clippy + Rust tests + UI typecheck/test/build/i18n
 make ci       # make check + git diff --check
-make build    # installer for the current OS
+make build    # desktop bundles for the current OS (msi/nsis on Windows, dmg on macOS)
 ```
 
-Use the targets rather than duplicating their commands. Run `make check` before opening a PR. If a target is unavailable, inspect repository scripts and report the limitation.
+Run `make check` before opening a PR. If a target is unavailable, inspect `Makefile` and `scripts/` and report the limitation.
 
 ## Git
 
 - `main` is protected and always green; no direct commits.
-- One change = one branch from `main`, merged via PR; delete the branch after merge.
-  Use `change/<name>` for code/UI and `release/<name>` for release engineering.
+- One change = one branch from `main`, merged via PR; delete the branch after merge. Use `change/<name>` for code/UI and `release/<name>` for release engineering.
+- One issue per PR; close it with `Closes #<n>` in the PR body.
 - Conventional Commits: `feat(desktop): ...`, `fix(ui): ...`.
-- Human approval is required for `git reset --hard`, force push, `--no-verify`, `rm -rf` outside build artifacts, `DROP`/`TRUNCATE`, and merging into `main` until the process stabilizes.
-- Never commit `.env`, secrets, `desktop/target/`, `node_modules/`, or AT5 baselines.
-
-## GitHub workflow
-
-Repository: `github.com/marakogr/gentree`. Issues, milestones and the project
-board are the durable work tracker; code still lands only through PRs.
-
-- **Milestones are releases.** Current: `0.2.1 — Update channel`,
-  `0.3.0 — UI consistency`, `0.4.0 — Unified views`, `0.5.0 — Chat history`.
-  Do not create a milestone for a one-off task.
-- **One issue per PR.** An issue may cover several related tasks; its checklist
-  is the agreed scope. Close it with `Closes #<n>` in the PR body.
-- **Decisions are issues.** Open questions carry the `hitl` label and contain
-  options, consequences and a recommendation. Close a decision issue only after
-  the chosen option is recorded in the PR.
-- **Labels:** `priority:P0|P1|P2`,
-  `area:ui|settings|help|events|map|timeline|chat|data|release`,
-  `size:S|M|L`, `hitl`. Do not invent a second label for the same meaning.
-- **Language:** issue and milestone titles in English; issue bodies in Russian.
-  PR titles follow Conventional Commits in English.
-- **Project board:** `Gentree Roadmap`
-  (`https://github.com/users/marakogr/projects/2`). Set `Status` to
-  `In Progress` when starting and `Done` after merge; keep `Priority` and
-  `Size` in sync with labels.
-- **Self-contained issues.** Do not link local-only `docs/research/` notes from
-  issues or PRs; paste the relevant acceptance criteria instead.
-- **Privacy.** Never put AT5 data, real names, dates, places, paths, secrets or
-  connection strings into issues, PRs, project fields or comments.
-- **Releases.** Tag only from green `main`; the tag must match
-  `desktop/apps/desktop/tauri.conf.json`; follow `docs/releases.md`.
-- **CLI.** `gh` is installed at
-  `%LOCALAPPDATA%\Programs\gh-cli\bin\gh.exe`; add it to the session `PATH` when
-  needed.
-
-## Specs (OpenSpec)
-
-OpenSpec is adopted for capability-level work from milestone `0.4.0` onward.
-
-- **Use it for** new capabilities and behavior that spans layers or changes a
-  contract: chat history, import policy, project format, dates, relations.
-- **Do not use it for** bugs, UI polish, copy, layout, dependency bumps, release
-  engineering or any `0.3.0` task. A bug gets a failing regression test, not a
-  spec folder.
-- **One change = one `openspec/changes/<id>/`** with `proposal.md`,
-  `design.md`, `tasks.md` and the spec delta. Link the GitHub issue and the
-  change folder in the PR.
-- **Archive after merge:** `openspec archive` merges the delta into
-  `openspec/specs/`; keep the archived change in git.
-- **Precedence:** invariants > contract tests > specs > docs. If a spec
-  contradicts a test, fix the spec.
-- **Setup:** install the CLI, run `openspec init` once, disable telemetry
-  (`openspec config set telemetry.enabled false`), and review the diff
-  (especially `AGENTS.md` and `.opencode/`) before committing.
-- **Pilot:** `add-chat-history` for CH-2. If the pilot duplicates issues/tests
-  and rots, drop `openspec/` instead of maintaining ceremony.
+- Human approval is required for: `git reset --hard`, force push, `--no-verify`, `rm -rf` outside build artifacts, `DROP`/`TRUNCATE`, and merging into `main`.
+- Never commit `.env`, secrets, `desktop/target/`, `node_modules/`, AT5 baselines, `docs/research/`, `.opencode/opencode.json`, or `HANDOFF.md`. `make hooks` enables the pre-commit guard; do not bypass it.
 
 ## HITL — mandatory stop
 
@@ -197,20 +109,23 @@ Ask a human before changing:
 - Relation or adoption model.
 - Person deletion/merge behavior.
 - Re-import policy.
-- Chat access model.
-- Architecture decisions.
+- Chat access model, including any new tool exposed to the chat model.
 - Project format.
+- Architecture: a new crate, a changed dependency direction, a new external dependency, a new network egress, a new IPC surface.
 
-Record options, consequences, and a recommendation in the PR. Approved changes to the project format, dates, or relations are recorded in the pull request and, once accepted, in the invariants above.
+Record options, consequences, and a recommendation in the PR. If no human is available in the session, stop and leave a draft `hitl` issue text instead of choosing. Approved changes to the project format, dates, or relations are recorded in the PR and, once accepted, in the invariants above. Decisions are tracked as `hitl` issues (format in `docs/agents/github-workflow.md`).
 
-Decisions are tracked as `hitl` issues (`D1`–`D9` in the current roadmap). Close a decision issue only after the chosen option is recorded in the PR and, when it changes an invariant, in this file.
+Changes to this file's Invariants, Privacy, HITL, or Git sections need human review.
 
-## Never
+## Detailed guides
 
-- Create sibling edges or fake timestamps.
-- Cascade-delete events with other participants.
-- Start a network MCP server or log secrets.
-- Generate UI from mockups without identifying the underlying data and IPC commands.
+Read only when the trigger applies.
+
+| Trigger | File |
+|---|---|
+| Creating or updating an issue, PR, milestone, project board item, tag or release | `docs/agents/github-workflow.md` |
+| New capability or a change that spans layers or contracts (OpenSpec) | `docs/agents/openspec.md` |
+| Ending a session in the middle of a large task, or resuming one | `docs/agents/handoff.md` |
 
 <!-- OPENWIKI:START -->
 
@@ -225,6 +140,6 @@ This repository has a generated `openwiki/` evidence index. It is optional just-
 - Treat source code and tests as authoritative. A brief's unknowns and review items are verification gaps, not automatic requirements.
 - Prefer the narrowest quiet validation that proves the changed behavior. Preserve complete failure output.
 
-The OpenWiki GitHub Actions workflow can refresh the repository wiki manually; it is not scheduled. Do not hand-edit generated OpenWiki pages unless explicitly asked; prefer updating source code/docs and letting OpenWiki regenerate.
+The wiki is refreshed manually by a maintainer (`openwiki code --update`); there is no CI workflow for it. Do not hand-edit generated OpenWiki pages unless explicitly asked; prefer updating source code/docs and letting OpenWiki regenerate.
 
 <!-- OPENWIKI:END -->
