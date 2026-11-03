@@ -67,8 +67,8 @@
     gap: 0.35rem;
   }
 
-  /* Year range: the caption and the picked span sit left of the track; the
-     two end labels stay under it. */
+  /* Year range: the track takes the whole width; the two end labels stay under
+     it and the accessible group name is rendered visually hidden. */
   .year-range {
     display: flex;
     align-items: flex-start;
@@ -76,20 +76,6 @@
     min-width: 18rem;
     max-width: 26rem;
     padding-top: 2px;
-  }
-
-  .year-range-caption {
-    display: grid;
-    flex: 0 0 auto;
-    gap: 2px;
-    font-size: 0.78rem;
-    color: var(--muted-foreground);
-  }
-
-  .year-range-values {
-    color: var(--foreground);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
   }
 
   .year-range-track-block {
@@ -268,5 +254,55 @@
     flex: 0 0 auto;
     margin-inline-start: auto;
     color: var(--muted-foreground);
+  }
+
+  /* Shared event filter header: search row, then person / type / years. */
+  .event-filter-header {
+    display: grid;
+    flex: 1;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .event-filter-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+    min-width: 0;
+  }
+
+  .event-filter-top > .filter-bar {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .event-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 8px 12px;
+    min-width: 0;
+  }
+
+  .event-filter-person {
+    flex: 0 1 15rem;
+    min-width: 13rem;
+    max-width: 15rem;
+  }
+
+  .event-filter-type {
+    flex: 0 0 auto;
+    width: 14rem;
+    max-width: 100%;
+  }
+
+  .event-filter-type > * {
+    width: 100%;
+  }
+
+  .event-filter-reset {
+    margin-top: 4px;
+    margin-inline-start: auto;
   }
 }

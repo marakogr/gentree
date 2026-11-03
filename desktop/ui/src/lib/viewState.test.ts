@@ -61,6 +61,7 @@ describe("DEFAULT_VIEW_STATE", () => {
     expect(SECTION_KEYS).toEqual([
       "persons",
       "events",
+      "filters",
       "timeline",
       "map",
       "search",
@@ -225,6 +226,30 @@ describe("storage", () => {
     const restored = readProjectViews("project-a", storage);
     expect(restored.persons?.query).toBe("bob");
     expect(restored.events?.page).toBe(1);
+  });
+
+  it("keeps the shared event filters when another view writes its own state", () => {
+    const storage = fakeStorage();
+    writeProjectViews(
+      "project-a",
+      {
+        filters: state({
+          query: "ivan",
+          filters: { personId: "p1", types: ["BIRTH"], fromYear: "1990" },
+        }),
+      },
+      storage,
+    );
+    // Switching to the events view writes its page/selection next to the shared
+    // filters; the filters themselves must survive.
+    writeProjectViews("project-a", { events: state({ page: 2 }) }, storage);
+    const restored = readProjectViews("project-a", storage);
+    expect(restored.filters?.query).toBe("ivan");
+    expect(restored.filters?.filters).toEqual({
+      personId: "p1",
+      types: ["BIRTH"],
+      fromYear: "1990",
+    });
   });
 
   it("isolates projects from each other", () => {

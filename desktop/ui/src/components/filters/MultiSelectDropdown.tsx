@@ -1,17 +1,17 @@
-// Searchable multi-select dropdown for small enum sets (event types and the
-// like). The trigger shows the current state in one compact field, the popover
-// keeps a search input and a checkbox list; nothing selected means "all", which
-// is why the first row clears the selection.
+// Multi-select dropdown for small enum sets (event types and the like). The
+// trigger shows the current state in one compact field; the popover keeps a
+// checkbox list, and nothing selected means "all", which is why the first row
+// clears the selection.
 //
 // Fluent owns the popover (outside click, positioning inside the viewport); the
 // listbox and keyboard model live here so the component stays independent of
-// Fluent's single-select Combobox.
+// Fluent's single-select Combobox. The listbox itself takes focus, so the arrows
+// and Enter work without a search field.
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 import {
   Button,
-  Input,
   Popover,
   PopoverSurface,
   PopoverTrigger,
@@ -24,7 +24,7 @@ import {
   DismissRegular,
 } from "@fluentui/react-icons";
 import {
-  filterComboItems,
+  comboListboxMaxHeightPx,
   moveActiveIndex,
   type ComboItem,
 } from "../ui/helpers";
@@ -44,20 +44,21 @@ export type MultiSelectDropdownProps = {
   label: string;
   /** Label of the row that clears the selection ("All types"). */
   allLabel: string;
-  searchPlaceholder: string;
-  emptyLabel: string;
   /** Trigger text when more than one option is selected. */
   multipleLabel: (count: number) => string;
   disabled?: boolean;
   id?: string;
 };
 
-const SURFACE_MAX_HEIGHT_PX = 320;
+const SURFACE_MAX_HEIGHT_PX = comboListboxMaxHeightPx();
 
 const useStyles = makeStyles({
   trigger: {
     display: "flex",
     justifyContent: "flex-start",
+    // Fluent buttons default to semibold; the person combobox beside this one
+    // uses regular input text, so match it.
+    fontWeight: tokens.fontWeightRegular,
     minWidth: 0,
     maxWidth: "100%",
     overflow: "hidden",
@@ -76,23 +77,24 @@ const useStyles = makeStyles({
     minWidth: 0,
     gap: tokens.spacingVerticalS,
     maxWidth: "calc(100vw - 2rem)",
+    // Same cap as the person combobox listbox: five rows plus its padding.
     maxHeight: `${SURFACE_MAX_HEIGHT_PX}px`,
     padding: tokens.spacingHorizontalS,
     overflowX: "hidden",
   },
-  search: {
-    width: "100%",
-  },
   list: {
     display: "flex",
+    flex: "1 1 auto",
     flexDirection: "column",
     width: "100%",
     minWidth: 0,
+    minHeight: 0,
     gap: "2px",
-    maxHeight: "16rem",
+    maxHeight: "100%",
     overflowY: "auto",
     overflowX: "hidden",
     overscrollBehavior: "contain",
+    outlineStyle: "none",
   },
 });
 
@@ -102,8 +104,6 @@ export function MultiSelectDropdown({
   onChange,
   label,
   allLabel,
-  searchPlaceholder,
-  emptyLabel,
   multipleLabel,
   disabled = false,
   id,
@@ -112,11 +112,10 @@ export function MultiSelectDropdown({
   const generatedId = useId();
   const baseId = id ?? generatedId;
   const listboxId = `${baseId}-listbox`;
-  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
   const [active, setActive] = useState(-1);
 
   const selected = useMemo(
@@ -124,19 +123,11 @@ export function MultiSelectDropdown({
     [options, values],
   );
 
-  const filtered = useMemo(
-    () => filterComboItems(options, query),
-    [options, query],
-  );
-
-  // The "all" row stays fixed above the filtered list, so keyboard indices are
-  // offset by one; `rows` is the single source for navigation.
+  // The "all" row stays fixed above the list, so keyboard indices are offset by
+  // one; `rows` is the single source for navigation.
   const rows = useMemo(
-    () => [
-      { id: "", label: allLabel } as MultiSelectOption,
-      ...filtered,
-    ],
-    [allLabel, filtered],
+    () => [{ id: "", label: allLabel } as MultiSelectOption, ...options],
+    [allLabel, options],
   );
 
   const isChecked = (optionId: string): boolean =>
@@ -151,16 +142,15 @@ export function MultiSelectDropdown({
 
   useEffect(() => {
     if (!open) return;
-    setQuery("");
     setActive(0);
-    // The search field is the keyboard entry point; focusing it on open also
-    // keeps the popover from stealing focus back to the trigger.
-    const frame = requestAnimationFrame(() => inputRef.current?.focus());
+    // The listbox is the keyboard entry point; focusing it on open also keeps
+    // the popover from stealing focus back to the trigger.
+    const frame = requestAnimationFrame(() => listRef.current?.focus());
     return () => cancelAnimationFrame(frame);
   }, [open]);
 
-  // Escape closes the popover even when focus drifted out of the search field
-  // (for example after a pointer click on the surface padding).
+  // Escape closes the popover even when focus drifted out of the listbox (for
+  // example after a pointer click on the surface padding).
   useEffect(() => {
     if (!open) return;
     const handleEscape = (event: globalThis.KeyboardEvent) => {
@@ -181,7 +171,7 @@ export function MultiSelectDropdown({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, open, rows]);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
@@ -209,7 +199,7 @@ export function MultiSelectDropdown({
       }
       case "Escape":
         // Handled by the document listener, which also covers focus that left
-        // the search field; only stop the default here.
+        // the listbox; only stop the default here.
         event.preventDefault();
         break;
       case "Tab":
@@ -273,41 +263,18 @@ export function MultiSelectDropdown({
         </Button>
       </PopoverTrigger>
       <PopoverSurface className={styles.surface} role="presentation">
-        <Input
-          ref={inputRef}
-          className={styles.search}
-          value={query}
-          placeholder={searchPlaceholder}
-          aria-label={searchPlaceholder}
-          role="combobox"
-          aria-expanded="true"
-          aria-controls={listboxId}
-          aria-autocomplete="list"
-          aria-activedescendant={
-            active >= 0 && rows[active] ? optionId(rows[active].id) : undefined
-          }
-          autoComplete="off"
-          spellCheck={false}
-          onChange={(event) => {
-            const next = event.target.value;
-            setQuery(next);
-            // Typing narrows the list: the keyboard focus moves to the first
-            // real match, not the fixed "all" row, so Enter does not silently
-            // clear the selection.
-            if (next.trim() === "") {
-              setActive(0);
-            } else {
-              setActive(filterComboItems(options, next).length > 0 ? 1 : 0);
-            }
-          }}
-          onKeyDown={handleKeyDown}
-        />
         <div
+          ref={listRef}
           id={listboxId}
           role="listbox"
           aria-label={label}
           aria-multiselectable="true"
+          aria-activedescendant={
+            active >= 0 && rows[active] ? optionId(rows[active].id) : undefined
+          }
+          tabIndex={0}
           className={styles.list}
+          onKeyDown={handleKeyDown}
         >
           {rows.map((row, index) => {
             const checked = isChecked(row.id);
@@ -321,8 +288,8 @@ export function MultiSelectDropdown({
                 className="multi-select-option"
                 title={row.label}
                 onMouseEnter={() => setActive(index)}
-                // Keep the keyboard on the search field: a pointer click must
-                // not move focus to the option (or to `body`), otherwise
+                // Keep the keyboard on the listbox: a pointer click must not
+                // move focus to the option (or to `body`), otherwise
                 // Escape/arrows stop working after the first mouse pick.
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => toggle(row.id)}
@@ -346,9 +313,6 @@ export function MultiSelectDropdown({
               </div>
             );
           })}
-          {filtered.length === 0 ? (
-            <div className="multi-select-empty">{emptyLabel}</div>
-          ) : null}
         </div>
       </PopoverSurface>
     </Popover>

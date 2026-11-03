@@ -17,6 +17,7 @@ import {
   yearForKey,
   type YearRangeHandle,
 } from "./yearRangeRules";
+import "../ui/ui.css";
 import "./filters.css";
 
 /** Visual separator between the two current years: `1900 — 2026`. */
@@ -180,10 +181,9 @@ export function YearRange({
 
   return (
     <div className="year-range" role="group" aria-labelledby={labelId}>
-      <span className="year-range-caption">
-        <span id={labelId} className="year-range-label">
-          {groupLabel}
-        </span>
+      {/* The caption is gone: the group name stays for screen readers. */}
+      <span id={labelId} className="ui-sr-only">
+        {groupLabel}
       </span>
 
       <div className="year-range-track-block">
