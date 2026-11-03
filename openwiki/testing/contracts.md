@@ -32,10 +32,10 @@ sources:
     resource: repo://desktop/ui/e2e/README.md
   - id: openwiki-source-521dba66491bc60efe25ff97
     resource: repo://desktop/ui/package.json
-generated: { by: "opencode", at: "2026-11-02T09:11:48.673Z" }
+generated: { by: "opencode", at: "2026-11-03T10:50:52.373Z" }
 verified:
   - by: openwiki/0.7.0
-    at: 2026-11-02T09:11:48.673Z
+    at: 2026-11-03T10:50:52.373Z
 ---
 
 # Contract test map
@@ -103,7 +103,7 @@ UI suites cover pure logic rather than DOM: navigation, theme/style/contrast, da
 
 ### Optional UI review harness
 
-The WebdriverIO specs under `desktop/ui/e2e/specs` are review tooling, not assertions: `01-smoke.js` checks that the window and a section render, `02-shell-audit.js` records interactive controls, hit targets, contrast candidates, overflow, untranslated keys and focus order, and `03-project-tour.js` visits the project sections with a synthetic project. They need a desktop session, `tauri-driver` and `msedgedriver`, run only on Windows, and are never part of `make check`; see [Build, quality gates and release](../operations/build-test-release.md).
+The WebdriverIO specs under `desktop/ui/e2e/specs` are review tooling, not assertions: `01-smoke.js` checks that the window and a section render, `02-shell-audit.js` records interactive controls, hit targets, contrast candidates, overflow, untranslated keys and focus order, `03-project-tour.js` visits the project sections with a synthetic project, `04-events-filters.js` exercises the shared filter header (person, relation scope, type, year) and the jump to the timeline, `05-occupation.js` checks the person-card occupation fact, `06-data-check.js` opens the data-check popup, and `07-event-card.js` opens the read-only event card. They need a desktop session, `tauri-driver` and `msedgedriver`, run only on Windows, and are never part of `make check`; see [Build, quality gates and release](../operations/build-test-release.md).
 
 ## Running checks
 

@@ -12,10 +12,10 @@ sources:
     resource: repo://desktop/crates/core/src/validation.rs
   - id: openwiki-source-23775c3de52f3ab95a13cb8b
     resource: repo://README.md
-generated: { by: "opencode", at: "2026-11-02T09:11:48.673Z" }
+generated: { by: "opencode", at: "2026-11-03T10:50:52.373Z" }
 verified:
   - by: openwiki/0.7.0
-    at: 2026-11-02T09:11:48.673Z
+    at: 2026-11-03T10:50:52.373Z
 ---
 
 # Gentree Desktop quickstart
@@ -75,7 +75,7 @@ Makefile                the only build/test entry point
 - **Tools run in process.** No network MCP server, no chat traffic before a provider is configured, no secrets or project data in logs.
 - **All UI strings live in i18n dictionaries**, and no Cyrillic appears outside them.
 
-`AGENTS.md` is the contract for how to work here: invariants first, then contract tests, then current documentation under `docs/`, then README. If code and a contract disagree, stop and ask instead of silently changing either side.
+`AGENTS.md` is the contract for how to work here: invariants first, then code and contract tests, then OpenSpec specs (when present), then current documentation under `docs/` and `desktop/docs/`, then README. If code and an invariant or contract test disagree, stop and ask instead of silently changing either side.
 
 ## First commands
 
