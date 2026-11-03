@@ -28,7 +28,7 @@ import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { cn } from "../../lib/utils";
 import { useScrollMemory, useViewState } from "../../lib/useViewState";
 import { useEventFilterState } from "../events/useEventFilterState";
-import type { EventPersonScope } from "../events/helpers";
+import { matchesEventQuery, type EventPersonScope } from "../events/helpers";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
 import { toTimelineEvents } from "./adapter";
@@ -280,6 +280,9 @@ export default function TimelinePage({
   const eventTypes = eventFilters.filters.types;
   const sharedPersonId = eventFilters.filters.personId;
   const sharedPersonScope = eventFilters.filters.personScope;
+  const sharedFromYear = eventFilters.filters.fromYear;
+  const sharedToYear = eventFilters.filters.toYear;
+  const sharedQuery = eventFilters.query;
   const { setFilter: setSharedFilter } = eventFilters;
 
   // The stored view is the base; a one-shot person deep link from another
@@ -368,12 +371,18 @@ export default function TimelinePage({
   );
 
   const focus = useMemo(
-    () => buildTimelineListParams(view, eventTypes),
+    () =>
+      buildTimelineListParams(
+        view,
+        eventTypes,
+        sharedFromYear,
+        sharedToYear,
+      ),
     // Only these fields reach the request.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [scope, personId, generations, eventTypes],
+    [scope, personId, generations, eventTypes, sharedFromYear, sharedToYear],
   );
-  const focusKey = `${scope}|${personId ?? ""}|${generations}|${eventTypes.join(",")}`;
+  const focusKey = `${scope}|${personId ?? ""}|${generations}|${eventTypes.join(",")}|${sharedFromYear}|${sharedToYear}`;
   const lastFocusRef = useRef<string | null>(null);
   const requestable = canRequestScope({ scope, personId, generations });
 
@@ -455,13 +464,38 @@ export default function TimelinePage({
     };
   }, [focus, focusKey, reloadKey, requestable, requestGuard, t, nameById]);
 
+  // The search text is shared with the events screen; the line filters rows
+  // client-side because the command has no text query.
+  const query = sharedQuery.trim();
+  const matchesQuery = useCallback(
+    (entry: TimelineEntry) =>
+      query === "" ||
+      matchesEventQuery(
+        entry.event,
+        {
+          personName: entry.personName,
+          typeLabel: eventTypeLabel(entry.event.type, t),
+        },
+        query,
+      ),
+    [query, t],
+  );
+  const visibleDated = useMemo(
+    () => line.dated.filter(matchesQuery),
+    [line.dated, matchesQuery],
+  );
+  const visibleUndated = useMemo(
+    () => line.undated.filter(matchesQuery),
+    [line.undated, matchesQuery],
+  );
+
   const datedEvents = useMemo(
-    () => toTimelineEvents(line.dated, genderById, nameById),
-    [line.dated, genderById, nameById],
+    () => toTimelineEvents(visibleDated, genderById, nameById),
+    [visibleDated, genderById, nameById],
   );
   const undatedEvents = useMemo(
-    () => toTimelineEvents(line.undated, genderById, nameById),
-    [line.undated, genderById, nameById],
+    () => toTimelineEvents(visibleUndated, genderById, nameById),
+    [visibleUndated, genderById, nameById],
   );
 
   const partitioned = useMemo(
@@ -480,11 +514,11 @@ export default function TimelinePage({
   );
   const entriesById = useMemo(() => {
     const index = new Map<string, TimelineEntry>();
-    for (const entry of [...line.dated, ...line.undated]) {
+    for (const entry of [...visibleDated, ...visibleUndated]) {
       index.set(entry.event.id, entry);
     }
     return index;
-  }, [line.dated, line.undated]);
+  }, [visibleDated, visibleUndated]);
 
   const relatedIds = useMemo(
     () => relatedEventIds(allEvents, selectedEventId),

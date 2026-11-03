@@ -140,10 +140,12 @@ export function resolveInitialTimelineView({
   };
 }
 
-/** Scope-specific parameters plus the shared event-type filter. */
+/** Scope-specific parameters plus the shared type and year filters. */
 export function buildTimelineListParams(
   view: TimelineView,
   types: readonly EventType[] = [],
+  fromYear = "",
+  toYear = "",
 ): TimelineListParams {
   const params = buildTimelineEventsOptions({
     scope: view.scope,
@@ -151,5 +153,8 @@ export function buildTimelineListParams(
     generations: view.generations,
   });
   if (types.length > 0) params.types = [...types];
+  // The shared filter stores years; the command expects whole-date bounds.
+  if (fromYear !== "") params.from = `${fromYear}-01-01`;
+  if (toYear !== "") params.to = `${toYear}-12-31`;
   return params;
 }

@@ -221,4 +221,41 @@ describe("event filters", () => {
     await shot("filters-types");
     expect(await consoleErrors()).toEqual([]);
   });
+
+  it("jumps to the timeline with the same person and types", async () => {
+    // Pick a person and one type, then jump: the timeline shares both.
+    const input = await $(PERSON_INPUT);
+    await input.click();
+    const person = await $('//*[@role="option"][contains(., "Иванов")]');
+    await person.waitForExist({ timeout: 5000 });
+    await person.click();
+    await browser.pause(400);
+    const personValue = await input.getValue();
+    expect(personValue).toContain("Иванов");
+
+    await openTypes();
+    await $('//*[@role="option"][normalize-space(.)="Рождение"]').click();
+    await browser.pause(300);
+    await closeTypes();
+
+    await $('//button[contains(., "Перейти в хронологию")]').click();
+    await browser.pause(800);
+    expect(await headingText()).toBe("Хронология");
+
+    const timelinePerson = await $("#timeline-focus-person");
+    await timelinePerson.waitForDisplayed({ timeout: 10000 });
+    expect(await timelinePerson.getValue()).toBe(personValue);
+    expect(
+      (await (await $("#timeline-type-filter")).getText()).trim(),
+    ).toBe("Рождение");
+    await shot("timeline-from-events");
+
+    // The breadcrumb returns to the events screen with the same filters.
+    await $(".app-breadcrumb button").click();
+    await browser.pause(600);
+    expect(await headingText()).toBe("События");
+    expect(await (await $(PERSON_INPUT)).getValue()).toBe(personValue);
+    expect((await triggerText()).trim()).toBe("Рождение");
+    expect(await consoleErrors()).toEqual([]);
+  });
 });
