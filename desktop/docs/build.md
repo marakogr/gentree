@@ -69,8 +69,8 @@ loopback) описан в [`docs/releases.md`](../../docs/releases.md).
 
 ## macOS: .dmg
 
-Релизы сейчас публикуются только для Windows: `.dmg` собирается локально, но в
-GitHub Releases не попадает и не подписан.
+`.dmg` собирается в релизном workflow на `macos-latest` (arm64) и локально через
+`make build`; в релизе он появляется в draft release наравне с Windows-сборкой.
 
 Кросс-сборка .dmg с Windows невозможна: бандлер использует `hdiutil`,
 `codesign` и SDK macOS. Нужен Mac (или macOS-раннер CI).
@@ -121,6 +121,13 @@ export APPLE_TEAM_ID="<TEAMID>"
 make build
 ```
 
+В CI те же значения лежат в секретах `APPLE_CERTIFICATE`,
+`APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_TEAM_ID` и
+`APPLE_ID`/`APPLE_PASSWORD` (или `APPLE_API_*`): пока их нет, `.dmg` публикуется
+неподписанным, а шаг проверки не требует подписи. Как только секреты заданы,
+релиз падает при неудачном `codesign`/`spctl`/`stapler`. Подробнее —
+`docs/releases.md`.
+
 Проверить сертификаты: `security find-identity -v -p codesigning`.
 Секреты не коммитить и не выводить в логи.
 
@@ -154,7 +161,7 @@ exe ничего не пишется. Пользовательское опис�
 [`docs/portable.md`](../../docs/portable.md).
 
 Требуется PowerShell: архив создаётся `Compress-Archive`. Цель работает только
-на Windows; на macOS остаётся сборка `.dmg`, которая пока не публикуется.
+на Windows; на macOS публикуется отдельная сборка `.dmg`.
 
 ## Проверки перед PR
 

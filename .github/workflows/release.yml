@@ -12,16 +12,22 @@ name: Release
 # private key is the TAURI_SIGNING_PRIVATE_KEY secret and never leaves the
 # secret store. Without that secret the release fails before the build starts.
 #
-# Every job verifies its artifacts before publishing them:
-#   - code signatures (blocking when WINDOWS_CERTIFICATE is configured),
-#   - Microsoft Defender scan (advisory smoke test),
-#   - SHA256SUMS-windows-x64.txt next to the installers.
-# The job also builds the portable archive from a production executable that
-# ships with the updater disabled (tauri.portable.conf.json).
+# Every job runs the quality gates before building and verifies its artifacts
+# before publishing them:
+#   - fmt, clippy and the Rust and UI tests on each platform (the same set as
+#     `make check`), so a platform-specific test failure stops the release,
+#   - code signatures (blocking when WINDOWS_CERTIFICATE or APPLE_CERTIFICATE is
+#     configured),
+#   - Microsoft Defender scan (advisory smoke test, Windows only),
+#   - SHA256SUMS-<platform>-<arch>.txt next to the artifacts.
+# The Windows job also builds the portable archive from a production executable
+# that ships with the updater disabled (tauri.portable.conf.json).
 #
-# Releases are Windows-only for now. The macOS bundle is still built locally
-# with `make build`, but it is not published and not signed yet; see
-# docs/releases.md.
+# Platforms: Windows x64 (NSIS installer and portable archive) and macOS arm64
+# (.dmg). macOS artifacts stay unsigned and un-notarized until the APPLE_*
+# secrets exist; the verification step only requires a signature when the
+# certificate is configured, and the release notes say which case applies.
+# See docs/releases.md.
 #
 # Only the NSIS installer is published: it installs per user, needs no
 # administrator rights, and the updater can run it silently. The MSI stays a
@@ -32,6 +38,19 @@ name: Release
 #   WINDOWS_CERTIFICATE_PASSWORD        password of that .pfx
 # Without the certificate pair the Windows artifacts are still built, but they
 # are unsigned and the signature check only warns. See docs/releases.md.
+#
+# Optional macOS signing and notarization secrets (names only, never values):
+#   APPLE_CERTIFICATE                   base64 of a Developer ID Application .p12
+#   APPLE_CERTIFICATE_PASSWORD          password set when exporting that .p12
+#   APPLE_SIGNING_IDENTITY              "Developer ID Application: Name (TEAMID)"
+#   APPLE_TEAM_ID                       the TEAMID from the identity
+#   APPLE_ID + APPLE_PASSWORD           Apple ID and an app-specific password,
+#                                       or APPLE_API_KEY + APPLE_API_ISSUER +
+#                                       APPLE_API_KEY_P8 (the .p8 contents; the
+#                                       workflow writes the key file and sets
+#                                       APPLE_API_KEY_PATH itself)
+# Without APPLE_CERTIFICATE the .dmg is published unsigned and Gatekeeper asks
+# the user to allow it. See docs/releases.md.
 #
 # Updater signing secrets (required):
 #   TAURI_SIGNING_PRIVATE_KEY          full contents of the minisign private key
@@ -58,6 +77,12 @@ jobs:
         include:
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
+            bundles: nsis
+            sums: release-assets/SHA256SUMS-windows-x64.txt
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            bundles: dmg
+            sums: release-assets/SHA256SUMS-macos-arm64.txt
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Check out repository
@@ -85,6 +110,27 @@ jobs:
 
       - name: Install UI dependencies
         run: npm ci --prefix desktop/ui
+
+      # A tag can point at any commit, so the release re-runs the gates from
+      # `make check` on every platform. Running them per matrix entry is what
+      # catches a test that only works on one OS.
+      - name: Check Rust formatting
+        working-directory: desktop
+        run: cargo fmt --all -- --check
+
+      - name: Lint Rust
+        working-directory: desktop
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Test Rust
+        working-directory: desktop
+        run: cargo test --workspace
+
+      - name: Test the UI
+        run: npm --prefix desktop/ui run test
+
+      - name: Check the locales
+        run: npm --prefix desktop/ui run i18n:check
 
       - name: Check that the tag matches the app version
         run: node -e "const fs=require('fs');const tag=process.env.GITHUB_REF_NAME.replace(/^v/,'');const version=JSON.parse(fs.readFileSync('desktop/apps/desktop/tauri.conf.json','utf8')).version;if(version!==tag){console.error('tag '+tag+' does not match tauri.conf.json version '+version);process.exit(1);}console.log('release version '+version);"
@@ -115,6 +161,7 @@ jobs:
       # build args stay identical whether or not a certificate is configured.
       - name: Prepare Windows code signing (optional)
         id: signing
+        if: matrix.platform == 'windows-latest'
         shell: pwsh
         env:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
@@ -157,6 +204,34 @@ jobs:
           "thumbprint=$($certificate.Thumbprint)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           Write-Host "Windows signing enabled with certificate $($certificate.Thumbprint)."
 
+      # tauri-action signs and notarizes the macOS bundle itself when the
+      # APPLE_* variables are present; there is no overlay to write. These two
+      # steps only prepare the optional API key and make the unsigned case
+      # visible in the log.
+      - name: Prepare the macOS notarization key (optional)
+        if: matrix.platform == 'macos-latest'
+        env:
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          if [ -n "$APPLE_API_KEY_P8" ]; then
+            key_path="$RUNNER_TEMP/AuthKey.p8"
+            printf '%s\n' "$APPLE_API_KEY_P8" > "$key_path"
+            chmod 600 "$key_path"
+            echo "APPLE_API_KEY_PATH=$key_path" >> "$GITHUB_ENV"
+            echo "App Store Connect API key written for notarization."
+          fi
+
+      - name: Report the macOS signing status
+        if: matrix.platform == 'macos-latest'
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+        run: |
+          if [ -z "$APPLE_CERTIFICATE" ]; then
+            echo "::warning::APPLE_CERTIFICATE is not set; the macOS artifacts stay unsigned and are not notarized."
+          else
+            echo "macOS signing and notarization are configured."
+          fi
+
       - name: Read the changelog section
         id: changelog
         shell: pwsh
@@ -183,6 +258,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Empty on an unsigned build: Tauri then skips signing and notarizing.
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Notarization: an Apple ID with an app-specific password, or an
+          # App Store Connect API key (the file is written by the step above).
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         with:
           projectPath: desktop/apps/desktop
           tagName: ${{ github.ref_name }}
@@ -215,14 +301,39 @@ jobs:
             per-app exception; turning it off is a system-wide security change.
             Code signing is planned, and a signed build will not trip either
             gate.
+
+            ### Installing on macOS (Apple Silicon)
+
+            Download `Gentree___VERSION___aarch64.dmg` and verify it against
+            `SHA256SUMS-macos-arm64.txt` from the same release:
+
+            ```bash
+            shasum -a 256 -c SHA256SUMS-macos-arm64.txt
+            ```
+
+            If Gatekeeper refuses the first launch (the build is notarized only
+            once the APPLE_* secrets are configured), open **System Settings →
+            Privacy & Security** and click **Open Anyway**, or clear the
+            quarantine flag after the checksum matched:
+
+            ```bash
+            xattr -dr com.apple.quarantine Gentree___VERSION___aarch64.dmg
+            ```
+
+            Intel Macs are not covered by this release yet; build from source
+            with `make build`.
           # `latest.json` points installed builds at the artifact of this release.
           includeUpdaterJson: true
           # Only NSIS is published. The MSI is a local build for managed
           # deployments and is not part of the release assets.
           updaterJsonPreferNsis: true
           # The first overlay produces the `.sig` files and the updater archive,
-          # the second one adds the optional Authenticode certificate.
-          args: --target ${{ matrix.target }} --bundles nsis --config tauri.release.conf.json --config tauri.signing.conf.json
+          # the second one adds the optional Authenticode certificate. macOS
+          # needs no overlay: Tauri reads the APPLE_* variables instead.
+          args: >-
+            --target ${{ matrix.target }} --bundles ${{ matrix.bundles }}
+            --config tauri.release.conf.json
+            ${{ matrix.platform == 'windows-latest' && '--config tauri.signing.conf.json' || '' }}
 
       # The portable executable is a separate build: tauri.portable.conf.json
       # empties the updater endpoint so a portable copy can never install itself
@@ -294,3 +405,29 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "${{ github.ref_name }}" release-assets/* --clobber
+
+      # The `.dmg` itself is uploaded by tauri-action; this step only adds the
+      # checksum file. Signature checks are blocking only once the certificate
+      # exists, same as on Windows.
+      - name: Verify the macOS artifacts
+        if: matrix.platform == 'macos-latest'
+        env:
+          SIGNED: ${{ secrets.APPLE_CERTIFICATE != '' }}
+        run: |
+          shopt -s nullglob
+          dmgs=(desktop/target/${{ matrix.target }}/release/bundle/dmg/*.dmg)
+          if [ ${#dmgs[@]} -eq 0 ]; then
+            echo "no .dmg was produced" >&2
+            exit 1
+          fi
+          arguments=(--asset "${dmgs[0]}" --sums "${{ matrix.sums }}")
+          if [ "$SIGNED" = "true" ]; then
+            arguments+=(--require-signature)
+          fi
+          node scripts/verify-release.mjs "${arguments[@]}"
+
+      - name: Upload the macOS checksums
+        if: matrix.platform == 'macos-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" "${{ matrix.sums }}" --clobber
