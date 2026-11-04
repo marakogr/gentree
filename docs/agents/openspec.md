@@ -9,5 +9,7 @@ Do not use it for bugs, UI polish, copy, layout, dependency bumps, or release en
 - One change = one `openspec/changes/<id>/` with `proposal.md`, `design.md`, `tasks.md` and the spec delta. Link the GitHub issue and the change folder in the PR.
 - After merge, `openspec archive` merges the delta into `openspec/specs/`; keep the archived change in git.
 - Precedence: invariants > contract tests > specs > docs. If a spec contradicts a contract test, fix the spec.
-- Setup (once): install the CLI, run `openspec init`, `openspec config set telemetry.enabled false`, and review the diff, especially `AGENTS.md` and `.opencode/`, before committing. `openspec init` edits `AGENTS.md`: keep its generated blocks inside their markers and do not let it overwrite the rest.
+- Layout: `openspec/config.yaml` (schema and project context), `openspec/specs/` (accepted specs), `openspec/changes/` (active changes), `openspec/changes/archive/` (archived changes, kept in git).
+- Slash commands `/opsx-propose`, `/opsx-explore`, `/opsx-apply`, `/opsx-update`, `/opsx-sync`, `/opsx-archive` are committed in `.opencode/commands/`. Flow: propose → apply → archive.
+- Setup (once per machine): install the CLI, then `openspec init --tools opencode --no-animation` and `openspec config set telemetry.enabled false`. Generated `.opencode/skills/` is local-only and gitignored. After a CLI upgrade run `openspec update` and review the diff of the committed commands.
 - Pilot: `add-chat-history`. If it duplicates issues and tests and starts to rot, drop `openspec/` instead of maintaining ceremony.

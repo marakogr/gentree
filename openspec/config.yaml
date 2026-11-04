@@ -1,0 +1,21 @@
+schema: spec-driven
+
+context: |
+  Gentree is a local-only family archive desktop app: Rust + Tauri 2, React/Vite UI, no backend
+  server, accounts or remote sync. Supported targets: Windows and macOS.
+
+  Write OpenSpec artifacts in English.
+
+  Constraints an agent cannot infer from the code:
+  - Everything in `AGENTS.md` (invariants, privacy, HITL, Git) outranks specs. Contract tests in
+    `desktop/crates/*/tests/*_contract.rs` outrank specs too; a spec that contradicts them is a
+    spec bug.
+  - Unknown dates keep `DateValue` precision UNKNOWN; sibling edges are never stored; re-import
+    never overwrites manual edits; deleting a person never cascade-deletes shared events.
+  - Anything touching date semantics, relations/adoption, deletion or merge, re-import policy, the
+    chat tool surface, the project format or architecture needs a `hitl` decision issue and human
+    approval before implementation. Put the options, consequences and a recommendation in the PR.
+  - Specs and designs never contain real AT5 data, personal names, dates, places, absolute paths or
+    secrets. Scenarios and fixtures use synthetic data only.
+  - User-facing UI copy lives in `desktop/ui/src/i18n/locales` (ru, uk, en); errors use stable codes
+    localized in the UI.
