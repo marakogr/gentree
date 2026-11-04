@@ -218,11 +218,18 @@ mod tests {
         assert!(export_target("  ").is_err());
         assert!(export_target("family.zip").is_err());
 
-        let path = export_target("C:/data/family").unwrap();
+        // An absolute path is platform-specific, so build one from the temp dir
+        // instead of a Windows literal that is relative on macOS and Linux.
+        let root = tempfile::tempdir().unwrap();
+        let base = root.path().join("family");
+
+        let path = export_target(&base.to_string_lossy()).unwrap();
         assert!(path.is_absolute());
         assert_eq!(path.file_name().unwrap(), "family.zip");
 
-        let path = export_target("C:/data/family.ZIP").unwrap();
+        let mut zipped = base.into_os_string();
+        zipped.push(".ZIP");
+        let path = export_target(&zipped.to_string_lossy()).unwrap();
         assert_eq!(path.file_name().unwrap(), "family.ZIP");
     }
 
