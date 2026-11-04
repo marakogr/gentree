@@ -61,8 +61,8 @@ The recipe builds with `--no-bundle --config tauri.portable.conf.json`, then
 runs `scripts/package-portable.mjs`, which stages `Gentree.exe` and a generated
 `README.txt`, writes `Gentree_<version>_x64_portable.zip` into
 `release-assets/` and prints its SHA-256. The archive is produced with
-PowerShell's `Compress-Archive`; the target is Windows-only. macOS keeps its own
-`.dmg` build, which is not published yet.
+PowerShell's `Compress-Archive`; the target is Windows-only. macOS ships its own
+`.dmg` from the same release.
 
 In CI the Windows job builds the same archive after the bundled build, signs the
 executable with the same certificate when one is configured, then runs

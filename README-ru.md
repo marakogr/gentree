@@ -25,7 +25,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Лицензия: MIT"></a>
   <a href="https://github.com/marakogr/gentree/releases"><img src="https://img.shields.io/github/v/release/marakogr/gentree?include_prereleases&amp;label=release" alt="Последний выпуск"></a>
-  <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20(из%20исходников)-lightgrey.svg" alt="Платформы: установщик для Windows, macOS из исходников">
+  <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20(Apple%20Silicon)-lightgrey.svg" alt="Платформы: установщики для Windows и macOS на Apple Silicon">
   <img src="https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg" alt="Сделано на Tauri 2">
   <img src="https://img.shields.io/badge/status-early%20preview-yellow.svg" alt="Статус: ранняя предварительная версия">
 </p>
@@ -69,8 +69,8 @@ Gentree подходит, если вы хотите хранить исслед
 
 Пока это не лучший выбор, если нужна совместная работа и публикация в браузере,
 подсказки по записям из онлайн-архивов или ДНК-инструменты, мобильное
-приложение или готовые установщики для macOS и Linux: выпуски пока только для
-Windows.
+приложение, Mac на Intel или установщики для Linux: релизы выходят для Windows
+x64 и macOS на Apple Silicon.
 
 ## Переезд из «Древа жизни»
 
@@ -175,6 +175,22 @@ API-ключи хранятся в переменных окружения, а �
 загрузку с `SHA256SUMS-windows-x64.txt`. Сборки пока не подписаны, поэтому при
 первом запуске SmartScreen может попросить подтверждение; шаги и требование к
 WebView2 описаны в [`docs/ru/install.md`](docs/ru/install.md).
+
+**macOS 11+, Apple Silicon.** Скачайте `Gentree_<version>_aarch64.dmg` на
+странице [Releases](https://github.com/marakogr/gentree/releases) и сверьте
+загрузку с `SHA256SUMS-macos-arm64.txt`. Сборка пока не подписана и не
+нотаризована, поэтому Gatekeeper не даст запустить приложение с первого раза:
+откройте **Системные настройки → Конфиденциальность и безопасность** и нажмите
+**Всё равно открыть** либо снимите флаг карантина после совпадения контрольной
+суммы:
+
+```bash
+shasum -a 256 -c SHA256SUMS-macos-arm64.txt
+xattr -dr com.apple.quarantine Gentree_<version>_aarch64.dmg
+```
+
+Mac на Intel в релизах пока не поддерживается — запускайте приложение из
+исходников.
 
 **macOS и сборка из исходников.** Нужны Rust 1.88+, Node.js 20+ и нативный
 набор инструментов.

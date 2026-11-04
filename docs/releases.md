@@ -5,9 +5,11 @@ itself through [`tauri-plugin-updater`](https://tauri.app/plugin/updater/). This
 document covers the release pipeline, the keys and secrets it needs, how the
 update endpoint is wired, and what is verified before a release becomes public.
 
-Releases are Windows-only for now. The macOS bundle can still be built locally
-with `make build` (`desktop/docs/build.md`), but it is neither published nor
-signed and notarized yet.
+Every release publishes Windows x64 and macOS arm64 (Apple Silicon) artifacts.
+Both are unsigned until their certificate secrets are configured: Authenticode
+for Windows, Developer ID with notarization for macOS (see
+[Code signing](#code-signing)). Intel Macs are not covered by the release yet;
+build from source with `make build` (`desktop/docs/build.md`).
 
 The release workflow code-signs the artifacts when a certificate is configured
 and verifies the signatures, the checksums and a Microsoft Defender scan while
@@ -149,14 +151,45 @@ Two expectations to keep:
   the same certificate, never rebuild an already published version, and do not
   rename signed artifacts.
 
-### macOS (not published yet)
+### macOS (Developer ID and notarization)
 
-The variables are documented in `desktop/docs/build.md`, and the verification
-script already understands `codesign`, `spctl` and `stapler`. Nothing is wired
-into the release workflow while macOS builds are not published: there are no
-`APPLE_*` secrets and no macOS job in the matrix. When the platform is turned
-back on, add those secrets to the build step and pass `--require-signature` to
-the verification step.
+The macOS job builds an unsigned `.dmg` until these secrets exist. Tauri reads
+them directly; there is no overlay file to write, unlike Windows:
+
+| Secret | Value |
+| --- | --- |
+| `APPLE_CERTIFICATE` | base64 of a `Developer ID Application` `.p12` |
+| `APPLE_CERTIFICATE_PASSWORD` | password chosen when exporting the `.p12` |
+| `APPLE_SIGNING_IDENTITY` | `Developer ID Application: <Name> (<TEAMID>)` from `security find-identity -v -p codesigning` |
+| `APPLE_TEAM_ID` | the `TEAMID` from that identity |
+| `APPLE_ID` + `APPLE_PASSWORD` | Apple ID and an app-specific password (notarization via Apple ID) |
+| or `APPLE_API_KEY` + `APPLE_API_ISSUER` + `APPLE_API_KEY_PATH` | App Store Connect API key, the safer option for CI |
+
+```bash
+# Base64 without line breaks; paste the result into the secret.
+openssl base64 -A -in certificate.p12 -out certificate-base64.txt
+```
+
+With the secrets present, `tauri-action` signs the `.app` and the `.dmg` with
+the Developer ID identity, submits the bundle for notarization and staples the
+ticket. The `Verify the macOS artifacts` step then passes
+`--require-signature`, so `spctl --assess` and `stapler validate` failures fail
+the release instead of only warning. Without `APPLE_CERTIFICATE` the step warns,
+the draft is published unsigned, and the release notes tell users how to open
+the app.
+
+The updater does not depend on Developer ID: the `.app.tar.gz` is signed with
+the minisign key like every other artifact, so updates work before notarization
+is configured. Gatekeeper still decides whether the user can *first* start the
+app.
+
+Two expectations to keep:
+
+- Notarization adds an external dependency to the release: an Apple outage or an
+  expired certificate must fail the draft, never publish an unsigned `.dmg`
+  silently.
+- The identity must match the certificate. A mismatched `APPLE_SIGNING_IDENTITY`
+  makes `codesign` fail; copy it from `security find-identity`, do not retype it.
 
 ### Unsigned preview releases
 
@@ -210,9 +243,10 @@ The endpoint must be HTTPS. The app does not enable
 `dangerousInsecureTransportProtocol`, so a plain `http://` endpoint is reported
 as `UPDATE_NOT_CONFIGURED` instead of being used.
 
-The release publishes the NSIS installer only. It installs per user, needs no
-administrator rights, and the updater can run it silently, so `latest.json` has
-a single `windows-x86_64` entry. The MSI is still produced by a local
+The Windows job publishes the NSIS installer only. It installs per user, needs
+no administrator rights, and the updater can run it silently. The macOS job adds
+one updater archive, so `latest.json` carries a `windows-x86_64` entry and a
+`darwin-aarch64` entry. The MSI is still produced by a local
 `make build` for managed deployments; it is not a release asset and an MSI
 install is not updated by this pipeline. Upgrade such installations with your
 own tooling.
@@ -236,24 +270,32 @@ own tooling.
    tag. The manual equivalent is `git tag v<version> && git push origin
    v<version>`.
 
-5. `.github/workflows/release.yml` builds Windows x64 and uploads to one
-   **draft** release. Before building, it checks that the tag matches
+5. `.github/workflows/release.yml` runs the quality gates from `make check`
+   (fmt, clippy, Rust tests, UI tests, locale parity) on every platform in the
+   matrix, then builds Windows x64 and macOS arm64 and uploads everything to one
+   **draft** release. Before the build it checks that the tag matches
    `tauri.conf.json`, that the update endpoint and public key are real, and that
    the signing key secret is present.
 6. Review the draft assets:
    - `Gentree_<version>_x64-setup.exe` (NSIS) and its minisign `.sig`;
    - `Gentree_<version>_x64_portable.zip`;
-   - `SHA256SUMS-windows-x64.txt`;
-   - `latest.json` with the `windows-x86_64` entry.
+   - `Gentree_<version>_aarch64.dmg`;
+   - `Gentree_<version>_aarch64.app.tar.gz` and its minisign `.sig` (the
+     updater artifact);
+   - `SHA256SUMS-windows-x64.txt` and `SHA256SUMS-macos-arm64.txt`;
+   - `latest.json` with the `windows-x86_64` and `darwin-aarch64` entries.
 7. Read the CI verification log: signature status per artifact, the Defender
-   scan result and the checksum file. CI covers signatures and a single engine;
-   the multi-engine check is manual:
+   scan result and the checksum files. CI covers signatures and a single
+   engine; the multi-engine check and the manual installs are up to you:
    - scan the installers and the portable archive with a current multi-engine
      scanner (VirusTotal or a local suite) and require zero detections;
    - download the artifacts in a browser on a clean Windows 11 VM, confirm the
      SmartScreen prompt, complete an install and start the app;
    - unzip the portable archive outside `%LOCALAPPDATA%`, start it, and confirm
-     that **Check for updates** reports that updates are not configured.
+     that **Check for updates** reports that updates are not configured;
+   - download the `.dmg` on a clean Apple Silicon Mac, confirm the Gatekeeper
+     prompt (or the notarized launch once `APPLE_*` is configured), drag the app
+     into **Applications** and start it.
 8. Publish the draft (not "Save draft"). Publishing is what makes
    `/releases/latest/download/latest.json` resolve.
 9. Verify from a machine that is not the build host:
@@ -291,10 +333,19 @@ node scripts/verify-release.mjs `
   runner without Defender produces a warning, not a failed release. It is a
   smoke test, not proof — one engine is not a multi-engine result.
 
-On macOS the same script verifies `codesign` for an `.app` bundle and `spctl` +
-`stapler` for a `.dmg`. That path is dormant while macOS builds are not
-published; the script reports unsigned artifacts instead of failing until
-`--require-signature` is passed.
+On macOS the same script checks a `.dmg` with `spctl --assess` and
+`xcrun stapler validate`, and an `.app` bundle with `codesign --verify --deep
+--strict`. CI verifies the `.dmg`; a local check of the bundle looks like this:
+
+```bash
+node scripts/verify-release.mjs \
+  --asset desktop/target/release/bundle/dmg/Gentree_0.2.0_aarch64.dmg \
+  --sums release-assets/SHA256SUMS-macos-arm64.txt
+```
+
+`--require-signature` is passed only when `APPLE_CERTIFICATE` exists, so the
+pipeline works before the certificate is bought, and a signed release cannot
+quietly lose its signature.
 
 ### When an engine reports a false positive
 

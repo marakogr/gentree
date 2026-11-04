@@ -25,7 +25,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <a href="https://github.com/marakogr/gentree/releases"><img src="https://img.shields.io/github/v/release/marakogr/gentree?include_prereleases&amp;label=release" alt="Latest release"></a>
-  <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20(from%20source)-lightgrey.svg" alt="Platforms: Windows installer, macOS from source">
+  <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20(Apple%20Silicon)-lightgrey.svg" alt="Platforms: Windows and Apple Silicon macOS installers">
   <img src="https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg" alt="Built with Tauri 2">
   <img src="https://img.shields.io/badge/status-early%20preview-yellow.svg" alt="Status: early preview">
 </p>
@@ -65,8 +65,8 @@ Gentree fits if you want your research as files you own, you have an AT5 or
 GEDCOM archive to bring over, and you care about uncertain dates and sources.
 
 It is not (yet) the right tool if you need real-time collaboration or sharing
-in a browser, online record hints or DNA tools, a mobile app, or ready-made
-macOS or Linux installers: releases are Windows-only for now.
+in a browser, online record hints or DNA tools, a mobile app, Intel Macs, or
+Linux installers: releases cover Windows x64 and Apple Silicon macOS.
 
 ## Features
 
@@ -156,6 +156,20 @@ archive from [Releases](https://github.com/marakogr/gentree/releases) and check
 it against `SHA256SUMS-windows-x64.txt`. Builds are not code-signed yet, so
 SmartScreen may ask you to confirm on first launch; see
 [`docs/install.md`](docs/install.md) for the steps and the WebView2 requirement.
+
+**macOS 11+, Apple Silicon.** Download `Gentree_<version>_aarch64.dmg` from
+[Releases](https://github.com/marakogr/gentree/releases) and verify it against
+`SHA256SUMS-macos-arm64.txt`. The build is not signed or notarized yet, so
+Gatekeeper refuses the first launch: open **System Settings → Privacy &
+Security** and click **Open Anyway**, or clear the quarantine flag after the
+checksum matched:
+
+```bash
+shasum -a 256 -c SHA256SUMS-macos-arm64.txt
+xattr -dr com.apple.quarantine Gentree_<version>_aarch64.dmg
+```
+
+Intel Macs are not covered by the releases yet; run the app from source.
 
 **macOS and from source.** You need Rust 1.88+, Node.js 20+ and a native
 toolchain.
