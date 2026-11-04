@@ -10,17 +10,3 @@ export function ErrorBanner({ error }: { error: AppErrorEnvelope | null }) {
     </p>
   );
 }
-
-export function FieldError({ code }: { code: string | null }) {
-  const { t } = useTranslation();
-  if (!code) return null;
-  return (
-    <p className="field-error" role="alert">
-      {t(`errors.${code}`, { defaultValue: t("errors.UNKNOWN") })}
-    </p>
-  );
-}
-
-export function EmptyState({ text }: { text: string }) {
-  return <p className="meta">{text}</p>;
-}

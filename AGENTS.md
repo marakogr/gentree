@@ -125,6 +125,7 @@ Read only when the trigger applies.
 |---|---|
 | Creating or updating an issue, PR, milestone, project board item, tag or release | `docs/agents/github-workflow.md` |
 | New capability or a change that spans layers or contracts (OpenSpec) | `docs/agents/openspec.md` |
+| Adding a screen, shared UI component or page-level pattern | `docs/agents/ui-kit.md` |
 | Ending a session in the middle of a large task, or resuming one | `docs/agents/handoff.md` |
 
 <!-- OPENWIKI:START -->

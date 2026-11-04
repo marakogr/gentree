@@ -24,6 +24,7 @@ import {
 } from "@fluentui/react-icons";
 import { Button } from "../../components/ui/button";
 import { EmptyState } from "../../components/ui/empty";
+import { PageShell } from "../../components/patterns/page-shell";
 import {
   GLOBAL_NAV,
   HELP_NAV,
@@ -125,10 +126,15 @@ function HelpArticle({
 
   return (
     <article className="help-article" aria-labelledby={`help-${topic.id}-title`}>
-      <button type="button" className="help-back" onClick={onBack}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="help-back"
+        onClick={onBack}
+      >
         <ArrowLeftRegular fontSize={16} aria-hidden="true" />
         {t("help:allTopics")}
-      </button>
+      </Button>
 
       <header className="help-article-head">
         <span className="help-article-icon" aria-hidden="true">
@@ -230,12 +236,20 @@ export default function HelpPage({
   };
 
   return (
-    <section className="panel help-page" aria-labelledby="help-title">
-      <header className="help-head">
+    <PageShell
+      className="help-page"
+      aria-labelledby="help-title"
+      headerAs="header"
+      headerClassName="help-head"
+      titleAs="none"
+      actionsClassName="help-head-actions"
+      title={
         <Title2 as="h1" id="help-title">
           {t("help:title")}
         </Title2>
-        <div className="help-head-actions">
+      }
+      actions={
+        <>
           <Input
             className="help-search"
             type="search"
@@ -251,8 +265,9 @@ export default function HelpPage({
               {t("help:startTour")}
             </Button>
           ) : null}
-        </div>
-      </header>
+        </>
+      }
+    >
 
       <div className="help-body">
         {searching ? (
@@ -318,6 +333,6 @@ export default function HelpPage({
           </div>
         )}
       </div>
-    </section>
+    </PageShell>
   );
 }

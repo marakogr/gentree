@@ -1,5 +1,8 @@
 // Shared filter bar: live search, filter chips, one reset action and the
 // "found N of M" counter. Used by persons, events, search and timeline.
+//
+// The bar is composed from generic pieces (search, chips, panel toggle) so a
+// screen can reuse one piece without the whole layout.
 
 import { useId, useState, type ReactNode } from "react";
 import {
@@ -13,6 +16,11 @@ import {
 import { ChevronDownRegular, SearchRegular } from "@fluentui/react-icons";
 import { Button } from "../ui/button";
 import { Chip } from "../ui/chip";
+import {
+  isFilterResetDisabled,
+  showsFilterChips,
+  showsFilterPanelToggle,
+} from "./filterBarRules";
 import "./filters.css";
 
 export type FilterChipModel = {
@@ -62,51 +70,61 @@ const useStyles = makeStyles({
   },
 });
 
-export function FilterBar({
-  query,
-  onQueryChange,
-  queryPlaceholder,
-  queryLabel,
-  clearLabel,
-  filtersLabel,
-  activeCount,
-  chips,
-  onReset,
-  resetLabel,
-  resultLabel,
-  loading = false,
-  showActiveBadge = true,
-  showReset = true,
-  inline = false,
-  children,
-}: FilterBarProps) {
-  const styles = useStyles();
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
+export type FilterSearchProps = {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  label: string;
+  clearLabel: string;
+};
 
-  const search = (
+/** Search field with the shared clear affordance. */
+export function FilterSearch({
+  value,
+  onChange,
+  placeholder,
+  label,
+  clearLabel,
+}: FilterSearchProps) {
+  const styles = useStyles();
+  return (
     <div className="filter-search">
       <SearchBox
         className={styles.search}
-        value={query}
-        placeholder={queryPlaceholder}
-        aria-label={queryLabel}
+        value={value}
+        placeholder={placeholder}
+        aria-label={label}
         contentBefore={<SearchRegular aria-hidden="true" />}
         dismiss={{
           "aria-label": clearLabel,
           title: clearLabel,
           // Fluent keeps the dismiss slot mounted; hide it while the field is
           // empty so no pointless clear button appears on focus.
-          style: query === "" ? { display: "none" } : undefined,
+          style: value === "" ? { display: "none" } : undefined,
         }}
-        onChange={(_, data) => onQueryChange(data.value)}
+        onChange={(_, data) => onChange(data.value)}
       />
     </div>
   );
+}
 
-  const resetDisabled = activeCount === 0 && query === "" && chips.length === 0;
+export type FilterChipsRowProps = {
+  chips: FilterChipModel[];
+  showReset: boolean;
+  resetDisabled: boolean;
+  resetLabel: string;
+  onReset: () => void;
+};
 
-  const chipsRow = (
+/** Active filter chips plus the optional reset action. */
+export function FilterChipsRow({
+  chips,
+  showReset,
+  resetDisabled,
+  resetLabel,
+  onReset,
+}: FilterChipsRowProps) {
+  return (
     <div className="filter-chips">
       {chips.map((chip) => (
         <Chip
@@ -130,29 +148,91 @@ export function FilterBar({
       ) : null}
     </div>
   );
-  const showChipsRow = chips.length > 0 || showReset;
+}
+
+export type FilterPanelToggleProps = {
+  open: boolean;
+  panelId: string;
+  label: string;
+  activeCount: number;
+  showBadge: boolean;
+  onToggle: () => void;
+};
+
+/** Button that opens the filter panel and shows its active count. */
+export function FilterPanelToggle({
+  open,
+  panelId,
+  label,
+  activeCount,
+  showBadge,
+  onToggle,
+}: FilterPanelToggleProps) {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-expanded={open}
+      aria-controls={panelId}
+      onClick={onToggle}
+    >
+      {label}
+      {activeCount > 0 && showBadge ? (
+        <CounterBadge count={activeCount} size="small" />
+      ) : null}
+      <ChevronDownRegular aria-hidden="true" />
+    </Button>
+  );
+}
+
+export function FilterBar({
+  query,
+  onQueryChange,
+  queryPlaceholder,
+  queryLabel,
+  clearLabel,
+  filtersLabel,
+  activeCount,
+  chips,
+  onReset,
+  resetLabel,
+  resultLabel,
+  loading = false,
+  showActiveBadge = true,
+  showReset = true,
+  inline = false,
+  children,
+}: FilterBarProps) {
+  const styles = useStyles();
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+
+  const resetDisabled = isFilterResetDisabled(activeCount, query, chips.length);
+  const withToggle = showsFilterPanelToggle(Boolean(children), inline);
+  const withChips = showsFilterChips(chips.length, showReset);
 
   return (
     <div className={inline ? "filter-bar filter-bar-inline" : "filter-bar"}>
       <div className="filter-row">
-        {search}
+        <FilterSearch
+          value={query}
+          onChange={onQueryChange}
+          placeholder={queryPlaceholder}
+          label={queryLabel}
+          clearLabel={clearLabel}
+        />
 
-        {inline ? (
+        {withToggle ? (
+          <FilterPanelToggle
+            open={open}
+            panelId={panelId}
+            label={filtersLabel}
+            activeCount={activeCount}
+            showBadge={showActiveBadge}
+            onToggle={() => setOpen((current) => !current)}
+          />
+        ) : inline ? (
           children
-        ) : children ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-expanded={open}
-            aria-controls={panelId}
-            onClick={() => setOpen((current) => !current)}
-          >
-            {filtersLabel}
-            {activeCount > 0 && showActiveBadge ? (
-              <CounterBadge count={activeCount} size="small" />
-            ) : null}
-            <ChevronDownRegular aria-hidden="true" />
-          </Button>
         ) : null}
 
         {resultLabel ? (
@@ -162,7 +242,15 @@ export function FilterBar({
         ) : null}
       </div>
 
-      {showChipsRow ? chipsRow : null}
+      {withChips ? (
+        <FilterChipsRow
+          chips={chips}
+          showReset={showReset}
+          resetDisabled={resetDisabled}
+          resetLabel={resetLabel}
+          onReset={onReset}
+        />
+      ) : null}
 
       {!inline && open && children ? (
         <div className="filter-panel" id={panelId}>

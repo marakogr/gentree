@@ -142,42 +142,7 @@
   cursor: col-resize;
 }
 
-/* Column resize handle: a thin grab area on the right edge of the header cell
-   (Fluent's `aside` slot). The sticky header is the positioning context; the
-   visible line only appears on hover, keyboard focus and while dragging. */
-.col-resize-handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  width: 8px;
-  cursor: col-resize;
-  outline: none;
-  touch-action: none;
-}
-
-.col-resize-handle::before {
-  content: "";
-  position: absolute;
-  top: 6px;
-  right: 1px;
-  bottom: 6px;
-  width: 2px;
-  border-radius: 999px;
-  background: var(--border);
-  opacity: 0;
-  transition:
-    opacity 120ms ease,
-    background-color 120ms ease;
-}
-
-.col-resize-handle:hover::before,
-.col-resize-handle:focus-visible::before,
-.col-resize-handle-active::before {
-  opacity: 1;
-  background: var(--primary);
-}
+/* Column resize handle styles live in the shared patterns stylesheet. */
 
 .events-date-cell {
   display: flex;
@@ -314,24 +279,7 @@
 
 /* ---------- footer / pager ---------- */
 
-.events-pager {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.events-pager-info {
-  color: var(--muted-foreground);
-  font-size: 0.75rem;
-}
-
-.events-pager-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+/* Pager layout lives in the shared patterns stylesheet. */
 
 /* ---------- dialog form ---------- */
 
@@ -705,33 +653,8 @@
   margin: 0.75rem 0 0;
 }
 
-/* Master-detail layout, mirroring the people screen: the list panel, a
-   splitter and the event card on its own panel. */
-.events-layout {
-  --events-list-width: 62%;
-  display: grid;
-  flex: 1 1 auto;
-  grid-template-columns:
-    minmax(0, var(--events-list-width))
-    8px
-    minmax(0, 1fr);
-  /* One full-height row: both panels end at the same line, like the people
-     screen, instead of shrinking to their content. */
-  grid-template-rows: minmax(0, 1fr);
-  align-items: stretch;
-  gap: 12px;
-  min-width: 0;
-  min-height: 0;
-}
-
-.events-layout-solo {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.events-layout-resizing {
-  user-select: none;
-  cursor: col-resize;
-}
+/* The master-detail grid, splitter track and stacked breakpoint live in the
+   shared CollectionShell; this file keeps the panel rows and the card. */
 
 .events-panel {
   display: flex;
@@ -751,53 +674,6 @@
 
 .events-card-panel {
   overflow-y: auto;
-}
-
-/* Vertical splitter between the table and the card. */
-.events-splitter {
-  position: relative;
-  align-self: stretch;
-  min-height: 120px;
-  border-radius: 999px;
-  cursor: col-resize;
-  outline: none;
-  touch-action: none;
-}
-
-.events-splitter::before {
-  content: "";
-  position: absolute;
-  top: 8px;
-  bottom: 8px;
-  left: 50%;
-  width: 2px;
-  border-radius: 999px;
-  background: var(--border);
-  transform: translateX(-50%);
-  transition:
-    background-color 120ms ease,
-    width 120ms ease;
-}
-
-.events-splitter:hover::before,
-.events-splitter:focus-visible::before,
-.events-layout-resizing .events-splitter::before {
-  width: 3px;
-  background: var(--primary);
-}
-
-.events-splitter:focus-visible::before {
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 35%, transparent);
-}
-
-@media (max-width: 1100px) {
-  .events-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .events-splitter {
-    display: none;
-  }
 }
 
 /* The card sits on the panel's own backing and mirrors the timeline popover:

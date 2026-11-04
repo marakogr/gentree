@@ -10,6 +10,7 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "i18n:check": "node scripts/i18n-check.mjs",
+    "ui:kit": "node scripts/ui-kit-check.mjs",
     "contrast:check": "node ../../design-system/gentree/verify-contrast.mjs",
     "test": "vitest run",
     "ux:setup": "node e2e/scripts/ensure-driver.mjs",

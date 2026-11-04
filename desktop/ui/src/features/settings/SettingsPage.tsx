@@ -22,6 +22,7 @@ import {
   type SettingsPathKind,
 } from "../../api/client";
 import type { GeocoderProvider, MapBasemap, UpdateStatus } from "../../api/types";
+import { PageShell } from "../../components/patterns/page-shell";
 import { Button } from "../../components/ui/button";
 import { resolveLocale, setLocale } from "../../i18n";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
@@ -419,34 +420,41 @@ export default function SettingsPage({
 
   return (
     <div className="settings-page">
-      <section className="panel settings-header">
-        <Title2 as="h1">{t("settings:title")}</Title2>
-        <div className="actions">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={busy}
-            onClick={reload}
-          >
-            {t("settings:reload")}
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            disabled={
-              busy ||
-              !countsValid ||
-              !geocoderValid ||
-              !mapValid ||
-              fieldGroupsError !== null
-            }
-            onClick={save}
-          >
-            {t("settings:save")}
-          </Button>
-        </div>
+      <PageShell
+        className="settings-header"
+        headerClassName={null}
+        titleAs="none"
+        actionsClassName="actions"
+        title={<Title2 as="h1">{t("settings:title")}</Title2>}
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={busy}
+              onClick={reload}
+            >
+              {t("settings:reload")}
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              disabled={
+                busy ||
+                !countsValid ||
+                !geocoderValid ||
+                !mapValid ||
+                fieldGroupsError !== null
+              }
+              onClick={save}
+            >
+              {t("settings:save")}
+            </Button>
+          </>
+        }
+      >
         {saved ? (
           <MessageBar intent="success" politeness="polite">
             <MessageBarBody>{t("settings:saved")}</MessageBarBody>
@@ -473,7 +481,7 @@ export default function SettingsPage({
             </MessageBarBody>
           </MessageBar>
         ) : null}
-      </section>
+      </PageShell>
 
       <nav className="settings-nav" aria-label={t("settings:tocLabel")}>
         {SETTINGS_SECTIONS.map((section) => (

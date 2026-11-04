@@ -176,6 +176,12 @@
   cursor: pointer;
 }
 
+.help-back .btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .help-back:hover {
   color: var(--foreground);
   background: color-mix(in oklab, var(--ring) 10%, transparent);

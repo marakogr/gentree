@@ -60,11 +60,6 @@ export function moveActiveIndex(
   return ((start + step) % length + length) % length;
 }
 
-/** Keys that activate the focused menu item / option. */
-export function isActivationKey(key: string): boolean {
-  return key === "Enter" || key === " " || key === "Spacebar";
-}
-
 /** Person pickers keep this many rows visible; the rest scroll inside. */
 export const COMBOBOX_VISIBLE_OPTIONS = 5;
 
