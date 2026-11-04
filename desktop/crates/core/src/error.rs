@@ -21,6 +21,12 @@ pub mod codes {
     pub const CONFIG_INVALID: &str = "CONFIG_INVALID";
     pub const CHAT_UNAVAILABLE: &str = "CHAT_UNAVAILABLE";
     pub const CHAT_CANCELLED: &str = "CHAT_CANCELLED";
+    /// A stored conversation cannot be parsed; `params.line` and
+    /// `params.reason` describe the failure without content or paths.
+    pub const CHAT_HISTORY_CORRUPTED: &str = "CHAT_HISTORY_CORRUPTED";
+    /// A save would exceed an entry, byte or conversation cap; `params.scope`
+    /// is `conversation` or `project`.
+    pub const CHAT_HISTORY_LIMIT: &str = "CHAT_HISTORY_LIMIT";
     /// Online address suggestions are enabled but no provider could answer.
     pub const GEOCODER_UNAVAILABLE: &str = "GEOCODER_UNAVAILABLE";
     /// The build has no update endpoint or public key, so no request was made.

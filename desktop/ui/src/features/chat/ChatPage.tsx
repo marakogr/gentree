@@ -27,13 +27,19 @@ import {
   AccordionItem,
   AccordionPanel,
   Avatar,
-  Button,
+  Badge,
+  Button as FluentButton,
   Caption1,
   MessageBar,
   MessageBarActions,
   MessageBarBody,
   MessageBarTitle,
   Subtitle2,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableHeaderCell,
+  TableRow,
   Textarea,
 } from "@fluentui/react-components";
 import { chatApi, personsApi } from "../../api/client";
@@ -44,27 +50,51 @@ import type {
   ChatDeltaEvent,
   ChatDoneEvent,
   ChatErrorEvent,
+  ChatHistoryLimits,
+  ChatHistorySummary,
   ChatSkillEvent,
   ChatStatus,
   DateValue,
   Gender,
   Person,
 } from "../../api/types";
-import { Markdown } from "../../components/Markdown";
+import { CollectionShell } from "../../components/patterns/collection-shell";
+import { DataTable, DataTableColgroup } from "../../components/patterns/data-table";
 import { PageShell } from "../../components/patterns/page-shell";
+import type { SplitterBounds } from "../../components/patterns/splitter";
+import { Button } from "../../components/ui/button";
+import { Dialog } from "../../components/ui/dialog";
 import { EmptyState } from "../../components/ui/empty";
+import { IconButton } from "../../components/ui/icon-button";
 import { useToast } from "../../components/ui/toast";
 import { normalizeError } from "../../lib/errors";
 import { useDateFormatter } from "../../lib/useDateFormatter";
+import { Markdown } from "../../components/Markdown";
 import type { EntityPerson } from "./entityLinks";
 import { durationParts, isLocalProviderUrl } from "./format";
 import { diffPerson, formatPersonName } from "./confirm";
+import {
+  fromChatEntries,
+  historyDateValue,
+  newConversationLimitScope,
+  nextConversationId,
+  sendLimitScope,
+  sortConversations,
+  startupConversationId,
+  toChatEntries,
+} from "./history";
+import {
+  DiscardedHistorySaveError,
+  HistoryQueue,
+} from "./historyQueue";
 import { rotationInterval, shouldPauseRotation } from "./rotation";
 import {
   buildTranscript,
   initialChatState,
   reduceChat,
+  type ChatAction,
   type ChatEntry,
+  type ChatStreamState,
   type ChatToolCall,
   type ChatToolEvent,
   type ChatToolStatus,
@@ -127,6 +157,40 @@ const TOOL_STATUS_LABEL: Record<ChatToolStatus, string> = {
 /** Matches the CSS `max-height` of the composer textarea (7rem). */
 const COMPOSER_MAX_HEIGHT = 112;
 
+/** The rail is narrower than a table screen; keep the detail pane dominant. */
+const CHAT_SPLITTER: SplitterBounds = {
+  defaultWidth: 32,
+  min: 26,
+  max: 44,
+};
+
+const CHAT_LIST_WIDTH_KEY = "gentree.chat.listWidth";
+
+/** A small local preference; the collection shell owns the geometry. */
+function readChatListWidth(): string | null {
+  try {
+    return window.localStorage.getItem(CHAT_LIST_WIDTH_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeChatListWidth(value: string): void {
+  try {
+    window.localStorage.setItem(CHAT_LIST_WIDTH_KEY, value);
+  } catch {
+    // Storage can be disabled in a hardened webview; keep the session width.
+  }
+}
+
+type HistoryNotice = "notSaved" | "limit" | "damaged" | null;
+
+type PendingAction =
+  | { kind: "delete"; id: string }
+  | { kind: "clear" }
+  | { kind: "switch"; id: string }
+  | { kind: "new" };
+
 /**
  * Phrases shown while the answer is being prepared and tool calls are hidden.
  * They rotate so a long request does not look frozen; the first one is the
@@ -165,6 +229,18 @@ export default function ChatPage({
   );
   const [confirmation, setConfirmation] = useState<ChatConfirmEvent | null>(null);
   const [confirmBusy, setConfirmBusy] = useState(false);
+
+  const [conversations, setConversations] = useState<ChatHistorySummary[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<AppErrorEnvelope | null>(null);
+  const [historyNotice, setHistoryNotice] = useState<HistoryNotice>(null);
+  const [pending, setPending] = useState<PendingAction | null>(null);
+  const [pendingBusy, setPendingBusy] = useState(false);
+  const [listWidth, setListWidth] = useState<string | null>(() =>
+    readChatListWidth(),
+  );
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   // `chat_status` is an IPC snapshot: a response that started earlier must not
@@ -172,6 +248,18 @@ export default function ChatPage({
   const statusSequence = useRef(0);
   const statusAlive = useRef(true);
   const activeRequestRef = useRef<string | null>(null);
+  const stateRef = useRef<ChatStreamState>(initialChatState);
+  const conversationsRef = useRef<ChatHistorySummary[]>([]);
+  const conversationIdRef = useRef<string | null>(null);
+  const limitsRef = useRef<ChatHistoryLimits | null>(null);
+  const projectIdRef = useRef<string | null>(projectId ?? null);
+  const loadSequence = useRef(0);
+  const sendLock = useRef(false);
+  const historyQueue = useRef<HistoryQueue | null>(null);
+  if (historyQueue.current === null) {
+    historyQueue.current = new HistoryQueue(chatApi.saveHistory);
+  }
+  projectIdRef.current = projectId ?? null;
 
   const locale: Locale = SUPPORTED_LOCALES.includes(
     i18n.language as Locale,
@@ -200,6 +288,37 @@ export default function ChatPage({
     workingHovered,
     workingFocused,
   );
+  const activeRow = conversations.find((row) => row.id === conversationId);
+
+  const updateConversations = useCallback(
+    (update: (rows: ChatHistorySummary[]) => ChatHistorySummary[]) => {
+      setConversations((previous) => {
+        const next = update(previous);
+        conversationsRef.current = next;
+        return next;
+      });
+    },
+    [],
+  );
+
+  const dateText = useCallback(
+    (row: ChatHistorySummary): string => {
+      const value = historyDateValue(row.updatedAt);
+      return value === null ? "—" : formatDate(value);
+    },
+    [formatDate],
+  );
+
+  const activeTitle =
+    activeRow !== undefined
+      ? (activeRow.title ?? t("chat:untitled"))
+      : t("chat:newConversation");
+  const activeDate = activeRow !== undefined ? dateText(activeRow) : null;
+
+  useEffect(() => {
+    stateRef.current = state;
+    activeRequestRef.current = state.activeRequestId;
+  }, [state]);
 
   useEffect(() => {
     statusAlive.current = true;
@@ -207,6 +326,126 @@ export default function ChatPage({
       statusAlive.current = false;
     };
   }, []);
+
+  const errorMessage = useCallback(
+    (error: AppErrorEnvelope) =>
+      t(`errors.${error.code}`, {
+        ns: "common",
+        defaultValue: t("errors.UNKNOWN", { ns: "common" }),
+      }),
+    [t],
+  );
+
+  /** Applies a reducer action while keeping the ref ahead of React's render. */
+  const apply = (action: ChatAction): ChatStreamState => {
+    const next = reduceChat(stateRef.current, action);
+    stateRef.current = next;
+    dispatch(action);
+    return next;
+  };
+
+  /** Queues a whole-conversation snapshot; failures stay visible, not silent. */
+  const persist = useCallback(
+    (
+      messages: ChatEntry[],
+      targetId = conversationIdRef.current,
+      terminal = false,
+    ) => {
+      const project = projectIdRef.current;
+      if (project === null || targetId === null) return;
+      void historyQueue.current
+        ?.enqueue(project, targetId, fromChatEntries(messages))
+        .then((summary) => {
+          updateConversations((rows) =>
+            sortConversations([
+              ...rows.filter((row) => row.id !== summary.id),
+              summary,
+            ]),
+          );
+          setHistoryNotice(null);
+        })
+        .catch((caught: unknown) => {
+          if (caught instanceof DiscardedHistorySaveError) return;
+          const error = normalizeError(caught);
+          setHistoryNotice(
+            terminal || error.code !== "CHAT_HISTORY_LIMIT"
+              ? "notSaved"
+              : "limit",
+          );
+        });
+    },
+    [updateConversations],
+  );
+
+  /**
+   * Loads one conversation. A corrupted file marks its row and tries the next
+   * healthy conversation; when none is readable the damaged row stays selected
+   * with an explicit notice instead of a partial transcript.
+   */
+  const loadConversation = useCallback(
+    async (id: string, rows?: readonly ChatHistorySummary[]): Promise<void> => {
+      const project = projectIdRef.current;
+      if (project === null) return;
+      const sequence = loadSequence.current + 1;
+      loadSequence.current = sequence;
+      try {
+        const conversation = await chatApi.loadHistory(project, id);
+        if (sequence !== loadSequence.current) return;
+        const entries = toChatEntries(conversation);
+        const next = { messages: entries, activeRequestId: null, error: null };
+        stateRef.current = next;
+        dispatch({ type: "load", messages: entries });
+        conversationIdRef.current = id;
+        setConversationId(id);
+        setHistoryError(null);
+        setHistoryNotice(null);
+        updateConversations((previous) =>
+          sortConversations(
+            previous.map((row) =>
+              row.id === id
+                ? {
+                    ...row,
+                    title: conversation.title,
+                    updatedAt: conversation.updatedAt,
+                    damaged: false,
+                  }
+                : row,
+            ),
+          ),
+        );
+      } catch (caught: unknown) {
+        if (sequence !== loadSequence.current) return;
+        const error = normalizeError(caught);
+        if (error.code !== "CHAT_HISTORY_CORRUPTED") {
+          setHistoryError(error);
+          return;
+        }
+        const base = rows ?? conversationsRef.current;
+        const nextRows = sortConversations(
+          base.map((row) =>
+            row.id === id ? { ...row, damaged: true, title: null } : row,
+          ),
+        );
+        updateConversations(() => nextRows);
+        const nextId = startupConversationId(nextRows, [id]);
+        if (nextId !== null) {
+          await loadConversation(nextId, nextRows);
+          return;
+        }
+        const empty: ChatStreamState = {
+          messages: [],
+          activeRequestId: null,
+          error: null,
+        };
+        stateRef.current = empty;
+        dispatch({ type: "load", messages: [] });
+        conversationIdRef.current = id;
+        setConversationId(id);
+        setHistoryNotice("damaged");
+      }
+    },
+    [updateConversations],
+  );
 
   const loadStatus = useCallback(() => {
     const sequence = statusSequence.current + 1;
@@ -226,8 +465,7 @@ export default function ChatPage({
 
   // The backend keeps `chat.enabled`/key/model in its live config, so the tab
   // refetches the snapshot whenever it becomes visible and when the project
-  // changes. The sequence guard above drops stale in-flight responses: an old
-  // `enabled=false` cannot overwrite a fresh one.
+  // changes. The sequence guard above drops stale in-flight responses.
   useEffect(() => {
     if (!active) return;
     loadStatus();
@@ -269,9 +507,51 @@ export default function ChatPage({
       void chatApi.cancel(requestId).catch(() => undefined);
     }
     dispatch({ type: "reset" });
+    stateRef.current = initialChatState;
+    conversationsRef.current = [];
+    conversationIdRef.current = null;
+    limitsRef.current = null;
+    loadSequence.current += 1;
+    setConversations([]);
+    setConversationId(null);
+    setHistoryError(null);
+    setHistoryNotice(null);
+    setHistoryLoading(projectId !== undefined);
+    setPending(null);
     setInput("");
     setConfirmation(null);
   }, [projectId]);
+
+  // Startup: list the project's conversations and open the most recent
+  // healthy one. Without an open project the chat stays ephemeral and no
+  // history command is called.
+  useEffect(() => {
+    if (projectId === undefined) return;
+    let disposed = false;
+    const sequence = loadSequence.current + 1;
+    loadSequence.current = sequence;
+    setHistoryLoading(true);
+    setHistoryError(null);
+    void chatApi
+      .listHistory(projectId)
+      .then((result) => {
+        if (disposed || sequence !== loadSequence.current) return;
+        const rows = sortConversations(result.conversations);
+        limitsRef.current = result.limits;
+        updateConversations(() => rows);
+        setHistoryLoading(false);
+        const id = startupConversationId(rows);
+        if (id !== null) void loadConversation(id, rows);
+      })
+      .catch((caught: unknown) => {
+        if (disposed || sequence !== loadSequence.current) return;
+        setHistoryLoading(false);
+        setHistoryError(normalizeError(caught));
+      });
+    return () => {
+      disposed = true;
+    };
+  }, [projectId, loadConversation, updateConversations]);
 
   // One page is enough for name linking; the list is sorted for determinism.
   useEffect(() => {
@@ -295,7 +575,8 @@ export default function ChatPage({
   }, [active, projectId]);
 
   // Stream events are global; `requestId` keeps concurrent requests apart and
-  // the reducer ignores events for requests it does not know.
+  // the reducer ignores events for requests it does not know. Terminal events
+  // also persist the final snapshot.
   useEffect(() => {
     let disposed = false;
     const unlisteners: Array<() => void> = [];
@@ -310,7 +591,7 @@ export default function ChatPage({
 
     register(
       listen<ChatSkillEvent>("chat-skill", (event) => {
-        dispatch({
+        apply({
           type: "skill",
           requestId: event.payload.requestId,
           skills: event.payload.skills,
@@ -319,7 +600,7 @@ export default function ChatPage({
     );
     register(
       listen<ChatDeltaEvent>("chat-delta", (event) => {
-        dispatch({
+        apply({
           type: "delta",
           requestId: event.payload.requestId,
           delta: event.payload.delta,
@@ -328,7 +609,7 @@ export default function ChatPage({
     );
     register(
       listen<ChatToolEvent>("chat-tool", (event) => {
-        dispatch({
+        apply({
           type: "tool",
           requestId: event.payload.requestId,
           name: event.payload.name,
@@ -341,22 +622,24 @@ export default function ChatPage({
     );
     register(
       listen<ChatDoneEvent>("chat-done", (event) => {
-        dispatch({
+        const next = apply({
           type: "done",
           requestId: event.payload.requestId,
           content: event.payload.content,
         });
         setConfirmation(null);
+        persist(next.messages, conversationIdRef.current, true);
       }),
     );
     register(
       listen<ChatErrorEvent>("chat-error", (event) => {
-        dispatch({
+        const next = apply({
           type: "error",
           requestId: event.payload.requestId,
           error: event.payload.error,
         });
         setConfirmation(null);
+        persist(next.messages, conversationIdRef.current, true);
       }),
     );
     register(
@@ -369,11 +652,9 @@ export default function ChatPage({
       disposed = true;
       for (const unlisten of unlisteners) unlisten();
     };
+    // `apply` and `persist` only touch refs and stable setters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    activeRequestRef.current = state.activeRequestId;
-  }, [state.activeRequestId]);
 
   // A project switch remounts the screen (the shell keys it by projectId):
   // cancel the old stream, otherwise its late events would be emitted for a
@@ -408,10 +689,10 @@ export default function ChatPage({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setReducedMotion(media.matches);
-    apply();
-    media.addEventListener("change", apply);
-    return () => media.removeEventListener("change", apply);
+    const applyPreference = () => setReducedMotion(media.matches);
+    applyPreference();
+    media.addEventListener("change", applyPreference);
+    return () => media.removeEventListener("change", applyPreference);
   }, []);
 
   useEffect(() => {
@@ -427,44 +708,144 @@ export default function ChatPage({
     textarea.style.height = `${Math.max(next, 44)}px`;
   }, [input]);
 
-  const errorMessage = (error: AppErrorEnvelope) =>
-    t(`errors.${error.code}`, {
-      ns: "common",
-      defaultValue: t("errors.UNKNOWN", { ns: "common" }),
-    });
+  /** Stops the active stream and optionally persists the cancelled snapshot. */
+  const stopStream = (save: boolean): void => {
+    const requestId = stateRef.current.activeRequestId;
+    if (requestId === null) return;
+    const next = apply({ type: "cancel", requestId });
+    setConfirmation(null);
+    void chatApi.cancel(requestId).catch(() => undefined);
+    if (save) persist(next.messages, conversationIdRef.current, true);
+  };
+
+  /** Clears the screen for an unsaved new conversation. */
+  const resetToNew = (): void => {
+    stateRef.current = initialChatState;
+    dispatch({ type: "reset" });
+    conversationIdRef.current = null;
+    setConversationId(null);
+    setInput("");
+    setConfirmation(null);
+    setHistoryNotice(null);
+    setHistoryError(null);
+  };
 
   const sendMessage = (raw: string) => {
     const text = raw.trim();
-    if (text === "" || state.activeRequestId !== null || !ready) return;
-    const requestId = newRequestId();
-    const transcript = buildTranscript(state.messages, text);
-    dispatch({
-      type: "send",
-      requestId,
-      userId: `user-${requestId}`,
-      content: text,
-    });
-    setInput("");
-    void chatApi
-      .send({ requestId, locale, messages: transcript })
-      .catch((caught: unknown) => {
-        dispatch({
-          type: "error",
+    if (
+      text === "" ||
+      stateRef.current.activeRequestId !== null ||
+      !ready ||
+      sendLock.current
+    ) {
+      return;
+    }
+    sendLock.current = true;
+    void (async () => {
+      try {
+        const project = projectIdRef.current;
+        const requestId = newRequestId();
+        const userId = `user-${requestId}`;
+        const transcript = buildTranscript(stateRef.current.messages, text);
+        const nextMessages: ChatEntry[] = [
+          ...stateRef.current.messages,
+          {
+            id: userId,
+            role: "user",
+            content: text,
+            requestId: null,
+            status: "done",
+            skills: [],
+            tools: [],
+          },
+          {
+            id: `assistant-${requestId}`,
+            role: "assistant",
+            content: "",
+            requestId,
+            status: "pending",
+            skills: [],
+            tools: [],
+          },
+        ];
+
+        if (project !== null) {
+          const limits = limitsRef.current;
+          if (limits !== null) {
+            const entryLimit = sendLimitScope(
+              limits,
+              stateRef.current.messages.length,
+            );
+            if (entryLimit !== null) {
+              setHistoryNotice("limit");
+              return;
+            }
+            if (
+              conversationIdRef.current === null &&
+              newConversationLimitScope(limits, conversationsRef.current.length)
+            ) {
+              setHistoryNotice("limit");
+              return;
+            }
+          }
+          if (conversationIdRef.current === null) {
+            const id = newUuid();
+            conversationIdRef.current = id;
+            setConversationId(id);
+          }
+          const targetId = conversationIdRef.current;
+          if (targetId !== null) {
+            try {
+              const summary = await historyQueue.current?.enqueue(
+                project,
+                targetId,
+                fromChatEntries(nextMessages),
+              );
+              if (summary !== undefined) {
+                updateConversations((rows) =>
+                  sortConversations([
+                    ...rows.filter((row) => row.id !== summary.id),
+                    summary,
+                  ]),
+                );
+              }
+            } catch (caught: unknown) {
+              if (caught instanceof DiscardedHistorySaveError) return;
+              const error = normalizeError(caught);
+              if (error.code === "CHAT_HISTORY_LIMIT") {
+                setHistoryNotice("limit");
+                return;
+              }
+              // A non-limit write failure must not lose the answer: send it and
+              // keep the persistent "not saved" notice.
+              setHistoryNotice("notSaved");
+            }
+          }
+        }
+
+        apply({
+          type: "send",
           requestId,
-          error: normalizeError(caught),
+          userId,
+          content: text,
         });
-      });
+        setInput("");
+        void chatApi
+          .send({ requestId, locale, messages: transcript })
+          .catch((caught: unknown) => {
+            const error = normalizeError(caught);
+            const next = apply({ type: "error", requestId, error });
+            persist(next.messages, conversationIdRef.current, true);
+          });
+      } finally {
+        sendLock.current = false;
+      }
+    })();
   };
 
   const send = () => sendMessage(input);
 
-  const stop = () => {
-    const requestId = state.activeRequestId;
-    if (requestId === null) return;
-    dispatch({ type: "cancel", requestId });
-    void chatApi.cancel(requestId).catch(() => undefined);
-    setConfirmation(null);
-  };
+  const stop = () => stopStream(true);
 
   const retry = () => {
     setStatusError(null);
@@ -474,18 +855,84 @@ export default function ChatPage({
     if (query !== null) sendMessage(query);
   };
 
-  const resetChat = () => {
-    if (state.activeRequestId !== null) {
-      stop();
+  const openConversation = (id: string) => {
+    if (id === conversationIdRef.current) return;
+    if (stateRef.current.activeRequestId !== null) {
+      setPending({ kind: "switch", id });
+      return;
     }
-    dispatch({ type: "reset" });
-    setConfirmation(null);
+    void loadConversation(id);
   };
 
-  const deleteChat = () => {
-    if (state.messages.length === 0) return;
-    if (!window.confirm(t("chat:confirmDelete"))) return;
-    resetChat();
+  const requestNewChat = () => {
+    if (stateRef.current.activeRequestId !== null) {
+      setPending({ kind: "new" });
+      return;
+    }
+    resetToNew();
+  };
+
+  const requestDelete = (id: string) => setPending({ kind: "delete", id });
+
+  const requestClear = () => setPending({ kind: "clear" });
+
+  const deleteConversation = async (id: string): Promise<void> => {
+    const project = projectIdRef.current;
+    if (project === null) return;
+    const wasActive = id === conversationIdRef.current;
+    if (wasActive) stopStream(false);
+    historyQueue.current?.tombstone(project, id);
+    await chatApi.deleteHistory(project, id);
+    const rows = conversationsRef.current;
+    const neighbour = wasActive ? nextConversationId(rows, id) : null;
+    const remaining = rows.filter((row) => row.id !== id);
+    updateConversations(() => remaining);
+    setHistoryNotice((current) => (current === "limit" ? null : current));
+    if (wasActive) {
+      if (neighbour !== null) await loadConversation(neighbour, remaining);
+      else resetToNew();
+    }
+  };
+
+  const clearAllHistory = async (): Promise<void> => {
+    const project = projectIdRef.current;
+    if (project === null) return;
+    // Stop first; the tombstone then discards any queued cancelled snapshot so
+    // a cleared history cannot be recreated.
+    stopStream(false);
+    historyQueue.current?.tombstoneAll();
+    await chatApi.clearHistory(project);
+    updateConversations(() => []);
+    resetToNew();
+  };
+
+  const runPending = async (): Promise<void> => {
+    const action = pending;
+    if (action === null || pendingBusy) return;
+    setPendingBusy(true);
+    try {
+      switch (action.kind) {
+        case "switch":
+          stopStream(true);
+          await loadConversation(action.id);
+          break;
+        case "new":
+          stopStream(true);
+          resetToNew();
+          break;
+        case "delete":
+          await deleteConversation(action.id);
+          break;
+        case "clear":
+          await clearAllHistory();
+          break;
+      }
+    } catch (caught: unknown) {
+      toast.error(errorMessage(normalizeError(caught)));
+    } finally {
+      setPendingBusy(false);
+      setPending(null);
+    }
   };
 
   const copyAnswer = (content: string) => {
@@ -542,6 +989,18 @@ export default function ChatPage({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [confirmation, cancelConfirmation]);
 
+  const dialogueKeys =
+    pending === null ? null : historyDialogue(pending, streaming, activeRow);
+  const dialogue =
+    dialogueKeys === null
+      ? null
+      : {
+          ...dialogueKeys,
+          title: t(dialogueKeys.title),
+          body: t(dialogueKeys.body),
+          action: t(dialogueKeys.action),
+        };
+
   return (
     <PageShell
       className="chat chat-screen"
@@ -550,354 +1009,590 @@ export default function ChatPage({
       titleAs="h2"
       titleClassName=""
       title={t("chat:title")}
+      titleAside={
+        <Badge appearance="tint" color="informative" size="small">
+          {conversations.length}
+        </Badge>
+      }
       actions={
         <>
-          <Button
-            appearance="subtle"
-            shape="rounded"
-            icon={<Add20Regular aria-hidden="true" />}
-            aria-label={t("chat:newChat")}
-            title={t("chat:newChat")}
-            onClick={resetChat}
-          />
-          <Button
-            appearance="subtle"
-            shape="rounded"
-            className="chat-delete"
-            icon={<Delete20Regular aria-hidden="true" />}
-            aria-label={t("chat:deleteChat")}
-            title={t("chat:deleteChat")}
-            disabled={state.messages.length === 0}
-            onClick={deleteChat}
-          />
-          <Button
-            appearance="subtle"
-            shape="rounded"
-            icon={<Settings20Regular aria-hidden="true" />}
-            aria-label={t("chat:openSettings")}
-            title={t("chat:openSettings")}
+          <IconButton
+            label={t("chat:newChat")}
+            onClick={requestNewChat}
+            data-tour="chat-new"
+          >
+            <Add20Regular aria-hidden="true" />
+          </IconButton>
+          <IconButton
+            label={t("chat:openSettings")}
             onClick={onOpenSettings}
-          />
+          >
+            <Settings20Regular aria-hidden="true" />
+          </IconButton>
         </>
       }
     >
-
-      {status !== null ? (
-        <div className="chat-status-strip" role="note">
-          <span className="chat-status-chip">
-            {t("chat:providerLabel", { provider: status.provider || "—" })}
-          </span>
-          <span className="chat-status-chip">
-            {t("chat:modelLabel", { model: status.model || "—" })}
-          </span>
-          {ready ? (
-            <span
-              className={
-                localProvider
-                  ? "chat-privacy chat-privacy-local"
-                  : "chat-privacy chat-privacy-external"
-              }
+      <CollectionShell
+        storedWidth={listWidth}
+        onCommitWidth={(value) => {
+          setListWidth(value);
+          writeChatListWidth(value);
+        }}
+        bounds={CHAT_SPLITTER}
+        splitterLabel={t("chat:resizeList")}
+        listLabel={t("chat:listLabel")}
+        layoutClassName="chat-collection"
+        listClassName="chat-history-panel"
+        splitterClassName="chat-splitter"
+        detailAs="section"
+        detailPanel
+        detailClassName="chat-detail-panel"
+        toolbar={
+          <div className="chat-history-toolbar">
+            <Caption1 className="chat-history-count">
+              {t("chat:conversationsLabel", { count: conversations.length })}
+            </Caption1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={requestClear}
+              disabled={projectId === undefined || conversations.length === 0}
             >
-              {localProvider ? (
-                <ShieldCheckmark16Regular aria-hidden="true" />
-              ) : (
-                <Globe16Regular aria-hidden="true" />
-              )}
-              {localProvider
-                ? t("chat:localNotice")
-                : t("chat:externalNotice")}
-            </span>
-          ) : null}
-          {toolsVisible ? (
-            <span className="chat-status-chip">
-              {t("chat:toolsCount", {
-                count: status.toolsCount ?? status.tools?.length ?? 0,
-              })}
-            </span>
-          ) : null}
-          {ready && status.canEditPersons === true ? (
-            <span className="chat-status-chip chat-status-chip-edit">
-              {t("chat:editingEnabled")}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-
-      {statusError !== null ? (
-        <MessageBar intent="error" layout="multiline">
-          <MessageBarBody>
-            <MessageBarTitle>{t("chat:unavailableTitle")}</MessageBarTitle>
-            {errorMessage(statusError)}
-          </MessageBarBody>
-          <MessageBarActions>
-            <Button appearance="secondary" size="small" onClick={retry}>
-              {t("chat:retry")}
+              {t("chat:clearHistory")}
             </Button>
-          </MessageBarActions>
-        </MessageBar>
-      ) : null}
-
-      <div
-        className="chat-feed"
-        aria-live="polite"
-        aria-label={t("chat:transcript")}
-      >
-        {status === null && statusError === null ? (
-          <div className="chat-loading" aria-hidden="true">
-            <span className="skeleton" />
-            <span className="skeleton" />
-            <span className="skeleton" />
           </div>
-        ) : null}
-
-        {state.messages.length === 0 && status !== null ? (
-          <div className="chat-empty">
-            <EmptyState compact text={t("chat:empty")} />
-            <div
-              className="chat-suggestions"
-              aria-label={t("chat:suggestionsLabel")}
-            >
-              {[t("chat:exampleLongevity"), t("chat:exampleConflicts")].map(
-                (example) => (
-                  <Button
-                    key={example}
-                    appearance="secondary"
-                    shape="rounded"
-                    size="small"
-                    onClick={() => applySuggestion(example)}
-                  >
-                    {example}
-                  </Button>
-                ),
-              )}
+        }
+        banner={
+          historyError !== null ? (
+            <MessageBar intent="error">
+              <MessageBarBody>{errorMessage(historyError)}</MessageBarBody>
+            </MessageBar>
+          ) : undefined
+        }
+        detail={
+          <div className="chat-detail">
+            <div className="chat-detail-head">
+              <Subtitle2 as="h3" className="chat-detail-title">
+                {activeTitle}
+              </Subtitle2>
+              {activeDate !== null ? (
+                <Caption1 className="chat-detail-date">{activeDate}</Caption1>
+              ) : null}
+              {activeRow?.damaged === true ? (
+                <Caption1 className="chat-damaged-label">
+                  {t("chat:damaged")}
+                </Caption1>
+              ) : null}
             </div>
-          </div>
-        ) : null}
 
-        {state.messages.map((message, index) => {
-          const roleLabel =
-            message.role === "user" ? t("chat:you") : t("chat:assistant");
-          return (
-            <article
-              key={message.id}
-              className={`chat-message ${message.role}`}
-              aria-busy={
-                message.status === "pending" || message.status === "streaming"
-              }
-            >
-              <div className="chat-message-head">
-                <Avatar
-                  name={roleLabel}
-                  size={24}
-                  color={message.role === "user" ? "brand" : "colorful"}
-                  aria-hidden="true"
-                />
-                <Caption1 className="chat-author">{roleLabel}</Caption1>
+            {status !== null ? (
+              <div className="chat-status-strip" role="note">
+                <span className="chat-status-chip">
+                  {t("chat:providerLabel", { provider: status.provider || "—" })}
+                </span>
+                <span className="chat-status-chip">
+                  {t("chat:modelLabel", { model: status.model || "—" })}
+                </span>
+                {ready ? (
+                  <span
+                    className={
+                      localProvider
+                        ? "chat-privacy chat-privacy-local"
+                        : "chat-privacy chat-privacy-external"
+                    }
+                  >
+                    {localProvider ? (
+                      <ShieldCheckmark16Regular aria-hidden="true" />
+                    ) : (
+                      <Globe16Regular aria-hidden="true" />
+                    )}
+                    {localProvider
+                      ? t("chat:localNotice")
+                      : t("chat:externalNotice")}
+                  </span>
+                ) : null}
+                {toolsVisible ? (
+                  <span className="chat-status-chip">
+                    {t("chat:toolsCount", {
+                      count: status.toolsCount ?? status.tools?.length ?? 0,
+                    })}
+                  </span>
+                ) : null}
+                {ready && status.canEditPersons === true ? (
+                  <span className="chat-status-chip chat-status-chip-edit">
+                    {t("chat:editingEnabled")}
+                  </span>
+                ) : null}
               </div>
-              {message.content === "" ? (
-                <p className="chat-text">
-                  {message.status === "pending" ||
-                  message.status === "streaming"
-                    ? t("chat:thinking")
-                    : ""}
-                </p>
-              ) : message.role === "assistant" ? (
-                <Markdown
-                  text={message.content}
-                  persons={onOpenPerson !== undefined ? persons : undefined}
-                  onOpenPerson={onOpenPerson}
-                />
-              ) : (
-                <p className="chat-text">{message.content}</p>
-              )}
+            ) : null}
 
-              {toolsVisible &&
-              message.role === "assistant" &&
-              message.skills.length > 0 ? (
+            {statusError !== null ? (
+              <MessageBar intent="error" layout="multiline">
+                <MessageBarBody>
+                  <MessageBarTitle>{t("chat:unavailableTitle")}</MessageBarTitle>
+                  {errorMessage(statusError)}
+                </MessageBarBody>
+                <MessageBarActions>
+                  <FluentButton
+                    appearance="secondary"
+                    size="small"
+                    onClick={retry}
+                  >
+                    {t("chat:retry")}
+                  </FluentButton>
+                </MessageBarActions>
+              </MessageBar>
+            ) : null}
+
+            {historyNotice === "notSaved" ? (
+              <MessageBar intent="warning" layout="multiline">
+                <MessageBarBody>{t("chat:notSaved")}</MessageBarBody>
+              </MessageBar>
+            ) : null}
+
+            {historyNotice === "limit" ? (
+              <MessageBar intent="warning" layout="multiline">
+                <MessageBarBody>{t("chat:limitNotice")}</MessageBarBody>
+              </MessageBar>
+            ) : null}
+
+            {historyNotice === "damaged" ? (
+              <MessageBar intent="warning" layout="multiline">
+                <MessageBarBody>{t("chat:damagedNotice")}</MessageBarBody>
+                <MessageBarActions>
+                  {conversationId !== null ? (
+                    <FluentButton
+                      appearance="secondary"
+                      size="small"
+                      onClick={() => requestDelete(conversationId)}
+                    >
+                      {t("chat:deleteConversation")}
+                    </FluentButton>
+                  ) : null}
+                </MessageBarActions>
+              </MessageBar>
+            ) : null}
+
+            <div
+              className="chat-feed"
+              aria-live="polite"
+              aria-label={t("chat:transcript")}
+            >
+              {status === null && statusError === null ? (
+                <div className="chat-loading" aria-hidden="true">
+                  <span className="skeleton" />
+                  <span className="skeleton" />
+                  <span className="skeleton" />
+                </div>
+              ) : null}
+
+              {state.messages.length === 0 &&
+              status !== null &&
+              historyNotice !== "damaged" ? (
+                <div className="chat-empty">
+                  <EmptyState compact text={t("chat:empty")} />
+                  <div
+                    className="chat-suggestions"
+                    aria-label={t("chat:suggestionsLabel")}
+                  >
+                    {[t("chat:exampleLongevity"), t("chat:exampleConflicts")].map(
+                      (example) => (
+                        <Button
+                          key={example}
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => applySuggestion(example)}
+                        >
+                          {example}
+                        </Button>
+                      ),
+                    )}
+                  </div>
+                </div>
+              ) : null}
+
+              {state.messages.map((message, index) => {
+                const roleLabel =
+                  message.role === "user"
+                    ? t("chat:you")
+                    : t("chat:assistant");
+                return (
+                  <article
+                    key={message.id}
+                    className={`chat-message ${message.role}`}
+                    aria-busy={
+                      message.status === "pending" ||
+                      message.status === "streaming"
+                    }
+                  >
+                    <div className="chat-message-head">
+                      <Avatar
+                        name={roleLabel}
+                        size={24}
+                        color={message.role === "user" ? "brand" : "colorful"}
+                        aria-hidden="true"
+                      />
+                      <Caption1 className="chat-author">{roleLabel}</Caption1>
+                    </div>
+                    {message.content === "" ? (
+                      <p className="chat-text">
+                        {message.status === "pending" ||
+                        message.status === "streaming"
+                          ? t("chat:thinking")
+                          : ""}
+                      </p>
+                    ) : message.role === "assistant" ? (
+                      <Markdown
+                        text={message.content}
+                        persons={
+                          onOpenPerson !== undefined ? persons : undefined
+                        }
+                        onOpenPerson={onOpenPerson}
+                      />
+                    ) : (
+                      <p className="chat-text">{message.content}</p>
+                    )}
+
+                    {toolsVisible &&
+                    message.role === "assistant" &&
+                    message.skills.length > 0 ? (
+                      <div
+                        className="chat-skills"
+                        aria-label={t("chat:skillsLabel")}
+                      >
+                        <SparkleRegular aria-hidden="true" fontSize={14} />
+                        <span>
+                          {t("chat:skillsUsed", {
+                            skills: message.skills.join(", "),
+                          })}
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {toolsVisible && message.tools.length > 0 ? (
+                      <ToolCalls tools={message.tools} locale={locale} />
+                    ) : null}
+
+                    {message.status === "cancelled" ? (
+                      <Caption1 as="p" className="chat-note">
+                        {t("chat:cancelled")}
+                      </Caption1>
+                    ) : null}
+                    {message.status === "error" ? (
+                      <MessageBar intent="error">
+                        <MessageBarBody>{t("chat:answerFailed")}</MessageBarBody>
+                      </MessageBar>
+                    ) : null}
+
+                    {message.role === "assistant" &&
+                    message.status === "done" &&
+                    message.content.trim() !== "" ? (
+                      <div className="chat-answer-actions">
+                        <FluentButton
+                          appearance="subtle"
+                          size="small"
+                          icon={<Copy16Regular aria-hidden="true" />}
+                          aria-label={t("chat:copy")}
+                          title={t("chat:copy")}
+                          onClick={() => copyAnswer(message.content)}
+                        />
+                        <FluentButton
+                          appearance="subtle"
+                          size="small"
+                          icon={<ArrowClockwise16Regular aria-hidden="true" />}
+                          aria-label={t("chat:repeat")}
+                          title={t("chat:repeat")}
+                          disabled={!ready || streaming}
+                          onClick={() => {
+                            const query = queryBefore(state.messages, index);
+                            if (query !== null) sendMessage(query);
+                          }}
+                        />
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })}
+
+              {confirmation !== null && confirmation.changedFields.length > 0 ? (
+                <ConfirmCard
+                  confirmation={confirmation}
+                  confirmBusy={confirmBusy}
+                  formatDate={formatDate}
+                  onApply={applyConfirmation}
+                  onCancel={cancelConfirmation}
+                />
+              ) : null}
+
+              {working ? (
                 <div
-                  className="chat-skills"
-                  aria-label={t("chat:skillsLabel")}
+                  className="chat-working"
+                  role="status"
+                  aria-live="polite"
+                  onMouseEnter={() => setWorkingHovered(true)}
+                  onMouseLeave={() => setWorkingHovered(false)}
+                  onFocusCapture={() => setWorkingFocused(true)}
+                  onBlurCapture={() => setWorkingFocused(false)}
                 >
                   <SparkleRegular aria-hidden="true" fontSize={14} />
-                  <span>
-                    {t("chat:skillsUsed", {
-                      skills: message.skills.join(", "),
-                    })}
+                  <span key={workingIndex} className="chat-working-text">
+                    {t(WORKING_KEYS[workingIndex])}
                   </span>
                 </div>
               ) : null}
 
-              {toolsVisible && message.tools.length > 0 ? (
-                <ToolCalls tools={message.tools} locale={locale} />
-              ) : null}
-
-              {message.status === "cancelled" ? (
-                <Caption1 as="p" className="chat-note">
-                  {t("chat:cancelled")}
-                </Caption1>
-              ) : null}
-              {message.status === "error" ? (
-                <MessageBar intent="error">
-                  <MessageBarBody>{t("chat:answerFailed")}</MessageBarBody>
+              {issueReason !== null && statusError === null ? (
+                <MessageBar intent="error" layout="multiline">
+                  <MessageBarBody>
+                    <MessageBarTitle>{t("chat:unavailableTitle")}</MessageBarTitle>
+                    {t(REASON_LABEL[issueReason])}
+                  </MessageBarBody>
+                  <MessageBarActions>
+                    <FluentButton
+                      appearance="secondary"
+                      size="small"
+                      onClick={retry}
+                    >
+                      {t("chat:retry")}
+                    </FluentButton>
+                    <FluentButton
+                      appearance="subtle"
+                      size="small"
+                      onClick={onOpenSettings}
+                    >
+                      {t("chat:openSettings")}
+                    </FluentButton>
+                  </MessageBarActions>
                 </MessageBar>
               ) : null}
 
-              {message.role === "assistant" &&
-              message.status === "done" &&
-              message.content.trim() !== "" ? (
-                <div className="chat-answer-actions">
-                  <Button
-                    appearance="subtle"
-                    size="small"
-                    icon={<Copy16Regular aria-hidden="true" />}
-                    aria-label={t("chat:copy")}
-                    title={t("chat:copy")}
-                    onClick={() => copyAnswer(message.content)}
-                  />
-                  <Button
-                    appearance="subtle"
-                    size="small"
-                    icon={<ArrowClockwise16Regular aria-hidden="true" />}
-                    aria-label={t("chat:repeat")}
-                    title={t("chat:repeat")}
-                    disabled={!ready || streaming}
-                    onClick={() => {
-                      const query = queryBefore(state.messages, index);
-                      if (query !== null) sendMessage(query);
-                    }}
-                  />
-                </div>
+              {state.error !== null && status?.logPath ? (
+                <Caption1 as="p" className="chat-note">
+                  {t("chat:logPath", { path: status.logPath })}
+                </Caption1>
               ) : null}
-            </article>
-          );
-        })}
 
-        {confirmation !== null && confirmation.changedFields.length > 0 ? (
-          <ConfirmCard
-            confirmation={confirmation}
-            confirmBusy={confirmBusy}
-            formatDate={formatDate}
-            onApply={applyConfirmation}
-            onCancel={cancelConfirmation}
-          />
-        ) : null}
+              <div ref={bottomRef} />
+            </div>
 
-        {working ? (
-          <div
-            className="chat-working"
-            role="status"
-            aria-live="polite"
-            onMouseEnter={() => setWorkingHovered(true)}
-            onMouseLeave={() => setWorkingHovered(false)}
-            onFocusCapture={() => setWorkingFocused(true)}
-            onBlurCapture={() => setWorkingFocused(false)}
-          >
-            <SparkleRegular aria-hidden="true" fontSize={14} />
-            <span key={workingIndex} className="chat-working-text">
-              {t(WORKING_KEYS[workingIndex])}
-            </span>
-          </div>
-        ) : null}
-
-        {issueReason !== null && statusError === null ? (
-          <MessageBar intent="error" layout="multiline">
-            <MessageBarBody>
-              <MessageBarTitle>{t("chat:unavailableTitle")}</MessageBarTitle>
-              {t(REASON_LABEL[issueReason])}
-            </MessageBarBody>
-            <MessageBarActions>
-              <Button
-                appearance="secondary"
-                size="small"
-                onClick={retry}
-              >
-                {t("chat:retry")}
-              </Button>
-              <Button
-                appearance="subtle"
-                size="small"
-                onClick={onOpenSettings}
-              >
-                {t("chat:openSettings")}
-              </Button>
-            </MessageBarActions>
-          </MessageBar>
-        ) : null}
-
-        {state.error !== null && status?.logPath ? (
-          <Caption1 as="p" className="chat-note">
-            {t("chat:logPath", { path: status.logPath })}
-          </Caption1>
-        ) : null}
-
-        <div ref={bottomRef} />
-      </div>
-
-      <form
-        className="chat-compose"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!streaming) send();
-        }}
-      >
-        <div className="chat-input-row">
-          <Textarea
-            ref={inputRef}
-            className="chat-compose-textarea"
-            value={input}
-            rows={1}
-            resize="none"
-            placeholder={t("chat:placeholder")}
-            aria-label={t("chat:inputLabel")}
-            onChange={(_, data) => setInput(data.value)}
-            onKeyDown={(event) => {
-              if (
-                event.key === "Enter" &&
-                !event.shiftKey &&
-                !event.nativeEvent.isComposing
-              ) {
+            <form
+              className="chat-compose"
+              onSubmit={(event) => {
                 event.preventDefault();
                 if (!streaming) send();
-              }
-            }}
-          />
-          <Button
-            type="button"
-            appearance={streaming ? "secondary" : "primary"}
-            aria-pressed={streaming}
-            aria-describedby={
-              !streaming && !ready ? sendReasonId : undefined
-            }
-            disabled={!streaming && (!ready || input.trim() === "")}
-            title={
-              !streaming && !ready ? t("chat:sendDisabled") : undefined
-            }
-            icon={
-              streaming ? (
-                <Stop20Regular aria-hidden="true" />
-              ) : (
-                <Send20Regular aria-hidden="true" />
-              )
-            }
-            onClick={() => {
-              if (streaming) stop();
-              else send();
-            }}
-          >
-            {streaming ? t("chat:stop") : t("chat:send")}
-          </Button>
-          {!streaming && !ready ? (
-            <span id={sendReasonId} className="ui-sr-only" aria-hidden="true">
-              {t("chat:sendDisabled")}
-            </span>
-          ) : null}
-        </div>
-        <Caption1 as="p" className="chat-hint">
-          {t("chat:hint")}
-        </Caption1>
-      </form>
+              }}
+            >
+              <div className="chat-input-row">
+                <Textarea
+                  ref={inputRef}
+                  className="chat-compose-textarea"
+                  value={input}
+                  rows={1}
+                  resize="none"
+                  placeholder={t("chat:placeholder")}
+                  aria-label={t("chat:inputLabel")}
+                  onChange={(_, data) => setInput(data.value)}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === "Enter" &&
+                      !event.shiftKey &&
+                      !event.nativeEvent.isComposing
+                    ) {
+                      event.preventDefault();
+                      if (!streaming) send();
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant={streaming ? "secondary" : "primary"}
+                  aria-pressed={streaming}
+                  aria-describedby={
+                    !streaming && !ready ? sendReasonId : undefined
+                  }
+                  disabled={!streaming && (!ready || input.trim() === "")}
+                  title={!streaming && !ready ? t("chat:sendDisabled") : undefined}
+                  onClick={() => {
+                    if (streaming) stop();
+                    else send();
+                  }}
+                >
+                  {streaming ? (
+                    <Stop20Regular aria-hidden="true" />
+                  ) : (
+                    <Send20Regular aria-hidden="true" />
+                  )}
+                  {streaming ? t("chat:stop") : t("chat:send")}
+                </Button>
+                {!streaming && !ready ? (
+                  <span
+                    id={sendReasonId}
+                    className="ui-sr-only"
+                    aria-hidden="true"
+                  >
+                    {t("chat:sendDisabled")}
+                  </span>
+                ) : null}
+              </div>
+              <Caption1 as="p" className="chat-hint">
+                {t("chat:hint")}
+              </Caption1>
+            </form>
+          </div>
+        }
+      >
+        {historyLoading ? (
+          <div className="chat-history-loading" aria-hidden="true">
+            <span className="skeleton" />
+            <span className="skeleton" />
+            <span className="skeleton" />
+          </div>
+        ) : historyError !== null ? null : projectId === undefined ? (
+          <EmptyState compact text={t("chat:ephemeral")} />
+        ) : conversations.length === 0 ? (
+          <EmptyState compact text={t("chat:noConversations")} />
+        ) : (
+          <div className="chat-history-table-wrap">
+            <DataTable
+              ariaLabel={t("chat:listLabel")}
+              busy={pendingBusy}
+              className="chat-history-table"
+            >
+              <DataTableColgroup
+                columns={["conversation", "actions"]}
+                widths={{}}
+                selection={false}
+                columnClassName={(column) =>
+                  column === "actions"
+                    ? "chat-history-col-actions"
+                    : "chat-history-col"
+                }
+              />
+              <TableHeader>
+                <TableRow>
+                  <TableHeaderCell>
+                    {t("chat:conversationColumn")}
+                  </TableHeaderCell>
+                  <TableHeaderCell className="chat-history-actions-head">
+                    <span className="ui-sr-only">
+                      {t("chat:deleteConversation")}
+                    </span>
+                  </TableHeaderCell>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {conversations.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className={
+                      row.id === conversationId
+                        ? "chat-history-row chat-history-row-active"
+                        : "chat-history-row"
+                    }
+                    aria-selected={row.id === conversationId}
+                    onClick={() => openConversation(row.id)}
+                  >
+                    <TableCell className="chat-history-cell">
+                      <span className="chat-history-title">
+                        {row.title ?? t("chat:untitled")}
+                      </span>
+                      <Caption1 className="chat-history-date">
+                        {dateText(row)}
+                        {row.damaged ? ` · ${t("chat:damaged")}` : ""}
+                      </Caption1>
+                    </TableCell>
+                    <TableCell
+                      className="chat-history-actions"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <IconButton
+                        label={t("chat:deleteConversation")}
+                        disabled={pendingBusy}
+                        onClick={() => requestDelete(row.id)}
+                      >
+                        <Delete20Regular aria-hidden="true" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </DataTable>
+          </div>
+        )}
+      </CollectionShell>
+
+      <Dialog
+        open={pending !== null}
+        title={dialogue?.title ?? ""}
+        description={dialogue?.body}
+        busy={pendingBusy}
+        onClose={() => {
+          if (!pendingBusy) setPending(null);
+        }}
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              disabled={pendingBusy}
+              onClick={() => setPending(null)}
+            >
+              {t("chat:confirmCancel")}
+            </Button>
+            <Button
+              variant={dialogue?.destructive === true ? "danger" : "primary"}
+              loading={pendingBusy}
+              onClick={() => void runPending()}
+            >
+              {dialogue?.action ?? t("chat:confirmApply")}
+            </Button>
+          </>
+        }
+      >
+        <span />
+      </Dialog>
     </PageShell>
   );
+}
+
+function historyDialogue(
+  pending: PendingAction,
+  streaming: boolean,
+  activeRow: ChatHistorySummary | undefined,
+): { title: string; body: string; action: string; destructive: boolean } {
+  // Translated by the caller's `t`, so this helper returns keys plus a flag.
+  switch (pending.kind) {
+    case "delete":
+      return {
+        title: "chat:deleteConversationTitle",
+        body:
+          streaming && activeRow?.id === pending.id
+            ? "chat:deleteActiveStreamingBody"
+            : "chat:deleteConversationBody",
+        action: "chat:deleteAction",
+        destructive: true,
+      };
+    case "clear":
+      return {
+        title: "chat:clearHistoryTitle",
+        body: "chat:clearHistoryBody",
+        action: "chat:clearAction",
+        destructive: true,
+      };
+    case "switch":
+      return {
+        title: "chat:switchTitle",
+        body: "chat:switchBody",
+        action: "chat:switchAction",
+        destructive: false,
+      };
+    case "new":
+      return {
+        title: "chat:newChatTitle",
+        body: "chat:newChatBody",
+        action: "chat:newChatAction",
+        destructive: false,
+      };
+  }
 }
 
 function reasonFromStatus(status: ChatStatus): ChatReason | null {
@@ -940,6 +1635,35 @@ function newRequestId(): string {
     return cryptoApi.randomUUID();
   }
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/** Conversation ids must be real UUIDs: the backend validates them. */
+function newUuid(): string {
+  const cryptoApi = globalThis.crypto as
+    | {
+        randomUUID?: () => string;
+        getRandomValues?: (values: Uint8Array) => Uint8Array;
+      }
+    | undefined;
+  if (cryptoApi && typeof cryptoApi.randomUUID === "function") {
+    return cryptoApi.randomUUID();
+  }
+  const bytes = new Uint8Array(16);
+  if (cryptoApi && typeof cryptoApi.getRandomValues === "function") {
+    cryptoApi.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  );
+  return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex
+    .slice(6, 8)
+    .join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }
 
 /** Pretty-prints JSON for the expandable tool details; raw text stays raw. */
@@ -1131,22 +1855,22 @@ function ConfirmCard({
         ))}
       </ul>
       <div className="chat-confirm-actions">
-        <Button
+        <FluentButton
           appearance="secondary"
           size="small"
           disabled={confirmBusy}
           onClick={onCancel}
         >
           {t("chat:confirmCancel")}
-        </Button>
-        <Button
+        </FluentButton>
+        <FluentButton
           appearance="primary"
           size="small"
           disabled={confirmBusy}
           onClick={onApply}
         >
           {confirmBusy ? t("chat:confirmApplying") : t("chat:confirmApply")}
-        </Button>
+        </FluentButton>
       </div>
     </div>
   );

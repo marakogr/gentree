@@ -113,7 +113,9 @@
     "DANGLING_REFERENCE": "Reference to a missing record",
     "EVENT_OUT_OF_LIFESPAN": "Event outside the lifespan",
     "DUPLICATE_LIFE_EVENT": "Several birth or death events",
-    "LIFE_EVENT_ALREADY_EXISTS": "This person already has a birth or death event"
+    "LIFE_EVENT_ALREADY_EXISTS": "This person already has a birth or death event",
+    "CHAT_HISTORY_CORRUPTED": "The conversation file is damaged",
+    "CHAT_HISTORY_LIMIT": "Chat history limit reached"
   },
   "page": "Page {{page}}",
   "empty": "No data",

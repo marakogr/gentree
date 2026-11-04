@@ -341,4 +341,55 @@ describe("message ordering", () => {
       { role: "user", content: "third" },
     ]);
   });
+
+  it("loads a conversation and ignores a late event for the old request", () => {
+    const streaming = reduceChat(initialChatState, {
+      type: "send",
+      requestId: "r1",
+      userId: "u1",
+      content: "old question",
+    });
+    const loaded = reduceChat(streaming, {
+      type: "load",
+      messages: [
+        {
+          id: "u2",
+          role: "user",
+          content: "loaded question",
+          requestId: null,
+          status: "done",
+          skills: [],
+          tools: [],
+        },
+        {
+          id: "a2",
+          role: "assistant",
+          content: "loaded answer",
+          requestId: null,
+          status: "done",
+          skills: [],
+          tools: [],
+        },
+      ],
+    });
+    expect(loaded.activeRequestId).toBeNull();
+    expect(loaded.error).toBeNull();
+    expect(loaded.messages.map((entry) => entry.content)).toEqual([
+      "loaded question",
+      "loaded answer",
+    ]);
+
+    const afterLateEvent = reduceChat(loaded, {
+      type: "delta",
+      requestId: "r1",
+      delta: "late",
+    });
+    const afterLateDone = reduceChat(afterLateEvent, {
+      type: "done",
+      requestId: "r1",
+      content: "late answer",
+    });
+    expect(afterLateDone).toBe(afterLateEvent);
+    expect(afterLateDone.messages).toBe(loaded.messages);
+  });
 });

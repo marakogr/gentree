@@ -7,6 +7,10 @@ import type {
   BackupInfo,
   ChatMessage,
   ChatStatus,
+  ChatHistoryConversation,
+  ChatHistoryEntry,
+  ChatHistoryList,
+  ChatHistorySummary,
   DescendantGraph,
   EventEntity,
   EventInput,
@@ -230,6 +234,32 @@ export const chatApi = {
   /** Resolves a pending `update_person` confirmation; nothing is written here. */
   confirm: (confirmationId: string, approve: boolean) =>
     invoke<boolean>("chat_confirm", { confirmationId, approve }),
+  /** Conversations of the open project, newest first, plus the active caps. */
+  listHistory: (projectId: string) =>
+    invoke<ChatHistoryList>("chat_history_list", { projectId }),
+  /** Strict load; a damaged file fails with `CHAT_HISTORY_CORRUPTED`. */
+  loadHistory: (projectId: string, conversationId: string) =>
+    invoke<ChatHistoryConversation>("chat_history_load", {
+      projectId,
+      conversationId,
+    }),
+  /** Whole-conversation atomic snapshot for the open project. */
+  saveHistory: (
+    projectId: string,
+    conversationId: string,
+    entries: ChatHistoryEntry[],
+  ) =>
+    invoke<ChatHistorySummary>("chat_history_save", {
+      projectId,
+      conversationId,
+      entries,
+    }),
+  /** Removes one conversation; missing files are idempotent. */
+  deleteHistory: (projectId: string, conversationId: string) =>
+    invoke<boolean>("chat_history_delete", { projectId, conversationId }),
+  /** Removes every conversation of the open project. */
+  clearHistory: (projectId: string) =>
+    invoke<number>("chat_history_clear", { projectId }),
 };
 
 export const mediaApi = {

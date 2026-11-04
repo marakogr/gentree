@@ -113,7 +113,9 @@
     "DANGLING_REFERENCE": "Спасылка на адсутны запіс",
     "EVENT_OUT_OF_LIFESPAN": "Падзея па-за межамі жыцця",
     "DUPLICATE_LIFE_EVENT": "Некалькі падзей нараджэння або смерці",
-    "LIFE_EVENT_ALREADY_EXISTS": "У чалавека ўжо ёсць падзея нараджэння або смерці"
+    "LIFE_EVENT_ALREADY_EXISTS": "У чалавека ўжо ёсць падзея нараджэння або смерці",
+    "CHAT_HISTORY_CORRUPTED": "Файл дыялога пашкоджаны",
+    "CHAT_HISTORY_LIMIT": "Дасягнуты ліміт гісторыі чата"
   },
   "page": "Старонка {{page}}",
   "empty": "Няма даных",

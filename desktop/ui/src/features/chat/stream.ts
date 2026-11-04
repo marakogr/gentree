@@ -80,6 +80,7 @@ export type ChatAction =
   | { type: "done"; requestId: string; content?: string }
   | { type: "error"; requestId: string; error: AppErrorEnvelope }
   | { type: "cancel"; requestId: string }
+  | { type: "load"; messages: ChatEntry[] }
   | { type: "reset" };
 
 /** Appends in send order; deltas update the matching assistant entry in place. */
@@ -202,6 +203,14 @@ export function reduceChat(
         error: null,
       };
     }
+    case "load":
+      // A loaded conversation has no live request. Its entries carry no
+      // request id, so a late event for the previous request cannot match.
+      return {
+        messages: action.messages,
+        activeRequestId: null,
+        error: null,
+      };
     case "reset":
       return initialChatState;
   }

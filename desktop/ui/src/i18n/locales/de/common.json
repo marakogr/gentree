@@ -113,7 +113,9 @@
     "DANGLING_REFERENCE": "Verweis auf einen fehlenden Eintrag",
     "EVENT_OUT_OF_LIFESPAN": "Ereignis außerhalb der Lebensspanne",
     "DUPLICATE_LIFE_EVENT": "Mehrere Geburts- oder Sterbeereignisse",
-    "LIFE_EVENT_ALREADY_EXISTS": "Diese Person hat bereits ein Geburts- oder Sterbeereignis"
+    "LIFE_EVENT_ALREADY_EXISTS": "Diese Person hat bereits ein Geburts- oder Sterbeereignis",
+    "CHAT_HISTORY_CORRUPTED": "Die Unterhaltungsdatei ist beschädigt",
+    "CHAT_HISTORY_LIMIT": "Das Limit für den Chat-Verlauf ist erreicht"
   },
   "page": "Seite {{page}}",
   "empty": "Keine Daten",

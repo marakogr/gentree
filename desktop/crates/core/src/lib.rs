@@ -52,3 +52,14 @@ pub fn now_rfc3339() -> String {
         .format(&Rfc3339)
         .unwrap_or_else(|_| "1970-01-01T00:00:00Z".to_owned())
 }
+
+/// Formats an arbitrary file-system time (for example a file mtime) in the
+/// same RFC 3339 shape as [`now_rfc3339`], without adding a dependency to the
+/// caller.
+#[must_use]
+pub fn rfc3339_from_system_time(value: std::time::SystemTime) -> String {
+    use time::format_description::well_known::Rfc3339;
+    time::OffsetDateTime::from(value)
+        .format(&Rfc3339)
+        .unwrap_or_else(|_| "1970-01-01T00:00:00Z".to_owned())
+}

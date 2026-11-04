@@ -37,6 +37,12 @@ next to the executable. Upgrading means replacing the folder with a newer
 archive; the data stays where it is. Project and backup folders are configurable
 in Settings.
 
+Chat conversations are auxiliary app data. They live in a `chat` folder under
+the application data root returned by `app.path().app_data_dir()` (the same root
+as projects and indexes; `%APPDATA%\com.gentree.desktop` on Windows), never in a
+project folder, its backups, its checksums or an export. Deleting a project
+removes its conversations; clearing history affects only the open project.
+
 This is deliberate: a portable app that keeps project data next to the
 executable would write into a folder the user may have unzipped into a
 read-only or synced location, and a crash during a save would be harder to
