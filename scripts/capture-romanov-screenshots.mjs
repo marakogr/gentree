@@ -51,10 +51,10 @@ const COPY = {
   timeline: "Хронология",
   chat: "Чат",
   edit: "Изменить",
-  fromQuery: "Николай",
-  fromName: "Романов Николай II Александрович",
-  toQuery: "Ксения",
-  toName: "Романова Ксения Александровна",
+  fromQuery: "Александр II",
+  fromName: "Романов Александр II Николаевич",
+  toQuery: "Алексей",
+  toName: "Романов Алексей Николаевич",
   chatQuestion: "Как Ксения приходится Николаю II?",
   chatEdit:
     "Поменяй Николаю II заметку на «Последний император Всероссийский; расстрелян с семьёй в Екатеринбурге».",
@@ -447,7 +447,19 @@ async function main() {
       "the timeline events",
       30000,
     );
-    await sleep(3500);
+    await sleep(2500);
+    // Zoom into the imperial era so single events separate from the clusters.
+    for (let step = 0; step < 2; step += 1) {
+      const zoomed = await exec(
+        `const node=document.querySelector('[data-testid="line-zoom-in"]');
+         if (!node) return false;
+         node.click();
+         return true;`,
+      );
+      if (!zoomed) break;
+      await sleep(1200);
+    }
+    await sleep(1500);
     await shot("09-timeline");
 
     await clickText(COPY.chat, "nav button");
