@@ -25,6 +25,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <a href="https://github.com/marakogr/gentree/releases"><img src="https://img.shields.io/github/v/release/marakogr/gentree?include_prereleases&amp;label=release" alt="Latest release"></a>
+  <a href="https://github.com/marakogr/gentree/actions/workflows/ci.yml"><img src="https://github.com/marakogr/gentree/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <img src="https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20(Apple%20Silicon)-lightgrey.svg" alt="Platforms: Windows and Apple Silicon macOS installers">
   <img src="https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg" alt="Built with Tauri 2">
   <img src="https://img.shields.io/badge/status-early%20preview-yellow.svg" alt="Status: early preview">

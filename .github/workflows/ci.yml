@@ -1,0 +1,78 @@
+name: CI
+
+# Runs the same gates as `make check` on every pull request and on main. The
+# matrix covers both release platforms, so a test that only passes on one OS
+# fails here instead of reaching main — a Windows-only absolute path in a test
+# did exactly that. The release workflow repeats these steps on the tag, so a
+# release never depends on a stale green run.
+#
+# No secrets and no write permissions: a pull request from a fork can run this
+# workflow and still see nothing but the checked-out code.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - windows-latest
+          - macos-latest
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: desktop/ui/package-lock.json
+
+      - name: Install the pinned Rust toolchain
+        working-directory: desktop
+        run: rustup show
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: desktop
+
+      - name: Install UI dependencies
+        run: npm ci --prefix desktop/ui
+
+      - name: Check Rust formatting
+        working-directory: desktop
+        run: cargo fmt --all -- --check
+
+      - name: Lint Rust
+        working-directory: desktop
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Test Rust
+        working-directory: desktop
+        run: cargo test --workspace
+
+      - name: Typecheck and build the UI
+        run: npm --prefix desktop/ui run build
+
+      - name: Test the UI
+        run: npm --prefix desktop/ui run test
+
+      - name: Check the locales
+        run: npm --prefix desktop/ui run i18n:check

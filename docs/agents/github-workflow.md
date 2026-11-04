@@ -10,6 +10,7 @@ Repository: `github.com/marakogr/gentree`. Issues, milestones and the project bo
 - **Labels:** `priority:P0|P1|P2`, `area:ui|settings|help|events|map|timeline|chat|data|release`, `size:S|M|L`, `hitl`. Do not invent a second label for the same meaning.
 - **Language:** issue and milestone titles in English; issue bodies in Russian. PR titles are English Conventional Commits.
 - **Project board:** `Gentree Roadmap` (`https://github.com/users/marakogr/projects/2`). Set `Status` to `In Progress` when starting and `Done` after merge; keep `Priority` and `Size` in sync with labels.
+- **Checks.** The `CI` workflow (`.github/workflows/ci.yml`) runs on every pull request and on `main`: Rust format, clippy with `-D warnings`, Rust tests, the UI build and tests, and locale parity, on Windows and macOS. `check (windows-latest)` and `check (macos-latest)` are required to merge; fix the code or re-run, never bypass a red check.
 - **Self-contained issues.** Do not link local-only `docs/research/` notes; paste the relevant acceptance criteria instead.
 - **Privacy.** Never put AT5 data, real names, dates, places, paths, secrets or connection strings into issues, PRs, project fields or comments.
 - **Releases.** Tag only from green `main`; the tag must match the version in `desktop/apps/desktop/tauri.conf.json` (and the workspace version in `desktop/Cargo.toml`); follow `docs/releases.md`. Do not tag or change release files while a release is running.
