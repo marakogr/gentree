@@ -27,6 +27,7 @@ import type {
 } from "../../api/types";
 import { FilterBar, type FilterChipModel } from "../../components/filters/FilterBar";
 import { TypeChips } from "../../components/filters/TypeChips";
+import { PageShell } from "../../components/patterns/page-shell";
 import { EmptyState } from "../../components/ui/empty";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { useDebouncedValue } from "../../lib/useDebouncedValue";
@@ -325,9 +326,11 @@ export default function SearchPage({
   }
 
   return (
-    <section className="panel search-page">
-      <div className="card-head">
-        <h1 className="page-title">{t("search:title")}</h1>
+    <PageShell
+      className="search-page"
+      actionsClassName={null}
+      title={t("search:title")}
+      actions={
         <Button
           appearance="subtle"
           size="small"
@@ -345,7 +348,8 @@ export default function SearchPage({
         >
           {rebuilding ? t("search:rebuilding") : t("search:rebuild")}
         </Button>
-      </div>
+      }
+    >
 
       <form
         onSubmit={(event) => {
@@ -511,7 +515,7 @@ export default function SearchPage({
           ))}
         </div>
       ) : null}
-    </section>
+    </PageShell>
   );
 }
 

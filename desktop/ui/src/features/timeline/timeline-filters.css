@@ -1,50 +1,12 @@
-/* Timeline screen: compact one-row filter strip, the person picker slot and the
-   scroll container whose offset is persisted with the section view state. */
+/* Timeline screen: the shared event filter row keeps one fixed row height, and
+   the scroll container keeps its persisted offset. Filter widths come from the
+   shared event filter row. */
 
 @layer components {
-  /* One fixed row height in every scope: the scope buttons are 28px tall while
-     the shared person combobox is 32px, so the strip reserves the taller size
-     and never jumps when the scope switches to "person/ancestors". */
+  /* One fixed row height in every scope: the shared person combobox is 32px
+     tall, so the strip reserves that size and never jumps. */
   .timeline-filter-row {
     min-height: 2rem;
-  }
-
-  .timeline-filter-group {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  /* Shared PersonSearch renders without its label here (`hideLabel`), so the
-     slot stays a single 32px field next to the scope buttons and is capped
-     instead of stretching over the whole row. */
-  .timeline-filter-person {
-    flex: 0 1 auto;
-    width: 18rem;
-    min-width: 12rem;
-    max-width: 18rem;
-  }
-
-  /* The scope and type selects keep one width whatever the summary says. */
-  .timeline-filter-scope {
-    flex: 0 0 auto;
-    width: 10.5rem;
-    max-width: 100%;
-  }
-
-  .timeline-filter-scope > * {
-    width: 100%;
-  }
-
-  .timeline-filter-types {
-    flex: 0 0 auto;
-    width: 12.5rem;
-    max-width: 100%;
-  }
-
-  .timeline-filter-types > * {
-    width: 100%;
   }
 
   .timeline-filter-label {

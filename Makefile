@@ -62,6 +62,7 @@ ui-check: ## Typecheck, test, build and check i18n for the UI
 	npm --prefix $(UI) run test
 	npm --prefix $(UI) run build
 	npm --prefix $(UI) run i18n:check
+	npm --prefix $(UI) run ui:kit -- --all-blocking
 
 i18n: ## Check locale parity and hardcoded strings
 	npm --prefix $(UI) run i18n:check

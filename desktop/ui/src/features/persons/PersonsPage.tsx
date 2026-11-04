@@ -4,35 +4,26 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   AddRegular,
-  ArrowDownRegular,
-  ArrowUpRegular,
   CheckmarkRegular,
   HistoryRegular,
   OrganizationRegular,
-  SettingsRegular,
 } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import {
   Badge,
-  Checkbox,
   MessageBar,
   MessageBarActions,
   MessageBarBody,
   MessageBarTitle,
   Skeleton,
   SkeletonItem,
-  Table,
   TableBody,
   TableCell,
   TableCellLayout,
   TableHeader,
-  TableHeaderCell,
   TableRow,
   makeStyles,
   mergeClasses,
@@ -46,18 +37,30 @@ import type {
   Versioned,
 } from "../../api/types";
 import { FilterBar } from "../../components/filters/FilterBar";
+import { ColumnMenu } from "../../components/patterns/column-menu";
+import { CollectionShell } from "../../components/patterns/collection-shell";
+import {
+  DataTable,
+  DataTableColgroup,
+  HeaderCell,
+  SelectionCell,
+  SelectionHeaderCell,
+} from "../../components/patterns/data-table";
+import { PageShell } from "../../components/patterns/page-shell";
+import { Pager } from "../../components/patterns/pager";
+import type { SplitterBounds } from "../../components/patterns/splitter";
+import { nextSortDirection } from "../../components/patterns/tableState";
 import { BulkBar } from "../../components/ui/bulk-bar";
 import { Button } from "../../components/ui/button";
 import { Dialog } from "../../components/ui/dialog";
 import { EmptyState } from "../../components/ui/empty";
 import { IconButton } from "../../components/ui/icon-button";
-import { MenuButton, type MenuItem } from "../../components/ui/menu";
+import type { MenuItem } from "../../components/ui/menu";
 import { useToast } from "../../components/ui/toast";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { EMPTY_VALUE } from "../../lib/formatValue";
 import {
   columnResizeHandle,
-  columnWidthStyle,
   useColumnWidths,
 } from "../../lib/tableColumns";
 import { useDebouncedValue } from "../../lib/useDebouncedValue";
@@ -89,9 +92,11 @@ const SKELETON_ROWS = [0, 1, 2, 3, 4, 5];
 const SKELETON_CELLS = [0, 1, 2, 3, 4];
 
 /** Splitter bounds in percent of the layout width. */
-const LIST_WIDTH_DEFAULT = 58;
-const LIST_WIDTH_MIN = 35;
-const LIST_WIDTH_MAX = 75;
+const PERSONS_SPLITTER: SplitterBounds = {
+  defaultWidth: 58,
+  min: 35,
+  max: 75,
+};
 
 /** Table columns in canonical order; "name" is always visible. */
 const PERSON_COLUMNS = ["name", "years", "age", "parents", "actions"] as const;
@@ -138,27 +143,6 @@ function readPersonColumns(filters: ViewFilters): PersonColumn[] {
   return known;
 }
 
-function clampListWidth(value: number): number {
-  return Math.min(LIST_WIDTH_MAX, Math.max(LIST_WIDTH_MIN, value));
-}
-
-/** Stored splitter position in percent, clamped to the allowed range. */
-function readListWidth(filters: ViewFilters): number {
-  const raw = filters.listWidth;
-  if (typeof raw !== "string" || raw === "") return LIST_WIDTH_DEFAULT;
-  const parsed = Number.parseFloat(raw);
-  return Number.isFinite(parsed) ? clampListWidth(parsed) : LIST_WIDTH_DEFAULT;
-}
-
-/** Direction arrow of the active sort column. */
-function SortIcon({ direction }: { direction: PersonSortDirection }) {
-  return direction === "asc" ? (
-    <ArrowUpRegular fontSize={12} aria-hidden="true" />
-  ) : (
-    <ArrowDownRegular fontSize={12} aria-hidden="true" />
-  );
-}
-
 type Props = {
   projectId: string;
   focusPersonId?: string | null;
@@ -179,18 +163,6 @@ type Editing = { person: Person; version: string };
 // stored width overrides the CSS default on the matching `<col>`, and the
 // handle in the header's `aside` slot edits it.
 const useStyles = makeStyles({
-  table: {
-    "& th": {
-      position: "sticky",
-      top: 0,
-      zIndex: 1,
-      backgroundColor: tokens.colorNeutralBackground1,
-    },
-    // Fixed layout: a long name or parent list is clipped, never overlapped.
-    "& td, & th": {
-      overflow: "hidden",
-    },
-  },
   row: {
     cursor: "pointer",
   },
@@ -204,11 +176,6 @@ const useStyles = makeStyles({
     flexWrap: "wrap",
     columnGap: tokens.spacingHorizontalXS,
     rowGap: tokens.spacingVerticalXXS,
-  },
-  // The sortable header cell owns a flex button; keep the label on the start
-  // edge like every other header.
-  sortButton: {
-    justifyContent: "flex-start",
   },
   /** Fixed widths; a column without a width takes the remaining space. */
   colYears: {
@@ -279,11 +246,6 @@ function PersonsView({
   const [columns, setColumns] = useState<PersonColumn[]>(() =>
     readPersonColumns(state.filters),
   );
-  const [listWidth, setListWidth] = useState(() => readListWidth(state.filters));
-  const [resizing, setResizing] = useState(false);
-  const layoutRef = useRef<HTMLDivElement | null>(null);
-  const listWidthRef = useRef(listWidth);
-  listWidthRef.current = listWidth;
 
   // Newest first by default; a stored choice always wins over the default.
   const storedSort = state.sort;
@@ -465,54 +427,11 @@ function PersonsView({
 
   /* ---------- splitter ---------- */
 
-  const commitListWidth = (value: number) => {
-    const next = Math.round(clampListWidth(value));
-    setListWidth(next);
+  const commitListWidth = (stored: string) => {
     patch((previous) => ({
       ...previous,
-      filters: { ...previous.filters, listWidth: String(next) },
+      filters: { ...previous.filters, listWidth: stored },
     }));
-  };
-
-  const widthFromPointer = (clientX: number) => {
-    const rect = layoutRef.current?.getBoundingClientRect();
-    if (!rect || rect.width <= 0) return;
-    const percent = ((clientX - rect.left) / rect.width) * 100;
-    setListWidth(clampListWidth(percent));
-  };
-
-  const onSplitterPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setResizing(true);
-    widthFromPointer(event.clientX);
-  };
-
-  const onSplitterPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!resizing) return;
-    widthFromPointer(event.clientX);
-  };
-
-  const endSplitterDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!resizing) return;
-    setResizing(false);
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    commitListWidth(listWidthRef.current);
-  };
-
-  const onSplitterKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    const step = event.shiftKey ? 5 : 2;
-    let next: number | null = null;
-    if (event.key === "ArrowLeft") next = listWidth - step;
-    else if (event.key === "ArrowRight") next = listWidth + step;
-    else if (event.key === "Home") next = LIST_WIDTH_MIN;
-    else if (event.key === "End") next = LIST_WIDTH_MAX;
-    if (next === null) return;
-    event.preventDefault();
-    commitListWidth(next);
   };
 
   /* ---------- column widths ---------- */
@@ -577,14 +496,12 @@ function PersonsView({
   const toggleSort = (key: PersonSort) => {
     // `sortKey` already includes the default, so the first click on the
     // highlighted "birth" column flips the visible desc order to asc.
-    const active = sortKey === key;
-    const next: PersonSortDirection = active
-      ? direction === "asc"
-        ? "desc"
-        : "asc"
-      : key === "birth"
-        ? "desc"
-        : "asc";
+    const next = nextSortDirection(
+      key,
+      sortKey,
+      direction,
+      (nextKey) => (nextKey === "birth" ? "desc" : "asc"),
+    );
     patch({ sort: { key, direction: next }, page: 0 });
   };
 
@@ -726,15 +643,17 @@ function PersonsView({
     state.selectedId !== null && loadedId !== state.selectedId;
 
   return (
-    <section className="panel persons-page">
-      <div className="card-head persons-head">
-        <div className="persons-head-title">
-          <h1 className="page-title">{t("person:title")}</h1>
-          <Badge appearance="tint" color="informative" size="small">
-            {t("person:count", { count: totalPersons })}
-          </Badge>
-        </div>
-      </div>
+    <PageShell
+      className="persons-page"
+      headerClassName="persons-head"
+      titleGroupClassName="persons-head-title"
+      title={t("person:title")}
+      titleAside={
+        <Badge appearance="tint" color="informative" size="small">
+          {t("person:count", { count: totalPersons })}
+        </Badge>
+      }
+    >
 
       {error ? (
         <MessageBar intent="error">
@@ -758,20 +677,18 @@ function PersonsView({
         </MessageBar>
       ) : null}
 
-      <div
-        ref={layoutRef}
-        className={[
-          "persons-layout",
-          state.selectedId ? "" : "persons-layout-solo",
-          resizing ? "persons-layout-resizing" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={
-          { "--persons-list-width": `${listWidth}%` } as CSSProperties
-        }
-      >
-        <section className="panel persons-panel" aria-label={t("person:title")}>
+      <CollectionShell
+        storedWidth={state.filters.listWidth}
+        onCommitWidth={commitListWidth}
+        bounds={PERSONS_SPLITTER}
+        splitterLabel={t("person:resizeList")}
+        listLabel={t("person:title")}
+        layoutClassName="persons-layout"
+        listClassName="persons-panel"
+        splitterClassName="persons-splitter"
+        detailAs="aside"
+        detailClassName="persons-detail"
+        toolbar={
           <div className="persons-toolbar">
             <div className="persons-toolbar-row">
               <FilterBar
@@ -794,12 +711,9 @@ function PersonsView({
                 showReset={false}
               />
               <div className="persons-toolbar-actions">
-                <MenuButton
-                  iconOnly
-                  icon={<SettingsRegular fontSize={16} aria-hidden="true" />}
+                <ColumnMenu
                   label={t("person:columnsTitle")}
                   items={columnItems}
-                  align="end"
                 />
                 <Button
                   variant="primary"
@@ -822,7 +736,56 @@ function PersonsView({
               />
             ) : null}
           </div>
-
+        }
+        footer={
+          <Pager
+            className="persons-pager"
+            page={page}
+            totalPages={totalPages}
+            label={`${t("common:page", { page: page + 1 })} / ${totalPages}`}
+            previousLabel={t("common:actions.previous")}
+            nextLabel={t("common:actions.next")}
+            disabled={listLoading}
+            onPageChange={(next) => patch({ page: next })}
+          />
+        }
+        detail={
+          state.selectedId ? (
+            shownDetail ? (
+                <PersonCard
+                  detail={shownDetail}
+                  persons={allPersons}
+                  projectId={projectId}
+                  homePersonId={homePersonId}
+                  onOpenPerson={select}
+                  onEdit={startEdit}
+                  onDelete={() => void deleteSelected()}
+                  onChanged={refreshSelected}
+                  onNavigate={onNavigate}
+                  onBack={closeSelection}
+                  onExpand={() => setExpanded(true)}
+                  busy={busy}
+                />
+              ) : detailPending ? (
+                <div
+                  className="persons-panel persons-detail-skeleton"
+                  aria-busy="true"
+                >
+                  <Skeleton aria-hidden="true" className={styles.detailSkeleton}>
+                    <SkeletonItem size={24} className={styles.skeletonTitle} />
+                    <SkeletonItem size={16} />
+                    <SkeletonItem size={16} />
+                    <SkeletonItem size={16} />
+                  </Skeleton>
+                </div>
+              ) : (
+                <div className="persons-panel persons-detail-empty">
+                  <EmptyState compact text={t("person:selectPrompt")} />
+                </div>
+              )
+          ) : undefined
+        }
+      >
           <div
             className={
               resizingColumn
@@ -832,7 +795,7 @@ function PersonsView({
             ref={scrollRef}
           >
             {listLoading ? (
-              <Table size="small" className={styles.table} aria-busy="true">
+              <DataTable busy>
                 <TableBody>
                   {SKELETON_ROWS.map((row) => (
                     <TableRow key={row}>
@@ -846,7 +809,7 @@ function PersonsView({
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </DataTable>
             ) : items.length === 0 ? (
               <EmptyState
                 compact
@@ -859,126 +822,72 @@ function PersonsView({
                 onAction={all.length === 0 ? startCreate : resetFilters}
               />
             ) : (
-              <Table size="small" className={styles.table}>
-                <colgroup>
-                  <col className="bulk-select-col" />
-                  {columns.map((column) => (
-                    <col
-                      key={column}
-                      className={
-                        column === "years"
-                          ? styles.colYears
-                          : column === "age"
-                            ? styles.colAge
-                            : column === "actions"
-                              ? styles.colActions
-                              : undefined
-                      }
-                      style={columnWidthStyle(columnWidths, column)}
-                    />
-                  ))}
-                </colgroup>
+              <DataTable>
+                <DataTableColgroup
+                  columns={columns}
+                  widths={columnWidths}
+                  columnClassName={(column) =>
+                    column === "years"
+                      ? styles.colYears
+                      : column === "age"
+                        ? styles.colAge
+                        : column === "actions"
+                          ? styles.colActions
+                          : undefined
+                  }
+                />
                 <TableHeader>
                   <TableRow>
-                    <TableHeaderCell className="bulk-select-cell">
-                      <Checkbox
-                        checked={
-                          allPageSelected
-                            ? true
-                            : somePageSelected
-                              ? "mixed"
-                              : false
-                        }
-                        onChange={(_event, data) =>
-                          togglePageSelected(data.checked === true)
-                        }
-                        aria-label={t("common:bulk.selectAll")}
-                      />
-                    </TableHeaderCell>
+                    <SelectionHeaderCell
+                      checked={
+                        allPageSelected
+                          ? true
+                          : somePageSelected
+                            ? "mixed"
+                            : false
+                      }
+                      onChange={togglePageSelected}
+                      label={t("common:bulk.selectAll")}
+                    />
                     {columns.includes("name") ? (
-                      <TableHeaderCell
-                        sortable
-                        sortDirection={
-                          sortKey === "name"
-                            ? direction === "asc"
-                              ? "ascending"
-                              : "descending"
-                            : undefined
-                        }
-                        sortIcon={
-                          sortKey === "name" ? (
-                            <SortIcon direction={direction} />
-                          ) : undefined
-                        }
-                        button={{
-                          className: styles.sortButton,
-                          onClick: () => toggleSort("name"),
-                        }}
+                      <HeaderCell
+                        direction={sortKey === "name" ? direction : undefined}
+                        onSort={() => toggleSort("name")}
                         aside={columnHandle("name")}
                       >
                         {t("person:colName")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                     {columns.includes("years") ? (
-                      <TableHeaderCell
-                        sortable
-                        sortDirection={
-                          sortKey === "birth"
-                            ? direction === "asc"
-                              ? "ascending"
-                              : "descending"
-                            : undefined
-                        }
-                        sortIcon={
-                          sortKey === "birth" ? (
-                            <SortIcon direction={direction} />
-                          ) : undefined
-                        }
-                        button={{
-                          className: styles.sortButton,
-                          onClick: () => toggleSort("birth"),
-                        }}
+                      <HeaderCell
+                        direction={sortKey === "birth" ? direction : undefined}
+                        onSort={() => toggleSort("birth")}
                         aside={columnHandle("years")}
                       >
                         {t("person:colYears")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                     {columns.includes("age") ? (
-                      <TableHeaderCell
-                        sortable
-                        sortDirection={
-                          sortKey === "age"
-                            ? direction === "asc"
-                              ? "ascending"
-                              : "descending"
-                            : undefined
-                        }
-                        sortIcon={
-                          sortKey === "age" ? (
-                            <SortIcon direction={direction} />
-                          ) : undefined
-                        }
-                        button={{
-                          className: styles.sortButton,
-                          onClick: () => toggleSort("age"),
-                        }}
+                      <HeaderCell
+                        direction={sortKey === "age" ? direction : undefined}
+                        onSort={() => toggleSort("age")}
                         aside={columnHandle("age")}
                       >
                         {t("person:age")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                     {columns.includes("parents") ? (
-                      <TableHeaderCell aside={columnHandle("parents")}>
+                      <HeaderCell aside={columnHandle("parents")}>
                         {t("person:colParents")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                     {columns.includes("actions") ? (
-                      <TableHeaderCell
+                      <HeaderCell
                         className={styles.actionsCell}
                         aside={columnHandle("actions")}
                       >
                         {t("common:fields.actions")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                   </TableRow>
                 </TableHeader>
@@ -999,21 +908,16 @@ function PersonsView({
                         aria-selected={selected}
                         onClick={() => select(entity.id)}
                       >
-                        <TableCell
-                          className="bulk-select-cell"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <Checkbox
-                            checked={selectedSet.has(entity.id)}
-                            onChange={(_event, data) =>
-                              toggleSelected(entity.id, data.checked === true)
-                            }
-                            aria-label={t("common:bulk.selectPerson", {
-                              name:
-                                displayName(entity) || t("person:unknownName"),
-                            })}
-                          />
-                        </TableCell>
+                        <SelectionCell
+                          checked={selectedSet.has(entity.id)}
+                          onChange={(checked) =>
+                            toggleSelected(entity.id, checked)
+                          }
+                          label={t("common:bulk.selectPerson", {
+                            name:
+                              displayName(entity) || t("person:unknownName"),
+                          })}
+                        />
                         {columns.includes("name") ? (
                           <TableCell>
                             <TableCellLayout>
@@ -1114,89 +1018,10 @@ function PersonsView({
                     );
                   })}
                 </TableBody>
-              </Table>
+              </DataTable>
             )}
           </div>
-
-          <div className="persons-pager">
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={page === 0 || listLoading}
-              onClick={() => patch({ page: Math.max(0, page - 1) })}
-            >
-              {t("common:actions.previous")}
-            </Button>
-            <span className="meta">
-              {t("common:page", { page: page + 1 })} / {totalPages}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={page + 1 >= totalPages || listLoading}
-              onClick={() => patch({ page: page + 1 })}
-            >
-              {t("common:actions.next")}
-            </Button>
-          </div>
-        </section>
-
-        {state.selectedId ? (
-          <>
-            <div
-              className="persons-splitter"
-              role="separator"
-              aria-orientation="vertical"
-              aria-label={t("person:resizeList")}
-              aria-valuemin={LIST_WIDTH_MIN}
-              aria-valuemax={LIST_WIDTH_MAX}
-              aria-valuenow={Math.round(listWidth)}
-              tabIndex={0}
-              onPointerDown={onSplitterPointerDown}
-              onPointerMove={onSplitterPointerMove}
-              onPointerUp={endSplitterDrag}
-              onPointerCancel={endSplitterDrag}
-              onKeyDown={onSplitterKeyDown}
-              onDoubleClick={() => commitListWidth(LIST_WIDTH_DEFAULT)}
-            />
-
-            <aside className="persons-detail">
-              {shownDetail ? (
-                <PersonCard
-                  detail={shownDetail}
-                  persons={allPersons}
-                  projectId={projectId}
-                  homePersonId={homePersonId}
-                  onOpenPerson={select}
-                  onEdit={startEdit}
-                  onDelete={() => void deleteSelected()}
-                  onChanged={refreshSelected}
-                  onNavigate={onNavigate}
-                  onBack={closeSelection}
-                  onExpand={() => setExpanded(true)}
-                  busy={busy}
-                />
-              ) : detailPending ? (
-                <div
-                  className="persons-panel persons-detail-skeleton"
-                  aria-busy="true"
-                >
-                  <Skeleton aria-hidden="true" className={styles.detailSkeleton}>
-                    <SkeletonItem size={24} className={styles.skeletonTitle} />
-                    <SkeletonItem size={16} />
-                    <SkeletonItem size={16} />
-                    <SkeletonItem size={16} />
-                  </Skeleton>
-                </div>
-              ) : (
-                <div className="persons-panel persons-detail-empty">
-                  <EmptyState compact text={t("person:selectPrompt")} />
-                </div>
-              )}
-            </aside>
-          </>
-        ) : null}
-      </div>
+      </CollectionShell>
 
       {formOpen ? (
         <PersonForm
@@ -1275,6 +1100,6 @@ function PersonsView({
       >
         <p className="bulk-hint">{t("common:bulk.deletePeopleHint")}</p>
       </Dialog>
-    </section>
+    </PageShell>
   );
 }

@@ -34,7 +34,8 @@ import { displayName } from "../persons/helpers";
 import { toTimelineEvents } from "./adapter";
 import type { TimelineWindow } from "./dates";
 import { EventPopover } from "./EventPopover";
-import { TimelineFilters } from "./filters";
+import { EventFilterRow } from "../events/EventFilterRow";
+import { TimelineGenerations } from "./filters";
 import { eventTypeLabel } from "./format";
 import { useTimelineTranslate } from "./i18n";
 import {
@@ -698,19 +699,26 @@ export default function TimelinePage({
           </span>
         </div>
 
-        <TimelineFilters
+        <EventFilterRow
+          testId="line-filters"
+          className="timeline-filter-row"
+          personFilterId="timeline-focus-person"
           personId={sharedPersonId}
           personScope={sharedPersonScope}
           persons={persons}
           photos={photos}
-          generations={generations}
           types={eventTypes}
           onPersonChange={handlePersonChange}
           onPersonScopeChange={handlePersonScopeChange}
-          onGenerationsChange={(value) =>
-            applyView({ generations: clampGenerations(value) })
-          }
           onTypesChange={(types) => setSharedFilter("types", types)}
+          extra={
+            <TimelineGenerations
+              generations={generations}
+              onGenerationsChange={(value) =>
+                applyView({ generations: clampGenerations(value) })
+              }
+            />
+          }
         />
 
         {line.truncated && (

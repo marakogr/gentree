@@ -159,3 +159,24 @@ component, never a half-migrated screen.
   table. Decided in phase 3 by trying it; the approach does not change.
 - Final naming of the filter directory after the domain split (`components/filters` vs
   `components/patterns`). Cosmetic; decided in phase 5.
+
+## Verification record
+
+Counts from the UI kit checker before and after the extraction:
+
+| Signal | Before | After |
+|---|---|---|
+| Splitter implementations | 2 (Persons, Events) | 1 (`Splitter` through `CollectionShell`) |
+| Pager definitions | 2 page blocks | 1 (`Pager`) |
+| Sort-header definitions | 2 page blocks + 2 icons | 1 (`HeaderCell` + `SortIcon`) |
+| Dropdown shells | 2 hand-rolled | 1 (`DropdownBase`); searchable `Combobox` stays Fluent |
+| Raw controls | 51 | 50 (Help back action migrated; renderers allowlisted) |
+| `boundaries` violations | 15 | 11 |
+| `kit-purity` violations | 24 | 17 |
+| `dead-export` violations | 2 | 0 |
+| `duplicate-css` violations | 2 | 0 |
+
+`make check` passes. Manual verification on macOS covered Persons, Events, Timeline,
+Search and Map; the map tiles load once the window is focused. Automated
+four-combination capture and `npm run ux:review` are not available in this environment
+(the harness is Windows-oriented); screenshots remain the manual review step for the PR.

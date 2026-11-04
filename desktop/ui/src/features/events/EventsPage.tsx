@@ -4,35 +4,26 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   Badge,
-  Checkbox,
   MessageBar,
   MessageBarActions,
   MessageBarBody,
   MessageBarTitle,
   Skeleton,
   SkeletonItem,
-  Table,
   TableBody,
   TableCell,
   TableCellLayout,
   TableHeader,
-  TableHeaderCell,
   TableRow,
   makeStyles,
   tokens,
 } from "@fluentui/react-components";
 import {
-  ArrowDownRegular,
-  ArrowUpRegular,
   AttachRegular,
   CheckmarkRegular,
-  SettingsRegular,
   WarningRegular,
 } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
@@ -48,25 +39,35 @@ import type {
   ValidationReport,
   Versioned,
 } from "../../api/types";
-import { EventFilterHeader } from "../../components/filters/EventFilterHeader";
+import { EventFilterHeader } from "./EventFilterHeader";
+import { ColumnMenu } from "../../components/patterns/column-menu";
+import { CollectionShell } from "../../components/patterns/collection-shell";
+import {
+  DataTable,
+  DataTableColgroup,
+  HeaderCell,
+  SelectionCell,
+  SelectionHeaderCell,
+} from "../../components/patterns/data-table";
+import { PageShell } from "../../components/patterns/page-shell";
+import { Pager } from "../../components/patterns/pager";
+import type { SplitterBounds } from "../../components/patterns/splitter";
+import { nextSortDirection } from "../../components/patterns/tableState";
 import { BulkBar } from "../../components/ui/bulk-bar";
 import { Button } from "../../components/ui/button";
 import { Dialog } from "../../components/ui/dialog";
 import { EmptyState } from "../../components/ui/empty";
-import { MenuButton, type MenuItem } from "../../components/ui/menu";
+import type { MenuItem } from "../../components/ui/menu";
 import { useToast } from "../../components/ui/toast";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { dash } from "../../lib/formatValue";
 import {
   columnResizeHandle,
-  columnWidthStyle,
   useColumnWidths,
-  type ColumnWidths,
 } from "../../lib/tableColumns";
 import { useDateFormatter } from "../../lib/useDateFormatter";
 import { useDebouncedValue } from "../../lib/useDebouncedValue";
 import { useScrollMemory, useViewState } from "../../lib/useViewState";
-import type { ViewFilters } from "../../lib/viewState";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
 import { ValidationSummary } from "../projects/ValidationSummary";
@@ -104,23 +105,11 @@ import "./events.css";
 const DEFAULT_SORT: EventSortState = { key: "date", direction: "desc" };
 
 /** Splitter bounds in percent of the layout width. */
-const EVENTS_LIST_DEFAULT = 62;
-const EVENTS_LIST_MIN = 35;
-const EVENTS_LIST_MAX = 75;
-
-function clampEventsListWidth(value: number): number {
-  return Math.min(EVENTS_LIST_MAX, Math.max(EVENTS_LIST_MIN, value));
-}
-
-/** Stored splitter position in percent, clamped to the allowed range. */
-function readEventsListWidth(filters: ViewFilters): number {
-  const raw = filters.listWidth;
-  if (typeof raw !== "string" || raw === "") return EVENTS_LIST_DEFAULT;
-  const parsed = Number.parseFloat(raw);
-  return Number.isFinite(parsed)
-    ? clampEventsListWidth(parsed)
-    : EVENTS_LIST_DEFAULT;
-}
+const EVENTS_SPLITTER: SplitterBounds = {
+  defaultWidth: 62,
+  min: 35,
+  max: 75,
+};
 
 /** Year-first table dates: `2016 · 1 October`. */
 const DATE_YEAR_SEPARATOR = " \u00b7 ";
@@ -151,64 +140,7 @@ function formatYearFirst(
   return `${year}${DATE_YEAR_SEPARATOR}${rest}`;
 }
 
-/**
- * Column widths live on a `colgroup`, so every page of rows renders with the
- * same layout regardless of how long the current page's values are. A stored
- * width overrides the CSS default of the matching column.
- */
-function EventColumnGroup({
-  columns,
-  widths,
-}: {
-  columns: readonly EventColumn[];
-  widths: ColumnWidths;
-}) {
-  return (
-    <colgroup>
-      <col className="bulk-select-col" />
-      {columns.map((column) => (
-        <col
-          key={column}
-          className={`events-col events-col-${column}`}
-          style={columnWidthStyle(widths, column)}
-        />
-      ))}
-    </colgroup>
-  );
-}
-
-/** Direction arrow of the active sort column. */
-function EventSortIcon({ direction }: { direction: "asc" | "desc" }) {
-  return direction === "asc" ? (
-    <ArrowUpRegular fontSize={12} aria-hidden="true" />
-  ) : (
-    <ArrowDownRegular fontSize={12} aria-hidden="true" />
-  );
-}
-
 const useStyles = makeStyles({
-  // `table-layout: fixed` plus the colgroup widths keep the columns from
-  // resizing when the page slice changes; the table is already 100% wide.
-  table: {
-    tableLayout: "fixed",
-    width: "100%",
-  },
-  actionsHeader: {
-    whiteSpace: "nowrap",
-  },
-  // The sortable header cell owns a flex button; keep the label on the start
-  // edge like every other header.
-  sortButton: {
-    justifyContent: "flex-start",
-  },
-  // The actions header and its row controls share the cell's start edge, so
-  // the icons sit exactly under the label instead of hugging the right edge.
-  actionsHeaderButton: {
-    justifyContent: "flex-start",
-  },
-  actionsCell: {
-    whiteSpace: "nowrap",
-  },
   skeletonCell: {
     paddingTop: tokens.spacingVerticalXS,
     paddingBottom: tokens.spacingVerticalXS,
@@ -298,65 +230,13 @@ export default function EventsPage({
 
   /* ---------- master-detail splitter ---------- */
 
-  const [listWidth, setListWidth] = useState(() =>
-    readEventsListWidth(view.filters),
-  );
-  const [resizing, setResizing] = useState(false);
-  const layoutRef = useRef<HTMLDivElement | null>(null);
-  const listWidthRef = useRef(listWidth);
-  listWidthRef.current = listWidth;
-
-  const clampListWidth = clampEventsListWidth;
-
   // The width is layout state, not a filter: it lives next to the filters and
   // survives a reset because `clearEventFilterValues` keeps unknown keys.
-  const commitListWidth = (value: number) => {
-    const next = Math.round(clampListWidth(value));
-    setListWidth(next);
+  const commitListWidth = (stored: string) => {
     patch((previous) => ({
       ...previous,
-      filters: { ...previous.filters, listWidth: String(next) },
+      filters: { ...previous.filters, listWidth: stored },
     }));
-  };
-
-  const widthFromPointer = (clientX: number) => {
-    const rect = layoutRef.current?.getBoundingClientRect();
-    if (!rect || rect.width <= 0) return;
-    setListWidth(clampListWidth(((clientX - rect.left) / rect.width) * 100));
-  };
-
-  const onSplitterPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setResizing(true);
-    widthFromPointer(event.clientX);
-  };
-
-  const onSplitterPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!resizing) return;
-    widthFromPointer(event.clientX);
-  };
-
-  const endSplitterDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!resizing) return;
-    setResizing(false);
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    commitListWidth(listWidthRef.current);
-  };
-
-  const onSplitterKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    const step = event.shiftKey ? 5 : 2;
-    let next: number | null = null;
-    if (event.key === "ArrowLeft") next = listWidth - step;
-    else if (event.key === "ArrowRight") next = listWidth + step;
-    else if (event.key === "Home") next = EVENTS_LIST_MIN;
-    else if (event.key === "End") next = EVENTS_LIST_MAX;
-    if (next === null) return;
-    event.preventDefault();
-    commitListWidth(next);
   };
 
   /* ---------- date display ---------- */
@@ -867,19 +747,8 @@ export default function EventsPage({
   };
 
   const toggleSort = (key: EventSortKey) => {
-    patch((previous) => {
-      const current =
-        previous.sort && isEventSortKey(previous.sort.key)
-          ? previous.sort
-          : null;
-      const direction =
-        current && current.key === key
-          ? current.direction === "asc"
-            ? "desc"
-            : "asc"
-          : "asc";
-      return { ...previous, sort: { key, direction }, page: 0 };
-    });
+    const direction = nextSortDirection(key, sort.key, sort.direction);
+    patch({ sort: { key, direction }, page: 0 });
   };
 
   /* ---------- column widths ---------- */
@@ -942,17 +811,19 @@ export default function EventsPage({
 
   return (
     <>
-      <section className="panel events-page">
-      <div className="card-head events-head">
-        <div className="events-head-title">
-          <h1 className="page-title">{t("event:title")}</h1>
+      <PageShell
+        className="events-page"
+        headerClassName="events-head"
+        titleGroupClassName="events-head-title"
+        actionsClassName="events-head-actions"
+        title={t("event:title")}
+        titleAside={
           <Badge appearance="tint" color="informative" size="small">
             {t("event:count", { count: events.length })}
           </Badge>
-        </div>
-
-        <div className="events-head-actions">
-          {anomalyCount > 0 ? (
+        }
+        actions={
+          anomalyCount > 0 ? (
             <Button
               variant="ghost"
               size="sm"
@@ -965,22 +836,23 @@ export default function EventsPage({
               <WarningRegular aria-hidden="true" />
               {t("event:anomaly.count", { count: anomalyCount })}
             </Button>
-          ) : null}
-        </div>
-      </div>
-
-      <div
-        ref={layoutRef}
-        className={[
-          "events-layout",
-          selectedRow ? "" : "events-layout-solo",
-          resizing ? "events-layout-resizing" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={{ "--events-list-width": `${listWidth}%` } as CSSProperties}
+          ) : undefined
+        }
       >
-        <section className="panel events-panel">
+
+      <CollectionShell
+        storedWidth={view.filters.listWidth}
+        onCommitWidth={commitListWidth}
+        bounds={EVENTS_SPLITTER}
+        splitterLabel={t("event:resizeList")}
+        listLabel={t("event:title")}
+        layoutClassName="events-layout"
+        listClassName="events-panel"
+        splitterClassName="events-splitter"
+        detailAs="section"
+        detailPanel
+        detailClassName="events-panel events-card-panel"
+        toolbar={
           <div className="events-toolbar">
             <div className="events-toolbar-row">
               <EventFilterHeader
@@ -1017,12 +889,9 @@ export default function EventsPage({
                   {t("event:openTimeline")}
                 </Button>
               ) : null}
-              <MenuButton
-                iconOnly
-                icon={<SettingsRegular fontSize={16} aria-hidden="true" />}
+              <ColumnMenu
                 label={t("event:columns.title")}
                 items={columnItems}
-                align="end"
               />
               <Button
                 variant="primary"
@@ -1046,7 +915,9 @@ export default function EventsPage({
             />
           ) : null}
         </div>
-
+        }
+        banner={
+          <>
         {error ? (
           <MessageBar intent="error">
             <MessageBarBody>
@@ -1070,15 +941,43 @@ export default function EventsPage({
             </MessageBarActions>
           </MessageBar>
         ) : null}
-
+          </>
+        }
+        footer={
+            <Pager
+              className="events-pager"
+              page={page.page}
+              totalPages={page.totalPages}
+              label={`${t("common:page", { page: page.page + 1 })} / ${page.totalPages}`}
+              previousLabel={t("common:actions.previous")}
+              nextLabel={t("common:actions.next")}
+              disabled={busy}
+              onPageChange={(next) => patch({ page: next })}
+            />
+        }
+        detail={
+          selectedRow ? (
+              <EventCard
+                event={selectedRow}
+                persons={personEntities}
+                onEdit={() => startEdit(selectedRow)}
+                onClose={() => patch({ selectedId: null })}
+              />
+          ) : undefined
+        }
+      >
         {loading && events.length === 0 ? (
           <>
             <p className="ui-sr-only" role="status">
               {t("common:loading")}
             </p>
             <div className="events-table-wrap" aria-hidden="true">
-              <Table size="small" className={styles.table}>
-                <EventColumnGroup columns={columns} widths={columnWidths} />
+              <DataTable>
+                <DataTableColgroup
+                  columns={columns}
+                  widths={columnWidths}
+                  columnClassName={(column) => `events-col events-col-${column}`}
+                />
                 <TableBody>
                   {Array.from({ length: 8 }, (_, index) => (
                     <TableRow key={index}>
@@ -1092,7 +991,7 @@ export default function EventsPage({
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </DataTable>
             </div>
           </>
         ) : events.length === 0 ? (
@@ -1123,105 +1022,58 @@ export default function EventsPage({
                 }
               ref={setScrollNode}
             >
-              <Table
-                size="small"
-                className={styles.table}
-                aria-label={t("event:title")}
-              >
-                <EventColumnGroup columns={columns} widths={columnWidths} />
+              <DataTable ariaLabel={t("event:title")}>
+                <DataTableColgroup
+                  columns={columns}
+                  widths={columnWidths}
+                  columnClassName={(column) => `events-col events-col-${column}`}
+                />
                 <TableHeader>
                   <TableRow>
-                    <TableHeaderCell className="bulk-select-cell">
-                      <Checkbox
-                        checked={
-                          allPageSelected
-                            ? true
-                            : somePageSelected
-                              ? "mixed"
-                              : false
-                        }
-                        onChange={(_event, data) =>
-                          togglePageSelected(data.checked === true)
-                        }
-                        aria-label={t("common:bulk.selectAll")}
-                      />
-                    </TableHeaderCell>
+                    <SelectionHeaderCell
+                      checked={
+                        allPageSelected
+                          ? true
+                          : somePageSelected
+                            ? "mixed"
+                            : false
+                      }
+                      onChange={togglePageSelected}
+                      label={t("common:bulk.selectAll")}
+                    />
                     {columns.includes("date") ? (
-                      <TableHeaderCell
-                        sortable
-                        sortDirection={
-                          sort.key === "date"
-                            ? sort.direction === "asc"
-                              ? "ascending"
-                              : "descending"
-                            : undefined
-                        }
-                        sortIcon={
-                          sort.key === "date" ? (
-                            <EventSortIcon direction={sort.direction} />
-                          ) : undefined
-                        }
-                        button={{
-                          className: styles.sortButton,
-                          onClick: () => toggleSort("date"),
-                        }}
+                      <HeaderCell
+                        direction={sort.key === "date" ? sort.direction : undefined}
+                        onSort={() => toggleSort("date")}
                         aside={columnHandle("date")}
                       >
                         {t("event:date")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                     {columns.includes("type") ? (
-                      <TableHeaderCell
-                        sortable
-                        sortDirection={
-                          sort.key === "type"
-                            ? sort.direction === "asc"
-                              ? "ascending"
-                              : "descending"
-                            : undefined
-                        }
-                        sortIcon={
-                          sort.key === "type" ? (
-                            <EventSortIcon direction={sort.direction} />
-                          ) : undefined
-                        }
-                        button={{
-                          className: styles.sortButton,
-                          onClick: () => toggleSort("type"),
-                        }}
+                      <HeaderCell
+                        direction={sort.key === "type" ? sort.direction : undefined}
+                        onSort={() => toggleSort("type")}
                         aside={columnHandle("type")}
                       >
                         {t("event:type")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                     {columns.includes("person") ? (
-                      <TableHeaderCell
-                        sortable
-                        sortDirection={
-                          sort.key === "person"
-                            ? sort.direction === "asc"
-                              ? "ascending"
-                              : "descending"
-                            : undefined
+                      <HeaderCell
+                        direction={
+                          sort.key === "person" ? sort.direction : undefined
                         }
-                        sortIcon={
-                          sort.key === "person" ? (
-                            <EventSortIcon direction={sort.direction} />
-                          ) : undefined
-                        }
-                        button={{
-                          className: styles.sortButton,
-                          onClick: () => toggleSort("person"),
-                        }}
+                        onSort={() => toggleSort("person")}
                         aside={columnHandle("person")}
                       >
                         {t("event:person")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                     {columns.includes("place") ? (
-                      <TableHeaderCell aside={columnHandle("place")}>
+                      <HeaderCell aside={columnHandle("place")}>
                         {t("event:place")}
-                      </TableHeaderCell>
+                      </HeaderCell>
                     ) : null}
                   </TableRow>
                 </TableHeader>
@@ -1248,24 +1100,19 @@ export default function EventsPage({
                           patch({ selectedId: entity.id });
                         }}
                       >
-                        <TableCell
-                          className="bulk-select-cell"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <Checkbox
-                            checked={selectedSet.has(entity.id)}
-                            onChange={(_event, data) =>
-                              toggleSelected(entity.id, data.checked === true)
-                            }
-                            aria-label={t("common:bulk.selectEvent", {
-                              name: `${eventTypeLabel(
-                                entity.type,
-                                entity.originalType,
-                                t,
-                              )} ${dateText}`,
-                            })}
-                          />
-                        </TableCell>
+                        <SelectionCell
+                          checked={selectedSet.has(entity.id)}
+                          onChange={(checked) =>
+                            toggleSelected(entity.id, checked)
+                          }
+                          label={t("common:bulk.selectEvent", {
+                            name: `${eventTypeLabel(
+                              entity.type,
+                              entity.originalType,
+                              t,
+                            )} ${dateText}`,
+                          })}
+                        />
                         {columns.includes("date") ? (
                           <TableCell title={dateText}>
                             <TableCellLayout truncate>
@@ -1361,64 +1208,13 @@ export default function EventsPage({
                     );
                   })}
                 </TableBody>
-              </Table>
+              </DataTable>
             </div>
 
-            <div className="events-pager">
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={page.page === 0 || busy}
-                onClick={() => patch({ page: Math.max(0, page.page - 1) })}
-              >
-                {t("common:actions.previous")}
-              </Button>
-              <span className="meta">
-                {t("common:page", { page: page.page + 1 })} /{" "}
-                {page.totalPages}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={page.page + 1 >= page.totalPages || busy}
-                onClick={() => patch({ page: page.page + 1 })}
-              >
-                {t("common:actions.next")}
-              </Button>
-            </div>
           </>
         )}
-        </section>
-
-        {selectedRow ? (
-          <>
-            <div
-              className="events-splitter"
-              role="separator"
-              aria-orientation="vertical"
-              aria-label={t("event:resizeList")}
-              aria-valuenow={Math.round(listWidth)}
-              aria-valuemin={EVENTS_LIST_MIN}
-              aria-valuemax={EVENTS_LIST_MAX}
-              tabIndex={0}
-              onPointerDown={onSplitterPointerDown}
-              onPointerMove={onSplitterPointerMove}
-              onPointerUp={endSplitterDrag}
-              onPointerCancel={endSplitterDrag}
-              onKeyDown={onSplitterKeyDown}
-            />
-            <section className="panel events-panel events-card-panel">
-              <EventCard
-                event={selectedRow}
-                persons={personEntities}
-                onEdit={() => startEdit(selectedRow)}
-                onClose={() => patch({ selectedId: null })}
-              />
-            </section>
-          </>
-        ) : null}
-      </div>
-    </section>
+      </CollectionShell>
+      </PageShell>
 
       {formOpen ? (
         <EventForm

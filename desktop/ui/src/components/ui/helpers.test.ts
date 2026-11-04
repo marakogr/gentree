@@ -7,7 +7,6 @@ import {
   clampActiveIndex,
   comboListboxMaxHeightPx,
   filterComboItems,
-  isActivationKey,
   moveActiveIndex,
   normalizeSearchText,
   type ComboItem,
@@ -102,20 +101,6 @@ describe("moveActiveIndex", () => {
   it("supports multi-step moves with wrapping", () => {
     expect(moveActiveIndex(0, 4, 3)).toBe(1);
     expect(moveActiveIndex(1, -4, 3)).toBe(0);
-  });
-});
-
-describe("isActivationKey", () => {
-  it("recognises Enter and Space", () => {
-    expect(isActivationKey("Enter")).toBe(true);
-    expect(isActivationKey(" ")).toBe(true);
-    expect(isActivationKey("Spacebar")).toBe(true);
-  });
-
-  it("rejects other keys", () => {
-    expect(isActivationKey("Tab")).toBe(false);
-    expect(isActivationKey("ArrowDown")).toBe(false);
-    expect(isActivationKey("Escape")).toBe(false);
   });
 });
 

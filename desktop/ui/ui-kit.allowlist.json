@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "rule": "boundaries",
+      "file": "src/components/Markdown.tsx",
+      "count": 1,
+      "reason": "Markdown renderer reads locale text; it is a renderer exception, not a composition."
+    },
+    {
+      "rule": "boundaries",
+      "file": "src/components/SidebarProject.tsx",
+      "count": 8,
+      "reason": "Project sidebar still composes feature dialogs; replace with a slot when the shell moves."
+    },
+    {
+      "rule": "boundaries",
+      "file": "src/components/feedback.tsx",
+      "count": 1,
+      "reason": "Error banners read the error envelope type; the module moves out of the kit in cleanup."
+    },
+    {
+      "rule": "boundaries",
+      "file": "src/components/ui/date-wheel.tsx",
+      "count": 1,
+      "reason": "Date wheel reads DatePrecision from the domain types; dates stay a domain concept."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/events/EventCard.tsx",
+      "count": 2,
+      "reason": "Card text actions are inline links inside a card heading; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/events/EventsPage.tsx",
+      "count": 1,
+      "reason": "Person name link in a table cell; migrates with the data table."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/graph/GraphPage.tsx",
+      "count": 6,
+      "reason": "Canvas/graph renderer needs element-level markup; allowlisted by design."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/help/HelpPage.tsx",
+      "count": 1,
+      "reason": "Topic tiles are custom card controls; the back action uses the shared Button."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/import/ImportDialog.tsx",
+      "count": 2,
+      "reason": "Native file input is the platform picker; keep allowlisted."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/map/ClarifyPanel.tsx",
+      "count": 5,
+      "reason": "Map popover controls; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/map/MapCanvas.tsx",
+      "count": 2,
+      "reason": "Leaflet markup is managed by the map renderer; allowlisted by design."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/map/MapPage.tsx",
+      "count": 1,
+      "reason": "Map list item link; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/onboarding/TourOverlay.tsx",
+      "count": 2,
+      "reason": "Tour spotlight markup is positioned by the overlay; allowlisted by design."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/path/PathPage.tsx",
+      "count": 1,
+      "reason": "Kinship step link inside the path list; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/persons/PersonCard.tsx",
+      "count": 1,
+      "reason": "Inline text action in the card; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/persons/PersonForm.tsx",
+      "count": 1,
+      "reason": "Inline text action in the form; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/persons/PersonsPage.tsx",
+      "count": 1,
+      "reason": "Person name link in a table cell; migrates with the data table."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/projects/ProjectsPage.tsx",
+      "count": 3,
+      "reason": "Project card links and sort controls; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/timeline/EventPopover.tsx",
+      "count": 6,
+      "reason": "Timeline popover links and close action; migrate in cleanup."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/timeline/filters.tsx",
+      "count": 1,
+      "reason": "Timeline filter chip toggle; merges into the shared filter row in phase 5."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/timeline/LineCanvas.tsx",
+      "count": 8,
+      "reason": "Canvas renderer needs element-level markup; allowlisted by design."
+    },
+    {
+      "rule": "raw-primitive",
+      "file": "src/features/timeline/TimelinePage.tsx",
+      "count": 6,
+      "reason": "Timeline controls and row buttons; extract with the collection shell."
+    },
+    {
+      "rule": "raw-table",
+      "file": "src/components/Markdown.tsx",
+      "count": 1,
+      "reason": "Markdown owns its table markup so rendered documents keep their HTML semantics."
+    },
+    {
+      "rule": "raw-table",
+      "file": "src/features/timeline/TimelinePage.tsx",
+      "count": 1,
+      "reason": "The compact undated timeline table does not fit the Fluent DataTable; recorded exception."
+    },
+    {
+      "rule": "kit-purity",
+      "file": "src/components/Markdown.tsx",
+      "count": 1,
+      "reason": "Markdown renderer resolves locale text; renderer exception."
+    },
+    {
+      "rule": "kit-purity",
+      "file": "src/components/SidebarProject.tsx",
+      "count": 10,
+      "reason": "Sidebar composes feature dialogs and translations; moves behind a slot."
+    },
+    {
+      "rule": "kit-purity",
+      "file": "src/components/feedback.tsx",
+      "count": 3,
+      "reason": "Error banners translate stable codes; the module moves out of the kit in cleanup."
+    },
+    {
+      "rule": "kit-purity",
+      "file": "src/components/ui/date-wheel.tsx",
+      "count": 3,
+      "reason": "Date wheel is a date-field primitive that keeps its own formatted labels."
+    },
+    {
+      "rule": "style",
+      "file": "src/components/filters/filters.css",
+      "count": 1,
+      "reason": "One box-shadow still uses a raw rgb alpha; replace with a token in cleanup."
+    }
+  ]
+}

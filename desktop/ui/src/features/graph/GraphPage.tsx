@@ -39,6 +39,7 @@ import type {
 import { resolveLocale } from "../../i18n";
 import { formatKinship } from "../../i18n/kinship";
 import { ErrorBanner } from "../../components/feedback";
+import { PageShell } from "../../components/patterns/page-shell";
 import { IconButton } from "../../components/ui/icon-button";
 import { useToast } from "../../components/ui/toast";
 import { useAsyncAction } from "../../lib/useAsyncAction";
@@ -780,16 +781,21 @@ export default function GraphPage({
 
   return (
     <>
-      <div className="card-head">
-        <h1 className="page-title">{t("graph:title")}</h1>
-        {rootPerson ? (
-          <span className="badge">
-            {t("graph:rootValue", { name: displayName(rootPerson, t("person:unknownName")) })}
-          </span>
-        ) : null}
-      </div>
-
-      <section className={`panel ${styles.screen}`}>
+      <PageShell
+        className={styles.screen}
+        headerInPanel={false}
+        actionsClassName={null}
+        title={t("graph:title")}
+        actions={
+          rootPerson ? (
+            <span className="badge">
+              {t("graph:rootValue", {
+                name: displayName(rootPerson, t("person:unknownName")),
+              })}
+            </span>
+          ) : undefined
+        }
+      >
         <ErrorBanner error={error} />
 
         {!personsLoaded ? <p className="meta">{t("common:loading")}</p> : null}
@@ -1194,7 +1200,7 @@ export default function GraphPage({
             </div>
           </>
         ) : null}
-      </section>
+      </PageShell>
 
       {formOpen ? (
         <PersonForm

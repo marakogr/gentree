@@ -61,82 +61,10 @@
 
 /* ---------- master-detail ---------- */
 
-/*
- * The list takes the wider share of the row; the splitter in the middle track
- * writes the width back into `--persons-list-width`, so a drag only touches
- * one custom property. `-solo` is used while nothing is selected: the detail
- * pane is not rendered and the list spans the whole row.
- */
-.persons-layout {
-  --persons-list-width: 58%;
-  display: grid;
-  grid-template-columns:
-    minmax(0, var(--persons-list-width))
-    8px
-    minmax(0, 1fr);
-  align-items: stretch;
-  gap: 12px;
-  min-width: 0;
-  min-height: 0;
-  flex: 1 1 auto;
-}
-
-.persons-layout-solo {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.persons-layout-resizing {
-  user-select: none;
-  cursor: col-resize;
-}
-
-/* Vertical splitter between the list and the card. */
-.persons-splitter {
-  position: relative;
-  align-self: stretch;
-  min-height: 120px;
-  border-radius: 999px;
-  cursor: col-resize;
-  outline: none;
-  touch-action: none;
-}
-
-.persons-splitter::before {
-  content: "";
-  position: absolute;
-  top: 8px;
-  bottom: 8px;
-  left: 50%;
-  width: 2px;
-  border-radius: 999px;
-  background: var(--border);
-  transform: translateX(-50%);
-  transition:
-    background-color 120ms ease,
-    width 120ms ease;
-}
-
-.persons-splitter:hover::before,
-.persons-splitter:focus-visible::before,
-.persons-layout-resizing .persons-splitter::before {
-  width: 3px;
-  background: var(--primary);
-}
-
-.persons-splitter:focus-visible::before {
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 35%, transparent);
-}
+/* The grid, splitter track and stacked breakpoint live in the shared
+   CollectionShell; this file keeps only the page-specific panel rows. */
 
 @media (max-width: 1100px) {
-  .persons-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* Stacked layout has no splitter and may scroll as a page again. */
-  .persons-splitter {
-    display: none;
-  }
-
   .persons-page {
     height: auto;
   }
@@ -265,42 +193,7 @@
   cursor: col-resize;
 }
 
-/* Column resize handle: a thin grab area on the right edge of the header cell
-   (Fluent's `aside` slot). The sticky header is the positioning context; the
-   visible line only appears on hover, keyboard focus and while dragging. */
-.col-resize-handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  width: 8px;
-  cursor: col-resize;
-  outline: none;
-  touch-action: none;
-}
-
-.col-resize-handle::before {
-  content: "";
-  position: absolute;
-  top: 6px;
-  right: 1px;
-  bottom: 6px;
-  width: 2px;
-  border-radius: 999px;
-  background: var(--border);
-  opacity: 0;
-  transition:
-    opacity 120ms ease,
-    background-color 120ms ease;
-}
-
-.col-resize-handle:hover::before,
-.col-resize-handle:focus-visible::before,
-.col-resize-handle-active::before {
-  opacity: 1;
-  background: var(--primary);
-}
+/* Column resize handle styles live in the shared patterns stylesheet. */
 
 .person-name {
   padding: 0;
@@ -381,10 +274,6 @@
 }
 
 .persons-pager {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   padding-top: 4px;
 }
 

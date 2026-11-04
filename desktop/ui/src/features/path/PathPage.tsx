@@ -37,6 +37,7 @@ import type {
 import { Button } from "../../components/ui/button";
 import { EmptyState } from "../../components/ui/empty";
 import { IconButton } from "../../components/ui/icon-button";
+import { PageShell } from "../../components/patterns/page-shell";
 import { describeChain, formatKinship } from "../../i18n/kinship";
 import type { Locale } from "../../i18n";
 import { useAsyncAction } from "../../lib/useAsyncAction";
@@ -450,16 +451,19 @@ export default function PathPage({
 
   return (
     <>
-      <div className="card-head">
-        <h1 className="page-title">{t("path:title")}</h1>
-        {term ? (
-          <Badge appearance="tint" color="brand">
-            {t("path:kinshipLabel", { term })}
-          </Badge>
-        ) : null}
-      </div>
-
-      <section className="panel path-page">
+      <PageShell
+        className="path-page"
+        headerInPanel={false}
+        actionsClassName={null}
+        title={t("path:title")}
+        actions={
+          term ? (
+            <Badge appearance="tint" color="brand">
+              {t("path:kinshipLabel", { term })}
+            </Badge>
+          ) : undefined
+        }
+      >
         {error ? (
           <MessageBar intent="error">
             <MessageBarBody>
@@ -878,7 +882,7 @@ export default function PathPage({
             </Text>
           </>
         ) : null}
-      </section>
+      </PageShell>
 
       {formOpen ? (
         <PersonForm

@@ -18,8 +18,9 @@ import type {
   Versioned,
 } from "../../api/types";
 import { ErrorBanner } from "../../components/feedback";
-import { EventFilterHeader } from "../../components/filters/EventFilterHeader";
+import { EventFilterHeader } from "../events/EventFilterHeader";
 import { normalizeYearRange } from "../../components/filters/yearRangeRules";
+import { PageShell } from "../../components/patterns/page-shell";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { useDebouncedValue } from "../../lib/useDebouncedValue";
 import { useViewState } from "../../lib/useViewState";
@@ -425,12 +426,15 @@ export default function MapPage({
     state.status === "ready" && placed.length === 0 && hasAnyPlace;
 
   return (
-    <section className="panel map-page">
-      <header className="map-header">
-        <div>
-          <h1 className="page-title">{t("title")}</h1>
-        </div>
-        <div className="map-counts">
+    <PageShell
+      className="map-page"
+      headerAs="header"
+      headerClassName="map-header"
+      titleGroupClassName=""
+      actionsClassName="map-counts"
+      title={t("title")}
+      actions={
+        <>
           <Text size={300}>{t("event:count", { count: filtered.length })}</Text>
           <Text size={300}>{t("placesCount", { count: groups.length })}</Text>
           {placedUndated.length > 0 ? (
@@ -438,8 +442,9 @@ export default function MapPage({
               {t("undatedCount", { count: placedUndated.length })}
             </Text>
           ) : null}
-        </div>
-      </header>
+        </>
+      }
+    >
 
       <div className="map-toolbar">
         <EventFilterHeader
@@ -634,7 +639,7 @@ export default function MapPage({
           </aside>
         ) : null}
       </div>
-    </section>
+    </PageShell>
   );
 }
 

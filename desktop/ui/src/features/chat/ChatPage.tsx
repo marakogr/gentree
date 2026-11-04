@@ -51,6 +51,7 @@ import type {
   Person,
 } from "../../api/types";
 import { Markdown } from "../../components/Markdown";
+import { PageShell } from "../../components/patterns/page-shell";
 import { EmptyState } from "../../components/ui/empty";
 import { useToast } from "../../components/ui/toast";
 import { normalizeError } from "../../lib/errors";
@@ -542,10 +543,15 @@ export default function ChatPage({
   }, [confirmation, cancelConfirmation]);
 
   return (
-    <section className="panel chat chat-screen">
-      <div className="card-head chat-head">
-        <h2>{t("chat:title")}</h2>
-        <div className="chat-head-actions">
+    <PageShell
+      className="chat chat-screen"
+      headerClassName="chat-head"
+      actionsClassName="chat-head-actions"
+      titleAs="h2"
+      titleClassName=""
+      title={t("chat:title")}
+      actions={
+        <>
           <Button
             appearance="subtle"
             shape="rounded"
@@ -572,8 +578,9 @@ export default function ChatPage({
             title={t("chat:openSettings")}
             onClick={onOpenSettings}
           />
-        </div>
-      </div>
+        </>
+      }
+    >
 
       {status !== null ? (
         <div className="chat-status-strip" role="note">
@@ -889,7 +896,7 @@ export default function ChatPage({
           {t("chat:hint")}
         </Caption1>
       </form>
-    </section>
+    </PageShell>
   );
 }
 

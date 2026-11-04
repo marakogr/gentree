@@ -1406,6 +1406,84 @@ legend{padding:0 4px;font:var(--weight-medium) var(--text-2xs)/1.2 var(--font-mo
               <div class="scale-row"><span class="scale-key">--font-mono</span><span class="mono">1874–1951 · ГАРТ, ф. 160, оп. 1</span></div>
             </div>
           </section>
+
+          <!-- Kit gallery: the shipped patterns, not a visual redesign. -->
+          <section class="spec">
+            <div class="spec-head"><h2 class="h3">Паттерны</h2><span class="meta">PageShell · CollectionShell · DataTable · Pager · DropdownBase</span></div>
+            <div class="spec-body stack" style="gap:16px">
+
+              <div class="panel" style="padding:12px">
+                <div class="card-head" style="padding-bottom:8px">
+                  <div class="page-title">
+                    <p class="eyebrow">PageShell</p>
+                    <h3 class="h3">Заголовок <span class="count">128</span></h3>
+                  </div>
+                  <button class="btn btn-secondary btn-sm" type="button">Действие</button>
+                </div>
+                <p class="meta" style="margin:8px 0 0">header · title · titleAside · actions · body</p>
+              </div>
+
+              <div class="master" style="min-height:190px">
+                <div class="panel">
+                  <div class="panel-head"><span class="eyebrow">CollectionShell · список</span><span class="meta">toolbar / body / footer</span></div>
+                  <div style="flex:1;padding:12px" class="meta">Фильтры и строки списка</div>
+                  <div class="pager">
+                    <button class="btn btn-ghost btn-sm" type="button">Назад</button>
+                    <span class="range">1 / 5</span>
+                    <button class="btn btn-ghost btn-sm" type="button">Вперёд</button>
+                  </div>
+                </div>
+                <div class="splitter" role="separator" aria-orientation="vertical" aria-label="Изменить ширину списка" tabindex="0"></div>
+                <div class="panel">
+                  <div class="panel-head"><span class="eyebrow">detail · необязательно</span></div>
+                  <div style="padding:12px" class="meta">Панель деталей; без неё список занимает всю ширину.</div>
+                </div>
+              </div>
+
+              <div style="overflow:hidden;border:1px solid var(--border);background:var(--card)">
+                <table class="people" aria-label="DataTable">
+                  <thead>
+                    <tr>
+                      <th style="width:30px"><input type="checkbox" aria-label="Выбрать все"></th>
+                      <th style="position:relative">
+                        <button class="th" type="button">Имя <svg class="ico" aria-hidden="true"><use href="#i-sort"/></svg></button>
+                        <span role="separator" aria-orientation="vertical" aria-label="Ширина колонки" tabindex="0"
+                          style="position:absolute;top:0;right:0;bottom:0;width:8px;cursor:col-resize;border-right:2px solid var(--primary)"></span>
+                      </th>
+                      <th>Годы</th>
+                      <th>Возраст</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="checkbox" aria-label="Выбрать строку"></td>
+                      <td><span class="name-btn">Анна Ковалёва</span></td>
+                      <td class="c-years">1901–1987</td>
+                      <td class="c-age">86</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+                <div>
+                  <button class="btn btn-secondary" type="button" aria-haspopup="listbox" aria-expanded="true">
+                    Все типы <svg class="ico" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+                  </button>
+                  <div role="listbox" aria-label="Тип события" style="min-width:190px;margin-top:4px;padding:6px;border:1px solid var(--border);background:var(--popover)">
+                    <div role="option" aria-selected="true" style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--accent)"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>Все типы</div>
+                    <div role="option" aria-selected="false" style="display:flex;align-items:center;gap:8px;padding:6px 8px">Рождение</div>
+                    <div role="option" aria-selected="false" style="display:flex;align-items:center;gap:8px;padding:6px 8px">Брак</div>
+                  </div>
+                </div>
+                <div style="flex:1;min-width:220px;padding:18px;border:1px dashed var(--border);text-align:center">
+                  <p class="meta" style="margin:0 0 8px">Пустое состояние</p>
+                  <button class="btn btn-secondary btn-sm" type="button">Добавить</button>
+                </div>
+              </div>
+
+            </div>
+          </section>
         </div>
       </section>
 
