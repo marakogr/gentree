@@ -1,0 +1,5 @@
+# Snapshot fixtures are embedded with include_str! and compared byte-for-byte.
+# Git converts text files to CRLF on a Windows checkout (core.autocrlf=true),
+# which changed the fixture and failed prompt_snapshot on windows-latest while
+# the assembled prompt itself is always LF. Keep these files LF everywhere.
+**/snapshots/** text eol=lf
