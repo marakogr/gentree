@@ -48,6 +48,7 @@ const COPY = {
   findRelation: "Найти связь",
   events: "События",
   map: "Карта",
+  timeline: "Хронология",
   chat: "Чат",
   edit: "Изменить",
   fromQuery: "Николай",
@@ -433,6 +434,21 @@ async function main() {
     console.log(`  map tiles: ${tiles ? "osm" : "offline outline"}`);
     await sleep(1500);
     await shot("07-map");
+
+    await clickText(COPY.timeline, "nav button");
+    await waitFor(
+      `return Boolean(document.querySelector('[data-testid="timeline-line-page"]'));`,
+      "the timeline",
+      30000,
+    );
+    await waitFor(
+      `const count=document.querySelector('[data-testid="line-count"]');
+       return Boolean(count && count.textContent.trim() !== "");`,
+      "the timeline events",
+      30000,
+    );
+    await sleep(3500);
+    await shot("09-timeline");
 
     await clickText(COPY.chat, "nav button");
     await waitFor(
