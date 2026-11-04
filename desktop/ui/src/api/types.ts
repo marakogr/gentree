@@ -132,6 +132,11 @@ export type PlaceSuggestion = {
   hint: string;
   source: "photon" | "dadata" | "wikidata";
   point?: PlaceGeo | null;
+  /**
+   * The suggestion was found by translating a historical name to its modern
+   * city. The UI keeps the typed historical text instead of the modern label.
+   */
+  historical?: boolean;
 };
 
 /** Bulk confirmation of one point for events sharing a typed place. */

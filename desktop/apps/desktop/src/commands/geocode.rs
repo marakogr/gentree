@@ -32,8 +32,8 @@ const MAX_SUGGESTIONS: usize = 8;
 const REQUEST_LIMIT: usize = 8;
 const USER_AGENT: &str = concat!("Gentree/", env!("CARGO_PKG_VERSION"));
 
-/// One address suggestion. `source` is `"photon"` or `"dadata"`; the UI uses it
-/// only as a label, never to re-query a provider directly.
+/// One address suggestion. `source` is `"photon"`, `"dadata"` or `"wikidata"`;
+/// the UI uses it only as a label, never to re-query a provider directly.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceSuggestion {
@@ -45,6 +45,16 @@ pub struct PlaceSuggestion {
     /// free text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub point: Option<PlaceGeo>,
+    /// True for a modern suggestion found by rewriting a historical place name
+    /// (for example "Горький, улица Горького" → "Нижний Новгород, улица
+    /// Горького"). The UI keeps the typed historical text; the modern label is
+    /// only shown next to the point.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub historical: bool,
+}
+
+fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 /// Geocoder settings cloned out of the shared config. The mutex guard is
@@ -119,7 +129,27 @@ pub async fn place_suggest(
         Some(settings) => wikidata(&client, &settings.api_url, &query).await.ok(),
         None => None,
     };
+    // A historical city name in front of a street ("Горький, улица Горького")
+    // is not a Wikidata label of the street itself. Resolve the city and ask
+    // the modern provider for the address inside today's city.
+    let contextual_results =
+        contextual_suggestions(&client, modern.as_ref(), historical.as_ref(), &query).await;
+    let modern_results = merge_contextual_modern(modern_results, contextual_results);
     combine_suggestions(modern_results, historical_results)
+}
+
+/// Keeps the contextual results first: they are the ones that match the
+/// historical city the user typed, while the original query may only return
+/// same-named streets in other cities.
+fn merge_contextual_modern(
+    modern: Option<Vec<PlaceSuggestion>>,
+    contextual: Option<Vec<PlaceSuggestion>>,
+) -> Option<Vec<PlaceSuggestion>> {
+    match (modern, contextual) {
+        (Some(modern), Some(contextual)) => Some(merge_suggestions(contextual, modern)),
+        (None, Some(contextual)) => Some(contextual),
+        (modern, None) => modern,
+    }
 }
 
 /// Modern providers keep their existing routing; a failure is `None` so the
@@ -159,6 +189,155 @@ fn combine_suggestions(
             Ok(merge_suggestions(historical, modern))
         }
     }
+}
+
+/// Administrative words that may precede a settlement name in imported
+/// addresses ("г. Горький", "пос. Ивановка").
+const ADMIN_PLACE_PREFIXES: [&str; 20] = [
+    "г",
+    "гор",
+    "город",
+    "пгт",
+    "пос",
+    "поселок",
+    "посёлок",
+    "рп",
+    "р.п",
+    "рабочий",
+    "с",
+    "село",
+    "дер",
+    "деревня",
+    "ст",
+    "станица",
+    "х",
+    "хутор",
+    "аул",
+    "кишлак",
+];
+
+/// Street-type words. A query that starts with one of these has no city in
+/// front of it, so there is nothing to rewrite.
+const STREET_PLACE_WORDS: [&str; 22] = [
+    "улица",
+    "ул",
+    "проспект",
+    "пр",
+    "пр-т",
+    "переулок",
+    "пер",
+    "проезд",
+    "площадь",
+    "пл",
+    "бульвар",
+    "б-р",
+    "шоссе",
+    "ш",
+    "набережная",
+    "наб",
+    "тупик",
+    "аллея",
+    "дом",
+    "д",
+    "квартира",
+    "кв",
+];
+
+/// Splits a typed address into a possible settlement name and the rest.
+/// `None` when the text has no remainder or already starts with a street type.
+fn leading_place(query: &str) -> Option<(String, String)> {
+    let trimmed = query.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let separator = |character: char| character == ',' || character == ';';
+    let (head, tail) = match trimmed.find(separator) {
+        Some(index) => (
+            trimmed[..index].trim(),
+            trimmed[index..].trim_start_matches(separator).trim(),
+        ),
+        None => (trimmed, ""),
+    };
+    let head = strip_admin_prefixes(head);
+    if head.is_empty() {
+        return None;
+    }
+    let (candidate, remainder) = if tail.is_empty() {
+        // Without a comma the first word is the only safe boundary.
+        let candidate = head.split_whitespace().next()?;
+        (candidate, head[candidate.len()..].trim())
+    } else {
+        (head, tail)
+    };
+    if remainder.is_empty() || is_street_word(candidate) {
+        return None;
+    }
+    Some((candidate.to_owned(), remainder.to_owned()))
+}
+
+fn strip_admin_prefixes(mut text: &str) -> &str {
+    loop {
+        let trimmed = text.trim_start();
+        let Some((word, rest)) = split_first_word(trimmed) else {
+            return "";
+        };
+        let normalized = word.trim_matches('.').to_lowercase();
+        if ADMIN_PLACE_PREFIXES.contains(&normalized.as_str()) {
+            text = rest;
+        } else {
+            return trimmed;
+        }
+    }
+}
+
+fn split_first_word(text: &str) -> Option<(&str, &str)> {
+    let text = text.trim_start();
+    if text.is_empty() {
+        return None;
+    }
+    let end = text.find(char::is_whitespace).unwrap_or(text.len());
+    Some((&text[..end], &text[end..]))
+}
+
+fn is_street_word(candidate: &str) -> bool {
+    candidate
+        .split_whitespace()
+        .next()
+        .map(|word| word.trim_matches('.').to_lowercase())
+        .is_some_and(|word| STREET_PLACE_WORDS.contains(&word.as_str()))
+}
+
+/// Modern suggestions for a historical city + street query. Wikidata supplies
+/// the modern city label; the address tail is kept as typed. Results are marked
+/// `historical` so the UI keeps the user's historical text.
+async fn contextual_suggestions(
+    client: &reqwest::Client,
+    modern: Option<&GeocoderSettings>,
+    historical: Option<&HistoricalSettings>,
+    query: &str,
+) -> Option<Vec<PlaceSuggestion>> {
+    let modern = modern?;
+    let historical = historical?;
+    let (candidate, remainder) = leading_place(query)?;
+    let resolved = wikidata(client, &historical.api_url, &candidate)
+        .await
+        .ok()?;
+    let modern_label = resolved
+        .iter()
+        .find(|suggestion| {
+            suggestion
+                .point
+                .as_ref()
+                .is_some_and(|point| point.precision == PlacePrecision::Settlement)
+        })
+        .map(|suggestion| suggestion.label.clone())
+        .filter(|label| !same_text(label, &candidate))?;
+    let rewritten = format!("{modern_label} {remainder}");
+    let mut suggestions = modern_suggestions(client, modern, &rewritten).await?;
+    for suggestion in &mut suggestions {
+        suggestion.historical = true;
+    }
+    Some(suggestions)
 }
 
 /// `both`: Latin queries go to Photon only; Cyrillic queries ask DaData first
@@ -392,7 +571,8 @@ struct WikidataDataValue {
     value: Option<Value>,
 }
 
-/// Only recognised settlement/administrative entities become suggestions.
+/// Only recognised settlement/administrative/street entities become
+/// suggestions.
 const WIKIDATA_SETTLEMENT_TYPES: [&str; 10] = [
     "Q515",     // city
     "Q3957",    // town
@@ -413,6 +593,21 @@ const WIKIDATA_REGION_TYPES: [&str; 5] = [
     "Q15063159", // district
 ];
 const WIKIDATA_COUNTRY_TYPES: [&str; 2] = ["Q6256", "Q3624078"];
+/// Street-like classes. A historical address is often a street, an avenue or a
+/// square rather than a settlement; those have their own point, so they are
+/// reported as `POINT`, not as the city centroid.
+const WIKIDATA_STREET_TYPES: [&str; 10] = [
+    "Q79007",     // street / улица
+    "Q907698",    // avenue / проспект
+    "Q54114",     // boulevard / бульвар
+    "Q1251403",   // lane / переулок
+    "Q113307036", // passage / проезд
+    "Q1418214",   // highway / шоссе
+    "Q3840711",   // embankment / набережная
+    "Q12731",     // dead end / тупик
+    "Q207934",    // alley / аллея
+    "Q174782",    // square / площадь
+];
 
 fn parse_wikidata_ids(body: &str) -> Result<Vec<String>, serde_json::Error> {
     let parsed: WikidataSearchResponse = serde_json::from_str(body)?;
@@ -460,6 +655,7 @@ fn parse_wikidata_entities(
             hint,
             source: "wikidata".to_owned(),
             point: Some(point),
+            historical: false,
         });
         if out.len() == MAX_HISTORICAL_SUGGESTIONS {
             break;
@@ -508,6 +704,7 @@ fn wikidata_is_place(types: &std::collections::HashSet<&str>) -> bool {
         WIKIDATA_SETTLEMENT_TYPES.contains(kind)
             || WIKIDATA_REGION_TYPES.contains(kind)
             || WIKIDATA_COUNTRY_TYPES.contains(kind)
+            || WIKIDATA_STREET_TYPES.contains(kind)
     })
 }
 
@@ -527,6 +724,11 @@ fn wikidata_precision(types: &std::collections::HashSet<&str>) -> PlacePrecision
         .any(|kind| WIKIDATA_SETTLEMENT_TYPES.contains(kind))
     {
         PlacePrecision::Settlement
+    } else if types
+        .iter()
+        .any(|kind| WIKIDATA_STREET_TYPES.contains(kind))
+    {
+        PlacePrecision::Point
     } else {
         PlacePrecision::Unknown
     }
@@ -752,6 +954,7 @@ fn photon_suggestion(feature: PhotonFeature) -> Option<PlaceSuggestion> {
         hint: hint.to_owned(),
         source: "photon".to_owned(),
         point,
+        historical: false,
     })
 }
 
@@ -855,6 +1058,7 @@ fn dadata_suggestion(suggestion: DadataSuggestion) -> Option<PlaceSuggestion> {
         hint: hint.to_owned(),
         source: "dadata".to_owned(),
         point,
+        historical: false,
     })
 }
 
@@ -868,6 +1072,7 @@ mod tests {
             hint: String::new(),
             source: source.to_owned(),
             point: None,
+            historical: false,
         }
     }
 
@@ -1199,6 +1404,77 @@ mod tests {
         assert_eq!(point.provider_ref.as_deref(), Some("Q891"));
         assert_eq!(point.label.as_deref(), Some("Нижний Новгород"));
         assert!((point.lat - 56.3269).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn contextual_modern_results_come_before_the_original_query() {
+        let mut contextual = suggestion("улица Максима Горького, Нижний Новгород", "photon");
+        contextual.historical = true;
+        let original = suggestion("улица Горького, Казань", "photon");
+
+        let merged =
+            merge_contextual_modern(Some(vec![original]), Some(vec![contextual])).expect("merged");
+
+        assert_eq!(merged[0].label, "улица Максима Горького, Нижний Новгород");
+        assert!(merged[0].historical);
+        assert_eq!(merged[1].label, "улица Горького, Казань");
+    }
+
+    #[test]
+    fn leading_place_splits_a_historical_city_from_the_address() {
+        assert_eq!(
+            leading_place("Горький улица Горького"),
+            Some(("Горький".to_owned(), "улица Горького".to_owned()))
+        );
+        assert_eq!(
+            leading_place("гор. Горький, ул. Горького"),
+            Some(("Горький".to_owned(), "ул. Горького".to_owned()))
+        );
+        assert_eq!(
+            leading_place("Нижний Новгород, проспект Ленина"),
+            Some(("Нижний Новгород".to_owned(), "проспект Ленина".to_owned()))
+        );
+    }
+
+    #[test]
+    fn leading_place_ignores_queries_without_a_city_or_remainder() {
+        assert_eq!(leading_place("Горький"), None);
+        assert_eq!(leading_place("проспект Ленина"), None);
+        assert_eq!(leading_place("улица Горького, Казань"), None);
+        assert_eq!(leading_place("  "), None);
+    }
+
+    #[test]
+    fn wikidata_resolves_streets_and_avenues_as_points() {
+        let body = r#"{"entities":{
+            "Q4471947":{
+                "labels":{"ru":{"value":"Улица Горького"}},
+                "descriptions":{"ru":{"value":"улица в Казани"}},
+                "claims":{
+                    "P625":[{"mainsnak":{"datavalue":{"value":{"latitude":55.79,"longitude":49.12}}}}],
+                    "P31":[{"mainsnak":{"datavalue":{"value":{"id":"Q79007"}}}}]
+                }
+            },
+            "Q2138098":{
+                "labels":{"ru":{"value":"Проспект Ленина"}},
+                "descriptions":{"ru":{"value":"улица в Екатеринбурге"}},
+                "claims":{
+                    "P625":[{"mainsnak":{"datavalue":{"value":{"latitude":56.84,"longitude":60.61}}}}],
+                    "P31":[{"mainsnak":{"datavalue":{"value":{"id":"Q907698"}}}}]
+                }
+            }
+        }}"#;
+
+        let suggestions =
+            parse_wikidata_entities(body, &["Q4471947".to_owned(), "Q2138098".to_owned()], "ru")
+                .expect("entities");
+
+        assert_eq!(suggestions.len(), 2);
+        for suggestion in &suggestions {
+            let point = suggestion.point.as_ref().expect("point");
+            assert_eq!(point.precision, PlacePrecision::Point);
+            assert_eq!(point.source, PlaceSource::Wikidata);
+        }
     }
 
     #[test]
