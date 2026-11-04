@@ -4,6 +4,49 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] — 2026-11-04
+
+Chat history: conversations now survive project switches and restarts, with a
+conversation rail, explicit limits and safe deletion.
+
+### Added
+
+- A project-scoped chat history stored under the application data directory,
+  outside the project folder, backups, checksums and exports. One JSONL file per
+  conversation, rewritten atomically.
+- A conversation rail with the automatic title, updated date, active row,
+  per-row delete and **Clear history** behind explicit confirmation.
+- Automatic titles from the first user message: whitespace collapsed, truncated
+  to 80 characters plus an ellipsis. No provider request and no rename surface.
+- Persistence of the full screen state: roles, content, statuses, skills and the
+  already-truncated tool arguments and results. Pending or streaming answers
+  load as cancelled.
+- Explicit limits without silent pruning: 400 entries and 8 MiB per
+  conversation, 200 conversations and 64 MiB per project, with
+  `CHAT_HISTORY_LIMIT` and a blocked turn before the provider call.
+- Damaged conversation files are isolated: the list still shows healthy
+  conversations, marks the damaged item and allows deleting it; a load returns
+  `CHAT_HISTORY_CORRUPTED` without a partial transcript.
+- Deleting a project removes its chat history. Restoring a backup starts with a
+  new project id and no old conversations.
+- Chat and error copy in all six UI locales.
+
+### Changed
+
+- The chat screen is a master-detail layout with a resizable conversation list.
+  At 1100 px and narrower the list and detail stack, both scroll internally and
+  the composer stays visible.
+- Snapshot saves are serialized; switching, starting a new chat, deleting the
+  active conversation or clearing history while streaming asks for confirmation,
+  stops the request and saves the partial answer as cancelled.
+- The app follows the shared UI kit contract across screens, with consistent
+  buttons, dialogs and list layouts.
+
+### Fixed
+
+- Historical street and avenue names resolve again instead of falling back to
+  the raw imported text.
+
 ## [0.4.0] — 2026-11-03
 
 One filter row across Events, Map and Timeline, a card for every event, and a
@@ -166,6 +209,7 @@ Windows SmartScreen or macOS Gatekeeper may ask for confirmation on first launch
 - The "Show from selected" and "Show siblings" tree buttons. The root picker
   already chooses the person the tree is built from.
 
+[0.5.0]: ../../releases/tag/v0.5.0
 [0.4.0]: ../../releases/tag/v0.4.0
 [0.3.0]: ../../releases/tag/v0.3.0
 [0.2.1]: ../../releases/tag/v0.2.1
