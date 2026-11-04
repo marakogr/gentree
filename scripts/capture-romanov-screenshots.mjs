@@ -41,6 +41,8 @@ const COPY = {
   people: "Люди",
   tree: "Дерево",
   ancestors: "Прямые предки",
+  relatives: "Кровные родственники",
+  both: "Предки и потомки",
   relation: "Родство",
   relationHeading: "Связь",
   findRelation: "Найти связь",
@@ -335,20 +337,10 @@ async function main() {
     await clickText(COPY.tree, "nav button");
     await waitHeading(COPY.tree);
     await waitFor(`return document.querySelectorAll(".graph-node").length > 1;`, "the graph");
-    await clickText(COPY.ancestors);
-    await sleep(1600);
-    // Expand one more generation on top of the default so the imperial line reads.
-    await exec(
-      `const label=arguments[0];
-       const node=[...document.querySelectorAll("button[aria-label]")].find(
-         (item) => item.getAttribute("aria-label") === label && !item.disabled,
-       );
-       if (!node) return false;
-       node.click();
-       return true;`,
-      ["Показать ещё поколение предков"],
-    );
-    await sleep(2200);
+    // Ancestors and descendants at once: the whole imperial family around the
+    // root, with photos and the kinship labels on the cards.
+    await clickText(COPY.both);
+    await sleep(2600);
     await shot("04-tree-ancestors");
 
     await clickText(COPY.relation, "nav button");
@@ -391,39 +383,56 @@ async function main() {
     await clickText('Отмена');
     await sleep(600);
 
-    // Tiles load asynchronously, and one failed batch makes the screen fall back
-    // to the outline for the rest of the mount: remount the map to retry and
-    // take the frame as soon as the tiles are really on screen.
-    let tilesLoaded = false;
-    for (let attempt = 0; attempt < 4 && !tilesLoaded; attempt += 1) {
-      await clickText(COPY.map, "nav button");
-      await waitHeading(COPY.map);
-      await waitFor(
-        `return document.querySelectorAll(".map-marker").length > 0;`,
-        "the map points",
-        40000,
+    // Focus the map on European Russia: drag the view east and zoom in twice so
+    // the place clusters separate instead of piling up on a world map.
+    const dragMap = (fromX, fromY, toX, toY) =>
+      request("POST", `/session/${sessionId}/actions`, {
+        actions: [
+          {
+            type: "pointer",
+            id: "mouse",
+            parameters: { pointerType: "mouse" },
+            actions: [
+              { type: "pointerMove", origin: "viewport", x: fromX, y: fromY, duration: 0 },
+              { type: "pointerDown", button: 0 },
+              { type: "pointerMove", origin: "viewport", x: toX, y: toY, duration: 500 },
+              { type: "pointerUp", button: 0 },
+            ],
+          },
+        ],
+      });
+
+    await clickText(COPY.map, "nav button");
+    await waitHeading(COPY.map);
+    await waitFor(
+      `return document.querySelectorAll(".map-marker").length > 0;`,
+      "the map points",
+      40000,
+    );
+    await clickText("Показать все точки");
+    await sleep(1500);
+    await dragMap(900, 520, 560, 520);
+    await sleep(900);
+    for (let step = 0; step < 2; step += 1) {
+      const zoomed = await exec(
+        `const node=[...document.querySelectorAll("button[aria-label]")].find(
+           (item) => item.getAttribute("aria-label") === arguments[0] && !item.disabled,
+         );
+         if (!node) return false;
+         node.click();
+         return true;`,
+        ["Приблизить"],
       );
-      const ready = await waitForSoft(
-        `return (
-           document.querySelectorAll(".leaflet-tile-loaded").length > 12 &&
-           !document.querySelector(".map-offline-note")
-         );`,
-        15000,
-      );
-      if (ready) {
-        tilesLoaded = true;
-        await sleep(500);
-        await shot("07-map");
-      } else {
-        await clickText(COPY.chat, "nav button");
-        await sleep(1200);
-      }
-    }
-    console.log(`  map tiles: ${tilesLoaded ? "osm" : "offline outline"}`);
-    if (!tilesLoaded) {
+      if (!zoomed) break;
       await sleep(1200);
-      await shot("07-map");
     }
+    const tiles = await waitForSoft(
+      `return document.querySelectorAll(".leaflet-tile-loaded").length > 6;`,
+      12000,
+    );
+    console.log(`  map tiles: ${tiles ? "osm" : "offline outline"}`);
+    await sleep(1500);
+    await shot("07-map");
 
     await clickText(COPY.chat, "nav button");
     await waitFor(
