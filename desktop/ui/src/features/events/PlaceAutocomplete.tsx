@@ -133,12 +133,14 @@ export function PlaceAutocomplete({
     const suggestion = Number.isInteger(index) ? suggestions[index] : undefined;
     if (!suggestion) return;
     // Historical matches keep the typed name; the modern label is stored in the
-    // point and shown next to the coordinates.
-    const text =
-      suggestion.source === "wikidata"
-        ? value
-        : placeSuggestionText(suggestion.label);
-    if (suggestion.source === "wikidata") keepLabel.current = suggestion.label;
+    // point and shown next to the coordinates. A contextual match uses a modern
+    // provider but was still found through the typed historical city.
+    const keepsTypedText =
+      suggestion.source === "wikidata" || suggestion.historical === true;
+    const text = keepsTypedText
+      ? value
+      : placeSuggestionText(suggestion.label);
+    if (keepsTypedText) keepLabel.current = suggestion.label;
     lastSelected.current = text;
     selectionPending.current = true;
     window.setTimeout(() => {
