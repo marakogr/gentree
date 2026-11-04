@@ -163,7 +163,7 @@ them directly; there is no overlay file to write, unlike Windows:
 | `APPLE_SIGNING_IDENTITY` | `Developer ID Application: <Name> (<TEAMID>)` from `security find-identity -v -p codesigning` |
 | `APPLE_TEAM_ID` | the `TEAMID` from that identity |
 | `APPLE_ID` + `APPLE_PASSWORD` | Apple ID and an app-specific password (notarization via Apple ID) |
-| or `APPLE_API_KEY` + `APPLE_API_ISSUER` + `APPLE_API_KEY_PATH` | App Store Connect API key, the safer option for CI |
+| or `APPLE_API_KEY` + `APPLE_API_ISSUER` + `APPLE_API_KEY_P8` | App Store Connect key ID, issuer ID and the `.p8` contents; the workflow writes the key file and exports `APPLE_API_KEY_PATH`. The safer option for CI |
 
 ```bash
 # Base64 without line breaks; paste the result into the secret.
@@ -172,7 +172,9 @@ openssl base64 -A -in certificate.p12 -out certificate-base64.txt
 
 With the secrets present, `tauri-action` signs the `.app` and the `.dmg` with
 the Developer ID identity, submits the bundle for notarization and staples the
-ticket. The `Verify the macOS artifacts` step then passes
+ticket. Provide either the Apple ID pair or the API key triple; notarization
+credentials are required, the certificate alone is not enough. The
+`Verify the macOS artifacts` step then passes
 `--require-signature`, so `spctl --assess` and `stapler validate` failures fail
 the release instead of only warning. Without `APPLE_CERTIFICATE` the step warns,
 the draft is published unsigned, and the release notes tell users how to open
