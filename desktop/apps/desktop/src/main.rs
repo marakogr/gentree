@@ -8,6 +8,7 @@ use gentree_core::person::{Name, Person};
 use gentree_core::record::backfill_marriage_participants;
 use gentree_core::{AppError, AppResult, Manifest, ValidationReport};
 use gentree_mcp::BackupInfo;
+use gentree_storage::chat_history::ChatHistoryStore;
 use gentree_storage::{
     delete_project, list_projects, prune_backups, rename_project, ProjectStore, BACKUP_SUFFIX,
 };
@@ -39,6 +40,8 @@ struct AppState {
     project: Arc<Mutex<Option<ProjectStore>>>,
     projects_dir: Mutex<Option<PathBuf>>,
     backups_dir: Mutex<Option<PathBuf>>,
+    /// App-data `chat/` root: conversation history is auxiliary, not project data.
+    chat_dir: Mutex<Option<PathBuf>>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -122,6 +125,34 @@ fn projects_dir(app: &AppHandle, state: &AppState) -> AppResult<PathBuf> {
 
 fn backups_dir(app: &AppHandle, state: &AppState) -> AppResult<PathBuf> {
     cached_app_dir(app, &state.backups_dir, "backups")
+}
+
+/// App-data `chat/` root, created on first use and cached like the other
+/// app-data directories.
+pub(crate) fn chat_dir(app: &AppHandle, state: &AppState) -> AppResult<PathBuf> {
+    cached_app_dir(app, &state.chat_dir, "chat")
+}
+
+/// Best-effort history cleanup after a project folder has moved to `.trash`.
+/// A failure is metadata-only: it must never fail the project deletion.
+fn cleanup_project_history(chat_root: &Path, project_id: &str) {
+    let Ok(project_id) = uuid::Uuid::parse_str(project_id.trim()) else {
+        logging::warn(
+            "chat.history",
+            "op=deleteProject code=VALIDATION_ERROR reason=invalidProjectId",
+        );
+        return;
+    };
+    match ChatHistoryStore::new(chat_root).delete_project(project_id) {
+        Ok(removed) => logging::info(
+            "chat.history",
+            format!("op=deleteProject project={project_id} removed={removed} code=OK"),
+        ),
+        Err(error) => logging::warn(
+            "chat.history",
+            format!("op=deleteProject project={project_id} code={}", error.code),
+        ),
+    }
 }
 
 /// Writes one backup and applies the retention policy.
@@ -239,6 +270,10 @@ fn project_delete(
     let trash = dir.join(".trash");
     std::fs::create_dir_all(&trash).map_err(|err| AppError::io("create trash dir", err))?;
     delete_project(&dir.join(&project_id), &trash)?;
+    // The folder is gone; history cleanup is best-effort and path-free.
+    if let Ok(chat_root) = chat_dir(&app, &state) {
+        cleanup_project_history(&chat_root, &project_id);
+    }
     Ok(true)
 }
 
@@ -506,6 +541,11 @@ fn main() {
             commands::chat::chat_send,
             commands::chat::chat_cancel,
             commands::chat::chat_confirm,
+            commands::chat_history::chat_history_list,
+            commands::chat_history::chat_history_load,
+            commands::chat_history::chat_history_save,
+            commands::chat_history::chat_history_delete,
+            commands::chat_history::chat_history_clear,
             settings::settings_get,
             settings::settings_update,
             settings::settings_reload,
@@ -608,5 +648,32 @@ mod tests {
             backup_path_in_dir(root.path(), &missing.to_string_lossy()).expect_err("missing");
 
         assert_eq!(error.code, codes::NOT_FOUND);
+    }
+
+    #[test]
+    fn history_cleanup_removes_the_project_directory() {
+        let root = backups_root();
+        let project_id = uuid::Uuid::now_v7();
+        let dir = root.path().join(project_id.to_string());
+        std::fs::create_dir_all(&dir).expect("history dir");
+        std::fs::write(dir.join("conversation.jsonl"), b"row").expect("history file");
+
+        cleanup_project_history(root.path(), &project_id.to_string());
+
+        assert!(!dir.exists());
+    }
+
+    #[test]
+    fn history_cleanup_failure_does_not_panic() {
+        let root = backups_root();
+        let project_id = uuid::Uuid::now_v7();
+        // A file where the directory is expected makes `remove_dir_all` fail.
+        let path = root.path().join(project_id.to_string());
+        std::fs::write(&path, b"not a directory").expect("blocking file");
+
+        cleanup_project_history(root.path(), &project_id.to_string());
+        cleanup_project_history(root.path(), "not-a-uuid");
+
+        assert!(path.exists());
     }
 }

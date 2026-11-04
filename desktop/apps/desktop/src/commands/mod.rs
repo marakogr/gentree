@@ -2,6 +2,7 @@
 //! Contracts: design.md §3, §5, §7, §11; ADR-0014 (codes only, no localized text).
 
 pub mod chat;
+pub mod chat_history;
 pub mod event;
 pub mod export;
 pub mod geocode;

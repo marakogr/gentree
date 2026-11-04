@@ -22,6 +22,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
+pub mod chat_history;
+
 pub const PERSON_FILE: &str = "persons.jsonl";
 pub const RELATIONSHIP_FILE: &str = "relationships.jsonl";
 pub const EVENT_FILE: &str = "events.jsonl";

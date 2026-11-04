@@ -113,7 +113,9 @@
     "DANGLING_REFERENCE": "Ссылка на отсутствующую запись",
     "EVENT_OUT_OF_LIFESPAN": "Событие вне периода жизни",
     "DUPLICATE_LIFE_EVENT": "Несколько событий рождения или смерти",
-    "LIFE_EVENT_ALREADY_EXISTS": "У человека уже есть событие рождения или смерти"
+    "LIFE_EVENT_ALREADY_EXISTS": "У человека уже есть событие рождения или смерти",
+    "CHAT_HISTORY_CORRUPTED": "Файл диалога повреждён",
+    "CHAT_HISTORY_LIMIT": "Достигнут лимит истории чата"
   },
   "page": "Страница {{page}}",
   "empty": "Нет данных",

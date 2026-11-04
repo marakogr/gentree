@@ -545,6 +545,67 @@ export type ChatConfirmEvent = {
   changedFields: ("names" | "gender" | "birth" | "death" | "notes")[];
 };
 
+/** Chat history is app-local auxiliary data, scoped to one project id. */
+export type ChatHistoryRole = "user" | "assistant";
+
+export type ChatHistoryStatus =
+  | "pending"
+  | "streaming"
+  | "done"
+  | "error"
+  | "cancelled";
+
+export type ChatHistoryToolStatus = "running" | "ok" | "error";
+
+export type ChatHistoryTool = {
+  name: string;
+  status: ChatHistoryToolStatus;
+  durationMs?: number;
+  arguments?: string;
+  result?: string;
+};
+
+export type ChatHistoryEntry = {
+  id: string;
+  role: ChatHistoryRole;
+  content: string;
+  status: ChatHistoryStatus;
+  skills: string[];
+  tools: ChatHistoryTool[];
+};
+
+/** One row of the conversation list. A damaged header has a null title. */
+export type ChatHistorySummary = {
+  id: string;
+  title: string | null;
+  updatedAt: string;
+  damaged: boolean;
+};
+
+export type ChatHistoryLimits = {
+  maxEntries: number;
+  maxConversationBytes: number;
+  maxConversations: number;
+  maxProjectBytes: number;
+  titleMaxChars: number;
+};
+
+export type ChatHistoryList = {
+  conversations: ChatHistorySummary[];
+  limits: ChatHistoryLimits;
+};
+
+export type ChatHistoryConversation = {
+  schema: number;
+  kind: string;
+  id: string;
+  projectId: string;
+  title: string | null;
+  createdAt: string;
+  updatedAt: string;
+  entries: ChatHistoryEntry[];
+};
+
 /** AT5 import report (design.md §12). Values are stable codes, not messages. */
 export type ImportConflictReason = "externalId" | "fioAndDates";
 
