@@ -127,6 +127,8 @@ export type EventDraft = {
   personId: string;
   /** Second participant of a marriage/divorce; empty when unknown. */
   spouseId: string;
+  /** Selected parents of a birth, at most two; other types keep [] . */
+  parentIds: string[];
   eventType: EventType;
   /**
    * Name of a user-defined type from the config (stored as `OTHER` plus this
@@ -165,6 +167,7 @@ export function emptyEventDraft(
   return {
     personId,
     spouseId: "",
+    parentIds: [],
     eventType,
     originalType: null,
     date: "",
@@ -189,6 +192,7 @@ export function draftFromEvent(event: EventEntity): EventDraft {
   return {
     personId: event.personId,
     spouseId: event.participantIds?.[0] ?? "",
+    parentIds: event.type === "BIRTH" ? [...(event.participantIds ?? [])] : [],
     eventType: event.type,
     originalType: event.originalType ?? null,
     date: dateValueToInput(event.date),
@@ -225,6 +229,7 @@ export function isEventDraftDirty(
   return (
     draft.personId !== stored.personId ||
     draft.spouseId !== stored.spouseId ||
+    draft.parentIds.join("|") !== stored.parentIds.join("|") ||
     draft.eventType !== stored.eventType ||
     draft.originalType !== stored.originalType ||
     draft.date !== stored.date ||
@@ -325,7 +330,15 @@ export function buildEventInput(
     ? spouseId === ""
       ? []
       : [spouseId]
-    : (base?.participantIds ?? []);
+    : draft.eventType === "BIRTH"
+      ? Array.from(
+          new Set(
+            draft.parentIds.filter(
+              (id) => id !== "" && id !== draft.personId,
+            ),
+          ),
+        )
+      : (base?.participantIds ?? []);
   const details = sanitizeEventDetails(draft.details);
   return {
     ok: true,

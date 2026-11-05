@@ -184,5 +184,10 @@
     "descendants": "Nachkommen",
     "both": "Vorfahren und Nachkommen"
   },
-  "openTimeline": "Zur Zeitleiste"
+  "openTimeline": "Zur Zeitleiste",
+  "parentFirst": "Elternteil",
+  "parentSecond": "Zweites Elternteil",
+  "personPlaceholderParent": "Elternteil auswählen",
+  "clearParent": "Elternteil entfernen",
+  "parentsLinked": "Beim Speichern wird eine Eltern-Kind-Beziehung erstellt"
 }

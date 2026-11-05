@@ -613,6 +613,28 @@ export default function PersonCard({
   const relatedPersonId = (row: RelationshipEntity): string =>
     row.personId === person.id ? row.relatedPersonId : row.personId;
 
+  /** "Marriage · 12 May 1900" for one source, or a count when several. */
+  const relationSource = (row: RelationshipEntity): string | null => {
+    const sources = row.sourceEventIds ?? [];
+    if (sources.length === 0) return null;
+    const found = detail.events.find((item) =>
+      sources.includes(item.entity.id),
+    );
+    if (found) {
+      return [
+        eventTypeLabel(found.entity.type, found.entity.originalType, t),
+        found.entity.date.start || found.entity.date.original
+          ? formatDate(found.entity.date)
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+    }
+    return t("relationship:automaticSeveralSources", {
+      count: sources.length,
+    });
+  };
+
   const addRelationship = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
@@ -648,7 +670,11 @@ export default function PersonCard({
   };
 
   const removeRelationship = async (row: Versioned<RelationshipEntity>) => {
-    if (!window.confirm(t("relationship:deleteConfirm"))) return;
+    const message =
+      row.entity.origin === "EVENT"
+        ? t("relationship:deleteAutomaticConfirm")
+        : t("relationship:deleteConfirm");
+    if (!window.confirm(message)) return;
     setError(null);
     setStale(false);
     setSaving(true);
@@ -1081,6 +1107,20 @@ export default function PersonCard({
                       <TableCell>
                         <TableCellLayout>
                           {t(`enums:relationshipType.${row.entity.type}`)}
+                          {row.entity.origin === "EVENT" ? (
+                            <span
+                              className="person-relation-origin"
+                              title={relationSource(row.entity) ?? undefined}
+                            >
+                              <Badge
+                                appearance="tint"
+                                color="informative"
+                                size="medium"
+                              >
+                                {t("relationship:automatic")}
+                              </Badge>
+                            </span>
+                          ) : null}
                         </TableCellLayout>
                       </TableCell>
                       <TableCell>
@@ -1096,6 +1136,11 @@ export default function PersonCard({
                           ) : (
                             relatedName(row.entity)
                           )}
+                          {row.entity.origin === "EVENT" ? (
+                            <Text size={100} className="person-relation-source">
+                              {relationSource(row.entity)}
+                            </Text>
+                          ) : null}
                         </TableCellLayout>
                       </TableCell>
                       <TableCell className={styles.actionsCell}>

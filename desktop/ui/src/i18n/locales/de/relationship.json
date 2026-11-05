@@ -11,5 +11,8 @@
   "deleteConfirm": "Diese Beziehung löschen?",
   "conflict": "Die Daten wurden in einem anderen Fenster geändert. Beziehungen neu laden.",
   "empty": "Keine Beziehungen",
-  "selectPerson": "Person auswählen"
+  "selectPerson": "Person auswählen",
+  "automatic": "Automatisch",
+  "automaticSeveralSources": "{{count}} Quellereignisse",
+  "deleteAutomaticConfirm": "Diese Beziehung wurde aus einem Ereignis erstellt. Hier löschen? Beim nächsten Speichern eines Quellereignisses wird sie erneut erstellt."
 }

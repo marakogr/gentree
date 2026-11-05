@@ -184,5 +184,10 @@
     "descendants": "Descendants",
     "both": "Ancestors and descendants"
   },
-  "openTimeline": "Open timeline"
+  "openTimeline": "Open timeline",
+  "parentFirst": "Parent",
+  "parentSecond": "Second parent",
+  "personPlaceholderParent": "Select a parent",
+  "clearParent": "Clear parent",
+  "parentsLinked": "Saving creates a parent–child relation"
 }

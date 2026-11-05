@@ -9,8 +9,8 @@ use gentree_core::{
     apply_merge, merge_preview, validate_project, Citation, CitationTarget, CivilDate, DateValue,
     Event, EventDecision, EventMatch, EventType, ExternalId, FieldPolicy, Gender, MatchConfidence,
     Media, MergeAction, MergeDecisions, MergeOutput, MergeWarning, Name, Person, PersonDecision,
-    PersonMatch, PlaceGeo, PlacePrecision, PlaceSource, ProjectSnapshot, Relationship,
-    RelationshipType, Side, Source,
+    PersonMatch, PlaceGeo, PlacePrecision, PlaceSource, ProjectSnapshot, RelationOrigin,
+    Relationship, RelationshipType, Side, Source,
 };
 use uuid::Uuid;
 
@@ -991,6 +991,70 @@ fn relationships_are_remapped_deduped_and_type_conflicts_keep_the_left_edge() {
         codes::RELATIONSHIP_CONFLICT
     ));
     assert_eq!(output_error_count(&output), 0);
+}
+
+#[test]
+fn merge_keeps_the_earliest_relationship_id_and_unions_provenance() {
+    let left_people = [
+        person(id(1), "Ivan", "Petrov"),
+        person(id(2), "Maria", "Petrova"),
+    ];
+    let right_people = [
+        person(id(11), "Ivan", "Petrov"),
+        person(id(12), "Maria", "Petrova"),
+    ];
+    let mut left = Relationship::new(RelationshipType::Spouse, id(1), id(2)).unwrap();
+    left.id = id(100);
+    left.origin = RelationOrigin::Event;
+    left.source_event_ids = vec![id(10)];
+    let mut right = Relationship::new(RelationshipType::Spouse, id(11), id(12)).unwrap();
+    right.id = id(200);
+    right.origin = RelationOrigin::Event;
+    right.source_event_ids = vec![id(20)];
+
+    let output = apply_merge(
+        snapshot(&left_people, &[], &[left], &[], &[], &[]),
+        snapshot(&right_people, &[], &[right.clone()], &[], &[], &[]),
+        &MergeDecisions {
+            persons: vec![merge_person(id(1), id(11)), merge_person(id(2), id(12))],
+            events: Vec::new(),
+        },
+    )
+    .expect("apply");
+
+    assert_eq!(output.relationships.len(), 1);
+    let merged = &output.relationships[0];
+    assert_eq!(merged.id, id(100));
+    assert_eq!(merged.origin, RelationOrigin::Event);
+    assert_eq!(merged.source_event_ids, vec![id(10), id(20)]);
+
+    // A manual row on either side wins over an automatic row.
+    let mut manual = right;
+    manual.origin = RelationOrigin::Manual;
+    manual.source_event_ids.clear();
+    let output = apply_merge(
+        snapshot(
+            &left_people,
+            &[],
+            output.relationships.as_slice(),
+            &[],
+            &[],
+            &[],
+        ),
+        snapshot(&right_people, &[], &[manual], &[], &[], &[]),
+        &MergeDecisions {
+            persons: vec![merge_person(id(1), id(11)), merge_person(id(2), id(12))],
+            events: Vec::new(),
+        },
+    )
+    .expect("apply");
+    assert_eq!(output.relationships.len(), 1);
+    assert_eq!(output.relationships[0].id, id(100));
+    assert_eq!(output.relationships[0].origin, RelationOrigin::Manual);
+    assert_eq!(
+        output.relationships[0].source_event_ids,
+        vec![id(10), id(20)]
+    );
 }
 
 #[test]

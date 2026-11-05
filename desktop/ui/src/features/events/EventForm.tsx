@@ -257,6 +257,27 @@ export default function EventForm({
     return items;
   }, [personItems, draft.personId, draft.spouseId, t]);
 
+  // Each birth parent picker hides the child and the other selected parent.
+  const parentItemsFor = (index: 0 | 1) => {
+    const other = draft.parentIds[index === 0 ? 1 : 0] ?? "";
+    const current = draft.parentIds[index] ?? "";
+    const items = personItems.filter(
+      (item) => item.id !== draft.personId && item.id !== other,
+    );
+    if (current !== "" && !items.some((item) => item.id === current)) {
+      const source = personItems.find((item) => item.id === current);
+      items.push(source ?? { id: current, label: t("person:unknownName") });
+    }
+    return items;
+  };
+
+  const setParent = (index: 0 | 1, personId: string) => {
+    const next = [...draft.parentIds];
+    while (next.length < 2) next.push("");
+    next[index] = personId;
+    update({ parentIds: next });
+  };
+
   const qualifierOptions = useMemo(() => {
     const options: DateQualifier[] = [...QUALIFIERS];
     if (!options.includes(draft.qualifier)) options.push(draft.qualifier);
@@ -590,6 +611,13 @@ export default function EventForm({
                     update({
                       personId,
                       ...(draft.spouseId === personId ? { spouseId: "" } : {}),
+                      ...(draft.parentIds.includes(personId)
+                        ? {
+                            parentIds: draft.parentIds.map((id) =>
+                              id === personId ? "" : id,
+                            ),
+                          }
+                        : {}),
                     });
                   }}
                   placeholder={primaryPlaceholder}
@@ -636,6 +664,50 @@ export default function EventForm({
                   <p className="events-link-badge">
                     <LinkRegular aria-hidden="true" />
                     <span>{t("event:participantsLinked")}</span>
+                  </p>
+                </div>
+              </>
+            ) : null}
+
+            {draft.eventType === "BIRTH" ? (
+              <>
+                {([0, 1] as const).map((index) => (
+                  <div className="events-form-span" key={`parent-${index}`}>
+                    <Field
+                      label={t(
+                        index === 0
+                          ? "event:parentFirst"
+                          : "event:parentSecond",
+                      )}
+                      htmlFor={`event-parent-${index}`}
+                      error={
+                        spouseServerError
+                          ? serverFieldMessage(spouseServerError)
+                          : null
+                      }
+                    >
+                      <Combobox
+                        id={`event-parent-${index}`}
+                        items={parentItemsFor(index)}
+                        value={draft.parentIds[index] ?? ""}
+                        onChange={(personId) => setParent(index, personId)}
+                        placeholder={t("event:personPlaceholderParent")}
+                        ariaLabel={t(
+                          index === 0
+                            ? "event:parentFirst"
+                            : "event:parentSecond",
+                        )}
+                        clearLabel={t("event:clearParent")}
+                        emptyLabel={t("event:noPersonMatches")}
+                        disabled={busy || parentItemsFor(index).length === 0}
+                      />
+                    </Field>
+                  </div>
+                ))}
+                <div className="events-form-span">
+                  <p className="events-link-badge">
+                    <LinkRegular aria-hidden="true" />
+                    <span>{t("event:parentsLinked")}</span>
                   </p>
                 </div>
               </>

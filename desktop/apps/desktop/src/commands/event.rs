@@ -6,7 +6,10 @@ use std::collections::BTreeMap;
 use gentree_core::date::CivilDate;
 use gentree_core::error::codes;
 use gentree_core::record::{CitationTarget, Event, EventType};
-use gentree_core::{AppError, AppResult, DateValue, PlaceGeo};
+use gentree_core::{
+    backfill_relations, derive_event_relations, retract_event_relations, AppError, AppResult,
+    DateValue, PlaceGeo, RelationBackfillReport,
+};
 use gentree_storage::{ProjectStore, EVENT_FILE};
 use serde::Deserialize;
 use tauri::State;
@@ -177,8 +180,16 @@ pub fn event_create(
         gentree_core::ensure_life_events_compatible(&events, &entity, None)?;
         gentree_core::ensure_event_within_lifespan(&person, &entity)?;
         gentree_core::ensure_residence_ranges_do_not_overlap(&events, &entity, None)?;
+        let persons = store.persons()?;
+        let mut relationships = store.relationships()?;
+        let original_relationships = relationships.clone();
+        derive_event_relations(&entity, &persons, &mut relationships)
+            .map_err(map_derivation_error)?;
         events.push(entity.clone());
         store.save_events(&events)?;
+        if relationships != original_relationships {
+            store.save_relationships(&relationships)?;
+        }
         let version = entity_version(store, EVENT_FILE, entity.id)?;
         Ok(Versioned { entity, version })
     })
@@ -212,8 +223,16 @@ pub fn event_update(
         gentree_core::ensure_life_events_compatible(&events, &entity, Some(id))?;
         gentree_core::ensure_event_within_lifespan(&person, &entity)?;
         gentree_core::ensure_residence_ranges_do_not_overlap(&events, &entity, Some(id))?;
+        let persons = store.persons()?;
+        let mut relationships = store.relationships()?;
+        let original_relationships = relationships.clone();
+        derive_event_relations(&entity, &persons, &mut relationships)
+            .map_err(map_derivation_error)?;
         events[index] = entity.clone();
         store.save_events(&events)?;
+        if relationships != original_relationships {
+            store.save_relationships(&relationships)?;
+        }
         let version = entity_version(store, EVENT_FILE, id)?;
         Ok(Versioned { entity, version })
     })
@@ -276,7 +295,165 @@ pub fn event_delete(
 
         // Citations next: no citation may point at a removed event.
         store.save_citations(&citations)?;
+        let mut relationships = store.relationships()?;
+        let original_relationships = relationships.clone();
+        retract_event_relations(id, &mut relationships);
         store.save_events(&events)?;
+        if relationships != original_relationships {
+            store.save_relationships(&relationships)?;
+        }
         Ok(())
     })
+}
+
+/// Keeps the stable code and points the form at the parent selection.
+fn map_derivation_error(error: AppError) -> AppError {
+    if error.code == gentree_core::PARENT_CHILD_AGE_GAP || error.code == codes::RELATIONSHIP_CYCLE {
+        error.with_param("field", "participantIds")
+    } else {
+        error
+    }
+}
+
+/// Reconcile stored events with the relationship collection when a writable
+/// project opens. Read-only projects are left byte-identical.
+pub(crate) fn backfill_relations_on_open(
+    store: &mut ProjectStore,
+) -> AppResult<RelationBackfillReport> {
+    if !store.is_writable() {
+        let mut empty = Vec::new();
+        return Ok(backfill_relations(&[], &[], &mut empty, false));
+    }
+    let events = store.events()?;
+    let persons = store.persons()?;
+    let mut relationships = store.relationships()?;
+    let original = relationships.clone();
+    let report = backfill_relations(&events, &persons, &mut relationships, true);
+    if relationships != original {
+        store.save_relationships(&relationships)?;
+    }
+    Ok(report)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use gentree_core::person::{Name, Person};
+    use gentree_core::relationship::{Relationship, RelationshipType};
+    use gentree_core::DateValue;
+
+    fn person(birth: DateValue) -> Person {
+        let mut person = Person::new(vec![Name {
+            given: Some("Test".to_owned()),
+            is_primary: true,
+            ..Name::default()
+        }])
+        .unwrap();
+        person.birth = birth;
+        person
+    }
+
+    fn marriage(owner: Uuid, partner: Uuid) -> Event {
+        let mut event = Event::new(owner, EventType::Marriage);
+        event.participant_ids = vec![partner];
+        event
+    }
+
+    #[test]
+    fn backfill_creates_missing_rows_once() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut store = ProjectStore::create(tmp.path(), "Synthetic").unwrap();
+        let a = person(DateValue::exact_year(1970));
+        let b = person(DateValue::exact_year(1972));
+        let (a_id, b_id) = (a.id, b.id);
+        store.save_persons(&[a, b]).unwrap();
+        store.save_events(&[marriage(a_id, b_id)]).unwrap();
+
+        let first = backfill_relations_on_open(&mut store).unwrap();
+        assert_eq!(first.spouse_created, 1);
+        assert_eq!(store.relationships().unwrap().len(), 1);
+
+        let second = backfill_relations_on_open(&mut store).unwrap();
+        assert_eq!(second.spouse_created, 0);
+        assert_eq!(store.relationships().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn backfill_leaves_manual_rows_and_read_only_projects_alone() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut store = ProjectStore::create(tmp.path(), "Synthetic").unwrap();
+        let a = person(DateValue::exact_year(1970));
+        let b = person(DateValue::exact_year(1972));
+        let (a_id, b_id) = (a.id, b.id);
+        store.save_persons(&[a, b]).unwrap();
+        store.save_events(&[marriage(a_id, b_id)]).unwrap();
+        let manual = Relationship::new(RelationshipType::Spouse, a_id, b_id).unwrap();
+        store
+            .save_relationships(std::slice::from_ref(&manual))
+            .unwrap();
+
+        let report = backfill_relations_on_open(&mut store).unwrap();
+        assert_eq!(report.spouse_created, 0);
+        assert_eq!(store.relationships().unwrap(), vec![manual]);
+
+        let root = store.root().to_path_buf();
+        drop(store);
+        let before = std::fs::read(root.join(gentree_storage::RELATIONSHIP_FILE)).unwrap();
+        let mut read_only = ProjectStore::open(&root, false).unwrap();
+        let report = backfill_relations_on_open(&mut read_only).unwrap();
+        assert!(report.read_only);
+        let after = std::fs::read(root.join(gentree_storage::RELATIONSHIP_FILE)).unwrap();
+        assert_eq!(before, after);
+    }
+
+    #[test]
+    #[allow(clippy::permissions_set_readonly_false)]
+    fn backfill_retries_after_a_failed_write() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut store = ProjectStore::create(tmp.path(), "Synthetic").unwrap();
+        let a = person(DateValue::exact_year(1970));
+        let b = person(DateValue::exact_year(1972));
+        let (a_id, b_id) = (a.id, b.id);
+        store.save_persons(&[a, b]).unwrap();
+        store.save_events(&[marriage(a_id, b_id)]).unwrap();
+        let root = store.root().to_path_buf();
+        drop(store);
+
+        let path = root.join(gentree_storage::RELATIONSHIP_FILE);
+        let mut permissions = std::fs::metadata(&path).unwrap().permissions();
+        permissions.set_readonly(true);
+        std::fs::set_permissions(&path, permissions).unwrap();
+
+        let mut locked = ProjectStore::open(&root, true).unwrap();
+        assert!(backfill_relations_on_open(&mut locked).is_err());
+        drop(locked);
+
+        let mut permissions = std::fs::metadata(&path).unwrap().permissions();
+        permissions.set_readonly(false);
+        std::fs::set_permissions(&path, permissions).unwrap();
+
+        let mut store = ProjectStore::open(&root, true).unwrap();
+        let report = backfill_relations_on_open(&mut store).unwrap();
+        assert_eq!(report.spouse_created, 1);
+        assert_eq!(store.relationships().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn backfill_derives_birth_parents_from_existing_participants() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut store = ProjectStore::create(tmp.path(), "Synthetic").unwrap();
+        let parent = person(DateValue::exact_year(1970));
+        let child = person(DateValue::exact_year(2000));
+        let (parent_id, child_id) = (parent.id, child.id);
+        store.save_persons(&[parent, child]).unwrap();
+        let mut event = Event::new(child_id, EventType::Birth);
+        event.participant_ids = vec![parent_id];
+        store.save_events(&[event]).unwrap();
+
+        let report = backfill_relations_on_open(&mut store).unwrap();
+        assert_eq!(report.parent_created, 1);
+        let rows = store.relationships().unwrap();
+        assert_eq!(rows[0].person_id, parent_id);
+        assert_eq!(rows[0].related_person_id, child_id);
+    }
 }

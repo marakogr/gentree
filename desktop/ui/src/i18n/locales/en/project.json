@@ -215,5 +215,6 @@
       "MEDIA_MISSING": "A media file is missing: the row was skipped",
       "MEDIA_CHANGED": "A media file changed on disk: the stored copy was kept"
     }
-  }
+  },
+  "relationBackfill": "Restored {{total}} relations from events ({{spouse}} spouse, {{parent}} parent)."
 }

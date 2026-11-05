@@ -13,6 +13,7 @@ pub mod person;
 pub mod place;
 pub mod project;
 pub mod record;
+pub mod relation_derivation;
 pub mod relationship;
 pub mod validation;
 
@@ -38,7 +39,11 @@ pub use person::{ExternalId, Gender, Name, NameType, Person, PersonId};
 pub use place::{apply_place_geo, normalize_place_text, ApplyPlaceGeoResult};
 pub use project::{Counts, Manifest, ProjectId, FORMAT_VERSION, SCHEMA_VERSION};
 pub use record::{Citation, CitationTarget, Confidence, Event, EventType, Media, Source};
-pub use relationship::{Relationship, RelationshipSet, RelationshipType};
+pub use relation_derivation::{
+    backfill_relations, derive_event_relations, retract_event_relations, DerivationReport,
+    RelationBackfillReport,
+};
+pub use relationship::{RelationOrigin, Relationship, RelationshipSet, RelationshipType};
 pub use validation::{
     ensure_event_within_lifespan, ensure_life_events_compatible, ensure_parent_child_age_gap,
     ensure_residence_ranges_do_not_overlap, ensure_single_life_event, removal_plan,

@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use gentree_core::error::codes;
 use gentree_core::person::{Name, Person};
 use gentree_core::record::backfill_marriage_participants;
-use gentree_core::{AppError, AppResult, Manifest, ValidationReport};
+use gentree_core::{AppError, AppResult, Manifest, RelationBackfillReport, ValidationReport};
 use gentree_mcp::BackupInfo;
 use gentree_storage::chat_history::ChatHistoryStore;
 use gentree_storage::{
@@ -56,6 +56,8 @@ struct ProjectInfo {
     updated_at: String,
     /// Default graph root; the UI falls back the same way when it is `null`.
     home_person_id: Option<String>,
+    /// Aggregate result of the on-open relation backfill. Contains counts only.
+    relation_backfill: RelationBackfillReport,
 }
 
 fn project_info(store: &ProjectStore) -> ProjectInfo {
@@ -72,6 +74,7 @@ fn project_info_from_manifest(manifest: &Manifest, read_only: bool) -> ProjectIn
         read_only,
         updated_at: manifest.updated_at.clone(),
         home_person_id: manifest.home_person_id.map(|id| id.to_string()),
+        relation_backfill: RelationBackfillReport::default(),
     }
 }
 
@@ -202,8 +205,10 @@ fn project_open(
     let dir = projects_dir(&app, &state)?.join(&project_id);
     let mut store = ProjectStore::open(&dir, true)?;
     repair_legacy_marriages(&mut store)?;
+    let relation_backfill = commands::event::backfill_relations_on_open(&mut store)?;
     allow_media_scope(&app, store.root());
-    let info = project_info(&store);
+    let mut info = project_info(&store);
+    info.relation_backfill = relation_backfill;
     *lock_or(&state.project, "state poisoned")? = Some(store);
     Ok(info)
 }
@@ -341,8 +346,10 @@ fn project_restore_backup(
     let projects = projects_dir(&app, &state)?;
     let mut store = ProjectStore::restore(&path, &projects)?;
     repair_legacy_marriages(&mut store)?;
+    let relation_backfill = commands::event::backfill_relations_on_open(&mut store)?;
     allow_media_scope(&app, store.root());
-    let info = project_info(&store);
+    let mut info = project_info(&store);
+    info.relation_backfill = relation_backfill;
     *lock_or(&state.project, "state poisoned")? = Some(store);
     Ok(info)
 }

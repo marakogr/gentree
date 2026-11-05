@@ -11,5 +11,8 @@
   "deleteConfirm": "Delete this relationship?",
   "conflict": "The data was changed in another window. Reload the relationships.",
   "empty": "No relationships",
-  "selectPerson": "Select a person"
+  "selectPerson": "Select a person",
+  "automatic": "Automatic",
+  "automaticSeveralSources": "{{count}} source events",
+  "deleteAutomaticConfirm": "This relation was created from an event. Delete it here? The next save of a source event will recreate it."
 }

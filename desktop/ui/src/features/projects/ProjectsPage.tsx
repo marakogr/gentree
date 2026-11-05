@@ -329,11 +329,27 @@ export default function ProjectsPage({
     })();
   };
 
+  const announceBackfill = (project: ProjectInfo) => {
+    const report = project.relationBackfill;
+    if (!report) return;
+    const total = report.spouseCreated + report.parentCreated;
+    if (total === 0) return;
+    toast.info(
+      t("project:relationBackfill", {
+        total,
+        spouse: report.spouseCreated,
+        parent: report.parentCreated,
+      }),
+    );
+  };
+
   const open = (project: ProjectInfo) => {
     void run(
       "open",
       async () => {
-        onOpened(await projectsApi.open(project.projectId));
+        const opened = await projectsApi.open(project.projectId);
+        announceBackfill(opened);
+        onOpened(opened);
       },
       project.projectId,
     );
@@ -1273,6 +1289,7 @@ export default function ProjectsPage({
         onImported={(imported) => {
           setImportOpen(false);
           void load();
+          announceBackfill(imported);
           onOpened(imported);
         }}
       />
@@ -1292,6 +1309,7 @@ export default function ProjectsPage({
           onClose={() => setRestoreTarget(null)}
           onRestored={(restored) => {
             setRestoreTarget(null);
+            announceBackfill(restored);
             onOpened(restored);
           }}
         />
@@ -1306,6 +1324,7 @@ export default function ProjectsPage({
         onOpened={(merged) => {
           setMergePair(null);
           setSelectedIds([]);
+          announceBackfill(merged);
           onOpened(merged);
           void load();
         }}
