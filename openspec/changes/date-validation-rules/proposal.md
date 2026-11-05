@@ -20,8 +20,10 @@ decision record even though the intent is already approved.
 - **No overlapping residence periods.** Two `RESIDENCE` events of the same person must not overlap.
   Adjacent periods (`end == next start`, half-open) are allowed. An open end extends to infinity.
 - **Precision-aware birth ordering.** Birth is anchored at the start of its precision interval
-  (year → 1 January, month → 1st, day → exact day). An event is only "before birth" when its whole
-  known interval lies before that anchor. Same year or same month as birth is accepted.
+  (year → 1 January, month → 1st, day → exact day). The event's start precision unit is compared:
+  the event is "before birth" only when the end of that start unit is at or before the birth
+  anchor. Same year or same month as birth is accepted; a period or open-ended event whose start
+  unit lies entirely before the anchor is rejected.
 - **Unknown dates never block.** `UNKNOWN` dates and missing bounds skip the comparison instead of
   being filled with an assumed value.
 - **Parent/child age gap.** A `PARENT_CHILD` edge is rejected when the parent's birth anchor is less
@@ -32,7 +34,8 @@ decision record even though the intent is already approved.
 - **No retroactive changes.** Imported and existing data is not normalized, rewritten or rejected on
   load. The new rules gate manual create/update and are reported by project validation.
 - **HITL.** Date semantics and a relation constraint change. Options, consequences and a
-  recommendation are recorded in `design.md`; the PR must record the decision.
+  recommendation are recorded in `design.md`. Approved by the orchestrator/reviewer on 2026-11-05
+  at the user's request; the PR records the decision.
 
 ## Capabilities
 

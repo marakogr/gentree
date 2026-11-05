@@ -64,10 +64,10 @@ stable code `RESIDENCE_RANGE_OVERLAP`.
 ### Requirement: Birth ordering is precision-aware
 
 Birth SHALL be anchored at the first day of its precision interval: 1 January for a year, the first
-day of the month for a month, and the exact day for a day. An event SHALL be reported as before the
-birth only when the whole known interval of the event lies before that anchor. An event in the same
-year or month as the birth SHALL NOT be reported. An event with an open end SHALL NOT be reported as
-before the birth.
+day of the month for a month, and the exact day for a day. The event SHALL be compared by the unit
+of its own start date; the end of that unit is the next day, month or year according to the event
+precision. An event SHALL be reported as before the birth only when that unit end is at or before
+the birth anchor.
 
 #### Scenario: Birth year and event in the same year
 
@@ -94,10 +94,20 @@ before the birth.
 - **WHEN** a person is born on 10 May 1900 and an event is dated 10 May 1900
 - **THEN** the event is not reported as before the birth
 
-#### Scenario: Event with an open end is not before birth
+#### Scenario: Open-ended event starting before birth is rejected
 
-- **WHEN** an event starts before the birth anchor and has no end bound
-- **THEN** it is not reported as before the birth
+- **WHEN** an open-ended event starts in 1940 and the person is born in 1950
+- **THEN** the event is reported as before the birth with `EVENT_OUT_OF_LIFESPAN`
+
+#### Scenario: Open-ended event whose start unit contains the birth is accepted
+
+- **WHEN** an open-ended event starts in 1950 (year precision) and the person is born in May 1950
+- **THEN** the event is not reported as before the birth
+
+#### Scenario: Ranged event starting before birth is rejected
+
+- **WHEN** a residence period covers 1948–1960 and the person is born in 1950
+- **THEN** the period is reported as before the birth with `EVENT_OUT_OF_LIFESPAN`
 
 ### Requirement: Birth and death ordering use the same interval comparison
 
