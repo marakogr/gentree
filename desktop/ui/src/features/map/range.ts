@@ -3,6 +3,7 @@
 // counted separately (ADR-0010: never invent a date).
 
 import type { TimelineEntry } from "../../api/types";
+import { dateOverlapsYearRange } from "../../lib/dates";
 
 export type YearBounds = { min: number; max: number };
 
@@ -34,14 +35,16 @@ export function yearBounds(
   return min === null || max === null ? null : { min, max };
 }
 
-/** Inclusive `[from, to]` filter; an undated event never matches. */
+/**
+ * Inclusive `[from, to]` years over the event's `[start, end)` period; an
+ * undated event never matches.
+ */
 export function filterByYears(
   entries: readonly TimelineEntry[],
   from: number,
   to: number,
 ): TimelineEntry[] {
-  return entries.filter((entry) => {
-    const year = entryYear(entry);
-    return year !== null && year >= from && year <= to;
-  });
+  return entries.filter((entry) =>
+    dateOverlapsYearRange(entry.event.date, from, to),
+  );
 }

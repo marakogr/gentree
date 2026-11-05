@@ -14,6 +14,7 @@ import type {
 } from "../../api/types";
 import {
   civilDateKey,
+  dateOverlapsYearRange,
   dateValueToInput,
   emptyDateValue,
   parseCivilDate,
@@ -606,21 +607,22 @@ function parseYearBound(value: string): number | null {
 }
 
 /**
- * Inclusive year bounds. A missing bound is open; an undated event never
- * matches a bounded range because its year is unknown.
+ * Year filter overlap: the event matches `fromYear..toYear` when its
+ * `[start, end)` interval intersects `[from-01-01, (to+1)-01-01)`. An open end
+ * runs to today; an undated event never matches a bounded range.
  */
-export function yearInRange(
-  year: number | null,
+export function eventYearOverlaps(
+  event: EventEntity,
   fromYear: string,
   toYear: string,
+  today: Date = new Date(),
 ): boolean {
-  const from = parseYearBound(fromYear);
-  const to = parseYearBound(toYear);
-  if (from === null && to === null) return true;
-  if (year === null) return false;
-  if (from !== null && year < from) return false;
-  if (to !== null && year > to) return false;
-  return true;
+  return dateOverlapsYearRange(
+    event.date,
+    parseYearBound(fromYear),
+    parseYearBound(toYear),
+    today,
+  );
 }
 
 /** True when both bounds are present and the lower one is later. */
@@ -653,7 +655,7 @@ export function matchesEventListFilters(
   if (filters.types.length > 0 && !filters.types.includes(event.type)) {
     return false;
   }
-  return yearInRange(eventYear(event), filters.fromYear, filters.toYear);
+  return eventYearOverlaps(event, filters.fromYear, filters.toYear);
 }
 
 /** Search + person/type/year filters over already fetched rows. */
