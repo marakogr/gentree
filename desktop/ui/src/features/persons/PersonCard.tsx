@@ -82,6 +82,7 @@ import {
 } from "./actions";
 import { buildEventTimeline, childrenOf } from "./eventTimeline";
 import { occupationPositions } from "./occupations";
+import { relationDirection, relationLabelKey } from "./relationLabel";
 import {
   ageInCompletedYears,
   ageTone,
@@ -601,17 +602,22 @@ export default function PersonCard({
     })();
   };
 
-  const relatedName = (row: RelationshipEntity): string => {
-    const otherId =
-      row.personId === person.id ? row.relatedPersonId : row.personId;
-    const found = detail.relatedPersons.find(
-      (item) => item.entity.id === otherId,
-    );
-    return found ? displayName(found.entity, t("person:unknownName")) : otherId;
-  };
-
   const relatedPersonId = (row: RelationshipEntity): string =>
     row.personId === person.id ? row.relatedPersonId : row.personId;
+
+  // The related person carries the gender used by the directional label; a
+  // missing row falls back to the neutral form instead of guessing.
+  const relatedPerson = (row: RelationshipEntity): Person | undefined =>
+    detail.relatedPersons.find(
+      (item) => item.entity.id === relatedPersonId(row),
+    )?.entity;
+
+  const relatedName = (row: RelationshipEntity): string => {
+    const found = relatedPerson(row);
+    return found
+      ? displayName(found, t("person:unknownName"))
+      : relatedPersonId(row);
+  };
 
   const addRelationship = async (event: FormEvent) => {
     event.preventDefault();
@@ -1080,7 +1086,13 @@ export default function PersonCard({
                     <TableRow key={row.entity.id}>
                       <TableCell>
                         <TableCellLayout>
-                          {t(`enums:relationshipType.${row.entity.type}`)}
+                          {t(
+                            relationLabelKey(
+                              row.entity.type,
+                              relationDirection(row.entity, person.id),
+                              relatedPerson(row.entity)?.gender ?? "UNKNOWN",
+                            ),
+                          )}
                         </TableCellLayout>
                       </TableCell>
                       <TableCell>
