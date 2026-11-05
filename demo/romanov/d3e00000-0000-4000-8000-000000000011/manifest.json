@@ -1,0 +1,19 @@
+{
+  "formatVersion": 5,
+  "schemaVersion": 1,
+  "projectId": "d3e00000-0000-4000-8000-000000000011",
+  "name": "Демо: семья Романовых",
+  "createdAt": "2026-10-01T09:00:00Z",
+  "updatedAt": "2026-10-01T09:00:00Z",
+  "appVersion": "0.4.0",
+  "homePersonId": "00000000-0000-4000-8000-000000000005",
+  "contentHash": "sha256:d6a4dbd013660b010001dbf77b332fe44553ae6eeb43ab5aae7ca52563b46e36",
+  "counts": {
+    "persons": 17,
+    "events": 52,
+    "relationships": 28,
+    "sources": 3,
+    "citations": 12,
+    "media": 17
+  }
+}

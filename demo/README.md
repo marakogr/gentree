@@ -108,6 +108,33 @@ folder. The generated GEDCOM is written to `%PUBLIC%\GentreeDemo`, and the
 imported project stays under the isolated `com.gentree.desktop.ux` app data.
 The assistant part sends only this synthetic demo to the configured provider.
 
+## The Romanov demo
+
+`demo/romanov/` (Russian) and `demo/romanov-en/` (English) are a second demo
+built from public historical data instead of an invented family: the last
+imperial family, **17 people, 52 events, 28 relationships, 3 sources and 12
+citations**, with a public-domain portrait for every person. Dates follow the
+Gregorian calendar; where a day is unknown the event keeps a year or month
+precision or a qualifier, and one undated family story stays in the undated
+list.
+
+```bash
+node scripts/make-demo-project-romanov.mjs demo/romanov ru
+node scripts/make-demo-project-romanov.mjs demo/romanov-en en
+node scripts/fetch-romanov-portraits.mjs demo/romanov ru      # Wikimedia Commons
+node scripts/fetch-romanov-portraits.mjs demo/romanov-en en
+node scripts/capture-romanov-screenshots.mjs docs/screenshots/romanov
+```
+
+The portrait script keeps files it already downloaded, so a second run is
+offline. Media files live under the checksum-sharded `media/<xx>/` folders the
+app expects.
+
+The screenshots in `docs/screenshots/romanov/` walk eight screens: projects
+before and after the project appears, people, the ancestor tree, the kinship
+path (Nicholas II and his sister Xenia), an event with custom fields and an
+approximate year, the map, and the assistant with its confirmation card.
+
 ## Open it manually
 
 For a manual tour, copy the project folder into the isolated review app data

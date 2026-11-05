@@ -1,0 +1,19 @@
+{
+  "formatVersion": 5,
+  "schemaVersion": 1,
+  "projectId": "d3e00000-0000-4000-8000-000000000012",
+  "name": "Demo: the Romanov family",
+  "createdAt": "2026-10-01T09:00:00Z",
+  "updatedAt": "2026-10-01T09:00:00Z",
+  "appVersion": "0.4.0",
+  "homePersonId": "00000000-0000-4000-8000-000000000005",
+  "contentHash": "sha256:aac36b42c70b48f92a34d6f6e1aa280192cf0a85f449dee2aa3ccb773230bd6e",
+  "counts": {
+    "persons": 17,
+    "events": 52,
+    "relationships": 28,
+    "sources": 3,
+    "citations": 12,
+    "media": 17
+  }
+}
