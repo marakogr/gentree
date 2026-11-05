@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { DateValue } from "../api/types";
 import {
   civilDateKey,
+  dateOverlapsYearRange,
   dateValueToInput,
   daysInMonth,
   formatCivilDate,
@@ -224,5 +225,50 @@ describe("civil date helpers", () => {
   it("knows leap years", () => {
     expect(daysInMonth(2000, 2)).toBe(29);
     expect(daysInMonth(1900, 2)).toBe(28);
+  });
+});
+
+describe("dateOverlapsYearRange", () => {
+  const today = new Date(2026, 10, 5);
+  const day = (start: string | null, end: string | null = null): DateValue => ({
+    start,
+    end,
+    precision: "DAY",
+    qualifier: "EXACT",
+    original: null,
+  });
+
+  it("matches a point date against the year that contains it", () => {
+    const date = day("1980-09-01", "1980-09-02");
+    expect(dateOverlapsYearRange(date, 1980, null, today)).toBe(true);
+    expect(dateOverlapsYearRange(date, 1980, 1980, today)).toBe(true);
+    expect(dateOverlapsYearRange(date, null, 1979, today)).toBe(false);
+    expect(dateOverlapsYearRange(date, 1981, null, today)).toBe(false);
+  });
+
+  it("matches a period against every year it spans", () => {
+    const period = day("1980-01-01", "1991-01-01");
+    expect(dateOverlapsYearRange(period, 1986, null, today)).toBe(true);
+    expect(dateOverlapsYearRange(period, 1980, 1990, today)).toBe(true);
+    expect(dateOverlapsYearRange(period, 1991, null, today)).toBe(false);
+    expect(dateOverlapsYearRange(period, null, 1979, today)).toBe(false);
+  });
+
+  it("treats an open end as running up to today", () => {
+    const openEnd = day("1970-05-01");
+    expect(dateOverlapsYearRange(openEnd, 2020, null, today)).toBe(true);
+    expect(dateOverlapsYearRange(openEnd, null, 1979, today)).toBe(true);
+    expect(dateOverlapsYearRange(openEnd, 2030, null, today)).toBe(false);
+  });
+
+  it("never matches an unknown date against a bounded range", () => {
+    expect(dateOverlapsYearRange(unknown, 1980, null, today)).toBe(false);
+    expect(dateOverlapsYearRange(unknown, null, 2000, today)).toBe(false);
+    expect(dateOverlapsYearRange(unknown, null, null, today)).toBe(true);
+  });
+
+  it("keeps the exclusive end out of the next year", () => {
+    expect(dateOverlapsYearRange(year(1950), 1950, 1950, today)).toBe(true);
+    expect(dateOverlapsYearRange(year(1950), 1951, null, today)).toBe(false);
   });
 });

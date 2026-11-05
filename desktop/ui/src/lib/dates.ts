@@ -71,6 +71,33 @@ export function parseCivilDate(value: string): CivilDate | null {
   return parts && isValidParts(parts) ? isoOf(parts) : null;
 }
 
+/**
+ * Half-open year overlap: the `[start, end)` date interval intersects
+ * `[fromYear-01-01, (toYear+1)-01-01)`. `null` years are open bounds; an open
+ * end runs up to `today`; a date with neither bound is unknown and never
+ * matches a bounded range. Mirrors the Rust `date_matches` (ADR-0010).
+ */
+export function dateOverlapsYearRange(
+  value: DateValue,
+  fromYear: number | null,
+  toYear: number | null,
+  today: Date = new Date(),
+): boolean {
+  if (fromYear === null && toYear === null) return true;
+  // An open start falls back to the end bound, like `eventYear`/`entryYear`.
+  const start = value.start ?? value.end;
+  if (start === null) return false;
+  const startKey = civilDateKey(start);
+  const endKey = value.end
+    ? civilDateKey(value.end)
+    : today.getFullYear() * 10000 +
+      (today.getMonth() + 1) * 100 +
+      today.getDate();
+  if (fromYear !== null && endKey <= fromYear * 10000 + 101) return false;
+  if (toYear !== null && startKey >= (toYear + 1) * 10000 + 101) return false;
+  return true;
+}
+
 function toUtcDate(parts: Parts): Date {
   // `Date.UTC` maps years 0..99 to 1900..1999, so set the year explicitly.
   const date = new Date(Date.UTC(2000, parts.month - 1, parts.day));
