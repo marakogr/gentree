@@ -671,3 +671,262 @@ describe("layoutDescendants", () => {
     expect(layout.nodes[0].y).toBe(PADDING);
   });
 });
+
+describe("spouse slots", () => {
+  function descendantSpouse(key: string, generation: number, personId: string) {
+    return descendantNode(key, generation, personId, "CHILD");
+  }
+
+  function ancestorSpouse(key: string, generation: number, personId: string) {
+    return {
+      personId,
+      occurrenceKey: key,
+      generation,
+      role: "MOTHER" as const,
+      adoptive: false,
+      placeholder: false,
+    };
+  }
+
+  it("keeps a spouse on the anchor generation and next to it", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "me",
+      generations: 0,
+      nodes: [
+        descendantNode("0", 0, "me", "ROOT"),
+        descendantSpouse("s:0:wife", 0, "wife"),
+      ],
+      edges: [],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutDescendants(graph, {
+      spouseOf: new Map([["s:0:wife", "0"]]),
+      spousePairs: [["0", "s:0:wife"]],
+    });
+    const root = layout.nodes.find((node) => node.occurrenceKey === "0");
+    const wife = layout.nodes.find((node) => node.occurrenceKey === "s:0:wife");
+    expect(wife?.generation).toBe(root?.generation);
+    expect(wife?.y).toBe(root?.y);
+    expect(wife?.spouseOfKey).toBe("0");
+    expect((wife?.x ?? 0) - (root?.x ?? 0)).toBe(NODE_WIDTH + SPOUSE_GAP);
+    const connector = layout.edges.find((edge) => edge.kind === "spouse");
+    expect(connector).toBeDefined();
+    expect(connector?.path).not.toContain("V");
+  });
+
+  it("does not change blood positions when a spouse is shown", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "me",
+      generations: 1,
+      nodes: [
+        descendantNode("0", 0, "me", "ROOT"),
+        descendantNode("0.c0", 1, "son", "SON"),
+        descendantNode("0.c1", 1, "daughter", "DAUGHTER"),
+      ],
+      edges: [descendantEdge("0", "0.c0"), descendantEdge("0", "0.c1")],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const before = layoutDescendants(graph);
+    const after = layoutDescendants(
+      {
+        ...graph,
+        nodes: [...graph.nodes, descendantSpouse("s:1:wife", 1, "wife")],
+      },
+      {
+        spouseOf: new Map([["s:1:wife", "0.c0"]]),
+        spousePairs: [["0.c0", "s:1:wife"]],
+      },
+    );
+    for (const node of before.nodes) {
+      const moved = after.nodes.find(
+        (item) => item.occurrenceKey === node.occurrenceKey,
+      );
+      expect(moved?.generation).toBe(node.generation);
+      expect(moved?.y).toBe(node.y);
+    }
+  });
+
+  it("keeps every spouse in a deterministic order without overlap", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "me",
+      generations: 0,
+      nodes: [
+        descendantNode("0", 0, "me", "ROOT"),
+        descendantSpouse("s:0:first", 0, "first"),
+        descendantSpouse("s:0:second", 0, "second"),
+      ],
+      edges: [],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutDescendants(graph, {
+      spouseOf: new Map([
+        ["s:0:first", "0"],
+        ["s:0:second", "0"],
+      ]),
+      spousePairs: [
+        ["0", "s:0:first"],
+        ["0", "s:0:second"],
+      ],
+    });
+    const row = layout.nodes
+      .filter((node) => node.generation === 0)
+      .sort((left, right) => left.x - right.x);
+    expect(row.map((node) => node.occurrenceKey)).toEqual([
+      "0",
+      "s:0:first",
+      "s:0:second",
+    ]);
+    for (let index = 1; index < row.length; index += 1) {
+      expect(row[index].x).toBeGreaterThanOrEqual(
+        row[index - 1].x + NODE_WIDTH,
+      );
+    }
+    expect(layoutDescendants(graph, {
+      spouseOf: new Map([
+        ["s:0:first", "0"],
+        ["s:0:second", "0"],
+      ]),
+      spousePairs: [
+        ["0", "s:0:first"],
+        ["0", "s:0:second"],
+      ],
+    })).toEqual(layout);
+  });
+
+  it("keeps one child occurrence under a couple", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "me",
+      generations: 1,
+      nodes: [
+        descendantNode("0", 0, "me", "ROOT"),
+        descendantSpouse("s:0:wife", 0, "wife"),
+        descendantNode("0.c0", 1, "child", "CHILD"),
+      ],
+      edges: [descendantEdge("0", "0.c0")],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutDescendants(graph, {
+      spouseOf: new Map([["s:0:wife", "0"]]),
+      spousePairs: [["0", "s:0:wife"]],
+    });
+    expect(layout.nodes.filter((node) => node.personId === "child")).toHaveLength(1);
+  });
+
+  it("routes a married-cousin connector above the row, clear of cards", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "me",
+      generations: 1,
+      nodes: [
+        descendantNode("0", 0, "me", "ROOT"),
+        descendantNode("0.c0", 1, "cousinA", "CHILD"),
+        descendantNode("0.c1", 1, "cousinB", "CHILD"),
+      ],
+      edges: [descendantEdge("0", "0.c0"), descendantEdge("0", "0.c1")],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutDescendants(graph, {
+      spousePairs: [["0.c0", "0.c1"]],
+    });
+    const connector = layout.edges.find((edge) => edge.kind === "spouse");
+    expect(connector).toBeDefined();
+    expect((connector?.path.match(/V/g) ?? []).length).toBe(2);
+    const first = layout.nodes.find((node) => node.occurrenceKey === "0.c0");
+    const second = layout.nodes.find((node) => node.occurrenceKey === "0.c1");
+    const rowTop = Math.min(first?.y ?? 0, second?.y ?? 0);
+    expect(connector?.path).toContain(`V ${rowTop - V_GAP / 2}`);
+    expect(connector?.path).not.toContain(`H ${first?.x}`);
+  });
+
+  it("puts a root spouse in the ancestor root block", () => {
+    const graph: AncestorGraph = {
+      rootPersonId: "me",
+      generations: 1,
+      nodes: [
+        {
+          personId: "me",
+          occurrenceKey: "0",
+          generation: 0,
+          role: "ROOT",
+          adoptive: false,
+          placeholder: false,
+        },
+        ancestorSpouse("s:0:wife", 0, "wife"),
+        {
+          personId: "father",
+          occurrenceKey: "0.f",
+          generation: 1,
+          role: "FATHER",
+          adoptive: false,
+          placeholder: false,
+        },
+      ],
+      edges: [edge("0.f", "0")],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutAncestors(graph, new Set(), {
+      includePlaceholders: false,
+      spouseOf: new Map([["s:0:wife", "0"]]),
+      spousePairs: [["0", "s:0:wife"]],
+    });
+    const root = layout.nodes.find((node) => node.occurrenceKey === "0");
+    const wife = layout.nodes.find((node) => node.occurrenceKey === "s:0:wife");
+    expect(wife?.y).toBe(root?.y);
+    expect(wife?.spouseOfKey).toBe("0");
+    expect((wife?.x ?? 0) - (root?.x ?? 0)).toBe(NODE_WIDTH + SPOUSE_GAP);
+    expect(layout.edges.some((item) => item.kind === "spouse")).toBe(true);
+  });
+
+  it("puts a grandparent's second spouse on the grandparent row", () => {
+    const graph: AncestorGraph = {
+      rootPersonId: "me",
+      generations: 2,
+      nodes: [
+        {
+          personId: "me",
+          occurrenceKey: "0",
+          generation: 0,
+          role: "ROOT",
+          adoptive: false,
+          placeholder: false,
+        },
+        {
+          personId: "father",
+          occurrenceKey: "0.f",
+          generation: 1,
+          role: "FATHER",
+          adoptive: false,
+          placeholder: false,
+        },
+        {
+          personId: "grandpa",
+          occurrenceKey: "0.f.f",
+          generation: 2,
+          role: "FATHER",
+          adoptive: false,
+          placeholder: false,
+        },
+        ancestorSpouse("s:0.f.f:second", 2, "secondWife"),
+      ],
+      edges: [edge("0.f", "0"), edge("0.f.f", "0.f")],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutAncestors(graph, new Set(), {
+      includePlaceholders: false,
+      spouseOf: new Map([["s:0.f.f:second", "0.f.f"]]),
+      spousePairs: [["0.f.f", "s:0.f.f:second"]],
+    });
+    const grandpa = layout.nodes.find((node) => node.occurrenceKey === "0.f.f");
+    const spouse = layout.nodes.find(
+      (node) => node.occurrenceKey === "s:0.f.f:second",
+    );
+    expect(spouse?.y).toBe(grandpa?.y);
+    expect(spouse?.x).toBe((grandpa?.x ?? 0) + NODE_WIDTH + SPOUSE_GAP);
+  });
+});
