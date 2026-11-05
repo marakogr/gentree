@@ -81,7 +81,10 @@ jobs:
             sums: release-assets/SHA256SUMS-windows-x64.txt
           - platform: macos-latest
             target: aarch64-apple-darwin
-            bundles: dmg
+            # `app` is required for the updater archive (`*.app.tar.gz` and
+            # its `.sig`); `dmg` is the user-facing installer. Bundling only
+            # `dmg` leaves latest.json without a darwin-aarch64 entry.
+            bundles: app,dmg
             sums: release-assets/SHA256SUMS-macos-arm64.txt
     runs-on: ${{ matrix.platform }}
     steps:
