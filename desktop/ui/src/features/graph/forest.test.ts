@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ParentEdges } from "./parents";
 import { buildBloodTree, buildFullTree } from "./forest";
+import { layoutDescendants } from "./layout";
 
 function person(id: string, gender: "MALE" | "FEMALE" | "UNKNOWN" = "UNKNOWN") {
   return { id, gender };
@@ -60,6 +61,99 @@ describe("buildFullTree", () => {
       .map((node) => node.occurrenceKey)
       .sort();
     expect(roots).toEqual(["a", "b"]);
+  });
+
+  it("keeps both parents of a child on one generation", () => {
+    // The father has parents of his own, the mother does not, and the mother
+    // owns the child's placement band (smaller id). Both must still share a
+    // level, with the child one level below them.
+    const tree = buildFullTree(
+      [
+        person("grandpa", "MALE"),
+        person("grandma", "FEMALE"),
+        person("anna", "FEMALE"),
+        person("boris", "MALE"),
+        person("kid"),
+      ],
+      parentsOf({
+        boris: ["grandpa", "grandma"],
+        kid: ["anna", "boris"],
+      }),
+    );
+    const generation = (id: string) =>
+      tree.graph.nodes.find((node) => node.occurrenceKey === id)?.generation;
+    expect(generation("grandpa")).toBe(0);
+    expect(generation("grandma")).toBe(0);
+    expect(generation("anna")).toBe(1);
+    expect(generation("boris")).toBe(1);
+    expect(generation("kid")).toBe(2);
+    // Alignment does not move the placement edge to the second parent.
+    expect(tree.graph.edges).toHaveLength(2);
+    expect(
+      tree.graph.edges.find((edge) => edge.childKey === "kid")?.parentKey,
+    ).toBe("anna");
+    expect(
+      tree.extraEdges.map((edge) => `${edge.parentKey}>${edge.childKey}`).sort(),
+    ).toEqual(["boris>kid", "grandpa>boris"]);
+  });
+
+  it("lays the aligned parents out on one row with the child below", () => {
+    const tree = buildFullTree(
+      [
+        person("grandpa", "MALE"),
+        person("grandma", "FEMALE"),
+        person("anna", "FEMALE"),
+        person("boris", "MALE"),
+        person("kid"),
+      ],
+      parentsOf({
+        boris: ["grandpa", "grandma"],
+        kid: ["anna", "boris"],
+      }),
+    );
+    const layout = layoutDescendants(tree.graph, {
+      extraEdges: tree.extraEdges,
+    });
+    const y = (id: string) =>
+      layout.nodes.find((node) => node.personId === id)?.y ?? -1;
+    expect(y("anna")).toBe(y("boris"));
+    expect(y("kid")).toBeGreaterThan(y("anna"));
+  });
+
+  it("still places a single-parent child below that parent", () => {
+    const tree = buildFullTree(
+      [person("parent"), person("child")],
+      parentsOf({ child: ["parent"] }),
+    );
+    const generation = (id: string) =>
+      tree.graph.nodes.find((node) => node.occurrenceKey === id)?.generation;
+    expect(generation("parent")).toBe(0);
+    expect(generation("child")).toBe(1);
+  });
+
+  it("gives every card a level when co-parents form a cycle", () => {
+    // a is a parent of the child, b is a parent of a and of the child: a and b
+    // are one co-parent unit, so the cycle collapses and the child stays below.
+    const tree = buildFullTree(
+      [person("a"), person("b"), person("child")],
+      parentsOf({ a: ["b"], child: ["a", "b"] }),
+    );
+    const generation = (id: string) =>
+      tree.graph.nodes.find((node) => node.occurrenceKey === id)?.generation;
+    expect(tree.graph.nodes).toHaveLength(3);
+    expect(generation("a")).toBe(generation("b"));
+    expect(generation("child")).toBe((generation("a") ?? 0) + 1);
+  });
+
+  it("keeps a plain two-person cycle deterministic and fully covered", () => {
+    const parents = parentsOf({ a: ["b"], b: ["a"] });
+    const tree = buildFullTree([person("a"), person("b")], parents);
+    expect(tree.graph.nodes).toHaveLength(2);
+    for (const node of tree.graph.nodes) {
+      expect(Number.isInteger(node.generation)).toBe(true);
+      expect(node.generation).toBeGreaterThanOrEqual(0);
+    }
+    expect(buildFullTree([person("a"), person("b")], parents)).toEqual(tree);
   });
 
   it("is deterministic for equal input", () => {
@@ -138,6 +232,25 @@ describe("buildBloodTree", () => {
     expect(
       tree.graph.nodes.find((node) => node.occurrenceKey === "root")?.role,
     ).toBe("ROOT");
+  });
+
+  it("keeps the root's mother and father on one generation", () => {
+    const tree = buildBloodTree(
+      [
+        person("grandpa", "MALE"),
+        person("grandma", "FEMALE"),
+        person("anna", "FEMALE"),
+        person("boris", "MALE"),
+        person("kid"),
+      ],
+      parentsOf({ boris: ["grandpa", "grandma"], kid: ["anna", "boris"] }),
+      "kid",
+    );
+    const generation = (id: string) =>
+      tree.graph.nodes.find((node) => node.occurrenceKey === id)?.generation;
+    expect(generation("anna")).toBe(generation("boris"));
+    expect(generation("boris")).toBe(1);
+    expect(generation("kid")).toBe(2);
   });
 
   it("returns a single card when the root has no blood links", () => {

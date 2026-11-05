@@ -7,7 +7,8 @@
 import type { EdgeDirection, PathStep } from "../../api/types";
 
 export const NODE_WIDTH = 168;
-export const NODE_HEIGHT = 64;
+/** Same three-line caption box as the tree node (see `graph/layout.ts`). */
+export const NODE_HEIGHT = 84;
 export const H_GAP = 56;
 export const V_GAP = 48;
 export const PADDING = 24;
