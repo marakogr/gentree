@@ -214,6 +214,40 @@ describe("emptyEventDraft", () => {
     expect(draftFromEvent(base).precision).toBe("YEAR");
   });
 
+  it("round-trips birth parents through the draft and the save payload", () => {
+    const base = event("e-1", "person-1", 2000, {
+      type: "BIRTH",
+      participantIds: ["parent-1", "parent-2"],
+    });
+    const draft = draftFromEvent(base);
+    expect(draft.parentIds).toEqual(["parent-1", "parent-2"]);
+    expect(isEventDraftDirty(draft, base)).toBe(false);
+
+    draft.parentIds = ["parent-2", ""];
+    expect(isEventDraftDirty(draft, base)).toBe(true);
+    const result = buildEventInput({ ...draft, parentIds: ["parent-2"] }, base);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.event.participantIds).toEqual(["parent-2"]);
+    }
+  });
+
+  it("never lets the child or a non-birth event become a parent", () => {
+    const base = event("e-1", "person-1", 2000, {
+      type: "BIRTH",
+      participantIds: ["parent-1"],
+    });
+    const result = buildEventInput(
+      { ...draftFromEvent(base), parentIds: ["person-1", "parent-2"] },
+      base,
+    );
+    expect(result.ok && result.event.participantIds).toEqual(["parent-2"]);
+
+    const occupation = emptyEventDraft("person-1", "OCCUPATION");
+    const built = buildEventInput({ ...occupation, parentIds: ["parent-1"] });
+    expect(built.ok && built.event.participantIds).toEqual([]);
+  });
+
   it("copies the confirmed place point into the draft and back", () => {
     const point: PlaceGeo = {
       lat: 57.4321,

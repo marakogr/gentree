@@ -164,7 +164,13 @@ export type RelationshipEntity = {
   personId: string;
   relatedPersonId: string;
   notes: string | null;
+  /** `MANUAL` for user rows and legacy rows without the field. */
+  origin?: RelationOrigin;
+  /** Events that currently assert an automatic row; absent or empty for manual. */
+  sourceEventIds?: string[];
 };
+
+export type RelationOrigin = "MANUAL" | "EVENT";
 
 export type RelationshipInput = Omit<RelationshipEntity, "id">;
 
@@ -195,6 +201,15 @@ export type ProjectInfo = {
   readOnly: boolean;
   updatedAt: string;
   homePersonId: string | null;
+  /** Aggregate result of the on-open relation backfill; counts only. */
+  relationBackfill?: RelationBackfillReport;
+};
+
+export type RelationBackfillReport = {
+  spouseCreated: number;
+  parentCreated: number;
+  ambiguousSkipped: number;
+  readOnly: boolean;
 };
 
 /** One backup archive listed by the restore dialog. */

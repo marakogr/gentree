@@ -29,5 +29,8 @@
     "adoptedChild": "Adoptivkind",
     "adoptedSon": "Adoptivsohn",
     "adoptedDaughter": "Adoptivtochter"
-  }
+  },
+  "automatic": "Automatisch",
+  "automaticSeveralSources": "{{count}} Quellereignisse",
+  "deleteAutomaticConfirm": "Diese Beziehung wurde aus einem Ereignis erstellt. Hier löschen? Beim nächsten Speichern eines Quellereignisses wird sie erneut erstellt."
 }

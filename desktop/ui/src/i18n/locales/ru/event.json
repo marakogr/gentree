@@ -184,5 +184,13 @@
     "descendants": "Потомки",
     "both": "Предки и потомки"
   },
-  "openTimeline": "Перейти в хронологию"
+  "openTimeline": "Перейти в хронологию",
+  "parentFirst": "Отец",
+  "parentSecond": "Мать",
+  "clearParent": "Убрать родителя",
+  "parentsLinked": "При сохранении создаётся связь «родитель — ребёнок»",
+  "parentFirstPlaceholder": "Выберите отца",
+  "parentSecondPlaceholder": "Выберите мать",
+  "parentGenderUnknown": "У этого человека не указан пол",
+  "parentCandidatesEmpty": "Нет подходящих людей: укажите пол в карточке человека"
 }

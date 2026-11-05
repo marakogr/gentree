@@ -14,6 +14,20 @@ pub enum RelationshipType {
     Partner,
 }
 
+/// Who created a relationship row. Legacy rows have no field and read as
+/// [`RelationOrigin::Manual`], so older builds and older projects stay safe.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum RelationOrigin {
+    #[default]
+    Manual,
+    Event,
+}
+
+fn is_manual_origin(origin: &RelationOrigin) -> bool {
+    *origin == RelationOrigin::Manual
+}
+
 impl RelationshipType {
     pub fn is_parent(self) -> bool {
         matches!(self, Self::ParentChild | Self::AdoptiveParentChild)
@@ -34,6 +48,13 @@ pub struct Relationship {
     pub person_id: Uuid,
     pub related_person_id: Uuid,
     pub notes: Option<String>,
+    /// Manual rows (and legacy rows without the field) are never retracted by
+    /// an event edit or delete. Omitted when manual, so legacy bytes stay stable.
+    #[serde(default, skip_serializing_if = "is_manual_origin")]
+    pub origin: RelationOrigin,
+    /// Events that currently assert this row. Empty for a purely manual row.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub source_event_ids: Vec<Uuid>,
 }
 
 impl Relationship {
@@ -45,6 +66,8 @@ impl Relationship {
             person_id: a,
             related_person_id: b,
             notes: None,
+            origin: RelationOrigin::Manual,
+            source_event_ids: Vec::new(),
         };
         row.canonicalize_spouse_order();
         row.validate_row()?;
@@ -76,7 +99,20 @@ impl Relationship {
             )
             .with_param("rule", "spouseOrder"));
         }
+        if self.origin == RelationOrigin::Event && self.source_event_ids.is_empty() {
+            return Err(AppError::validation("sourceEventIds", "required"));
+        }
+        let mut seen = HashSet::new();
+        for event_id in &self.source_event_ids {
+            if event_id.is_nil() || !seen.insert(*event_id) {
+                return Err(AppError::validation("sourceEventIds", "invalid"));
+            }
+        }
         Ok(())
+    }
+
+    pub fn is_automatic(&self) -> bool {
+        self.origin == RelationOrigin::Event
     }
 
     pub fn child(&self) -> Option<Uuid> {
@@ -294,5 +330,48 @@ mod tests {
         let mut expected = vec![a, b];
         expected.sort();
         assert_eq!(parents, expected);
+    }
+
+    #[test]
+    fn legacy_rows_load_as_manual_and_serialize_unchanged() {
+        let a = Uuid::now_v7();
+        let b = Uuid::now_v7();
+        let row = Relationship::new(RelationshipType::Spouse, a, b).unwrap();
+        let value = serde_json::to_value(&row).unwrap();
+        assert!(value.get("origin").is_none());
+        assert!(value.get("sourceEventIds").is_none());
+
+        let legacy = serde_json::json!({
+            "id": a,
+            "type": "PARENT_CHILD",
+            "personId": b,
+            "relatedPersonId": a,
+            "notes": null
+        });
+        let parsed: Relationship = serde_json::from_value(legacy).unwrap();
+        assert_eq!(parsed.origin, RelationOrigin::Manual);
+        assert!(parsed.source_event_ids.is_empty());
+    }
+
+    #[test]
+    fn derived_rows_serialize_origin_and_sources_and_require_a_source() {
+        let a = Uuid::now_v7();
+        let b = Uuid::now_v7();
+        let event = Uuid::now_v7();
+        let mut row = Relationship::new(RelationshipType::ParentChild, a, b).unwrap();
+        row.origin = RelationOrigin::Event;
+        row.source_event_ids = vec![event];
+        let value = serde_json::to_value(&row).unwrap();
+        assert_eq!(value["origin"], "EVENT");
+        assert_eq!(value["sourceEventIds"][0], event.to_string());
+
+        let mut missing = row.clone();
+        missing.source_event_ids.clear();
+        let err = missing.validate_row().unwrap_err();
+        assert_eq!(err.code, codes::VALIDATION_ERROR);
+        assert_eq!(
+            err.params.get("field").map(String::as_str),
+            Some("sourceEventIds")
+        );
     }
 }
