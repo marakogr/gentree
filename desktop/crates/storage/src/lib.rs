@@ -1221,7 +1221,10 @@ mod tests {
     use gentree_core::person::Name;
     use gentree_core::record::{CitationTarget, EventType};
     use gentree_core::relationship::RelationshipType;
-    use gentree_core::{PlaceGeo, PlacePrecision, PlaceSource};
+    use gentree_core::{
+        validate_project, DatePrecision, DateQualifier, DateValue, PlaceGeo, PlacePrecision,
+        PlaceSource, ProjectSnapshot, RESIDENCE_RANGE_OVERLAP,
+    };
 
     fn store(dir: &Path) -> ProjectStore {
         ProjectStore::create(dir, "Тестовый проект").unwrap()
@@ -1271,6 +1274,54 @@ mod tests {
         assert_eq!(persons.len(), 2);
         assert_eq!(persons[0].display_name(), "Петров Иван");
         assert!(reopened.manifest().content_hash.starts_with("sha256:"));
+    }
+
+    #[test]
+    fn open_residence_range_round_trips_and_validation_rewrites_nothing() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut project = store(tmp.path());
+        let id = project.manifest().project_id;
+        let person = person("Ivan");
+        let person_id = person.id;
+        project.save_persons(std::slice::from_ref(&person)).unwrap();
+
+        let mut open = Event::new(person_id, EventType::Residence);
+        open.date = DateValue {
+            start: Some(gentree_core::CivilDate::new(1950, 1, 1).unwrap()),
+            end: None,
+            precision: DatePrecision::Year,
+            qualifier: DateQualifier::Range,
+            original: None,
+        };
+        let unknown = Event::new(person_id, EventType::Residence);
+        let mut first = Event::new(person_id, EventType::Residence);
+        first.date = DateValue::exact_year(1960);
+        let mut second = Event::new(person_id, EventType::Residence);
+        second.date = DateValue::exact_year(1960);
+        project
+            .save_events(&[open.clone(), unknown, first, second])
+            .unwrap();
+        drop(project);
+
+        let reopened = ProjectStore::open(&tmp.path().join(id.to_string()), true).unwrap();
+        let events = reopened.events().unwrap();
+        let stored_open = events.iter().find(|event| event.id == open.id).unwrap();
+        assert!(stored_open.date.end.is_none());
+        assert_eq!(stored_open.date.qualifier, DateQualifier::Range);
+
+        let path = reopened.root().join(EVENT_FILE);
+        let before = fs::read(&path).unwrap();
+        let report = validate_project(ProjectSnapshot {
+            persons: std::slice::from_ref(&person),
+            events: &events,
+            ..ProjectSnapshot::default()
+        });
+        let after = fs::read(&path).unwrap();
+        assert_eq!(before, after, "validation must not rewrite the project");
+        assert!(report
+            .issues
+            .iter()
+            .any(|issue| issue.code == RESIDENCE_RANGE_OVERLAP));
     }
 
     #[test]

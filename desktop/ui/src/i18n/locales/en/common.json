@@ -85,6 +85,7 @@
     "before": "before {{date}}",
     "after": "after {{date}}",
     "range": "{{from}} — {{to}}",
+    "rangeOpen": "{{from}} — present",
     "approximate": "about {{date}}"
   },
   "errors": {
@@ -114,6 +115,8 @@
     "EVENT_OUT_OF_LIFESPAN": "Event outside the lifespan",
     "DUPLICATE_LIFE_EVENT": "Several birth or death events",
     "LIFE_EVENT_ALREADY_EXISTS": "This person already has a birth or death event",
+    "RESIDENCE_RANGE_OVERLAP": "Residence periods overlap",
+    "PARENT_CHILD_AGE_GAP": "Parent is less than nine years older than the child",
     "CHAT_HISTORY_CORRUPTED": "The conversation file is damaged",
     "CHAT_HISTORY_LIMIT": "Chat history limit reached"
   },

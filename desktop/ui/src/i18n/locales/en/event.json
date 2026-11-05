@@ -47,6 +47,7 @@
   "dateModeGraduation": "Graduation year",
   "dateModeStudyPeriod": "Years of study (period)",
   "dateModeResidencePeriod": "Residence period (from–to)",
+  "dateOngoing": "Ongoing (no end date)",
   "dateRangeQualifier": "Set automatically for a period",
   "dateRangeUnknownHint": "A period cannot be stored with unknown precision",
   "precision": "Precision",

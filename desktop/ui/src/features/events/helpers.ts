@@ -138,6 +138,11 @@ export type EventDraft = {
   /** End of an explicit period; ignored unless `dateMode` is `"range"`. */
   dateEnd: string;
   /**
+   * An open-ended residence period. When true, `dateEnd` is ignored and the
+   * stored `RANGE` has no end. Only offered for `RESIDENCE`.
+   */
+  dateOngoing: boolean;
+  /**
    * `"range"` stores one RANGE `DateValue`; `"single"` keeps the historical
    * one-bound date. Only range-capable types offer the switch.
    */
@@ -164,6 +169,7 @@ export function emptyEventDraft(
     originalType: null,
     date: "",
     dateEnd: "",
+    dateOngoing: false,
     // A new event starts on day precision; a blank date still saves as an
     // unknown date (see `parseDraftDateValue`).
     dateMode: "single",
@@ -187,6 +193,7 @@ export function draftFromEvent(event: EventEntity): EventDraft {
     originalType: event.originalType ?? null,
     date: dateValueToInput(event.date),
     dateEnd: period?.to ?? "",
+    dateOngoing: period !== null && period.to === "",
     dateMode: period === null ? "single" : "range",
     precision: event.date.precision,
     qualifier: event.date.qualifier,
@@ -222,6 +229,7 @@ export function isEventDraftDirty(
     draft.originalType !== stored.originalType ||
     draft.date !== stored.date ||
     draft.dateEnd !== stored.dateEnd ||
+    draft.dateOngoing !== stored.dateOngoing ||
     draft.dateMode !== stored.dateMode ||
     draft.precision !== stored.precision ||
     draft.qualifier !== stored.qualifier ||
@@ -268,7 +276,13 @@ export type DraftDateResult =
  */
 export function parseDraftDateValue(draft: EventDraft): DraftDateResult {
   if (draft.dateMode === "range" && draft.precision !== "UNKNOWN") {
-    return parsePeriodInput(draft.date, draft.dateEnd, draft.precision);
+    const allowOpenEnd = draft.eventType === "RESIDENCE" && draft.dateOngoing;
+    return parsePeriodInput(
+      draft.date,
+      allowOpenEnd ? "" : draft.dateEnd,
+      draft.precision,
+      allowOpenEnd,
+    );
   }
   if (draft.date.trim() === "") return { ok: true, value: emptyDateValue() };
   const parsed: ParsedDateInput = parseDateInput(

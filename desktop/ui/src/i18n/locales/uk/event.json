@@ -47,6 +47,7 @@
   "dateModeGraduation": "Рік закінчення",
   "dateModeStudyPeriod": "Роки навчання (період)",
   "dateModeResidencePeriod": "Період проживання (з–по)",
+  "dateOngoing": "Дотепер (без дати закінчення)",
   "dateRangeQualifier": "Для періоду задається автоматично",
   "dateRangeUnknownHint": "Період не можна зберегти з невідомою точністю",
   "precision": "Точність",

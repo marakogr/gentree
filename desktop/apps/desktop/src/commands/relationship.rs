@@ -3,7 +3,7 @@
 
 use gentree_core::record::CitationTarget;
 use gentree_core::relationship::{Relationship, RelationshipType};
-use gentree_core::{AppError, AppResult};
+use gentree_core::{AppError, AppResult, Person};
 use gentree_storage::{ProjectStore, RELATIONSHIP_FILE};
 use serde::Deserialize;
 use tauri::State;
@@ -23,16 +23,18 @@ pub struct RelationshipInput {
     pub notes: Option<String>,
 }
 
-fn ensure_persons(store: &mut ProjectStore, a: Uuid, b: Uuid) -> AppResult<()> {
+fn ensure_persons(store: &mut ProjectStore, a: Uuid, b: Uuid) -> AppResult<(Person, Person)> {
     let persons = store.persons()?;
-    for id in [a, b] {
-        if !persons.iter().any(|person| person.id == id) {
-            return Err(
+    let find = |id: Uuid| {
+        persons
+            .iter()
+            .find(|person| person.id == id)
+            .cloned()
+            .ok_or_else(|| {
                 AppError::validation("personId", "notFound").with_param("id", id.to_string())
-            );
-        }
-    }
-    Ok(())
+            })
+    };
+    Ok((find(a)?, find(b)?))
 }
 
 #[tauri::command]
@@ -65,7 +67,7 @@ pub fn relationship_create(
     relationship: RelationshipInput,
 ) -> Result<Versioned<Relationship>, AppError> {
     with_store(&state, |store| {
-        ensure_persons(
+        let (person, related) = ensure_persons(
             store,
             relationship.person_id,
             relationship.related_person_id,
@@ -75,6 +77,9 @@ pub fn relationship_create(
             relationship.person_id,
             relationship.related_person_id,
         )?;
+        // `person_id` is the parent for parent edges and the age rule applies
+        // to `PARENT_CHILD` only; the core function skips adoptive edges.
+        gentree_core::ensure_parent_child_age_gap(entity.rel_type, &person, &related)?;
         entity.notes = relationship
             .notes
             .map(|notes| notes.trim().to_owned())

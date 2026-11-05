@@ -231,6 +231,44 @@ describe("detectAnomalies", () => {
     expect(codesOf(anomalies, "earlier-year")).toEqual(["EVENT_BEFORE_BIRTH"]);
   });
 
+  it("flags open-ended and ranged starts before birth", () => {
+    const anomalies = detectAnomalies(
+      [
+        event("open-before", "p1", "RESIDENCE", {
+          ...day("1940-01-01"),
+          end: null,
+          qualifier: "RANGE",
+        }),
+        event("open-containing", "p2", "RESIDENCE", {
+          ...year(1950),
+          end: null,
+          qualifier: "RANGE",
+        }),
+        event("range-before", "p3", "RESIDENCE", {
+          ...year(1948),
+          end: "1961-01-01",
+          qualifier: "RANGE",
+        }),
+        event("range-containing", "p4", "RESIDENCE", {
+          ...year(1950),
+          end: "1961-01-01",
+          qualifier: "RANGE",
+        }),
+      ],
+      [
+        person("p1", { birth: year(1950) }),
+        person("p2", { birth: month("1950-05") }),
+        person("p3", { birth: year(1950) }),
+        person("p4", { birth: month("1950-05") }),
+      ],
+      TODAY,
+    );
+    expect(codesOf(anomalies, "open-before")).toEqual(["EVENT_BEFORE_BIRTH"]);
+    expect(codesOf(anomalies, "open-containing")).toBeUndefined();
+    expect(codesOf(anomalies, "range-before")).toEqual(["EVENT_BEFORE_BIRTH"]);
+    expect(codesOf(anomalies, "range-containing")).toBeUndefined();
+  });
+
   it("never invents a comparison for UNKNOWN or empty dates", () => {
     const anomalies = detectAnomalies(
       [
