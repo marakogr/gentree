@@ -507,6 +507,16 @@ function descendantGraph(): DescendantGraph {
 }
 
 describe("layoutDescendants", () => {
+  it("leaves room inside the node for a three-line caption", () => {
+    // Mirrors the caption box in styles.css: three 13px/1.25 name lines, the
+    // 11px/1.25 meta line, the 2px grid gap, 8px padding above and below, and
+    // the 1px border on each side. Otherwise a wrapped name would overlap the
+    // next generation.
+    const caption =
+      3 * 13 * 1.25 + 11 * 1.25 + 2 + 2 * 8 + 2 * 1;
+    expect(NODE_HEIGHT).toBeGreaterThanOrEqual(caption);
+  });
+
   it("puts the root on top and grows downward by generation", () => {
     const layout = layoutDescendants(descendantGraph());
     const root = layout.nodes.find((item) => item.occurrenceKey === "0");

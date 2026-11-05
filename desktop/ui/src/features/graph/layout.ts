@@ -12,7 +12,12 @@ import type {
 } from "../../api/types";
 
 export const NODE_WIDTH = 168;
-export const NODE_HEIGHT = 64;
+/**
+ * Three 13px caption lines, the 11px meta line, their gap and the card padding
+ * (8px top and bottom) plus the border. A clamped name therefore never spills
+ * onto the neighbouring generation.
+ */
+export const NODE_HEIGHT = 84;
 export const H_GAP = 28;
 /** Partners sit closer together than unrelated cards, so a couple reads as one. */
 export const SPOUSE_GAP = 16;
