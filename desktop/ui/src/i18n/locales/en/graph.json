@@ -41,5 +41,8 @@
   "avatarAlt": "Photo of {{name}}",
   "showWholeTree": "Whole tree",
   "showWholeTreeHint": "Show every person in the project without a root; kinship is not labelled in this mode.",
-  "wholeTreeWarning": "The whole project tree is hard to read when fully expanded. Use it for an overview only."
+  "wholeTreeWarning": "The whole project tree is hard to read when fully expanded. Use it for an overview only.",
+  "showSpouses": "Show spouses",
+  "showSpousesHint": "Show the spouses and partners of the root and of visible blood relatives on the same level.",
+  "spouseRole": "Spouse"
 }
