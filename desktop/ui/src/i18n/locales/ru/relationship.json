@@ -11,5 +11,23 @@
   "deleteConfirm": "Удалить связь?",
   "conflict": "Данные изменены в другом окне. Перечитайте связи.",
   "empty": "Связей нет",
-  "selectPerson": "Выберите человека"
+  "selectPerson": "Выберите человека",
+  "relation": {
+    "parent": "Родитель",
+    "father": "Отец",
+    "mother": "Мать",
+    "child": "Ребёнок",
+    "son": "Сын",
+    "daughter": "Дочь",
+    "spouse": "Супруг(а)",
+    "husband": "Муж",
+    "wife": "Жена",
+    "partner": "Партнёр",
+    "adoptiveParent": "Приёмный родитель",
+    "adoptiveFather": "Приёмный отец",
+    "adoptiveMother": "Приёмная мать",
+    "adoptedChild": "Приёмный ребёнок",
+    "adoptedSon": "Приёмный сын",
+    "adoptedDaughter": "Приёмная дочь"
+  }
 }

@@ -11,5 +11,23 @@
   "deleteConfirm": "Выдаліць гэтую роднасць?",
   "conflict": "Даныя зменены ў іншым акне. Перачытайце роднасці.",
   "empty": "Няма роднасцей",
-  "selectPerson": "Выберыце чалавека"
+  "selectPerson": "Выберыце чалавека",
+  "relation": {
+    "parent": "Бацька або маці",
+    "father": "Бацька",
+    "mother": "Маці",
+    "child": "Дзіця",
+    "son": "Сын",
+    "daughter": "Дачка",
+    "spouse": "Муж або жонка",
+    "husband": "Муж",
+    "wife": "Жонка",
+    "partner": "Партнёр",
+    "adoptiveParent": "Прыёмны бацька або маці",
+    "adoptiveFather": "Прыёмны бацька",
+    "adoptiveMother": "Прыёмная маці",
+    "adoptedChild": "Прыёмнае дзіця",
+    "adoptedSon": "Прыёмны сын",
+    "adoptedDaughter": "Прыёмная дачка"
+  }
 }

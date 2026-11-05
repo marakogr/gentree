@@ -11,5 +11,23 @@
   "deleteConfirm": "Diese Beziehung löschen?",
   "conflict": "Die Daten wurden in einem anderen Fenster geändert. Beziehungen neu laden.",
   "empty": "Keine Beziehungen",
-  "selectPerson": "Person auswählen"
+  "selectPerson": "Person auswählen",
+  "relation": {
+    "parent": "Elternteil",
+    "father": "Vater",
+    "mother": "Mutter",
+    "child": "Kind",
+    "son": "Sohn",
+    "daughter": "Tochter",
+    "spouse": "Ehepartner",
+    "husband": "Ehemann",
+    "wife": "Ehefrau",
+    "partner": "Partner",
+    "adoptiveParent": "Adoptivelternteil",
+    "adoptiveFather": "Adoptivvater",
+    "adoptiveMother": "Adoptivmutter",
+    "adoptedChild": "Adoptivkind",
+    "adoptedSon": "Adoptivsohn",
+    "adoptedDaughter": "Adoptivtochter"
+  }
 }

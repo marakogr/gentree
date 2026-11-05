@@ -11,5 +11,23 @@
   "deleteConfirm": "Видалити цей зв’язок?",
   "conflict": "Дані змінено в іншому вікні. Перезавантажте зв’язки.",
   "empty": "Немає зв’язків",
-  "selectPerson": "Виберіть людину"
+  "selectPerson": "Виберіть людину",
+  "relation": {
+    "parent": "Батько або мати",
+    "father": "Батько",
+    "mother": "Мати",
+    "child": "Дитина",
+    "son": "Син",
+    "daughter": "Донька",
+    "spouse": "Чоловік або дружина",
+    "husband": "Чоловік",
+    "wife": "Дружина",
+    "partner": "Партнер",
+    "adoptiveParent": "Прийомний батько або мати",
+    "adoptiveFather": "Прийомний батько",
+    "adoptiveMother": "Прийомна мати",
+    "adoptedChild": "Прийомна дитина",
+    "adoptedSon": "Прийомний син",
+    "adoptedDaughter": "Прийомна донька"
+  }
 }

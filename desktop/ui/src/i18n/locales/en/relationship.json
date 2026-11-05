@@ -11,5 +11,23 @@
   "deleteConfirm": "Delete this relationship?",
   "conflict": "The data was changed in another window. Reload the relationships.",
   "empty": "No relationships",
-  "selectPerson": "Select a person"
+  "selectPerson": "Select a person",
+  "relation": {
+    "parent": "Parent",
+    "father": "Father",
+    "mother": "Mother",
+    "child": "Child",
+    "son": "Son",
+    "daughter": "Daughter",
+    "spouse": "Spouse",
+    "husband": "Husband",
+    "wife": "Wife",
+    "partner": "Partner",
+    "adoptiveParent": "Adoptive parent",
+    "adoptiveFather": "Adoptive father",
+    "adoptiveMother": "Adoptive mother",
+    "adoptedChild": "Adopted child",
+    "adoptedSon": "Adopted son",
+    "adoptedDaughter": "Adopted daughter"
+  }
 }
