@@ -184,5 +184,13 @@
     "descendants": "Descendants",
     "both": "Ancestors and descendants"
   },
-  "openTimeline": "Open timeline"
+  "openTimeline": "Open timeline",
+  "parentFirst": "Father",
+  "parentSecond": "Mother",
+  "clearParent": "Clear parent",
+  "parentsLinked": "Saving creates a parent–child relation",
+  "parentFirstPlaceholder": "Select the father",
+  "parentSecondPlaceholder": "Select the mother",
+  "parentGenderUnknown": "Gender is not set for this person",
+  "parentCandidatesEmpty": "No people match this slot; set a gender in the person card"
 }

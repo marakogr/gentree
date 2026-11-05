@@ -215,5 +215,6 @@
       "MEDIA_MISSING": "Mediendatei fehlt: Zeile übersprungen",
       "MEDIA_CHANGED": "Mediendatei auf der Festplatte geändert: gespeicherte Kopie behalten"
     }
-  }
+  },
+  "relationBackfill": "{{total}} Beziehungen aus Ereignissen wiederhergestellt ({{spouse}} Ehe, {{parent}} Eltern)."
 }

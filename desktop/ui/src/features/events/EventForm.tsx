@@ -38,6 +38,7 @@ import {
 } from "../../lib/errors";
 import { useDateFormatter } from "../../lib/useDateFormatter";
 import { displayName } from "../persons/helpers";
+import { birthParentCandidates } from "./birthParents";
 import {
   CUSTOM_EVENT_TYPE_PREFIX,
   EVENT_TYPES,
@@ -226,6 +227,11 @@ export default function EventForm({
     });
   };
 
+  const personEntities = useMemo(
+    () => persons.map((item) => item.entity),
+    [persons],
+  );
+
   const personItems = useMemo(() => {
     const items = persons.map((item) => ({
       id: item.entity.id,
@@ -256,6 +262,47 @@ export default function EventForm({
     }
     return items;
   }, [personItems, draft.personId, draft.spouseId, t]);
+
+  // Slot 0 is the father picker, slot 1 the mother picker. A preselected
+  // person is kept visible even when their gender is UNKNOWN or mismatched.
+  const parentCandidatesFor = (index: 0 | 1) =>
+    birthParentCandidates(
+      personEntities,
+      index,
+      draft.parentIds,
+      draft.personId,
+    );
+
+  const parentItemsFor = (index: 0 | 1) => {
+    const other = draft.parentIds[index === 0 ? 1 : 0] ?? "";
+    const current = draft.parentIds[index] ?? "";
+    const items = parentCandidatesFor(index).map((person) => ({
+      id: person.id,
+      label: displayName(person, t("person:unknownName")),
+    }));
+    if (current !== "" && !items.some((item) => item.id === current)) {
+      const source = personItems.find((item) => item.id === current);
+      items.push(source ?? { id: current, label: t("person:unknownName") });
+    }
+    return items.filter((item) => item.id !== draft.personId && item.id !== other);
+  };
+
+  const parentHintFor = (index: 0 | 1): string | undefined => {
+    const current = draft.parentIds[index] ?? "";
+    const person = personEntities.find((item) => item.id === current);
+    if (person?.gender === "UNKNOWN") return t("event:parentGenderUnknown");
+    if (parentCandidatesFor(index).length === 0) {
+      return t("event:parentCandidatesEmpty");
+    }
+    return undefined;
+  };
+
+  const setParent = (index: 0 | 1, personId: string) => {
+    const next = [...draft.parentIds];
+    while (next.length < 2) next.push("");
+    next[index] = personId;
+    update({ parentIds: next });
+  };
 
   const qualifierOptions = useMemo(() => {
     const options: DateQualifier[] = [...QUALIFIERS];
@@ -590,6 +637,13 @@ export default function EventForm({
                     update({
                       personId,
                       ...(draft.spouseId === personId ? { spouseId: "" } : {}),
+                      ...(draft.parentIds.includes(personId)
+                        ? {
+                            parentIds: draft.parentIds.map((id) =>
+                              id === personId ? "" : id,
+                            ),
+                          }
+                        : {}),
                     });
                   }}
                   placeholder={primaryPlaceholder}
@@ -636,6 +690,55 @@ export default function EventForm({
                   <p className="events-link-badge">
                     <LinkRegular aria-hidden="true" />
                     <span>{t("event:participantsLinked")}</span>
+                  </p>
+                </div>
+              </>
+            ) : null}
+
+            {draft.eventType === "BIRTH" ? (
+              <>
+                {([0, 1] as const).map((index) => (
+                  <div className="events-form-span" key={`parent-${index}`}>
+                    <Field
+                      label={t(
+                        index === 0
+                          ? "event:parentFirst"
+                          : "event:parentSecond",
+                      )}
+                      htmlFor={`event-parent-${index}`}
+                      hint={parentHintFor(index)}
+                      error={
+                        spouseServerError
+                          ? serverFieldMessage(spouseServerError)
+                          : null
+                      }
+                    >
+                      <Combobox
+                        id={`event-parent-${index}`}
+                        items={parentItemsFor(index)}
+                        value={draft.parentIds[index] ?? ""}
+                        onChange={(personId) => setParent(index, personId)}
+                        placeholder={t(
+                          index === 0
+                            ? "event:parentFirstPlaceholder"
+                            : "event:parentSecondPlaceholder",
+                        )}
+                        ariaLabel={t(
+                          index === 0
+                            ? "event:parentFirst"
+                            : "event:parentSecond",
+                        )}
+                        clearLabel={t("event:clearParent")}
+                        emptyLabel={t("event:noPersonMatches")}
+                        disabled={busy || parentItemsFor(index).length === 0}
+                      />
+                    </Field>
+                  </div>
+                ))}
+                <div className="events-form-span">
+                  <p className="events-link-badge">
+                    <LinkRegular aria-hidden="true" />
+                    <span>{t("event:parentsLinked")}</span>
                   </p>
                 </div>
               </>

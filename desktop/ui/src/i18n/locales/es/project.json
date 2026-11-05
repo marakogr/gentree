@@ -215,5 +215,6 @@
       "MEDIA_MISSING": "Falta un archivo multimedia: fila omitida",
       "MEDIA_CHANGED": "El archivo multimedia cambió en el disco: se conservó la copia guardada"
     }
-  }
+  },
+  "relationBackfill": "Se restauraron {{total}} relaciones desde eventos ({{spouse}} de cónyuge, {{parent}} de progenitor)."
 }

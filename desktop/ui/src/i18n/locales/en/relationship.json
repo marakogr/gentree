@@ -29,5 +29,8 @@
     "adoptedChild": "Adopted child",
     "adoptedSon": "Adopted son",
     "adoptedDaughter": "Adopted daughter"
-  }
+  },
+  "automatic": "Automatic",
+  "automaticSeveralSources": "{{count}} source events",
+  "deleteAutomaticConfirm": "This relation was created from an event. Delete it here? The next save of a source event will recreate it."
 }

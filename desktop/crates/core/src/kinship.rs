@@ -729,6 +729,26 @@ mod tests {
         assert_eq!(in_law.via_spouse_gender, Some(Gender::Male));
     }
 
+    #[test]
+    fn a_co_parent_without_a_spouse_row_is_not_a_spouse() {
+        let mut family = Fixture::new();
+        let father = family.person(Gender::Male);
+        let mother = family.person(Gender::Female);
+        let child = family.person(Gender::Unknown);
+        family.parent(father, child);
+        family.parent(mother, child);
+
+        let descriptor = family.kinship(father, mother);
+        assert!(!matches!(
+            descriptor.kind,
+            KinshipKind::Husband | KinshipKind::Wife | KinshipKind::Partner
+        ));
+        assert!(descriptor.path.contains(&child));
+
+        family.spouse(father, mother);
+        assert_eq!(family.kinship(father, mother).kind, KinshipKind::Wife);
+    }
+
     struct InLaws {
         ego: Uuid,
         wife: Uuid,

@@ -58,7 +58,7 @@ use crate::error::{codes as error_codes, AppError, AppResult};
 use crate::geo::PlaceGeo;
 use crate::person::{ExternalId, Gender, Name, NameType, Person};
 use crate::record::{Citation, CitationTarget, Event, EventType, Media, Source};
-use crate::relationship::{Relationship, RelationshipSet};
+use crate::relationship::{RelationOrigin, Relationship, RelationshipSet};
 use crate::validation::{validate_project, ProjectSnapshot, Severity};
 
 /// Stable evidence and warning codes returned by this module.
@@ -768,7 +768,7 @@ pub fn apply_merge(
         row.canonicalize_spouse_order();
 
         if let Some(existing) = relationships
-            .iter()
+            .iter_mut()
             .find(|existing| same_relationship_pair(existing, &row))
         {
             if existing.rel_type != row.rel_type {
@@ -782,6 +782,23 @@ pub fn apply_merge(
                     ],
                 ));
             }
+            // Keep the earliest row id, union the provenance, and let a manual
+            // row on either side win so a later event edit cannot retract it.
+            let manual =
+                existing.origin == RelationOrigin::Manual || row.origin == RelationOrigin::Manual;
+            let mut sources = existing.source_event_ids.clone();
+            for event_id in &row.source_event_ids {
+                if !sources.contains(event_id) {
+                    sources.push(*event_id);
+                }
+            }
+            sources.sort_unstable();
+            existing.origin = if manual {
+                RelationOrigin::Manual
+            } else {
+                RelationOrigin::Event
+            };
+            existing.source_event_ids = sources;
             relationship_map.insert(right_row.id, existing.id);
             continue;
         }
