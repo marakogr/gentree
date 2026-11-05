@@ -97,4 +97,18 @@ describe("filterByYears", () => {
     ]);
     expect(filterByYears(rows, 1901, 1909)).toEqual([]);
   });
+
+  it("keeps a period that overlaps the chosen years", () => {
+    const period = entry("p", {
+      start: "1980-01-01",
+      end: "1991-01-01",
+      precision: "YEAR",
+      qualifier: "RANGE",
+      original: null,
+    });
+    expect(filterByYears([period], 1986, 1986).map((row) => row.event.id)).toEqual([
+      "p",
+    ]);
+    expect(filterByYears([period], 1991, 1991)).toEqual([]);
+  });
 });

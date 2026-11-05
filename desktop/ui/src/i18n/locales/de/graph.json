@@ -41,5 +41,8 @@
   "avatarAlt": "Foto von {{name}}",
   "showWholeTree": "Ganzer Baum",
   "showWholeTreeHint": "Alle Personen des Projekts ohne Wurzel anzeigen; Verwandtschaft wird in diesem Modus nicht beschriftet.",
-  "wholeTreeWarning": "Der Baum des gesamten Projekts ist vollständig aufgeklappt unleserlich. Verwenden Sie ihn nur für einen Überblick."
+  "wholeTreeWarning": "Der Baum des gesamten Projekts ist vollständig aufgeklappt unleserlich. Verwenden Sie ihn nur für einen Überblick.",
+  "showSpouses": "Ehepartner anzeigen",
+  "showSpousesHint": "Ehepartner und Partner der Wurzelperson und sichtbarer Blutsverwandter auf derselben Ebene anzeigen.",
+  "spouseRole": "Ehepartner"
 }

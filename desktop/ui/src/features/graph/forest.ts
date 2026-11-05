@@ -40,7 +40,10 @@ function genderRole(
  * Places `persons` in a forest rooted at the people without parents.
  * A child belongs to one primary parent for placement: the smallest parent id,
  * so equal input stays equal. The other parent links become `extraEdges`.
- * People caught in a data cycle still get a card, so nobody silently disappears.
+ * Generations are assigned per co-parent unit instead of per placement edge, so
+ * the two parents of a child always share one level even when they have
+ * different ancestries. People caught in a data cycle still get a card, so
+ * nobody silently disappears.
  */
 function buildForest(
   persons: readonly PersonLike[],
@@ -48,15 +51,16 @@ function buildForest(
   rootPersonId: string,
 ): FullTree {
   const byId = new Map(persons.map((person) => [person.id, person]));
-  const childrenOf = new Map<string, string[]>();
   const placementEdges: DescendantEdge[] = [];
   const extraEdges: DescendantEdge[] = [];
   const primaryEdge = new Map<string, DescendantEdge>();
+  const ownParents = new Map<string, ParentEdge[]>();
 
   for (const person of persons) {
     const own = (parents.get(person.id) ?? []).filter((edge) =>
       byId.has(edge.parentId),
     );
+    ownParents.set(person.id, own);
     const primary = own.map((edge) => edge.parentId).sort()[0] ?? null;
     for (const edge of own) {
       const link: DescendantEdge = {
@@ -71,31 +75,109 @@ function buildForest(
         extraEdges.push(link);
       }
     }
-    if (primary !== null) {
-      const list = childrenOf.get(primary) ?? [];
-      list.push(person.id);
-      childrenOf.set(primary, list);
-    }
   }
 
-  const hasParent = new Set(placementEdges.map((edge) => edge.childKey));
-  const roots = persons
-    .filter((person) => !hasParent.has(person.id))
-    .map((person) => person.id);
+  // Co-parents form one unit, so a child's father and mother cannot land on
+  // different generations. Union-find keeps a person in exactly one unit even
+  // when they have children with more than one partner.
+  const indexOf = new Map(persons.map((person, index) => [person.id, index]));
+  const unitRoot = persons.map((_, index) => index);
+  const findUnit = (index: number): number => {
+    let root = index;
+    while (unitRoot[root] !== root) root = unitRoot[root];
+    let current = index;
+    while (unitRoot[current] !== root) {
+      const next = unitRoot[current];
+      unitRoot[current] = root;
+      current = next;
+    }
+    return root;
+  };
+  const unionUnits = (left: number, right: number) => {
+    const leftRoot = findUnit(left);
+    const rightRoot = findUnit(right);
+    if (leftRoot === rightRoot) return;
+    // The smaller index stays the root, so unit ids follow person order.
+    if (leftRoot < rightRoot) unitRoot[rightRoot] = leftRoot;
+    else unitRoot[leftRoot] = rightRoot;
+  };
+  for (const person of persons) {
+    const own = ownParents.get(person.id) ?? [];
+    const first = own[0];
+    if (!first) continue;
+    const firstIndex = indexOf.get(first.parentId);
+    if (firstIndex === undefined) continue;
+    for (const edge of own.slice(1)) {
+      const otherIndex = indexOf.get(edge.parentId);
+      if (otherIndex !== undefined) unionUnits(firstIndex, otherIndex);
+    }
+  }
+  const unitOfPerson = (id: string): number => {
+    const index = indexOf.get(id);
+    return index === undefined ? -1 : findUnit(index);
+  };
+
+  // Units form a DAG along the placement edges. A unit sits one level below
+  // its deepest parent unit, so partners share a row and their child is below.
+  const unitChildren = new Map<number, number[]>();
+  const unitParentsByUnit = new Map<number, number[]>();
+  const seenUnitEdges = new Set<string>();
+  for (const edge of placementEdges) {
+    const parentUnit = unitOfPerson(edge.parentKey);
+    const childUnit = unitOfPerson(edge.childKey);
+    if (parentUnit < 0 || childUnit < 0 || parentUnit === childUnit) continue;
+    const key = `${parentUnit}>${childUnit}`;
+    if (seenUnitEdges.has(key)) continue;
+    seenUnitEdges.add(key);
+    const children = unitChildren.get(parentUnit) ?? [];
+    children.push(childUnit);
+    unitChildren.set(parentUnit, children);
+    const unitParents = unitParentsByUnit.get(childUnit) ?? [];
+    unitParents.push(parentUnit);
+    unitParentsByUnit.set(childUnit, unitParents);
+  }
+
+  const unitIds = [
+    ...new Set(persons.map((_, index) => findUnit(index))),
+  ].sort((left, right) => left - right);
+  const unitLevel = new Map<number, number>();
+  const pendingParents = new Map<number, number>();
+  for (const unit of unitIds) {
+    pendingParents.set(unit, (unitParentsByUnit.get(unit) ?? []).length);
+  }
+  const ready = unitIds.filter((unit) => pendingParents.get(unit) === 0);
+  const settled = new Set<number>();
+  for (let cursor = 0; cursor < ready.length; cursor += 1) {
+    const unit = ready[cursor];
+    if (settled.has(unit)) continue;
+    settled.add(unit);
+    const level = unitLevel.get(unit) ?? 0;
+    unitLevel.set(unit, level);
+    for (const childUnit of unitChildren.get(unit) ?? []) {
+      unitLevel.set(
+        childUnit,
+        Math.max(unitLevel.get(childUnit) ?? 0, level + 1),
+      );
+      const remaining = (pendingParents.get(childUnit) ?? 1) - 1;
+      pendingParents.set(childUnit, remaining);
+      if (remaining === 0) ready.push(childUnit);
+    }
+  }
+  // A corrupt cycle never becomes ready. Its units still get a level, in unit
+  // order, below whichever of their parents already has one.
+  for (const unit of unitIds) {
+    if (settled.has(unit)) continue;
+    let level = 0;
+    for (const parentUnit of unitParentsByUnit.get(unit) ?? []) {
+      level = Math.max(level, (unitLevel.get(parentUnit) ?? 0) + 1);
+    }
+    unitLevel.set(unit, level);
+  }
 
   const generation = new Map<string, number>();
-  const visit = (id: string, depth: number) => {
-    const known = generation.get(id);
-    if (known !== undefined && known <= depth) return;
-    generation.set(id, depth);
-    for (const child of childrenOf.get(id) ?? []) visit(child, depth + 1);
-  };
-  for (const root of roots) visit(root, 0);
-  // Unreachable nodes (a corrupt cycle) become extra roots at the end.
   for (const person of persons) {
-    if (generation.has(person.id)) continue;
-    roots.push(person.id);
-    visit(person.id, 0);
+    const unit = unitOfPerson(person.id);
+    generation.set(person.id, unit < 0 ? 0 : (unitLevel.get(unit) ?? 0));
   }
 
   const nodes: DescendantNode[] = persons.map((person) => {

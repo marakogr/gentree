@@ -435,6 +435,33 @@ export function splitGivenPatronymic(
   };
 }
 
+/**
+ * Normalises a name typed into the person form: trims the ends and upper-cases
+ * the first letter of every word, including hyphenated parts (`ivan ivanov` ->
+ * `Ivan Ivanov`, `petrov-vodkin` -> `Petrov-Vodkin`). The rest of the user's
+ * case is preserved, so mixed-case input is not lower-cased.
+ */
+export function capitalizeName(value: string): string {
+  return value
+    .trim()
+    .replace(
+      /(^|[\s-])(\p{L})/gu,
+      (_match: string, lead: string, letter: string) =>
+        lead + letter.toLocaleUpperCase(),
+    );
+}
+
+/** Name fields are normalised on save too, so a skipped blur cannot leak case. */
+function normalizedNameDraft(draft: PersonDraft): PersonDraft {
+  return {
+    ...draft,
+    given: capitalizeName(draft.given),
+    surname: capitalizeName(draft.surname),
+    patronymic: capitalizeName(draft.patronymic),
+    birthSurname: capitalizeName(draft.birthSurname),
+  };
+}
+
 function birthNameOf(
   person: Person,
   primary: PersonName | undefined,
@@ -643,7 +670,7 @@ export function buildPersonInput(
     person: {
       ...(base ? { id: base.id } : {}),
       gender: draft.gender,
-      names: replacePrimaryName(base, draft),
+      names: replacePrimaryName(base, normalizedNameDraft(draft)),
       birth: birth.value,
       death: death.value,
       notes: blankToNull(draft.notes),

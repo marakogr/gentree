@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
+import type { DateValue } from "../../api/types";
+import { parseCivilDate } from "../../lib/dates";
 import { DEFAULT_VIEW_STATE, mergeViewState } from "../../lib/viewState";
+import { dateOverlaps } from "../events/helpers";
 import { canRequestScope, createLineRequestGuard } from "./scope";
 import {
   buildTimelineListParams,
@@ -217,18 +220,33 @@ describe("buildTimelineListParams", () => {
     expect(buildTimelineListParams(view())).toEqual({ scope: "all" });
   });
 
-  it("adds the shared types and whole-year bounds", () => {
+  it("adds the shared types and half-open year bounds", () => {
     expect(
       buildTimelineListParams(view(), ["BIRTH", "DEATH"], "1900", "1950"),
     ).toEqual({
       scope: "all",
       types: ["BIRTH", "DEATH"],
       from: "1900-01-01",
-      to: "1950-12-31",
+      to: "1951-01-01",
     });
     expect(
       buildTimelineListParams(view(), [], "", "1950"),
-    ).toEqual({ scope: "all", to: "1950-12-31" });
+    ).toEqual({ scope: "all", to: "1951-01-01" });
+  });
+
+  it("keeps 31 December of the upper year inside the request", () => {
+    const params = buildTimelineListParams(view(), [], "", "1986");
+    expect(params.to).toBe("1987-01-01");
+    const to = params.to ? parseCivilDate(params.to) : null;
+    const lastDay: DateValue = {
+      start: "1986-12-31",
+      end: null,
+      precision: "DAY",
+      qualifier: "EXACT",
+      original: null,
+    };
+    expect(to).not.toBeNull();
+    expect(dateOverlaps(lastDay, null, to)).toBe(true);
   });
 });
 

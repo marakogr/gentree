@@ -8,8 +8,11 @@ import {
   buildAxisTicks,
   buildDensityBins,
   buildLineMarkers,
+  clampWindow,
+  clampWindowToDomain,
   clusterLineMarkers,
   computeLineWindow,
+  computeMarkerWindow,
   computePersonWindow,
   dedupeEvents,
   formatLineDate,
@@ -17,6 +20,7 @@ import {
   lineDateKind,
   lineIconKind,
   lineIntervalEnd,
+  markerDomain,
   panWindow,
   partitionLineEvents,
   personEventIds,
@@ -224,7 +228,7 @@ describe("buildLineMarkers", () => {
 });
 
 describe("computeLineWindow", () => {
-  it("covers all dated events with 2–5% padding", () => {
+  it("covers exactly the loaded events", () => {
     const window = computeLineWindow(
       [
         event("e1", "BIRTH", { start: "1950-01-01T00:00:00.000Z" }),
@@ -234,27 +238,17 @@ describe("computeLineWindow", () => {
     );
     expect(window).not.toBeNull();
     if (window === null) return;
-    const first = new Date(1950, 0, 1);
-    const last = new Date(1981, 0, 1);
-    expect(window.start.getTime()).toBeLessThan(first.getTime());
-    expect(window.end.getTime()).toBeGreaterThan(last.getTime());
-    const span = last.getTime() - first.getTime();
-    expect((first.getTime() - window.start.getTime()) / span).toBeGreaterThanOrEqual(0.02);
-    expect((first.getTime() - window.start.getTime()) / span).toBeLessThanOrEqual(0.05);
+    expect(window.start).toEqual(new Date(1950, 0, 1));
+    expect(window.end).toEqual(new Date(1981, 0, 1));
   });
 
-  it("keeps a two-year fallback around one point", () => {
+  it("uses the marker interval for a single point", () => {
     const window = computeLineWindow(
       [event("e1", "BIRTH", { start: "1950-01-01T00:00:00.000Z" })],
       ru,
     );
-    expect(window).not.toBeNull();
-    expect(window?.start.getTime()).toBeLessThan(
-      new Date(1950, 0, 1).getTime(),
-    );
-    expect(window?.end.getTime()).toBeGreaterThan(
-      new Date(1951, 0, 1).getTime(),
-    );
+    expect(window?.start).toEqual(new Date(1950, 0, 1));
+    expect(window?.end).toEqual(new Date(1951, 0, 1));
   });
 
   it("returns null for an empty or undated set", () => {
@@ -262,6 +256,66 @@ describe("computeLineWindow", () => {
     expect(
       computeLineWindow([event("e1", "OTHER", { start: null })], ru),
     ).toBeNull();
+  });
+});
+
+describe("markerDomain", () => {
+  const markers = buildLineMarkers(
+    [
+      event("e1", "BIRTH", { start: "1900-01-01T00:00:00.000Z" }),
+      event("e2", "DEATH", { start: "1980-06-15T00:00:00.000Z" }),
+    ],
+    ru,
+  );
+
+  it("spans the earliest marker to the latest interval end", () => {
+    const domain = markerDomain(markers, new Date(2026, 0, 1));
+    expect(domain?.start).toEqual(new Date(1900, 0, 1));
+    expect(domain?.end).toEqual(new Date(1981, 0, 1));
+  });
+
+  it("never extends past the current local date", () => {
+    const domain = markerDomain(markers, new Date(1970, 0, 1));
+    expect(domain?.start).toEqual(new Date(1900, 0, 1));
+    expect(domain?.end).toEqual(new Date(1970, 0, 1));
+  });
+
+  it("keeps future-only markers reachable instead of collapsing to today", () => {
+    const future = buildLineMarkers(
+      [
+        event("f1", "BIRTH", { start: "2100-01-01T00:00:00.000Z" }),
+        event("f2", "DEATH", { start: "2110-06-15T00:00:00.000Z" }),
+      ],
+      ru,
+    );
+    const domain = markerDomain(future, new Date(2026, 0, 1));
+    expect(domain?.start).toEqual(new Date(2100, 0, 1));
+    expect(domain?.end).toEqual(new Date(2111, 0, 1));
+  });
+
+  it("always returns a non-empty domain when a marker exists", () => {
+    const point = buildLineMarkers(
+      [
+        event("p1", "OTHER", {
+          start: "1950-01-01T00:00:00.000Z",
+          precision: "UNKNOWN",
+        }),
+      ],
+      ru,
+    );
+    const domain = markerDomain(point, new Date(2026, 0, 1));
+    expect(domain).not.toBeNull();
+    if (domain === null) return;
+    expect(domain.end.getTime()).toBeGreaterThan(domain.start.getTime());
+    const window = computeMarkerWindow(point, 0.04, domain);
+    expect(window).not.toBeNull();
+    if (window === null) return;
+    expect(window.end.getTime()).toBeGreaterThan(window.start.getTime());
+  });
+
+  it("returns null without dated markers", () => {
+    expect(markerDomain([], new Date(2026, 0, 1))).toBeNull();
+    expect(computeMarkerWindow([], 0.04, null)).toBeNull();
   });
 });
 
@@ -277,9 +331,8 @@ describe("computePersonWindow", () => {
       ru,
     );
     const window = computePersonWindow(markers, "p1");
-    expect(window?.start.getFullYear()).toBeLessThan(1900);
-    expect(window?.end.getFullYear()).toBeGreaterThan(1980);
-    expect(window?.end.getFullYear()).toBeLessThan(2001);
+    expect(window?.start).toEqual(new Date(1900, 0, 1));
+    expect(window?.end).toEqual(new Date(1981, 0, 1));
   });
 
   it("returns null without a person or events", () => {
@@ -335,6 +388,39 @@ describe("positionOnLine / pan / zoom / brush", () => {
     );
     const tiny = brushWindow(window, 0.5, 0.5);
     expect(tiny.end.getTime() - tiny.start.getTime()).toBeGreaterThan(0);
+  });
+});
+
+describe("timeline window bounds", () => {
+  const domain = { start: new Date(1900, 0, 1), end: new Date(2000, 0, 1) };
+  const window = { start: new Date(1950, 0, 1), end: new Date(1960, 0, 1) };
+  const span = window.end.getTime() - window.start.getTime();
+
+  it("does not pan before the earliest or after the latest marker", () => {
+    const left = panWindow(window, -10, domain);
+    expect(left.start.getTime()).toBe(domain.start.getTime());
+    expect(left.end.getTime() - left.start.getTime()).toBe(span);
+    const right = panWindow(window, 10, domain);
+    expect(right.end.getTime()).toBe(domain.end.getTime());
+    expect(right.end.getTime() - right.start.getTime()).toBe(span);
+  });
+
+  it("keeps every zoom anchor inside the domain", () => {
+    for (const factor of [0.1, 0.5, 2, 10]) {
+      for (const anchor of [0, 0.5, 1]) {
+        const next = zoomWindow(window, factor, anchor, domain);
+        expect(next.start.getTime()).toBeGreaterThanOrEqual(
+          domain.start.getTime(),
+        );
+        expect(next.end.getTime()).toBeLessThanOrEqual(domain.end.getTime());
+      }
+    }
+  });
+
+  it("collapses a window wider than the domain to the domain", () => {
+    const wide = { start: new Date(1800, 0, 1), end: new Date(2100, 0, 1) };
+    expect(clampWindowToDomain(wide, domain)).toEqual(domain);
+    expect(clampWindow(wide, domain)).toEqual(domain);
   });
 });
 

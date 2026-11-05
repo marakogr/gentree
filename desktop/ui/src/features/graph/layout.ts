@@ -12,7 +12,12 @@ import type {
 } from "../../api/types";
 
 export const NODE_WIDTH = 168;
-export const NODE_HEIGHT = 64;
+/**
+ * Three 13px caption lines, the 11px meta line, their gap and the card padding
+ * (8px top and bottom) plus the border. A clamped name therefore never spills
+ * onto the neighbouring generation.
+ */
+export const NODE_HEIGHT = 84;
 export const H_GAP = 28;
 /** Partners sit closer together than unrelated cards, so a couple reads as one. */
 export const SPOUSE_GAP = 16;
@@ -28,6 +33,8 @@ export type LayoutNode = {
   role: AncestorNode["role"] | DescendantNode["role"];
   adoptive: boolean;
   placeholder: boolean;
+  /** Anchor occurrence key when this card exists only because of a spouse. */
+  spouseOfKey: string | null;
   x: number;
   y: number;
   width: number;
@@ -58,7 +65,86 @@ export type LayoutOptions = {
    * disappear with them.
    */
   includePlaceholders?: boolean;
+  /** Spouse-only occurrence key -> the anchor card it stands beside. */
+  spouseOf?: ReadonlyMap<string, string>;
+  /** Occurrence-key pairs joined by a spouse connector. */
+  spousePairs?: readonly (readonly [string, string])[];
 };
+
+type SpouseSlots = {
+  spouseOf: ReadonlyMap<string, string>;
+  spouseKeys: Set<string>;
+  /** Anchor occurrence key -> spouse occurrence keys in node order. */
+  spousesOf: Map<string, string[]>;
+};
+
+function spouseSlots(
+  nodes: readonly { occurrenceKey: string }[],
+  spouseOf: ReadonlyMap<string, string> | undefined,
+): SpouseSlots {
+  const mapping = spouseOf ?? new Map<string, string>();
+  const spouseKeys = new Set(mapping.keys());
+  const byAnchor = new Map<string, string[]>();
+  for (const node of nodes) {
+    const anchor = mapping.get(node.occurrenceKey);
+    if (anchor === undefined) continue;
+    const list = byAnchor.get(anchor) ?? [];
+    list.push(node.occurrenceKey);
+    byAnchor.set(anchor, list);
+  }
+  return { spouseOf: mapping, spouseKeys, spousesOf: byAnchor };
+}
+
+function blockWidthOf(keys: readonly string[]): number {
+  return keys.length === 0
+    ? NODE_WIDTH
+    : keys.length * NODE_WIDTH + (keys.length - 1) * SPOUSE_GAP;
+}
+
+/**
+ * A couple that shares a block gets a short horizontal connector. Cards that
+ * cannot be adjacent (both are blood occurrences) get a routed connector above
+ * their row so it never crosses a card body.
+ */
+function spousePath(left: LayoutNode, right: LayoutNode): string {
+  const [first, second] = left.x <= right.x ? [left, right] : [right, left];
+  const gap = second.x - (first.x + first.width);
+  if (Math.abs(first.y - second.y) < 0.01 && gap <= SPOUSE_GAP + 0.01) {
+    const y = round(first.y + first.height / 2);
+    return `M ${round(first.x + first.width)} ${y} H ${round(second.x)}`;
+  }
+  const midY = round(
+    Math.max(PADDING / 2, Math.min(first.y, second.y) - V_GAP / 2),
+  );
+  return [
+    `M ${round(first.x + first.width / 2)} ${round(first.y)}`,
+    `V ${midY}`,
+    `H ${round(second.x + second.width / 2)}`,
+    `V ${round(second.y)}`,
+  ].join(" ");
+}
+
+function appendSpouseEdges(
+  edges: LayoutEdge[],
+  positioned: ReadonlyMap<string, LayoutNode>,
+  pairs: readonly (readonly [string, string])[],
+): void {
+  const drawn = new Set<string>();
+  for (const [leftKey, rightKey] of pairs) {
+    const left = positioned.get(leftKey);
+    const right = positioned.get(rightKey);
+    if (!left || !right) continue;
+    const key = spousePairKey(leftKey, rightKey);
+    if (drawn.has(key)) continue;
+    drawn.add(key);
+    edges.push({
+      kind: "spouse",
+      fromKey: left.x <= right.x ? leftKey : rightKey,
+      toKey: left.x <= right.x ? rightKey : leftKey,
+      path: spousePath(left, right),
+    });
+  }
+}
 
 /** Order-independent key for a spouse/partner couple. */
 export function spousePairKey(left: string, right: string): string {
@@ -78,6 +164,7 @@ export function layoutAncestors(
   const sourceNodes = includePlaceholders
     ? graph.nodes
     : graph.nodes.filter((node) => !node.placeholder);
+  const slots = spouseSlots(sourceNodes, options.spouseOf);
   const sourceKeys = new Set(sourceNodes.map((node) => node.occurrenceKey));
   const sourceEdges = includePlaceholders
     ? graph.edges
@@ -120,9 +207,12 @@ export function layoutAncestors(
     frontier = next;
   }
 
-  // Nodes unreachable from the root (defensive) still get a slot.
+  // Nodes unreachable from the root (defensive) still get a slot. Spouse-only
+  // cards are appended to their anchor's block instead of becoming roots.
   for (const node of sourceNodes) {
-    if (seen.has(node.occurrenceKey)) continue;
+    if (seen.has(node.occurrenceKey) || slots.spouseKeys.has(node.occurrenceKey)) {
+      continue;
+    }
     while (levels.length <= node.generation) levels.push([]);
     levels[node.generation].push(node);
   }
@@ -147,28 +237,39 @@ export function layoutAncestors(
   }
 
   type Block = { keys: string[]; width: number; x: number };
-  const blockWidth = (keys: string[]): number =>
-    keys.length < 2 ? NODE_WIDTH : NODE_WIDTH * 2 + SPOUSE_GAP;
+  const blockWidth = (keys: string[]): number => blockWidthOf(keys);
 
   // Blocks keep the tree order of the level: parents of one child stay
-  // together, and the father slot stays left of the mother slot.
+  // together, and the father slot stays left of the mother slot. Spouse-only
+  // cards follow their anchor inside the same block, so they share its row.
   const blocksByLevel: Block[][] = levels.map((level) => {
     const positionOf = new Map(
       level.map((node, index) => [node.occurrenceKey, index]),
     );
     const used = new Set<string>();
     const blocks: Block[] = [];
+    const withSpouses = (bloodKeys: string[]): string[] => {
+      const keys = [...bloodKeys];
+      for (const key of bloodKeys) {
+        for (const spouseKey of slots.spousesOf.get(key) ?? []) {
+          if (keys.includes(spouseKey) || used.has(spouseKey)) continue;
+          keys.push(spouseKey);
+        }
+      }
+      return keys;
+    };
     for (const node of level) {
       const key = node.occurrenceKey;
       if (used.has(key)) continue;
       const partner = partnerOf.get(key);
-      const keys =
+      const bloodKeys =
         partner !== undefined && positionOf.has(partner) && !used.has(partner)
           ? [key, partner].sort(
               (left, right) =>
                 (positionOf.get(left) ?? 0) - (positionOf.get(right) ?? 0),
             )
           : [key];
+      const keys = withSpouses(bloodKeys);
       for (const member of keys) used.add(member);
       blocks.push({ keys, width: blockWidth(keys), x: 0 });
     }
@@ -226,6 +327,7 @@ export function layoutAncestors(
       role: node.role,
       adoptive: node.adoptive,
       placeholder: node.placeholder,
+      spouseOfKey: slots.spouseOf.get(node.occurrenceKey) ?? null,
       x: round(
         (block?.x ?? 0) + shift + slot * (NODE_WIDTH + SPOUSE_GAP),
       ),
@@ -269,25 +371,22 @@ export function layoutAncestors(
     });
   }
 
-  // Each couple block gets one horizontal connector between the two cards, so a
-  // line never spans a stranger.
-  for (const block of blocksByLevel.flat()) {
-    if (block.keys.length < 2) continue;
-    const first = positioned.get(block.keys[0]);
-    const second = positioned.get(block.keys[1]);
-    if (!first || !second) continue;
-    const [left, rightNode] =
-      first.x <= second.x ? [first, second] : [second, first];
-    const connectorY = left.y + NODE_HEIGHT / 2;
-    edges.push({
-      kind: "spouse",
-      fromKey: left.occurrenceKey,
-      toKey: rightNode.occurrenceKey,
-      path: `M ${round(left.x + NODE_WIDTH)} ${round(connectorY)} H ${round(
-        rightNode.x,
-      )}`,
-    });
+  // Explicit spouse pairs (from the decoration pass) are authoritative. Older
+  // callers without them keep the couple-block connector behavior.
+  const connectorPairs: (readonly [string, string])[] = [];
+  if (options.spousePairs !== undefined) {
+    connectorPairs.push(...options.spousePairs);
+  } else {
+    for (const block of blocksByLevel.flat()) {
+      if (block.keys.length === 2) {
+        connectorPairs.push([block.keys[0], block.keys[1]]);
+      }
+    }
+    for (const [spouseKey, anchorKey] of slots.spouseOf) {
+      connectorPairs.push([anchorKey, spouseKey]);
+    }
   }
+  appendSpouseEdges(edges, positioned, connectorPairs);
 
   return { nodes, edges, width, height };
 }
@@ -314,6 +413,7 @@ export function layoutDescendants(
   const nodesByKey = new Map(
     graph.nodes.map((node) => [node.occurrenceKey, node]),
   );
+  const slots = spouseSlots(graph.nodes, options.spouseOf);
 
   // Placement edges define the tree: one band per child. A child listed twice
   // (defensive) is placed under its first parent only.
@@ -332,18 +432,20 @@ export function layoutDescendants(
 
   const widths = new Map<string, number>();
   const visiting = new Set<string>();
+  const blockWidthAt = (key: string): number =>
+    blockWidthOf([key, ...(slots.spousesOf.get(key) ?? [])]);
   const subtreeWidth = (key: string): number => {
     const cached = widths.get(key);
     if (cached !== undefined) return cached;
-    if (visiting.has(key)) return NODE_WIDTH;
+    if (visiting.has(key)) return blockWidthAt(key);
     visiting.add(key);
     const children = childrenOf.get(key) ?? [];
-    let width = NODE_WIDTH;
+    let width = blockWidthAt(key);
     if (children.length > 0) {
       const total =
         children.reduce((sum, child) => sum + subtreeWidth(child), 0) +
         H_GAP * (children.length - 1);
-      width = Math.max(NODE_WIDTH, total);
+      width = Math.max(width, total);
     }
     visiting.delete(key);
     widths.set(key, width);
@@ -356,9 +458,10 @@ export function layoutDescendants(
     if (placed.has(key)) return;
     placed.add(key);
     const width = subtreeWidth(key);
+    const blockWidth = blockWidthAt(key);
     const children = childrenOf.get(key) ?? [];
     if (children.length === 0) {
-      x.set(key, left + (width - NODE_WIDTH) / 2);
+      x.set(key, left + (width - blockWidth) / 2);
       return;
     }
     const total =
@@ -371,16 +474,23 @@ export function layoutDescendants(
     }
     const first = x.get(children[0]) ?? left;
     const last = x.get(children[children.length - 1]) ?? left;
-    const desired = (first + last) / 2;
+    const firstCentre = first + blockWidthAt(children[0]) / 2;
+    const lastCentre = last + blockWidthAt(children[children.length - 1]) / 2;
+    const desired = (firstCentre + lastCentre) / 2 - blockWidth / 2;
     x.set(
       key,
-      Math.min(Math.max(desired, left), left + width - NODE_WIDTH),
+      Math.min(Math.max(desired, left), left + width - blockWidth),
     );
   };
 
   // Roots in node order, so equal input stays equal. A node caught in a data
   // cycle has a parent but is never reached; it becomes its own root below.
-  const roots = graph.nodes.filter((node) => !hasParent.has(node.occurrenceKey));
+  // Spouse-only cards never become roots; they travel with their anchor.
+  const roots = graph.nodes.filter(
+    (node) =>
+      !hasParent.has(node.occurrenceKey) &&
+      !slots.spouseKeys.has(node.occurrenceKey),
+  );
   let cursor = 0;
   for (const root of roots) {
     place(root.occurrenceKey, cursor);
@@ -388,12 +498,30 @@ export function layoutDescendants(
   }
   for (const node of graph.nodes) {
     if (placed.has(node.occurrenceKey)) continue;
+    if (slots.spouseKeys.has(node.occurrenceKey)) continue;
     place(node.occurrenceKey, cursor);
     cursor += subtreeWidth(node.occurrenceKey) + H_GAP;
   }
 
   const knownXs = [...x.values()];
   const shift = PADDING - Math.min(...knownXs);
+
+  // A spouse-only card is placed to the right of its anchor, in node order.
+  const positions = new Map<string, number>();
+  for (const node of graph.nodes) {
+    if (slots.spouseKeys.has(node.occurrenceKey)) continue;
+    const anchorX = (x.get(node.occurrenceKey) ?? 0) + shift;
+    positions.set(node.occurrenceKey, anchorX);
+    let spouseCursor = anchorX + NODE_WIDTH + SPOUSE_GAP;
+    for (const spouseKey of slots.spousesOf.get(node.occurrenceKey) ?? []) {
+      positions.set(spouseKey, spouseCursor);
+      spouseCursor += NODE_WIDTH + SPOUSE_GAP;
+    }
+  }
+  for (const spouseKey of slots.spouseKeys) {
+    if (!positions.has(spouseKey)) positions.set(spouseKey, PADDING);
+  }
+
   const deepest = Math.max(...graph.nodes.map((node) => node.generation));
   const nodes: LayoutNode[] = graph.nodes.map((node) => ({
     occurrenceKey: node.occurrenceKey,
@@ -402,7 +530,8 @@ export function layoutDescendants(
     role: node.role,
     adoptive: node.adoptive,
     placeholder: false,
-    x: round((x.get(node.occurrenceKey) ?? 0) + shift),
+    spouseOfKey: slots.spouseOf.get(node.occurrenceKey) ?? null,
+    x: round(positions.get(node.occurrenceKey) ?? 0),
     y: round(PADDING + node.generation * (NODE_HEIGHT + V_GAP)),
     width: NODE_WIDTH,
     height: NODE_HEIGHT,
@@ -450,6 +579,16 @@ export function layoutDescendants(
       if (drawn.has(`${edge.parentKey}>${edge.childKey}`)) continue;
       drawEdge(edge);
     }
+  }
+
+  if (options.spousePairs !== undefined) {
+    appendSpouseEdges(edges, positioned, options.spousePairs);
+  } else if (options.spouseOf !== undefined) {
+    const pairs: [string, string][] = [];
+    for (const [spouseKey, anchorKey] of slots.spouseOf) {
+      pairs.push([anchorKey, spouseKey]);
+    }
+    appendSpouseEdges(edges, positioned, pairs);
   }
 
   return { nodes, edges, width, height };

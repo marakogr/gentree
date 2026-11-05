@@ -11,6 +11,7 @@ import {
   eventPersonIds,
   eventYear,
   eventYearBounds,
+  eventYearOverlaps,
   filterEventRows,
   isEventDraftDirty,
   isYearRangeInvalid,
@@ -848,6 +849,82 @@ describe("isYearRangeInvalid", () => {
     expect(isYearRangeInvalid("1950", "1990")).toBe(false);
     expect(isYearRangeInvalid("1950", "")).toBe(false);
     expect(isYearRangeInvalid("", "")).toBe(false);
+  });
+});
+
+describe("year filter over event periods (issue #83)", () => {
+  const day = (start: string, end: string | null): DateValue => ({
+    start,
+    end,
+    precision: "DAY",
+    qualifier: "EXACT",
+    original: null,
+  });
+  const point = versioned(
+    event("point", "a", null, {
+      type: "EDUCATION",
+      date: day("1980-09-01", "1980-09-02"),
+    }),
+  );
+  const period = versioned(
+    event("period", "a", null, {
+      type: "EDUCATION",
+      date: day("1980-01-01", "1991-01-01"),
+    }),
+  );
+  const openEnd = event("open", "a", null, {
+    type: "EDUCATION",
+    date: day("1970-05-01", null),
+  });
+  const undated = versioned(event("undated", "a", null));
+  const byYear = (fromYear: string, toYear: string) =>
+    filterEventRows(
+      [point, period, undated],
+      "",
+      { ...noFilters, fromYear, toYear },
+      contextOf,
+    ).map((item) => item.entity.id);
+
+  it("shows a dated event from its start year", () => {
+    expect(byYear("1980", "")).toEqual(["point", "period"]);
+  });
+
+  it("shows a period from a year inside it", () => {
+    expect(byYear("1986", "")).toEqual(["period"]);
+  });
+
+  it("excludes an event that starts after the upper year", () => {
+    expect(byYear("", "1979")).toEqual([]);
+  });
+
+  it("excludes a period that ends at the from-year boundary", () => {
+    const ended = versioned(
+      event("ended", "a", null, {
+        type: "EDUCATION",
+        date: day("1980-01-01", "1986-01-01"),
+      }),
+    );
+    expect(
+      filterEventRows(
+        [ended],
+        "",
+        { ...noFilters, fromYear: "1986" },
+        contextOf,
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("treats an open end as running up to now", () => {
+    const today = new Date(2026, 10, 5);
+    expect(eventYearOverlaps(openEnd, "2020", "", today)).toBe(true);
+    expect(eventYearOverlaps(openEnd, "", "1979", today)).toBe(true);
+    expect(eventYearOverlaps(openEnd, "2030", "", today)).toBe(false);
+  });
+
+  it("never matches an unknown date against a bounded filter", () => {
+    expect(eventYearOverlaps(undated.entity, "1980", "")).toBe(false);
+    expect(eventYearOverlaps(undated.entity, "", "2000")).toBe(false);
+    expect(eventYearOverlaps(undated.entity, "", "")).toBe(true);
   });
 });
 
