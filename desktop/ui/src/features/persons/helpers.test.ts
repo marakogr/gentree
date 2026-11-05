@@ -4,6 +4,7 @@ import {
   ageInCompletedYears,
   ageTone,
   buildPersonInput,
+  capitalizeName,
   displayName,
   draftFromPerson,
   emptyPersonDraft,
@@ -241,6 +242,28 @@ describe("splitGivenPatronymic", () => {
   });
 });
 
+describe("capitalizeName", () => {
+  it("upper-cases the first letter of every word", () => {
+    expect(capitalizeName("иван иванов")).toBe("Иван Иванов");
+    expect(capitalizeName("john smith")).toBe("John Smith");
+  });
+
+  it("handles hyphenated parts", () => {
+    expect(capitalizeName("петров-водкин")).toBe("Петров-Водкин");
+    expect(capitalizeName("анна-мария")).toBe("Анна-Мария");
+  });
+
+  it("keeps the rest of the user's case and trims the ends", () => {
+    expect(capitalizeName("  иВАН  иванов  ")).toBe("ИВАН  Иванов");
+  });
+
+  it("leaves blank input and non-letter words untouched", () => {
+    expect(capitalizeName("")).toBe("");
+    expect(capitalizeName("   ")).toBe("");
+    expect(capitalizeName("иван 123")).toBe("Иван 123");
+  });
+});
+
 describe("birth surname", () => {
   it("round-trips the surname at birth as a separate BIRTH name", () => {
     const result = buildPersonInput({
@@ -340,6 +363,27 @@ describe("buildPersonInput", () => {
     expect(result.person.names).toHaveLength(2);
     expect(result.person.names[0].surname).toBe("Smirnov");
     expect(result.person.names[1].surname).toBe("Sidorov");
+  });
+
+  it("capitalises every name field on save", () => {
+    const result = buildPersonInput({
+      ...emptyPersonDraft(),
+      given: "иван",
+      surname: "петров-водкин",
+      patronymic: "иванович",
+      birthSurname: "сидоров",
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.person.names[0]).toMatchObject({
+      given: "Иван",
+      surname: "Петров-Водкин",
+      patronymic: "Иванович",
+    });
+    expect(result.person.names[1]).toMatchObject({
+      surname: "Сидоров",
+      nameType: "BIRTH",
+    });
   });
 
   it("reports invalid date fields instead of inventing a value", () => {
