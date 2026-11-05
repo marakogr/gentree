@@ -42,6 +42,7 @@ import {
   buildLineMarkers,
   clampWindow,
   computeMarkerWindow,
+  markerDomain,
   partitionLineEvents,
   personEventIds,
   positionOnLine,
@@ -507,7 +508,12 @@ export default function TimelinePage({
     () => buildLineMarkers(partitioned.dated, t),
     [partitioned.dated, t],
   );
-  const dataWindow = useMemo(() => computeMarkerWindow(markers), [markers]);
+  // The loaded events bound every navigation gesture, not the window span.
+  const domain = useMemo(() => markerDomain(markers), [markers]);
+  const dataWindow = useMemo(
+    () => computeMarkerWindow(markers, 0.04, domain),
+    [markers, domain],
+  );
 
   const allEvents = useMemo(
     () => [...datedEvents, ...undatedEvents],
@@ -553,9 +559,12 @@ export default function TimelinePage({
     setReloadKey((current) => current + 1);
   }, []);
 
-  const commitWindow = useCallback((next: TimelineWindow) => {
-    setWindow(clampWindow(next));
-  }, []);
+  const commitWindow = useCallback(
+    (next: TimelineWindow) => {
+      setWindow(clampWindow(next, domain));
+    },
+    [domain],
+  );
 
   const handleFit = useCallback(() => {
     setWindow(dataWindow);
