@@ -40,9 +40,11 @@ pub use project::{Counts, Manifest, ProjectId, FORMAT_VERSION, SCHEMA_VERSION};
 pub use record::{Citation, CitationTarget, Confidence, Event, EventType, Media, Source};
 pub use relationship::{Relationship, RelationshipSet, RelationshipType};
 pub use validation::{
-    ensure_event_within_lifespan, ensure_life_events_compatible, ensure_single_life_event,
-    removal_plan, validate_project, IssueCounts, ProjectSnapshot, RemovalPlan, Severity,
-    ValidationIssue, ValidationReport,
+    ensure_event_within_lifespan, ensure_life_events_compatible, ensure_parent_child_age_gap,
+    ensure_residence_ranges_do_not_overlap, ensure_single_life_event, removal_plan,
+    validate_project, IssueCounts, ProjectSnapshot, RemovalPlan, Severity, ValidationIssue,
+    ValidationReport, EVENT_OUT_OF_LIFESPAN, MIN_PARENT_AGE_GAP_YEARS, PARENT_CHILD_AGE_GAP,
+    RESIDENCE_RANGE_OVERLAP,
 };
 
 /// RFC 3339 timestamp used in manifest/JSONL envelopes (UTC).

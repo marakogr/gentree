@@ -145,7 +145,12 @@ impl Event {
         if self.person_id.is_nil() {
             return Err(AppError::validation("personId", "required"));
         }
-        self.date.validate()?;
+        if self.event_type == EventType::Residence {
+            // A residence may be ongoing: `RANGE` with a start and no end.
+            self.date.validate_open_range()?;
+        } else {
+            self.date.validate()?;
+        }
         if self.place.as_deref().is_some_and(|value| value.len() > 500) {
             return Err(AppError::validation("place", "tooLong"));
         }

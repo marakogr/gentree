@@ -79,6 +79,23 @@ describe("parsePeriodInput", () => {
     });
   });
 
+  it("saves an open-ended range only when the type allows it", () => {
+    expect(parsePeriodInput("1980", "", "YEAR", true)).toEqual({
+      ok: true,
+      value: {
+        start: "1980-01-01",
+        end: null,
+        precision: "YEAR",
+        qualifier: "RANGE",
+        original: null,
+      },
+    });
+    expect(parsePeriodInput("", "1985", "YEAR", true)).toEqual({
+      ok: false,
+      reason: "incomplete",
+    });
+  });
+
   it("refuses an inverted period", () => {
     expect(parsePeriodInput("1985", "1980", "YEAR")).toEqual({
       ok: false,
@@ -107,7 +124,7 @@ describe("periodFromDate", () => {
     ).toEqual({ from: "1980", to: "1985" });
   });
 
-  it("returns null for a single date, an unknown date or a partial range", () => {
+  it("returns null for a single date or an unknown date", () => {
     expect(
       periodFromDate({
         start: "1980-01-01",
@@ -126,6 +143,9 @@ describe("periodFromDate", () => {
         original: "about 1850",
       }),
     ).toBeNull();
+  });
+
+  it("keeps an open range open instead of inventing an end", () => {
     expect(
       periodFromDate({
         start: "1980-01-01",
@@ -134,6 +154,6 @@ describe("periodFromDate", () => {
         qualifier: "RANGE",
         original: null,
       }),
-    ).toBeNull();
+    ).toEqual({ from: "1980", to: "" });
   });
 });

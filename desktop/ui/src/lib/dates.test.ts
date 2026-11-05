@@ -107,6 +107,19 @@ describe("formatDateValue", () => {
       }),
     );
   });
+
+  it("renders an open range as ongoing without inventing an end", () => {
+    const range: DateValue = {
+      start: "1950-01-01",
+      end: null,
+      precision: "YEAR",
+      qualifier: "RANGE",
+      original: null,
+    };
+    expect(formatDateValue(range, "en", t)).toBe(
+      t("date.rangeOpen", { from: formatCivilDate("1950-01-01", "YEAR", "en") }),
+    );
+  });
 });
 
 describe("parseDateInput", () => {
