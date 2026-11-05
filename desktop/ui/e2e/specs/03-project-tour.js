@@ -65,12 +65,12 @@ describe("project tour", () => {
 
       if (slug === "timeline") {
         // The person filter is shared with the events screen and defaults to
-        // "all people"; the full-name placeholder matches the people table.
+        // "all people"; the placeholder is the shared filter-row copy.
         const person = await $("#timeline-focus-person");
         await person.waitForDisplayed({ timeout: 5000 });
         expect(await person.getValue()).toBe("Все люди");
         expect(await person.getAttribute("placeholder")).toBe(
-          "Имя, фамилия или отчество",
+          "Начните вводить имя",
         );
         await shot("timeline-filters-empty");
       }

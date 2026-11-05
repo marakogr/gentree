@@ -246,7 +246,7 @@ describe("event filters", () => {
     await timelinePerson.waitForDisplayed({ timeout: 10000 });
     expect(await timelinePerson.getValue()).toBe(personValue);
     expect(
-      (await (await $("#timeline-type-filter")).getText()).trim(),
+      (await (await $("#event-type-filter")).getText()).trim(),
     ).toBe("Рождение");
     await shot("timeline-from-events");
 
