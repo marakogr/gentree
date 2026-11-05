@@ -47,6 +47,7 @@
   "dateModeGraduation": "Año de finalización",
   "dateModeStudyPeriod": "Años de estudio (periodo)",
   "dateModeResidencePeriod": "Periodo de residencia (de–a)",
+  "dateOngoing": "En curso (sin fecha de fin)",
   "dateRangeQualifier": "Se establece automáticamente para un periodo",
   "dateRangeUnknownHint": "Un periodo no se puede guardar con precisión desconocida",
   "precision": "Precisión",

@@ -47,6 +47,7 @@
   "dateModeGraduation": "Год заканчэння",
   "dateModeStudyPeriod": "Гады навучання (перыяд)",
   "dateModeResidencePeriod": "Перыяд пражывання (з–па)",
+  "dateOngoing": "Дагэтуль (без даты заканчэння)",
   "dateRangeQualifier": "Для перыяду задаецца аўтаматычна",
   "dateRangeUnknownHint": "Перыяд нельга захаваць з невядомай дакладнасцю",
   "precision": "Дакладнасць",

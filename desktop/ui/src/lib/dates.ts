@@ -173,6 +173,9 @@ export function formatDateValue(
     case "RANGE": {
       const from = value.start;
       const to = value.end;
+      if (from && !to) {
+        return t("date.rangeOpen", { from: format(from) });
+      }
       if (!from || !to) {
         const single = from ?? to;
         return single ? format(single) : t("date.unknown");

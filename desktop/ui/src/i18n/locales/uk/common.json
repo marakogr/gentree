@@ -85,6 +85,7 @@
     "before": "до {{date}}",
     "after": "після {{date}}",
     "range": "{{from}} — {{to}}",
+    "rangeOpen": "{{from}} — дотепер",
     "approximate": "близько {{date}}"
   },
   "errors": {
@@ -114,6 +115,8 @@
     "EVENT_OUT_OF_LIFESPAN": "Подія поза межами життя",
     "DUPLICATE_LIFE_EVENT": "Кілька подій народження або смерті",
     "LIFE_EVENT_ALREADY_EXISTS": "У людини вже є подія народження або смерті",
+    "RESIDENCE_RANGE_OVERLAP": "Періоди проживання перетинаються",
+    "PARENT_CHILD_AGE_GAP": "Різниця у віці батька або матері та дитини менша за 9 років",
     "CHAT_HISTORY_CORRUPTED": "Файл діалогу пошкоджено",
     "CHAT_HISTORY_LIMIT": "Досягнуто ліміту історії чату"
   },

@@ -427,6 +427,23 @@ describe("period dates in the draft", () => {
     expect(draftFromEvent(base).dateMode).toBe("single");
   });
 
+  it("reopens an open-ended residence as an ongoing period", () => {
+    const base: EventEntity = {
+      ...event("event-1", "person-1", null, { type: "RESIDENCE" }),
+      date: {
+        start: "1980-01-01",
+        end: null,
+        precision: "YEAR",
+        qualifier: "RANGE",
+        original: null,
+      },
+    };
+    const draft = draftFromEvent(base);
+    expect(draft.dateMode).toBe("range");
+    expect(draft.dateOngoing).toBe(true);
+    expect(draft.dateEnd).toBe("");
+  });
+
   it("builds one half-open RANGE value and keeps the period qualifier", () => {
     const result = buildEventInput({
       ...emptyEventDraft("person-1", "OCCUPATION"),
@@ -441,6 +458,27 @@ describe("period dates in the draft", () => {
     expect(result.event.date).toEqual({
       start: "1980-01-01",
       end: "1986-01-01",
+      precision: "YEAR",
+      qualifier: "RANGE",
+      original: null,
+    });
+  });
+
+  it("builds an open-ended residence range without inventing an end", () => {
+    const result = buildEventInput({
+      ...emptyEventDraft("person-1", "RESIDENCE"),
+      dateMode: "range",
+      date: "1980",
+      dateEnd: "",
+      dateOngoing: true,
+      precision: "YEAR",
+      qualifier: "RANGE",
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.event.date).toEqual({
+      start: "1980-01-01",
+      end: null,
       precision: "YEAR",
       qualifier: "RANGE",
       original: null,

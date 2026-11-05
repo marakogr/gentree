@@ -176,6 +176,7 @@ pub fn event_create(
         gentree_core::ensure_single_life_event(&events, &entity, None)?;
         gentree_core::ensure_life_events_compatible(&events, &entity, None)?;
         gentree_core::ensure_event_within_lifespan(&person, &entity)?;
+        gentree_core::ensure_residence_ranges_do_not_overlap(&events, &entity, None)?;
         events.push(entity.clone());
         store.save_events(&events)?;
         let version = entity_version(store, EVENT_FILE, entity.id)?;
@@ -210,6 +211,7 @@ pub fn event_update(
         }
         gentree_core::ensure_life_events_compatible(&events, &entity, Some(id))?;
         gentree_core::ensure_event_within_lifespan(&person, &entity)?;
+        gentree_core::ensure_residence_ranges_do_not_overlap(&events, &entity, Some(id))?;
         events[index] = entity.clone();
         store.save_events(&events)?;
         let version = entity_version(store, EVENT_FILE, id)?;

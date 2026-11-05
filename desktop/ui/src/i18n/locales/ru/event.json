@@ -47,6 +47,7 @@
   "dateModeGraduation": "Год окончания",
   "dateModeStudyPeriod": "Годы обучения (период)",
   "dateModeResidencePeriod": "Период проживания (с–по)",
+  "dateOngoing": "По настоящее время (без даты окончания)",
   "dateRangeQualifier": "Для периода задаётся автоматически",
   "dateRangeUnknownHint": "Период нельзя сохранить с неизвестной точностью",
   "precision": "Точность",

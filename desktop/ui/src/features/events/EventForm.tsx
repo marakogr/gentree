@@ -11,6 +11,7 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Switch,
   Textarea,
 } from "@fluentui/react-components";
 import { eventsApi } from "../../api/client";
@@ -216,6 +217,7 @@ export default function EventForm({
         ? {
             dateMode: "single" as const,
             qualifier: singleQualifier,
+            dateOngoing: false,
           }
         : {}),
       ...(next.eventType === "EDUCATION" && blankDate
@@ -440,7 +442,7 @@ export default function EventForm({
       update({ dateMode: "range", qualifier: "RANGE" });
       return;
     }
-    update({ dateMode: "single", qualifier: singleQualifier });
+    update({ dateMode: "single", qualifier: singleQualifier, dateOngoing: false });
   };
 
   const footer = confirmDelete ? (
@@ -745,11 +747,23 @@ export default function EventForm({
                         precision={draft.precision}
                         placeholder={datePlaceholder}
                         ariaLabel={t("event:to")}
-                        disabled={busy}
+                        disabled={busy || draft.dateOngoing}
                         onChange={(dateEnd) => update({ dateEnd })}
                         onBlur={() => setTouchedDate(true)}
                       />
                     </Field>
+                    {draft.eventType === "RESIDENCE" ? (
+                      <div className="events-date-ongoing">
+                        <Switch
+                          checked={draft.dateOngoing}
+                          disabled={busy}
+                          label={t("event:dateOngoing")}
+                          onChange={(_event, data) =>
+                            update({ dateOngoing: data.checked })
+                          }
+                        />
+                      </div>
+                    ) : null}
                   </>
                 ) : (
                   <Field
