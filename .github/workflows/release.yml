@@ -221,16 +221,48 @@ jobs:
             echo "App Store Connect API key written for notarization."
           fi
 
-      - name: Report the macOS signing status
+      # Tauri treats an Apple variable that is present but empty as "signing
+      # configured" and tries to import an empty certificate. Export only the
+      # non-empty secrets, so an unsigned macOS build really skips signing.
+      - name: Configure optional macOS signing
         if: matrix.platform == 'macos-latest'
         env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          SECRET_APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          SECRET_APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          SECRET_APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          SECRET_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          SECRET_APPLE_ID: ${{ secrets.APPLE_ID }}
+          SECRET_APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          SECRET_APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          SECRET_APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         run: |
-          if [ -z "$APPLE_CERTIFICATE" ]; then
+          write_env() {
+            name="$1"
+            value="$2"
+            if [ -z "$value" ]; then
+              return 0
+            fi
+            {
+              printf '%s<<GENTREE_APPLE_EOF\n' "$name"
+              printf '%s\n' "$value"
+              printf 'GENTREE_APPLE_EOF\n'
+            } >> "$GITHUB_ENV"
+          }
+
+          if [ -z "$SECRET_APPLE_CERTIFICATE" ]; then
             echo "::warning::APPLE_CERTIFICATE is not set; the macOS artifacts stay unsigned and are not notarized."
           else
             echo "macOS signing and notarization are configured."
           fi
+
+          write_env APPLE_CERTIFICATE "$SECRET_APPLE_CERTIFICATE"
+          write_env APPLE_CERTIFICATE_PASSWORD "$SECRET_APPLE_CERTIFICATE_PASSWORD"
+          write_env APPLE_SIGNING_IDENTITY "$SECRET_APPLE_SIGNING_IDENTITY"
+          write_env APPLE_TEAM_ID "$SECRET_APPLE_TEAM_ID"
+          write_env APPLE_ID "$SECRET_APPLE_ID"
+          write_env APPLE_PASSWORD "$SECRET_APPLE_PASSWORD"
+          write_env APPLE_API_KEY "$SECRET_APPLE_API_KEY"
+          write_env APPLE_API_ISSUER "$SECRET_APPLE_API_ISSUER"
 
       - name: Read the changelog section
         id: changelog
@@ -258,17 +290,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          # Empty on an unsigned build: Tauri then skips signing and notarizing.
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # Notarization: an Apple ID with an app-specific password, or an
-          # App Store Connect API key (the file is written by the step above).
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
-          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          # APPLE_* values are exported by "Configure optional macOS signing"
+          # only when non-empty; an empty certificate must not reach Tauri.
         with:
           projectPath: desktop/apps/desktop
           tagName: ${{ github.ref_name }}
