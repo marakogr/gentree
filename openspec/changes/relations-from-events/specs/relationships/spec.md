@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Defines how life events assert kinship: which relations are created from a marriage or birth, how repeated saves and manual rows are reconciled, which validation protects the graph, and how a spouse is resolved without falling back to a co-parent.
+Defines how life events assert kinship: which relations are created from a marriage or birth, how existing events are reconciled when a project opens, how repeated saves and manual rows are reconciled, which validation protects the graph, and how a spouse is resolved without falling back to a co-parent.
 
 ## ADDED Requirements
 
@@ -108,6 +108,61 @@ Relations created through the relationship commands, and relations loaded from p
 - **THEN** the adoptive relation is kept
 - **AND** no biological `PARENT_CHILD` row is added for the same pair
 
+### Requirement: Existing events are backfilled on writable open
+
+Opening a writable project SHALL reconcile stored events before the project is reported as open. A marriage with exactly two distinct people SHALL gain a spouse relation only when no spouse or partner pair exists. A birth with one or two participants SHALL gain the missing parent relations. A birth without participants SHALL be left alone.
+
+#### Scenario: An existing marriage gains a spouse row
+
+- **WHEN** a writable project containing a marriage with one owner and one distinct co-participant and no spouse pair is opened
+- **THEN** a `SPOUSE` relation is stored for the pair
+- **AND** the person cards and kinship show the spouse without a further save
+
+#### Scenario: An existing birth gains parent rows
+
+- **WHEN** a writable project containing a birth with one or two participants and no corresponding parent row is opened
+- **THEN** the missing `PARENT_CHILD` rows are stored
+
+#### Scenario: A birth without participants stays childless
+
+- **WHEN** a writable project contains a birth with no participants
+- **THEN** no parent relation is created
+- **AND** no parent is inferred from a spouse relation or another event
+
+#### Scenario: An ambiguous cast is skipped
+
+- **WHEN** a stored marriage has fewer or more than two distinct people, or a stored birth has more than two participants
+- **THEN** backfill creates no relation for that event
+- **AND** the event remains readable and unchanged
+
+### Requirement: Backfill is safe, repeatable and aggregated
+
+Backfill MUST NOT overwrite, re-type or delete a manual relation, MUST NOT run for a read-only project, and MUST write nothing on a second open. It SHALL report only aggregate counts, without person ids, names, dates, places or paths.
+
+#### Scenario: A second open is a no-op
+
+- **WHEN** a project is opened again after a successful backfill
+- **THEN** no relation row is added, changed or deleted
+- **AND** the reported creation count is zero
+
+#### Scenario: A manual relation is left untouched
+
+- **WHEN** the pair already has a manual spouse, partner, biological parent or adoptive parent row
+- **THEN** that row keeps its id, type and notes
+- **AND** no automatic row is added for the pair
+
+#### Scenario: A read-only project is unchanged
+
+- **WHEN** a project is opened read-only
+- **THEN** the relationship and event collections are byte-identical after the open
+- **AND** no backfill report claims a change
+
+#### Scenario: The report contains no personal data
+
+- **WHEN** a backfill runs
+- **THEN** the report contains only counts of created and skipped relations
+- **AND** it contains no person ids, names, dates, places, event text or file paths
+
 ### Requirement: Derived relations validate the graph
 
 Derivation SHALL enforce the relationship invariants: no self-link, no duplicate pair, and no parent cycle. A save that would violate them SHALL be rejected as a whole, and clearing the offending selection SHALL allow the event to save.
@@ -126,12 +181,12 @@ Derivation SHALL enforce the relationship invariants: no self-link, no duplicate
 
 ### Requirement: Parent age is validated
 
-A derived or manual `PARENT_CHILD` relation SHALL require the parent to be at least 9 years older than the child when both birth dates are known. The comparison SHALL use the start of each date's precision range and SHALL be skipped when either date is unknown, as specified by the date rules of issue #79. Exactly 9 years SHALL be accepted.
+A derived or manual `PARENT_CHILD` relation SHALL require the parent to be at least 9 years older than the child when both birth dates are known. The comparison SHALL use the start of each date's precision range and SHALL be skipped when either date is unknown, as specified by the date rules of issue #79. Exactly 9 years SHALL be accepted. Rejection SHALL use the canonical `PARENT_CHILD_AGE_GAP` code from #79.
 
 #### Scenario: Less than nine years is rejected
 
 - **WHEN** both birth dates are known and the parent is less than 9 years older
-- **THEN** the save fails with `PARENT_AGE_GAP`
+- **THEN** the save fails with `PARENT_CHILD_AGE_GAP`
 - **AND** `params.field` identifies the parent selection
 - **AND** clearing the parents allows the event to save
 
@@ -148,13 +203,14 @@ A derived or manual `PARENT_CHILD` relation SHALL require the parent to be at le
 
 ### Requirement: Derived relations are identifiable
 
-Every stored relation SHALL record whether it was created by a user or derived from an event, and derived rows SHALL identify their source event. The relationship list, person card and chat-visible DTOs SHALL expose this origin without exposing event content.
+Every stored relation SHALL record whether it was created by a user or derived from an event, and derived rows SHALL list the event or events that assert them. The relationship list, person card and chat-visible DTOs SHALL expose this origin without exposing event content.
 
 #### Scenario: The person card marks an automatic relation
 
 - **WHEN** a relation was derived from a marriage or birth event
 - **THEN** the person card labels it as created automatically
-- **AND** the row identifies the source event by type and date, not by free text
+- **AND** the row identifies at least one source event by type and date, not by free text
+- **AND** when several events assert the pair, the row reports that it has several sources
 
 #### Scenario: A manual relation is not labelled automatic
 
@@ -164,12 +220,18 @@ Every stored relation SHALL record whether it was created by a user or derived f
 #### Scenario: Deleting an automatic row is not durable
 
 - **WHEN** the user deletes an automatic relation while its source event still asserts it
-- **THEN** the row is removed
-- **AND** the UI warns that the next save of the source event will recreate it
+- **THEN** the row is removed and the backend accepts the delete
+- **AND** the UI warns that the next save of a source event will recreate it
 
 ### Requirement: Editing or deleting an event retracts only its own derived rows
 
-Saving an edited marriage or birth event SHALL retract automatic relations that the same event previously asserted and no longer asserts, then create the newly asserted rows. Deleting the event SHALL retract its automatic rows. Manual rows MUST NOT be cascade-deleted by an event edit or delete.
+Saving an edited marriage or birth event SHALL remove that event from the provenance of automatic relations it previously asserted and no longer asserts, deleting a row only when no source event remains, then create the newly asserted rows. Deleting the event SHALL remove its provenance in the same way. Manual rows MUST NOT be cascade-deleted by an event edit or delete.
+
+#### Scenario: Another event still asserts the pair
+
+- **WHEN** two marriage events assert the same pair and one of them is deleted
+- **THEN** the spouse row remains
+- **AND** its provenance still names the surviving event
 
 #### Scenario: Changing the marriage partner
 
