@@ -190,5 +190,7 @@
   "clearParent": "Прыбраць бацьку або маці",
   "parentsLinked": "Пры захаванні ствараецца сувязь «бацька або маці — дзіця»",
   "parentFirstPlaceholder": "Выберыце бацьку",
-  "parentSecondPlaceholder": "Выберыце маці"
+  "parentSecondPlaceholder": "Выберыце маці",
+  "parentGenderUnknown": "У гэтага чалавека не пазначаны пол",
+  "parentCandidatesEmpty": "Няма адпаведных людзей: пазначце пол у картцы чалавека"
 }

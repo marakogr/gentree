@@ -190,5 +190,7 @@
   "clearParent": "Прибрати батька або матір",
   "parentsLinked": "Під час збереження створюється зв'язок «батько або мати — дитина»",
   "parentFirstPlaceholder": "Виберіть батька",
-  "parentSecondPlaceholder": "Виберіть матір"
+  "parentSecondPlaceholder": "Виберіть матір",
+  "parentGenderUnknown": "У цієї людини не вказано стать",
+  "parentCandidatesEmpty": "Немає відповідних людей: укажіть стать у картці людини"
 }

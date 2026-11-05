@@ -38,6 +38,7 @@ import {
 } from "../../lib/errors";
 import { useDateFormatter } from "../../lib/useDateFormatter";
 import { displayName } from "../persons/helpers";
+import { birthParentCandidates } from "./birthParents";
 import {
   CUSTOM_EVENT_TYPE_PREFIX,
   EVENT_TYPES,
@@ -226,6 +227,11 @@ export default function EventForm({
     });
   };
 
+  const personEntities = useMemo(
+    () => persons.map((item) => item.entity),
+    [persons],
+  );
+
   const personItems = useMemo(() => {
     const items = persons.map((item) => ({
       id: item.entity.id,
@@ -257,18 +263,38 @@ export default function EventForm({
     return items;
   }, [personItems, draft.personId, draft.spouseId, t]);
 
-  // Each birth parent picker hides the child and the other selected parent.
+  // Slot 0 is the father picker, slot 1 the mother picker. A preselected
+  // person is kept visible even when their gender is UNKNOWN or mismatched.
+  const parentCandidatesFor = (index: 0 | 1) =>
+    birthParentCandidates(
+      personEntities,
+      index,
+      draft.parentIds,
+      draft.personId,
+    );
+
   const parentItemsFor = (index: 0 | 1) => {
     const other = draft.parentIds[index === 0 ? 1 : 0] ?? "";
     const current = draft.parentIds[index] ?? "";
-    const items = personItems.filter(
-      (item) => item.id !== draft.personId && item.id !== other,
-    );
+    const items = parentCandidatesFor(index).map((person) => ({
+      id: person.id,
+      label: displayName(person, t("person:unknownName")),
+    }));
     if (current !== "" && !items.some((item) => item.id === current)) {
       const source = personItems.find((item) => item.id === current);
       items.push(source ?? { id: current, label: t("person:unknownName") });
     }
-    return items;
+    return items.filter((item) => item.id !== draft.personId && item.id !== other);
+  };
+
+  const parentHintFor = (index: 0 | 1): string | undefined => {
+    const current = draft.parentIds[index] ?? "";
+    const person = personEntities.find((item) => item.id === current);
+    if (person?.gender === "UNKNOWN") return t("event:parentGenderUnknown");
+    if (parentCandidatesFor(index).length === 0) {
+      return t("event:parentCandidatesEmpty");
+    }
+    return undefined;
   };
 
   const setParent = (index: 0 | 1, personId: string) => {
@@ -680,6 +706,7 @@ export default function EventForm({
                           : "event:parentSecond",
                       )}
                       htmlFor={`event-parent-${index}`}
+                      hint={parentHintFor(index)}
                       error={
                         spouseServerError
                           ? serverFieldMessage(spouseServerError)
