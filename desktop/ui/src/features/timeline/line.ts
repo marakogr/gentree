@@ -296,9 +296,75 @@ export function positionOnLine(
 }
 
 /**
- * Initial window covering all loaded dated events. Padding is 4% of the data
- * span (at least two years for a single point) so the first and last marker
- * never touch the viewport edge.
+ * Navigable range of the loaded markers: from the earliest marker start to the
+ * latest known interval end, capped at the current local date. Returns null
+ * when the set carries no usable date, so no arbitrary future range is shown.
+ */
+export function markerDomain(
+  markers: readonly LineMarker[],
+  now: Date = new Date(),
+): TimelineWindow | null {
+  let min: number | null = null;
+  let max: number | null = null;
+  for (const marker of markers) {
+    const start = marker.time.getTime();
+    if (!Number.isFinite(start)) {
+      continue;
+    }
+    const end = marker.end?.getTime() ?? start;
+    min = min === null ? start : Math.min(min, start);
+    max = max === null ? end : Math.max(max, end);
+  }
+  if (min === null || max === null) {
+    return null;
+  }
+  const today = now.getTime();
+  const capped = Number.isFinite(today) ? Math.min(max, today) : max;
+  // A future-only marker set never inverts the domain.
+  return { start: new Date(min), end: new Date(Math.max(min, capped)) };
+}
+
+/**
+ * Clip `window` into `domain`. A window at least as wide as the domain becomes
+ * exactly the domain; a narrower one shifts back inside without changing span.
+ */
+export function clampWindowToDomain(
+  window: TimelineWindow,
+  domain: TimelineWindow | null,
+): TimelineWindow {
+  if (domain === null) {
+    return window;
+  }
+  const domainStart = domain.start.getTime();
+  const domainEnd = domain.end.getTime();
+  if (
+    !Number.isFinite(domainStart) ||
+    !Number.isFinite(domainEnd) ||
+    domainEnd < domainStart
+  ) {
+    return window;
+  }
+  const start = window.start.getTime();
+  const end = window.end.getTime();
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
+    return window;
+  }
+  const span = end - start;
+  const domainSpan = domainEnd - domainStart;
+  if (span >= domainSpan) {
+    return { start: new Date(domainStart), end: new Date(domainEnd) };
+  }
+  const nextStart = Math.min(Math.max(start, domainStart), domainEnd - span);
+  return {
+    start: new Date(nextStart),
+    end: new Date(nextStart + span),
+  };
+}
+
+/**
+ * Initial window covering all loaded dated events, clipped to the marker
+ * domain so it never shows empty time before the first or after the last
+ * loaded event.
  */
 export function computeLineWindow(
   events: readonly TimelineEvent[],
@@ -308,10 +374,11 @@ export function computeLineWindow(
   return computeMarkerWindow(buildLineMarkers(events, t), paddingFraction);
 }
 
-/** Same padding rule as `computeLineWindow`, over already built markers. */
+/** Same rule as `computeLineWindow`, over already built markers. */
 export function computeMarkerWindow(
   markers: readonly LineMarker[],
   paddingFraction = 0.04,
+  domain: TimelineWindow | null = markerDomain(markers),
 ): TimelineWindow | null {
   let min: number | null = null;
   let max: number | null = null;
@@ -336,10 +403,13 @@ export function computeMarkerWindow(
           markers.length === 1 ? twoYears : 0,
         )
       : twoYears;
-  return {
-    start: new Date(min - padding),
-    end: new Date(max + padding),
-  };
+  return clampWindowToDomain(
+    {
+      start: new Date(min - padding),
+      end: new Date(max + padding),
+    },
+    domain,
+  );
 }
 
 /** Window around the events of one person; null when the person has none. */
@@ -362,20 +432,30 @@ export function computePersonWindow(
 export function panWindow(
   window: TimelineWindow,
   deltaFraction: number,
+  domain: TimelineWindow | null = null,
 ): TimelineWindow {
   const span = window.end.getTime() - window.start.getTime();
   if (!Number.isFinite(span) || span <= 0 || !Number.isFinite(deltaFraction)) {
     return window;
   }
   const delta = span * deltaFraction;
-  return {
-    start: new Date(window.start.getTime() + delta),
-    end: new Date(window.end.getTime() + delta),
-  };
+  return clampWindow(
+    {
+      start: new Date(window.start.getTime() + delta),
+      end: new Date(window.end.getTime() + delta),
+    },
+    domain,
+  );
 }
 
-/** Keep the span between one day and 5000 years; no negative/NaN windows. */
-export function clampWindow(window: TimelineWindow): TimelineWindow {
+/**
+ * Keep the span between one day and 5000 years and stay inside `domain`
+ * (when supplied); no negative/NaN windows.
+ */
+export function clampWindow(
+  window: TimelineWindow,
+  domain: TimelineWindow | null = null,
+): TimelineWindow {
   const start = window.start.getTime();
   const end = window.end.getTime();
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
@@ -398,7 +478,7 @@ export function clampWindow(window: TimelineWindow): TimelineWindow {
       end: new Date(middle + maxSpan / 2),
     };
   }
-  return next;
+  return clampWindowToDomain(next, domain);
 }
 
 /** Zoom by `factor` around a fraction along the window (0 = left, 1 = right). */
@@ -406,6 +486,7 @@ export function zoomWindow(
   window: TimelineWindow,
   factor: number,
   anchorFraction = 0.5,
+  domain: TimelineWindow | null = null,
 ): TimelineWindow {
   const start = window.start.getTime();
   const end = window.end.getTime();
@@ -422,10 +503,13 @@ export function zoomWindow(
   const anchor = start + span * clamped;
   const nextSpan = span * factor;
   const nextStart = anchor - nextSpan * clamped;
-  return clampWindow({
-    start: new Date(nextStart),
-    end: new Date(nextStart + nextSpan),
-  });
+  return clampWindow(
+    {
+      start: new Date(nextStart),
+      end: new Date(nextStart + nextSpan),
+    },
+    domain,
+  );
 }
 
 /** Brush window from two fractions of the full range, minimum 2% wide. */
