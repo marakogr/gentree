@@ -319,9 +319,16 @@ export function markerDomain(
     return null;
   }
   const today = now.getTime();
-  const capped = Number.isFinite(today) ? Math.min(max, today) : max;
-  // A future-only marker set never inverts the domain.
-  return { start: new Date(min), end: new Date(Math.max(min, capped)) };
+  // A range entirely in the future is still loaded data: keep it reachable
+  // instead of collapsing it onto today. Past and mixed ranges stop at today.
+  const domainEnd =
+    Number.isFinite(today) && min <= today ? Math.min(max, today) : max;
+  // A single point has no known interval; keep a non-empty axis for it.
+  const day = 24 * 3600_000;
+  return {
+    start: new Date(min),
+    end: new Date(domainEnd > min ? domainEnd : min + day),
+  };
 }
 
 /**

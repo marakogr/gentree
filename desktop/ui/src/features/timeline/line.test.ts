@@ -280,6 +280,39 @@ describe("markerDomain", () => {
     expect(domain?.end).toEqual(new Date(1970, 0, 1));
   });
 
+  it("keeps future-only markers reachable instead of collapsing to today", () => {
+    const future = buildLineMarkers(
+      [
+        event("f1", "BIRTH", { start: "2100-01-01T00:00:00.000Z" }),
+        event("f2", "DEATH", { start: "2110-06-15T00:00:00.000Z" }),
+      ],
+      ru,
+    );
+    const domain = markerDomain(future, new Date(2026, 0, 1));
+    expect(domain?.start).toEqual(new Date(2100, 0, 1));
+    expect(domain?.end).toEqual(new Date(2111, 0, 1));
+  });
+
+  it("always returns a non-empty domain when a marker exists", () => {
+    const point = buildLineMarkers(
+      [
+        event("p1", "OTHER", {
+          start: "1950-01-01T00:00:00.000Z",
+          precision: "UNKNOWN",
+        }),
+      ],
+      ru,
+    );
+    const domain = markerDomain(point, new Date(2026, 0, 1));
+    expect(domain).not.toBeNull();
+    if (domain === null) return;
+    expect(domain.end.getTime()).toBeGreaterThan(domain.start.getTime());
+    const window = computeMarkerWindow(point, 0.04, domain);
+    expect(window).not.toBeNull();
+    if (window === null) return;
+    expect(window.end.getTime()).toBeGreaterThan(window.start.getTime());
+  });
+
   it("returns null without dated markers", () => {
     expect(markerDomain([], new Date(2026, 0, 1))).toBeNull();
     expect(computeMarkerWindow([], 0.04, null)).toBeNull();
