@@ -637,15 +637,22 @@ textarea {
   background: transparent;
 }
 
+/* A long or hyphenated name wraps inside the card and stops after three
+   lines, so the caption never spills over the neighbours below. */
 .graph-node-name {
   font-size: 13px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .graph-node-meta {
   font-size: 11px;
+  line-height: 1.25;
   color: var(--legacy-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -662,6 +669,13 @@ textarea {
   gap: 2px;
   min-width: 0;
   flex: 1;
+}
+
+/* An adoptive flag adds a third row to the card, so the caption gives up one
+   line instead of pushing the flag out of the fixed node box. */
+.graph-node-body:has(> .graph-node-flag) .graph-node-name {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .graph-node-avatar {
@@ -821,15 +835,21 @@ textarea {
   flex: 1;
 }
 
+/* Same three-line clamp as the tree caption, so a long name wraps here too. */
 .path-node-name {
   font-size: 13px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .path-node-meta {
   font-size: 11px;
+  line-height: 1.25;
   color: var(--legacy-muted);
   overflow: hidden;
   text-overflow: ellipsis;
