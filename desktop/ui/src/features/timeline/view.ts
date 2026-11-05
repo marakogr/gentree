@@ -6,6 +6,7 @@ import type {
   TimelineListParams,
   TimelineScope,
 } from "../../api/types";
+import { parseYear } from "../../components/filters/yearRangeRules";
 import type {
   SectionViewState,
   SortDirection,
@@ -154,7 +155,11 @@ export function buildTimelineListParams(
   });
   if (types.length > 0) params.types = [...types];
   // The shared filter stores years; the command expects whole-date bounds.
-  if (fromYear !== "") params.from = `${fromYear}-01-01`;
-  if (toYear !== "") params.to = `${toYear}-12-31`;
+  // `date_matches` is half-open `[from, to)`, so the upper year ends at the
+  // next 1 January — 31 December of `toYear` stays inside the request.
+  const from = parseYear(fromYear);
+  if (from !== null) params.from = `${from}-01-01`;
+  const to = parseYear(toYear);
+  if (to !== null) params.to = `${to + 1}-01-01`;
   return params;
 }

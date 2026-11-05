@@ -825,6 +825,23 @@ describe("year filter over event periods (issue #83)", () => {
     expect(byYear("", "1979")).toEqual([]);
   });
 
+  it("excludes a period that ends at the from-year boundary", () => {
+    const ended = versioned(
+      event("ended", "a", null, {
+        type: "EDUCATION",
+        date: day("1980-01-01", "1986-01-01"),
+      }),
+    );
+    expect(
+      filterEventRows(
+        [ended],
+        "",
+        { ...noFilters, fromYear: "1986" },
+        contextOf,
+      ),
+    ).toHaveLength(0);
+  });
+
   it("treats an open end as running up to now", () => {
     const today = new Date(2026, 10, 5);
     expect(eventYearOverlaps(openEnd, "2020", "", today)).toBe(true);
