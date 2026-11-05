@@ -47,6 +47,7 @@
   "dateModeGraduation": "Abschlussjahr",
   "dateModeStudyPeriod": "Studienjahre (Zeitraum)",
   "dateModeResidencePeriod": "Wohnzeitraum (von–bis)",
+  "dateOngoing": "Andauernd (kein Enddatum)",
   "dateRangeQualifier": "Wird für einen Zeitraum automatisch gesetzt",
   "dateRangeUnknownHint": "Ein Zeitraum kann nicht mit unbekannter Genauigkeit gespeichert werden",
   "precision": "Genauigkeit",

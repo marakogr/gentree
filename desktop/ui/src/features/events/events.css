@@ -339,6 +339,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.events-date-ongoing {
+  grid-column: 1 / -1;
+}
+
 /* ---------- type-specific details ---------- */
 
 .events-form-details {

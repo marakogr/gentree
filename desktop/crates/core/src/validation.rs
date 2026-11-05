@@ -10,10 +10,11 @@ use std::collections::{BTreeMap, HashSet};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::date::{is_leap, CivilDate, DatePrecision, DateValue};
 use crate::error::{codes, AppError};
 use crate::person::Person;
 use crate::record::{Citation, CitationTarget, Event, EventType, Media, Source};
-use crate::relationship::{Relationship, RelationshipSet};
+use crate::relationship::{Relationship, RelationshipSet, RelationshipType};
 
 /// Issue code: an id occurs more than once, within or across collections.
 pub const DUPLICATE_ID: &str = "DUPLICATE_ID";
@@ -30,6 +31,15 @@ pub const DUPLICATE_LIFE_EVENT: &str = "DUPLICATE_LIFE_EVENT";
 /// the same person. Existing duplicates stay editable, but no new one is
 /// accepted; imports and merges write rows directly and only warn.
 pub const LIFE_EVENT_ALREADY_EXISTS: &str = "LIFE_EVENT_ALREADY_EXISTS";
+/// Issue code: two `RESIDENCE` periods of one person overlap.
+///
+/// An error on manual create/update; a warning in [`validate_project`] so
+/// imported and legacy data stays readable.
+pub const RESIDENCE_RANGE_OVERLAP: &str = "RESIDENCE_RANGE_OVERLAP";
+/// Error code: a `PARENT_CHILD` edge has less than the minimum birth gap.
+pub const PARENT_CHILD_AGE_GAP: &str = "PARENT_CHILD_AGE_GAP";
+/// Minimum number of calendar years between a parent and a child.
+pub const MIN_PARENT_AGE_GAP_YEARS: i32 = 9;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -93,6 +103,8 @@ pub fn validate_project(snapshot: ProjectSnapshot<'_>) -> ValidationReport {
     issues.extend(entity_issues(&snapshot));
     issues.extend(duplicate_life_event_issues(&snapshot));
     issues.extend(lifespan_issues(&snapshot));
+    issues.extend(residence_overlap_issues(&snapshot));
+    issues.extend(parent_child_age_issues(&snapshot));
 
     let counts = IssueCounts {
         error: issues
@@ -332,36 +344,41 @@ fn entity_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssue> {
     issues
 }
 
-/// Rejects an event whose date falls outside the person's known life span.
+/// First day of the precision interval of a birth date.
 ///
-/// Only bounds the data actually has are used: an unknown birth or death date
-/// never invents a limit. Death and burial may happen at/after the death bound
-/// (and must not precede the birth bound); every other type must not precede
-/// the birth or reach the death bound. A blank event date is always allowed.
+/// `UNKNOWN` precision and an absent start are not a usable anchor.
+fn birth_anchor(date: &DateValue) -> Option<CivilDate> {
+    if date.precision == DatePrecision::Unknown {
+        None
+    } else {
+        date.start
+    }
+}
+
+/// Rejects an event whose start precision unit lies entirely before birth.
+///
+/// Birth is anchored at the first day of its precision unit. The event is
+/// compared by the unit of its own start: year -> 1 January of the next year,
+/// month -> the first of the next month, day -> the next day. The check only
+/// rejects when that unit end is at or before the anchor, so a same-year or
+/// same-month event is valid. An unknown or missing date skips the check.
+/// Death and burial may happen at/after the death bound; every other type must
+/// not start at or after the death bound.
 pub fn ensure_event_within_lifespan(person: &Person, candidate: &Event) -> crate::AppResult<()> {
     let Some(start) = candidate.date.start else {
         return Ok(());
     };
-    let bound = match candidate.event_type {
-        EventType::Death | EventType::Burial => person
-            .birth
-            .start
-            .filter(|birth| start < *birth)
-            .map(|_| "birth"),
-        _ => person
-            .birth
-            .start
-            .filter(|birth| start < *birth)
-            .map(|_| "birth")
-            .or_else(|| {
-                person
-                    .death
-                    .end
-                    .filter(|death_end| start >= *death_end)
-                    .map(|_| "death")
-            }),
+    let before_birth = match (birth_anchor(&person.birth), candidate.date.start_unit_end()) {
+        (Some(anchor), Some(unit_end)) => unit_end <= anchor,
+        _ => false,
     };
-    let Some(bound) = bound else {
+    let after_death = !matches!(candidate.event_type, EventType::Death | EventType::Burial)
+        && person.death.end.is_some_and(|death_end| start >= death_end);
+    let bound = if before_birth {
+        "birth"
+    } else if after_death {
+        "death"
+    } else {
         return Ok(());
     };
     Err(AppError::new(
@@ -376,9 +393,11 @@ pub fn ensure_event_within_lifespan(person: &Person, candidate: &Event) -> crate
 /// Rejects a life event that contradicts the other one already stored.
 ///
 /// Birth and death may repeat in legacy data, so the check compares the new
-/// row with every stored life event of the same person: a birth after a known
-/// death, or a death before a known birth, is incompatible. `replaced` is the
-/// row an update overwrites and never counts as its own counterpart.
+/// row with every stored life event of the same person. The whole interval is
+/// the right question here: a birth is contradictory only when it lies entirely
+/// after the death interval, and a death only when it lies entirely before the
+/// birth interval. `replaced` is the row an update overwrites and never counts
+/// as its own counterpart.
 pub fn ensure_life_events_compatible(
     existing: &[Event],
     candidate: &Event,
@@ -387,7 +406,7 @@ pub fn ensure_life_events_compatible(
     if !matches!(candidate.event_type, EventType::Birth | EventType::Death) {
         return Ok(());
     }
-    let Some(start) = candidate.date.start else {
+    let Some(candidate_interval) = candidate.date.interval() else {
         return Ok(());
     };
     let counterpart = match candidate.event_type {
@@ -395,17 +414,29 @@ pub fn ensure_life_events_compatible(
         _ => EventType::Birth,
     };
     let conflicting = existing.iter().any(|event| {
-        Some(event.id) != replaced
-            && event.id != candidate.id
-            && event.event_type == counterpart
-            && event.person_id == candidate.person_id
-            && event.date.start.is_some_and(|other| {
-                if counterpart == EventType::Death {
-                    start > other
-                } else {
-                    start < other
-                }
-            })
+        if Some(event.id) == replaced
+            || event.id == candidate.id
+            || event.event_type != counterpart
+            || event.person_id != candidate.person_id
+        {
+            return false;
+        }
+        let Some(other) = event.date.interval() else {
+            return false;
+        };
+        if candidate.event_type == EventType::Birth {
+            // Birth entirely after the death interval.
+            matches!(
+                (candidate_interval.start, other.end),
+                (Some(birth), Some(death_end)) if birth >= death_end
+            )
+        } else {
+            // Death entirely before the birth interval.
+            matches!(
+                (candidate_interval.end, other.start),
+                (Some(death_end), Some(birth)) if death_end <= birth
+            )
+        }
     });
     if !conflicting {
         return Ok(());
@@ -496,9 +527,11 @@ fn duplicate_life_event_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<Validation
         .collect()
 }
 
-/// Warn when an event lies wholly before the owner's birth or at/after the
-/// owner's death. Unknown and open-ended dates are never invented into a bound:
-/// the check only runs on bounds the data actually has.
+/// Warn when an event's start precision unit lies wholly before the owner's
+/// birth, or its start reaches the owner's death bound.
+///
+/// Unknown dates are never invented into a bound: the check only runs on bounds
+/// the data actually has.
 fn lifespan_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssue> {
     let persons: BTreeMap<Uuid, &Person> = snapshot
         .persons
@@ -517,14 +550,9 @@ fn lifespan_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssue> {
             continue;
         }
         let date = &event.date;
-        let before_birth = person
-            .birth
-            .start
-            .is_some_and(|birth| match (date.start, date.end) {
-                (_, Some(end)) => end <= birth,
-                (Some(start), None) => start < birth,
-                (None, None) => false,
-            });
+        let before_birth = birth_anchor(&person.birth)
+            .zip(date.start_unit_end())
+            .is_some_and(|(anchor, unit_end)| unit_end <= anchor);
         let after_death = person
             .death
             .end
@@ -547,6 +575,165 @@ fn lifespan_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssue> {
             severity: Severity::Warning,
             entity_ids: vec![event.id, person.id],
             params,
+        });
+    }
+    issues
+}
+
+/// Rejects a residence event whose half-open period overlaps another residence
+/// period of the same person.
+///
+/// Adjacency (`end == next start`) is allowed. A missing end is infinity and a
+/// missing start is negative infinity; an unknown date is not compared. An
+/// error on manual create/update; [`validate_project`] reports the same code as
+/// a warning so legacy data stays readable.
+pub fn ensure_residence_ranges_do_not_overlap(
+    existing: &[Event],
+    candidate: &Event,
+    replaced: Option<Uuid>,
+) -> crate::AppResult<()> {
+    if candidate.event_type != EventType::Residence {
+        return Ok(());
+    }
+    let Some(candidate_interval) = candidate.date.interval() else {
+        return Ok(());
+    };
+    for other in existing.iter().filter(|event| {
+        event.event_type == EventType::Residence
+            && event.person_id == candidate.person_id
+            && Some(event.id) != replaced
+            && event.id != candidate.id
+    }) {
+        let Some(other_interval) = other.date.interval() else {
+            continue;
+        };
+        if candidate_interval.overlaps(other_interval) {
+            return Err(
+                AppError::new(RESIDENCE_RANGE_OVERLAP, "Residence periods overlap")
+                    .with_param("personId", candidate.person_id.to_string())
+                    .with_param("eventId", candidate.id.to_string())
+                    .with_param("otherEventId", other.id.to_string()),
+            );
+        }
+    }
+    Ok(())
+}
+
+/// Adds the calendar years without inventing a day.
+///
+/// A 29 February anchor is clamped to 28 February when the target year is not
+/// a leap year.
+fn add_years(date: CivilDate, years: i32) -> CivilDate {
+    let year = date.year + years;
+    let day = if date.month == 2 && date.day == 29 && !is_leap(year) {
+        28
+    } else {
+        date.day
+    };
+    CivilDate {
+        year,
+        month: date.month,
+        day,
+    }
+}
+
+/// Rejects a `PARENT_CHILD` edge when the parent is less than
+/// [`MIN_PARENT_AGE_GAP_YEARS`] older than the child.
+///
+/// Both sides use their birth anchor; exactly nine years is accepted, unknown
+/// births skip the check and `ADOPTIVE_PARENT_CHILD` is exempt.
+pub fn ensure_parent_child_age_gap(
+    rel_type: RelationshipType,
+    parent: &Person,
+    child: &Person,
+) -> crate::AppResult<()> {
+    if rel_type != RelationshipType::ParentChild {
+        return Ok(());
+    }
+    let (Some(parent_anchor), Some(child_anchor)) =
+        (birth_anchor(&parent.birth), birth_anchor(&child.birth))
+    else {
+        return Ok(());
+    };
+    if child_anchor >= add_years(parent_anchor, MIN_PARENT_AGE_GAP_YEARS) {
+        return Ok(());
+    }
+    Err(
+        AppError::new(PARENT_CHILD_AGE_GAP, "Parent is too young for the child")
+            .with_param("parentId", parent.id.to_string())
+            .with_param("childId", child.id.to_string())
+            .with_param("minYears", MIN_PARENT_AGE_GAP_YEARS.to_string()),
+    )
+}
+
+/// Pairwise residence overlap warnings for the whole project.
+fn residence_overlap_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssue> {
+    let mut by_person: BTreeMap<Uuid, Vec<&Event>> = BTreeMap::new();
+    for event in snapshot.events {
+        if event.event_type == EventType::Residence {
+            by_person.entry(event.person_id).or_default().push(event);
+        }
+    }
+
+    let mut issues = Vec::new();
+    for (person_id, events) in by_person {
+        for (index, left) in events.iter().enumerate() {
+            let Some(left_interval) = left.date.interval() else {
+                continue;
+            };
+            for right in events.iter().skip(index + 1) {
+                let Some(right_interval) = right.date.interval() else {
+                    continue;
+                };
+                if !left_interval.overlaps(right_interval) {
+                    continue;
+                }
+                let mut params = BTreeMap::new();
+                params.insert("personId".to_owned(), person_id.to_string());
+                params.insert("eventId".to_owned(), left.id.to_string());
+                params.insert("otherEventId".to_owned(), right.id.to_string());
+                issues.push(ValidationIssue {
+                    code: RESIDENCE_RANGE_OVERLAP.to_owned(),
+                    severity: Severity::Warning,
+                    entity_ids: vec![left.id, right.id, person_id],
+                    params,
+                });
+            }
+        }
+    }
+    issues
+}
+
+/// Parent/child age-gap warnings for the whole project.
+fn parent_child_age_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssue> {
+    let persons: BTreeMap<Uuid, &Person> = snapshot
+        .persons
+        .iter()
+        .map(|person| (person.id, person))
+        .collect();
+
+    let mut issues = Vec::new();
+    for row in snapshot.relationships {
+        if row.rel_type != RelationshipType::ParentChild {
+            continue;
+        }
+        let (Some(parent), Some(child)) = (
+            persons.get(&row.person_id),
+            persons.get(&row.related_person_id),
+        ) else {
+            // Dangling references are reported separately.
+            continue;
+        };
+        let Err(error) = ensure_parent_child_age_gap(row.rel_type, parent, child) else {
+            continue;
+        };
+        let mut entity_ids = vec![row.id, parent.id, child.id];
+        entity_ids.dedup();
+        issues.push(ValidationIssue {
+            code: error.code,
+            severity: Severity::Warning,
+            entity_ids,
+            params: error.params,
         });
     }
     issues
@@ -1372,5 +1559,296 @@ mod tests {
 
         assert!(report.is_valid(), "{report:?}");
         assert_eq!(report.counts.warning, 0, "{report:?}");
+    }
+
+    fn person_with_birth(id: Uuid, birth: DateValue) -> Person {
+        let mut person = person(id, None, None);
+        person.birth = birth;
+        person
+    }
+
+    fn open_range(start: CivilDate) -> DateValue {
+        DateValue {
+            start: Some(start),
+            end: None,
+            precision: DatePrecision::Year,
+            qualifier: crate::date::DateQualifier::Range,
+            original: None,
+        }
+    }
+
+    fn residence(id: Uuid, person_id: Uuid, date: DateValue) -> Event {
+        event(id, person_id, EventType::Residence, date)
+    }
+
+    #[test]
+    fn before_birth_uses_the_event_start_unit() {
+        let person_id = uuid(1);
+        let by_year = person(person_id, Some(1950), None);
+        let by_month = person_with_birth(
+            person_id,
+            DateValue::exact_month(CivilDate::new(1950, 5, 1).unwrap()),
+        );
+        let by_day = person_with_birth(
+            person_id,
+            DateValue::exact_day(CivilDate::new(1950, 5, 10).unwrap()),
+        );
+
+        // Same year and same month are accepted.
+        assert!(ensure_event_within_lifespan(
+            &by_month,
+            &residence(uuid(10), person_id, DateValue::exact_year(1950))
+        )
+        .is_ok());
+        assert!(ensure_event_within_lifespan(
+            &by_day,
+            &residence(
+                uuid(11),
+                person_id,
+                DateValue::exact_month(CivilDate::new(1950, 5, 1).unwrap())
+            )
+        )
+        .is_ok());
+        assert!(ensure_event_within_lifespan(
+            &by_day,
+            &residence(
+                uuid(12),
+                person_id,
+                DateValue::exact_day(CivilDate::new(1950, 5, 10).unwrap())
+            )
+        )
+        .is_ok());
+
+        // An exact earlier day and an earlier year are rejected.
+        assert!(ensure_event_within_lifespan(
+            &by_day,
+            &residence(
+                uuid(13),
+                person_id,
+                DateValue::exact_day(CivilDate::new(1950, 5, 9).unwrap())
+            )
+        )
+        .is_err());
+        assert!(ensure_event_within_lifespan(
+            &by_year,
+            &residence(uuid(14), person_id, DateValue::exact_year(1949))
+        )
+        .is_err());
+
+        // An open-ended or ranged start wholly before birth is rejected.
+        assert!(ensure_event_within_lifespan(
+            &by_year,
+            &residence(
+                uuid(15),
+                person_id,
+                open_range(CivilDate::new(1940, 1, 1).unwrap())
+            )
+        )
+        .is_err());
+        let mut ranged = event(
+            uuid(16),
+            person_id,
+            EventType::Residence,
+            DateValue::exact_year(1948),
+        );
+        ranged.date.end = Some(CivilDate::new(1961, 1, 1).unwrap());
+        ranged.date.qualifier = crate::date::DateQualifier::Range;
+        assert!(ensure_event_within_lifespan(&by_year, &ranged).is_err());
+
+        // An open-ended start unit containing the birth anchor is accepted.
+        assert!(ensure_event_within_lifespan(
+            &by_month,
+            &residence(
+                uuid(17),
+                person_id,
+                open_range(CivilDate::new(1950, 1, 1).unwrap())
+            )
+        )
+        .is_ok());
+
+        // Unknown dates skip the check.
+        assert!(ensure_event_within_lifespan(
+            &by_year,
+            &residence(uuid(18), person_id, DateValue::default())
+        )
+        .is_ok());
+    }
+
+    #[test]
+    fn same_year_birth_and_death_are_compatible() {
+        let person_id = uuid(1);
+        let birth = event(
+            uuid(10),
+            person_id,
+            EventType::Birth,
+            DateValue::exact_year(1950),
+        );
+        let death = event(
+            uuid(11),
+            person_id,
+            EventType::Death,
+            DateValue::exact_year(1950),
+        );
+        assert!(ensure_life_events_compatible(std::slice::from_ref(&death), &birth, None).is_ok());
+        assert!(ensure_life_events_compatible(std::slice::from_ref(&birth), &death, None).is_ok());
+    }
+
+    #[test]
+    fn residence_overlap_respects_adjacency_and_open_bounds() {
+        let person_id = uuid(1);
+        let existing = vec![residence(uuid(10), person_id, DateValue::exact_year(1950))];
+
+        let overlapping = residence(uuid(11), person_id, DateValue::exact_year(1950));
+        let error = ensure_residence_ranges_do_not_overlap(&existing, &overlapping, None)
+            .expect_err("overlap");
+        assert_eq!(error.code, RESIDENCE_RANGE_OVERLAP);
+        assert_eq!(
+            error.params.get("otherEventId").map(String::as_str),
+            Some(uuid(10).to_string().as_str())
+        );
+
+        let adjacent = residence(uuid(12), person_id, DateValue::exact_year(1951));
+        assert!(ensure_residence_ranges_do_not_overlap(&existing, &adjacent, None).is_ok());
+
+        let open = residence(
+            uuid(13),
+            person_id,
+            open_range(CivilDate::new(1970, 1, 1).unwrap()),
+        );
+        let later = residence(uuid(14), person_id, DateValue::exact_year(1980));
+        assert!(
+            ensure_residence_ranges_do_not_overlap(std::slice::from_ref(&open), &later, None)
+                .is_err()
+        );
+
+        // A `BEFORE` residence starts at negative infinity.
+        let mut before = residence(
+            uuid(15),
+            person_id,
+            DateValue::before(CivilDate::new(1980, 1, 1).unwrap()),
+        );
+        before.date.precision = DatePrecision::Year;
+        assert!(ensure_residence_ranges_do_not_overlap(&[before], &open, None).is_err());
+
+        // Unknown dates are not compared, and the replaced row is itself.
+        let unknown = residence(uuid(16), person_id, DateValue::default());
+        assert!(ensure_residence_ranges_do_not_overlap(&[unknown], &open, None).is_ok());
+        assert!(
+            ensure_residence_ranges_do_not_overlap(&existing, &existing[0], Some(uuid(10))).is_ok()
+        );
+    }
+
+    #[test]
+    fn parent_child_age_gap_is_nine_calendar_years() {
+        let parent = person_with_birth(
+            uuid(1),
+            DateValue::exact_day(CivilDate::new(1900, 1, 1).unwrap()),
+        );
+        let eight = person_with_birth(
+            uuid(2),
+            DateValue::exact_day(CivilDate::new(1908, 1, 1).unwrap()),
+        );
+        let nine = person_with_birth(
+            uuid(3),
+            DateValue::exact_day(CivilDate::new(1909, 1, 1).unwrap()),
+        );
+        let older = person_with_birth(
+            uuid(4),
+            DateValue::exact_day(CivilDate::new(1930, 1, 1).unwrap()),
+        );
+
+        let error = ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &eight)
+            .expect_err("too young");
+        assert_eq!(error.code, PARENT_CHILD_AGE_GAP);
+        assert_eq!(error.params.get("minYears").map(String::as_str), Some("9"));
+        assert!(ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &nine).is_ok());
+        assert!(
+            ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &older).is_ok()
+        );
+
+        // Unknown births skip, and adoption is exempt.
+        let unknown = person(uuid(5), None, None);
+        assert!(
+            ensure_parent_child_age_gap(RelationshipType::ParentChild, &unknown, &eight).is_ok()
+        );
+        assert!(ensure_parent_child_age_gap(
+            RelationshipType::AdoptiveParentChild,
+            &parent,
+            &eight
+        )
+        .is_ok());
+
+        // A range anchor is its start.
+        let ranged = person_with_birth(uuid(6), open_range(CivilDate::new(1900, 1, 1).unwrap()));
+        assert!(
+            ensure_parent_child_age_gap(RelationshipType::ParentChild, &ranged, &eight).is_err()
+        );
+        assert!(ensure_parent_child_age_gap(RelationshipType::ParentChild, &ranged, &nine).is_ok());
+    }
+
+    #[test]
+    fn parent_age_gap_clamps_february_29() {
+        let parent = person_with_birth(
+            uuid(1),
+            DateValue::exact_day(CivilDate::new(1904, 2, 29).unwrap()),
+        );
+        // 1913 is not a leap year: the threshold is 28 February.
+        let before = person_with_birth(
+            uuid(2),
+            DateValue::exact_day(CivilDate::new(1913, 2, 27).unwrap()),
+        );
+        let at = person_with_birth(
+            uuid(3),
+            DateValue::exact_day(CivilDate::new(1913, 2, 28).unwrap()),
+        );
+        assert!(
+            ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &before).is_err()
+        );
+        assert!(ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &at).is_ok());
+    }
+
+    #[test]
+    fn project_validation_reports_overlap_and_age_gap_as_warnings() {
+        let parent = person_with_birth(
+            uuid(1),
+            DateValue::exact_day(CivilDate::new(1900, 1, 1).unwrap()),
+        );
+        let child = person_with_birth(
+            uuid(2),
+            DateValue::exact_day(CivilDate::new(1905, 1, 1).unwrap()),
+        );
+        let persons = vec![parent, child];
+        let events = vec![
+            residence(uuid(10), uuid(1), DateValue::exact_year(1950)),
+            residence(uuid(11), uuid(1), DateValue::exact_year(1950)),
+        ];
+        let relationships =
+            vec![Relationship::new(RelationshipType::ParentChild, uuid(1), uuid(2)).unwrap()];
+
+        let report = validate_project(ProjectSnapshot {
+            persons: &persons,
+            events: &events,
+            relationships: &relationships,
+            ..ProjectSnapshot::default()
+        });
+
+        assert!(report.is_valid(), "findings must not block: {report:?}");
+        assert_eq!(report.counts.error, 0);
+        assert_eq!(report.counts.warning, 2);
+        let codes: Vec<&str> = report
+            .issues
+            .iter()
+            .map(|issue| issue.code.as_str())
+            .collect();
+        assert!(codes.contains(&RESIDENCE_RANGE_OVERLAP), "{report:?}");
+        assert!(codes.contains(&PARENT_CHILD_AGE_GAP), "{report:?}");
+        let overlap = report
+            .issues
+            .iter()
+            .find(|issue| issue.code == RESIDENCE_RANGE_OVERLAP)
+            .unwrap();
+        assert_eq!(overlap.severity, Severity::Warning);
+        assert!(overlap.params.contains_key("otherEventId"));
+        assert!(overlap.params.contains_key("personId"));
     }
 }

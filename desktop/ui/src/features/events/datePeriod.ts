@@ -29,20 +29,19 @@ export type PeriodParseResult =
   | { ok: false; reason: "format" | "incomplete" | "order" };
 
 /**
- * A stored `DateValue` expressed as the two form inputs. Only a real range with
- * both bounds is represented: a single date, an unknown date or a partial
- * legacy range keeps the one-field mode and is never guessed at.
+ * A stored `DateValue` expressed as the two form inputs. A residence range may
+ * be open-ended: the end stays empty and is never guessed at.
  */
 export function periodFromDate(value: DateValue): PeriodInput | null {
   if (
     value.qualifier !== "RANGE" ||
     value.precision === "UNKNOWN" ||
-    value.start === null ||
-    value.end === null
+    value.start === null
   ) {
     return null;
   }
   const start = dateValueToInput(value);
+  if (value.end === null) return { from: start, to: "" };
   const lastUnit = inclusiveEnd(value.end, value.precision);
   const end = dateValueToInput({ ...value, start: lastUnit, end: null });
   return { from: start, to: end };
@@ -51,31 +50,45 @@ export function periodFromDate(value: DateValue): PeriodInput | null {
 /**
  * `from`/`to` text -> one `RANGE` date. Both bounds must parse under the chosen
  * precision and the start must not be later than the end. Two blank fields mean
- * "no date" and stay an unknown date, so an optional period is never invented.
+ * "no date" and stay an unknown date. With `allowOpenEnd`, an empty `to` stores
+ * a range with no end ("ongoing"); an empty `from` is never accepted.
  */
 export function parsePeriodInput(
   from: string,
   to: string,
   precision: DatePrecision,
+  allowOpenEnd = false,
 ): PeriodParseResult {
   const startText = from.trim();
   const endText = to.trim();
   if (startText === "" && endText === "") {
     return { ok: true, value: emptyDateValue() };
   }
-  if (startText === "" || endText === "") {
+  if (startText === "") {
     return { ok: false, reason: "incomplete" };
   }
   if (precision === "UNKNOWN") return { ok: false, reason: "format" };
 
   const start = parseDateInput(startText, precision, "RANGE");
+  if (!start.ok || start.value.start === null) {
+    return { ok: false, reason: "format" };
+  }
+  if (endText === "") {
+    if (!allowOpenEnd) return { ok: false, reason: "incomplete" };
+    return {
+      ok: true,
+      value: {
+        start: start.value.start,
+        end: null,
+        precision,
+        qualifier: "RANGE",
+        original: null,
+      },
+    };
+  }
+
   const end = parseDateInput(endText, precision, "RANGE");
-  if (!start.ok || !end.ok) return { ok: false, reason: "format" };
-  if (
-    start.value.start === null ||
-    end.value.start === null ||
-    end.value.end === null
-  ) {
+  if (!end.ok || end.value.start === null || end.value.end === null) {
     return { ok: false, reason: "format" };
   }
   // ISO civil dates compare correctly as strings.

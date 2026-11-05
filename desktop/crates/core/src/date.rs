@@ -55,6 +55,34 @@ pub struct DateValue {
     pub original: Option<String>,
 }
 
+/// Known half-open interval `[start, end)` of a date value.
+///
+/// `None` on either side is infinity; callers use [`Self::overlaps`] instead of
+/// inventing a boundary. `UNKNOWN` precision is represented by no interval.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DateInterval {
+    pub start: Option<CivilDate>,
+    pub end: Option<CivilDate>,
+}
+
+impl DateInterval {
+    /// True when the two half-open intervals share at least one instant.
+    ///
+    /// Adjacent intervals (`end == next start`) do not overlap.
+    pub fn overlaps(self, other: Self) -> bool {
+        starts_before_end(self.start, other.end) && starts_before_end(other.start, self.end)
+    }
+}
+
+/// `start < end` with `None` treated as infinity.
+fn starts_before_end(start: Option<CivilDate>, end: Option<CivilDate>) -> bool {
+    match (start, end) {
+        (_, None) => true,
+        (None, Some(_)) => true,
+        (Some(start), Some(end)) => start < end,
+    }
+}
+
 impl Default for DateValue {
     fn default() -> Self {
         Self::unknown(None)
@@ -238,7 +266,49 @@ impl DateValue {
         }
     }
 
+    /// End-exclusive interval of a date value; `None` on a side means unbounded.
+    ///
+    /// `UNKNOWN` precision has no interval and is never compared.
+    pub fn interval(&self) -> Option<DateInterval> {
+        if self.precision == DatePrecision::Unknown {
+            return None;
+        }
+        if self.start.is_none() && self.end.is_none() {
+            return None;
+        }
+        Some(DateInterval {
+            start: self.start,
+            end: self.end,
+        })
+    }
+
+    /// End-exclusive boundary of the start's own precision unit.
+    ///
+    /// Year -> 1 January of the next year, month -> the first of the next month,
+    /// day -> the next day. Returns `None` when there is no usable start.
+    pub fn start_unit_end(&self) -> Option<CivilDate> {
+        let start = self.start?;
+        match self.precision {
+            DatePrecision::Day => Some(start.next_day()),
+            DatePrecision::Month => Some(start.first_of_month().next_month()),
+            DatePrecision::Year => Some(start.first_of_year().next_year()),
+            DatePrecision::Unknown => None,
+        }
+    }
+
     pub fn validate(&self) -> AppResult<()> {
+        self.validate_with(false)
+    }
+
+    /// Validates a residence date, where a `RANGE` may omit its end.
+    ///
+    /// The missing end means "ongoing" and is never filled with a date. Only a
+    /// range with a start may be open; a range without a start stays invalid.
+    pub fn validate_open_range(&self) -> AppResult<()> {
+        self.validate_with(true)
+    }
+
+    fn validate_with(&self, allow_open_range: bool) -> AppResult<()> {
         use DateQualifier as Q;
         match self.precision {
             DatePrecision::Unknown => {
@@ -254,6 +324,11 @@ impl DateValue {
             }
         }
 
+        let open_range = allow_open_range
+            && self.qualifier == Q::Range
+            && self.start.is_some()
+            && self.end.is_none();
+
         match self.qualifier {
             Q::Before if self.start.is_some() || self.end.is_none() => {
                 return Err(AppError::validation("date", "beforeBounds"));
@@ -261,7 +336,9 @@ impl DateValue {
             Q::After if self.end.is_some() || self.start.is_none() => {
                 return Err(AppError::validation("date", "afterBounds"));
             }
-            Q::Exact | Q::Approximate | Q::Range if self.start.is_none() || self.end.is_none() => {
+            Q::Exact | Q::Approximate | Q::Range
+                if (self.start.is_none() || self.end.is_none()) && !open_range =>
+            {
                 return Err(AppError::validation("date", "missingBounds"));
             }
             _ => {}
@@ -378,5 +455,70 @@ mod tests {
         let mut month = DateValue::exact_month(CivilDate::new(1950, 5, 1).unwrap());
         month.end = Some(CivilDate::new(1950, 6, 2).unwrap());
         assert!(month.validate().is_err());
+    }
+
+    #[test]
+    fn intervals_treat_missing_bounds_as_infinity() {
+        let year = DateValue::exact_year(1950).interval().unwrap();
+        assert_eq!(year.start.unwrap().to_iso(), "1950-01-01");
+        assert_eq!(year.end.unwrap().to_iso(), "1951-01-01");
+
+        let open = DateValue {
+            start: Some(CivilDate::new(1950, 1, 1).unwrap()),
+            end: None,
+            precision: DatePrecision::Year,
+            qualifier: DateQualifier::Range,
+            original: None,
+        };
+        let open = open.interval().unwrap();
+        assert!(open.overlaps(year));
+        assert!(!open.overlaps(DateValue::exact_year(1940).interval().unwrap()));
+
+        let before = DateValue::before(CivilDate::new(1951, 1, 1).unwrap())
+            .interval()
+            .unwrap();
+        assert!(before.start.is_none());
+        assert!(before.overlaps(open));
+
+        assert!(DateValue::unknown(None).interval().is_none());
+    }
+
+    #[test]
+    fn adjacent_intervals_do_not_overlap() {
+        let left = DateValue::exact_year(1950).interval().unwrap();
+        let right = DateValue::exact_year(1951).interval().unwrap();
+        assert!(!left.overlaps(right));
+        assert!(left.overlaps(DateValue::exact_year(1950).interval().unwrap()));
+    }
+
+    #[test]
+    fn start_unit_end_follows_precision() {
+        let day = DateValue::exact_day(CivilDate::new(1950, 5, 10).unwrap());
+        assert_eq!(day.start_unit_end().unwrap().to_iso(), "1950-05-11");
+        let month = DateValue::exact_month(CivilDate::new(1950, 12, 1).unwrap());
+        assert_eq!(month.start_unit_end().unwrap().to_iso(), "1951-01-01");
+        let year = DateValue::exact_year(1950);
+        assert_eq!(year.start_unit_end().unwrap().to_iso(), "1951-01-01");
+        assert!(DateValue::default().start_unit_end().is_none());
+        assert!(DateValue::before(CivilDate::new(1950, 1, 1).unwrap())
+            .start_unit_end()
+            .is_none());
+    }
+
+    #[test]
+    fn open_range_is_valid_only_through_the_residence_entry_point() {
+        let open = DateValue {
+            start: Some(CivilDate::new(1950, 1, 1).unwrap()),
+            end: None,
+            precision: DatePrecision::Year,
+            qualifier: DateQualifier::Range,
+            original: None,
+        };
+        assert!(open.validate_open_range().is_ok());
+        assert!(open.validate().is_err());
+
+        let mut no_start = open;
+        no_start.start = None;
+        assert!(no_start.validate_open_range().is_err());
     }
 }
