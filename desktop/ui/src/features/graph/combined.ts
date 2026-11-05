@@ -3,7 +3,13 @@
 // the shared root card and re-routes the edges in the merged coordinate space.
 // Pure: no React, no IPC, no DOM.
 
-import { PADDING, type GraphLayout, type LayoutEdge } from "./layout";
+import {
+  PADDING,
+  SPOUSE_GAP,
+  V_GAP,
+  type GraphLayout,
+  type LayoutEdge,
+} from "./layout";
 
 const ROOT_KEY = "0";
 
@@ -18,8 +24,20 @@ function edgePath(edge: LayoutEdge, layout: GraphLayout): string | null {
   if (!from || !to) return null;
   if (edge.kind === "spouse") {
     const [left, right] = from.x <= to.x ? [from, to] : [to, from];
-    const y = round(left.y + left.height / 2);
-    return `M ${round(left.x + left.width)} ${y} H ${round(right.x)}`;
+    const gap = right.x - (left.x + left.width);
+    if (Math.abs(left.y - right.y) < 0.01 && gap <= SPOUSE_GAP + 0.01) {
+      const y = round(left.y + left.height / 2);
+      return `M ${round(left.x + left.width)} ${y} H ${round(right.x)}`;
+    }
+    const midY = round(
+      Math.max(PADDING / 2, Math.min(left.y, right.y) - V_GAP / 2),
+    );
+    return [
+      `M ${round(left.x + left.width / 2)} ${round(left.y)}`,
+      `V ${midY}`,
+      `H ${round(right.x + right.width / 2)}`,
+      `V ${round(right.y)}`,
+    ].join(" ");
   }
   const startX = round(from.x + from.width / 2);
   const startY = round(from.y + from.height);
@@ -57,10 +75,23 @@ export function combineLayouts(
 
   const dx = ancestorRoot.x - descendantRoot.x;
   const dy = ancestorRoot.y - descendantRoot.y;
+  const ancestorSpousePersons = new Set(
+    ancestor.nodes
+      .filter((node) => node.spouseOfKey !== null && node.personId !== null)
+      .map((node) => node.personId as string),
+  );
   const merged = [
     ...ancestor.nodes,
     ...descendant.nodes
-      .filter((node) => node.occurrenceKey !== ROOT_KEY)
+      .filter(
+        (node) =>
+          node.occurrenceKey !== ROOT_KEY &&
+          !(
+            node.spouseOfKey !== null &&
+            node.personId !== null &&
+            ancestorSpousePersons.has(node.personId)
+          ),
+      )
       .map((node) => ({ ...node, x: node.x + dx, y: node.y + dy })),
   ];
 

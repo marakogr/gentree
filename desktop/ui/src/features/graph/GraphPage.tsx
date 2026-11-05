@@ -61,16 +61,25 @@ import { showsNodeLabels } from "./detail";
 import {
   layoutAncestors,
   layoutDescendants,
-  spousePairKey,
   type LayoutNode,
 } from "./layout";
 import { buildBloodTree, buildFullTree } from "./forest";
 import { combineLayouts } from "./combined";
 import {
+  EMPTY_SPOUSE_INDEX,
+  buildSpouseIndex,
+  decorateAncestorGraph,
+  decorateDescendantGraph,
+  readSpouseToggle,
+  writeSpouseToggle,
+  type SpouseIndex,
+} from "./spouses";
+import {
   parentEdgesFromRelationships,
   type ParentEdges,
 } from "./parents";
 import { selectRootPerson } from "./root";
+import TreeSpouseToggle from "./TreeSpouseToggle";
 
 const GRAPH_SCALE_BOUNDS = { min: 0.4, max: 1.8 } as const;
 const FIT_PADDING = 16;
@@ -170,7 +179,10 @@ export default function GraphPage({
   const [persons, setPersons] = useState<Person[]>([]);
   const [personsLoaded, setPersonsLoaded] = useState(false);
   const [photos, setPhotos] = useState<Map<string, MediaItem>>(new Map());
-  const [spousePairs, setSpousePairs] = useState<Set<string>>(new Set());
+  const [spouseIndex, setSpouseIndex] =
+    useState<SpouseIndex>(EMPTY_SPOUSE_INDEX);
+  /** Session-scoped; off by default so the blood view is unchanged. */
+  const [showSpouses, setShowSpouses] = useState(readSpouseToggle);
   const [parentEdges, setParentEdges] = useState<ParentEdges>(new Map());
   const [mode, setMode] = useState<GraphMode>("both");
   /** The mode of the last request; read by callbacks that must not re-subscribe. */
@@ -256,20 +268,8 @@ export default function GraphPage({
     ]);
     setPersons(page.items.map((item) => item.entity));
     setPhotos(photosByPerson(media));
-    setSpousePairs(
-      new Set(
-        relationships
-          .filter(
-            (row) =>
-              row.entity.type === "SPOUSE" ||
-              row.entity.type === "PARTNER",
-          )
-          .map((row) =>
-            spousePairKey(row.entity.personId, row.entity.relatedPersonId),
-          ),
-      ),
-    );
     setParentEdges(parentEdgesFromRelationships(relationships));
+    setSpouseIndex(buildSpouseIndex(relationships));
     setPersonsLoaded(true);
   }, [projectId]);
 
@@ -301,6 +301,28 @@ export default function GraphPage({
         ? null
         : buildBloodTree(persons, parentEdges, rootId),
     [persons, parentEdges, rootId],
+  );
+
+  const ancestorSpouseView = useMemo(
+    () =>
+      showSpouses && ancestorGraph
+        ? decorateAncestorGraph(ancestorGraph, personsById, spouseIndex)
+        : null,
+    [ancestorGraph, personsById, showSpouses, spouseIndex],
+  );
+  const descendantSpouseView = useMemo(
+    () =>
+      showSpouses && descendantGraph
+        ? decorateDescendantGraph(descendantGraph, personsById, spouseIndex)
+        : null,
+    [descendantGraph, personsById, showSpouses, spouseIndex],
+  );
+  const bloodSpouseView = useMemo(
+    () =>
+      showSpouses && bloodTree
+        ? decorateDescendantGraph(bloodTree.graph, personsById, spouseIndex)
+        : null,
+    [bloodTree, personsById, showSpouses, spouseIndex],
   );
 
   // Disclosure stays available at every depth: the backend clamps the request,
@@ -398,11 +420,26 @@ export default function GraphPage({
 
   const displayGraph = useMemo(() => {
     if (mode === "tree") return fullTree.graph;
-    if (mode === "relatives") return bloodTree?.graph ?? null;
-    if (mode === "ancestors") return ancestorGraph;
-    if (mode === "descendants") return descendantGraph;
+    if (mode === "relatives") {
+      return bloodSpouseView?.graph ?? bloodTree?.graph ?? null;
+    }
+    if (mode === "ancestors") {
+      return ancestorSpouseView?.graph ?? ancestorGraph;
+    }
+    if (mode === "descendants") {
+      return descendantSpouseView?.graph ?? descendantGraph;
+    }
     return null;
-  }, [ancestorGraph, descendantGraph, mode, fullTree, bloodTree]);
+  }, [
+    ancestorGraph,
+    ancestorSpouseView,
+    bloodSpouseView,
+    bloodTree,
+    descendantGraph,
+    descendantSpouseView,
+    fullTree,
+    mode,
+  ]);
 
   /** No rootless tree and no root means no kinship to label. */
   const rootGraphId = mode === "tree" ? "" : (rootId ?? "");
@@ -410,10 +447,12 @@ export default function GraphPage({
   const graphPersonIds = useMemo(() => {
     if (mode === "both") {
       const ids = new Set<string>();
-      for (const node of ancestorGraph?.nodes ?? []) {
+      for (const node of (ancestorSpouseView?.graph ?? ancestorGraph)?.nodes ??
+        []) {
         if (node.personId) ids.add(node.personId);
       }
-      for (const node of descendantGraph?.nodes ?? []) {
+      for (const node of (descendantSpouseView?.graph ?? descendantGraph)
+        ?.nodes ?? []) {
         ids.add(node.personId);
       }
       return [...ids];
@@ -423,7 +462,14 @@ export default function GraphPage({
         .map((node) => node.personId)
         .filter((id): id is string => id !== null) ?? []
     );
-  }, [ancestorGraph, descendantGraph, displayGraph, mode]);
+  }, [
+    ancestorGraph,
+    ancestorSpouseView,
+    descendantGraph,
+    descendantSpouseView,
+    displayGraph,
+    mode,
+  ]);
 
   useEffect(() => {
     if (rootGraphId === "" || graphPersonIds.length === 0) {
@@ -454,9 +500,12 @@ export default function GraphPage({
       });
     }
     if (mode === "relatives") {
-      return bloodTree
-        ? layoutDescendants(bloodTree.graph, {
-            extraEdges: bloodTree.extraEdges,
+      const graph = bloodSpouseView?.graph ?? bloodTree?.graph;
+      return graph
+        ? layoutDescendants(graph, {
+            extraEdges: bloodTree?.extraEdges,
+            spouseOf: bloodSpouseView?.spouseOf,
+            spousePairs: bloodSpouseView?.spousePairs,
           })
         : null;
     }
@@ -464,13 +513,25 @@ export default function GraphPage({
     // backend still returns them for the web client.
     const ancestorLayout =
       (mode === "ancestors" || mode === "both") && ancestorGraph
-        ? layoutAncestors(ancestorGraph, spousePairs, {
-            includePlaceholders: false,
-          })
+        ? layoutAncestors(
+            ancestorSpouseView?.graph ?? ancestorGraph,
+            spouseIndex.pairs,
+            {
+              includePlaceholders: false,
+              spouseOf: ancestorSpouseView?.spouseOf,
+              spousePairs: ancestorSpouseView?.spousePairs,
+            },
+          )
         : null;
     const descendantLayout =
       (mode === "descendants" || mode === "both") && descendantGraph
-        ? layoutDescendants(descendantGraph)
+        ? layoutDescendants(
+            descendantSpouseView?.graph ?? descendantGraph,
+            {
+              spouseOf: descendantSpouseView?.spouseOf,
+              spousePairs: descendantSpouseView?.spousePairs,
+            },
+          )
         : null;
     if (mode === "ancestors") return ancestorLayout;
     if (mode === "descendants") return descendantLayout;
@@ -480,11 +541,14 @@ export default function GraphPage({
     return ancestorLayout ?? descendantLayout;
   }, [
     ancestorGraph,
-    descendantGraph,
-    fullTree,
+    ancestorSpouseView,
+    bloodSpouseView,
     bloodTree,
+    descendantGraph,
+    descendantSpouseView,
+    fullTree,
     mode,
-    spousePairs,
+    spouseIndex,
   ]);
 
   const fit = useCallback(() => {
@@ -907,6 +971,21 @@ export default function GraphPage({
               >
                 {t("graph:showBloodRelatives")}
               </Button>
+              {mode !== "tree" ? (
+                <TreeSpouseToggle
+                  pressed={showSpouses}
+                  disabled={busy}
+                  label={t("graph:showSpouses")}
+                  hint={t("graph:showSpousesHint")}
+                  onToggle={() => {
+                    setShowSpouses((current) => {
+                      const next = !current;
+                      writeSpouseToggle(next);
+                      return next;
+                    });
+                  }}
+                />
+              ) : null}
               {wholeTreeEnabled ? (
                 <Button
                   appearance={mode === "tree" ? "primary" : "secondary"}
@@ -1009,10 +1088,13 @@ export default function GraphPage({
                     const name = person
                       ? displayName(person, t("person:unknownName"))
                       : t("person:unknownName");
+                    const spouse = node.spouseOfKey !== null;
                     const ancestorNode =
-                      node.role === "FATHER" || node.role === "MOTHER";
-                    const role =
-                      mode === "relatives"
+                      !spouse &&
+                      (node.role === "FATHER" || node.role === "MOTHER");
+                    const role = spouse
+                      ? t("graph:spouseRole")
+                      : mode === "relatives"
                         ? ""
                         : t(
                             `enums:${
@@ -1055,6 +1137,7 @@ export default function GraphPage({
                     if (isRoot) classes.push("root");
                     if (selected?.person.entity.id === node.personId)
                       classes.push("selected");
+                    if (node.spouseOfKey !== null) classes.push("spouse");
                     const position = {
                       left: node.x,
                       top: node.y,

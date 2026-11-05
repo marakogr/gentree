@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ParentEdges } from "./parents";
 import { buildBloodTree, buildFullTree } from "./forest";
+import { decorateDescendantGraph, type SpouseIndex } from "./spouses";
 import { layoutDescendants } from "./layout";
 
 function person(id: string, gender: "MALE" | "FEMALE" | "UNKNOWN" = "UNKNOWN") {
@@ -269,5 +270,55 @@ describe("buildBloodTree", () => {
     expect(buildBloodTree(persons, parents, "root")).toEqual(
       buildBloodTree(persons, parents, "root"),
     );
+  });
+});
+
+describe("blood tree with spouses", () => {
+  it("adds spouses without changing blood membership or generations", () => {
+    const persons = [
+      person("grandpa", "MALE"),
+      person("grandma", "FEMALE"),
+      person("root", "MALE"),
+      person("sister", "FEMALE"),
+      person("wife", "FEMALE"),
+      person("child", "MALE"),
+    ];
+    const parents = parentsOf({
+      root: ["grandpa", "grandma"],
+      sister: ["grandpa", "grandma"],
+      child: ["root", "wife"],
+    });
+    const tree = buildBloodTree(persons, parents, "root");
+    const before = new Map(
+      tree.graph.nodes.map((node) => [node.occurrenceKey, node.generation]),
+    );
+    const index: SpouseIndex = {
+      partnersOf: new Map([["root", ["wife"]]]),
+      pairs: new Set(["root|wife"]),
+    };
+    const lookup = new Map(persons.map((item) => [item.id, item]));
+    const view = decorateDescendantGraph(tree.graph, lookup, index);
+
+    for (const [key, generation] of before) {
+      const stillThere = view.graph.nodes.find(
+        (node) => node.occurrenceKey === key,
+      );
+      expect(stillThere?.generation).toBe(generation);
+    }
+    const wife = view.graph.nodes.find((node) => node.personId === "wife");
+    expect(wife?.generation).toBe(before.get("root"));
+    expect(view.spouseOf.get(wife?.occurrenceKey ?? "")).toBe("root");
+
+    const layout = layoutDescendants(view.graph, {
+      extraEdges: tree.extraEdges,
+      spouseOf: view.spouseOf,
+      spousePairs: view.spousePairs,
+    });
+    expect(
+      layout.nodes.filter((node) => node.personId === "child"),
+    ).toHaveLength(1);
+    expect(
+      layout.nodes.filter((node) => node.personId === "wife"),
+    ).toHaveLength(1);
   });
 });
