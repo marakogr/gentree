@@ -23,6 +23,7 @@ import {
 } from "../../lib/errors";
 import {
   buildPersonInput,
+  capitalizeName,
   draftFromPerson,
   emptyPersonDraft,
   splitGivenPatronymic,
@@ -295,7 +296,10 @@ export default function PersonForm({
               value={draft.surname}
               disabled={busy}
               autoComplete="off"
-              onBlur={() => touch("name")}
+              onBlur={(event) => {
+                update({ surname: capitalizeName(event.target.value) });
+                touch("name");
+              }}
               onChange={(event) => update({ surname: event.target.value })}
             />
           </Field>
@@ -310,7 +314,10 @@ export default function PersonForm({
               value={draft.given}
               disabled={busy}
               autoComplete="off"
-              onBlur={() => touch("name")}
+              onBlur={(event) => {
+                update({ given: capitalizeName(event.target.value) });
+                touch("name");
+              }}
               onChange={(event) => update({ given: event.target.value })}
             />
           </Field>
@@ -321,6 +328,9 @@ export default function PersonForm({
               value={draft.patronymic}
               disabled={busy}
               autoComplete="off"
+              onBlur={(event) =>
+                update({ patronymic: capitalizeName(event.target.value) })
+              }
               onChange={(event) => update({ patronymic: event.target.value })}
             />
           </Field>
@@ -335,6 +345,9 @@ export default function PersonForm({
               value={draft.birthSurname}
               disabled={busy}
               autoComplete="off"
+              onBlur={(event) =>
+                update({ birthSurname: capitalizeName(event.target.value) })
+              }
               onChange={(event) =>
                 update({ birthSurname: event.target.value })
               }
