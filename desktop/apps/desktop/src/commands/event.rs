@@ -407,7 +407,6 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::permissions_set_readonly_false)]
     fn backfill_retries_after_a_failed_write() {
         let tmp = tempfile::tempdir().unwrap();
         let mut store = ProjectStore::create(tmp.path(), "Synthetic").unwrap();
@@ -419,18 +418,44 @@ mod tests {
         let root = store.root().to_path_buf();
         drop(store);
 
-        let path = root.join(gentree_storage::RELATIONSHIP_FILE);
-        let mut permissions = std::fs::metadata(&path).unwrap().permissions();
-        permissions.set_readonly(true);
-        std::fs::set_permissions(&path, permissions).unwrap();
-
+        // Open first so the lock exists before the write failure is injected.
         let mut locked = ProjectStore::open(&root, true).unwrap();
-        assert!(backfill_relations_on_open(&mut locked).is_err());
-        drop(locked);
 
-        let mut permissions = std::fs::metadata(&path).unwrap().permissions();
-        permissions.set_readonly(false);
-        std::fs::set_permissions(&path, permissions).unwrap();
+        // Unix `rename` replaces a read-only file, so the failure has to come
+        // from the project directory instead: atomic writes create their temp
+        // file there. Windows still rejects the rename over a read-only file.
+        #[cfg(unix)]
+        let result = {
+            use std::os::unix::fs::PermissionsExt;
+            let original = std::fs::metadata(&root).unwrap().permissions();
+            let mode = original.mode();
+            let mut read_only = original;
+            read_only.set_mode(mode & !0o222);
+            std::fs::set_permissions(&root, read_only).unwrap();
+
+            let result = backfill_relations_on_open(&mut locked);
+
+            let mut restored = std::fs::metadata(&root).unwrap().permissions();
+            restored.set_mode(mode);
+            std::fs::set_permissions(&root, restored).unwrap();
+            result
+        };
+        #[cfg(windows)]
+        let result = {
+            let path = root.join(gentree_storage::RELATIONSHIP_FILE);
+            let original = std::fs::metadata(&path).unwrap().permissions();
+            let mut read_only = original.clone();
+            read_only.set_readonly(true);
+            std::fs::set_permissions(&path, read_only).unwrap();
+
+            let result = backfill_relations_on_open(&mut locked);
+
+            std::fs::set_permissions(&path, original).unwrap();
+            result
+        };
+
+        assert!(result.is_err());
+        drop(locked);
 
         let mut store = ProjectStore::open(&root, true).unwrap();
         let report = backfill_relations_on_open(&mut store).unwrap();
