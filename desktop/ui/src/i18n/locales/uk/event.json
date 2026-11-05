@@ -185,9 +185,10 @@
     "both": "Предки й нащадки"
   },
   "openTimeline": "Перейти до хронології",
-  "parentFirst": "Батько або мати",
-  "parentSecond": "Другий з батьків",
-  "personPlaceholderParent": "Виберіть батька або матір",
+  "parentFirst": "Батько",
+  "parentSecond": "Мати",
   "clearParent": "Прибрати батька або матір",
-  "parentsLinked": "Під час збереження створюється зв'язок «батько або мати — дитина»"
+  "parentsLinked": "Під час збереження створюється зв'язок «батько або мати — дитина»",
+  "parentFirstPlaceholder": "Виберіть батька",
+  "parentSecondPlaceholder": "Виберіть матір"
 }

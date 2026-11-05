@@ -691,7 +691,11 @@ export default function EventForm({
                         items={parentItemsFor(index)}
                         value={draft.parentIds[index] ?? ""}
                         onChange={(personId) => setParent(index, personId)}
-                        placeholder={t("event:personPlaceholderParent")}
+                        placeholder={t(
+                          index === 0
+                            ? "event:parentFirstPlaceholder"
+                            : "event:parentSecondPlaceholder",
+                        )}
                         ariaLabel={t(
                           index === 0
                             ? "event:parentFirst"

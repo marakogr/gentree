@@ -185,9 +185,10 @@
     "both": "Antepasados y descendientes"
   },
   "openTimeline": "Abrir la cronología",
-  "parentFirst": "Progenitor",
-  "parentSecond": "Segundo progenitor",
-  "personPlaceholderParent": "Selecciona un progenitor",
+  "parentFirst": "Padre",
+  "parentSecond": "Madre",
   "clearParent": "Quitar progenitor",
-  "parentsLinked": "Al guardar se crea una relación progenitor-hijo"
+  "parentsLinked": "Al guardar se crea una relación progenitor-hijo",
+  "parentFirstPlaceholder": "Selecciona al padre",
+  "parentSecondPlaceholder": "Selecciona a la madre"
 }

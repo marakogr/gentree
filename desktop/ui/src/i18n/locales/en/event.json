@@ -185,9 +185,10 @@
     "both": "Ancestors and descendants"
   },
   "openTimeline": "Open timeline",
-  "parentFirst": "Parent",
-  "parentSecond": "Second parent",
-  "personPlaceholderParent": "Select a parent",
+  "parentFirst": "Father",
+  "parentSecond": "Mother",
   "clearParent": "Clear parent",
-  "parentsLinked": "Saving creates a parent–child relation"
+  "parentsLinked": "Saving creates a parent–child relation",
+  "parentFirstPlaceholder": "Select the father",
+  "parentSecondPlaceholder": "Select the mother"
 }
