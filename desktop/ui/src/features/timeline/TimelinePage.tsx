@@ -554,12 +554,10 @@ export default function TimelinePage({
     () => buildLineMarkers(partitioned.dated, t),
     [partitioned.dated, t],
   );
-  // The loaded events bound every navigation gesture, not the window span.
+  // The loaded events are the navigation reference: a gesture may move the
+  // window well past them, but it stops once no event would stay in view.
   const domain = useMemo(() => markerDomain(markers), [markers]);
-  const dataWindow = useMemo(
-    () => computeMarkerWindow(markers, 0.04, domain),
-    [markers, domain],
-  );
+  const dataWindow = useMemo(() => computeMarkerWindow(markers), [markers]);
 
   const allEvents = useMemo(
     () => [...datedEvents, ...undatedEvents],
