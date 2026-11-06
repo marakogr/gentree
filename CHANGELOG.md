@@ -4,6 +4,54 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] — 2026-11-06
+
+Family tree and relations: parents, spouses and birth events now agree with each
+other, existing archives are migrated on first writable open, and dates and
+patronymics follow explicit rules.
+
+### Added
+
+- Date validation: birth before death, plausible date ranges, and parents at
+  least 11 years older than their children; unknown dates stay unknown.
+- Derive spouse and parent-child relations from life events.
+- Show spouses on the family tree for the root person and relatives.
+- Bidirectional sync between biological parent-child relations and the child's
+  birth event; adoptive links stay separate.
+- Writable-open migration for existing projects: missing life events, relations
+  derived from events, birth-event parent mirrors, and patronymic backfill.
+  Read-only projects are untouched, re-opening is idempotent and reports contain
+  aggregates only.
+- Automatic patronymic from a known father for Cyrillic names and a known child
+  gender; existing patronymics are never overwritten.
+- Timeline: 10% initial edge padding, bounded wheel/pinch zoom and pan that keeps
+  at least one marker visible.
+- WebDriver coverage for the 0.6.0 feedback rules.
+
+### Changed
+
+- Event form is type-first, keeps its footer visible and scrolls the files block;
+  parent slots resolve by gender, and existing birth/death event types are
+  blocked with a localized hint.
+- Tree cards fit the root name, align parents and captions, and show only the
+  relationship to the root on hover.
+- Event filters stay per project and show an active-filter notice, reset and a
+  real year control.
+- Person and event cards, the events table, dialog close controls, import
+  preview, map search controls and shell spacing follow the shared UI kit.
+
+### Fixed
+
+- Timeline no longer scrolls to extreme years when wheel or pinch zooming.
+- Deleting a father no longer shifts the mother into the father slot.
+- Event form footer and files no longer overflow; duplicate BIRTH/DEATH types
+  cannot be added.
+- Person and event cards no longer clip long values or leave dialogs stuck.
+- Event table shows the event owner instead of every participant; tree hover no
+  longer duplicates relationships.
+- Import preview badges, frame and action buttons no longer overlap.
+- Map coordinate search controls no longer jump while typing.
+
 ## [0.5.0] — 2026-11-04
 
 Chat history: conversations now survive project switches and restarts, with a
@@ -209,6 +257,7 @@ Windows SmartScreen or macOS Gatekeeper may ask for confirmation on first launch
 - The "Show from selected" and "Show siblings" tree buttons. The root picker
   already chooses the person the tree is built from.
 
+[0.6.0]: ../../releases/tag/v0.6.0
 [0.5.0]: ../../releases/tag/v0.5.0
 [0.4.0]: ../../releases/tag/v0.4.0
 [0.3.0]: ../../releases/tag/v0.3.0
