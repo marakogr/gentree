@@ -21,6 +21,8 @@
   "roleSpouseFirst": "Перший(-а) з подружжя",
   "roleSpouseSecond": "Другий(-а) з подружжя",
   "type": "Тип",
+  "typeAlreadyExistsOption": "{{type}} — уже є",
+  "typeAlreadyUsedHint": "У людини вже є подія: {{types}}. Такий тип не можна додати повторно.",
   "from": "Дата від",
   "to": "Дата до",
   "allPersons": "Усі люди",

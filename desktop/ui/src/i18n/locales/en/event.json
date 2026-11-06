@@ -21,6 +21,8 @@
   "roleSpouseFirst": "First spouse",
   "roleSpouseSecond": "Second spouse",
   "type": "Type",
+  "typeAlreadyExistsOption": "{{type}} — already recorded",
+  "typeAlreadyUsedHint": "This person already has: {{types}}. That type cannot be added again.",
   "from": "From date",
   "to": "To date",
   "allPersons": "All people",

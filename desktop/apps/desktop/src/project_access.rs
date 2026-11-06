@@ -1512,6 +1512,91 @@ mod tests {
     }
 
     #[test]
+    fn project_access_refuses_a_second_birth_or_death_event() {
+        // Issue #129: the IPC/chat create path enforces the same uniqueness the
+        // form shows. Person creation already owns the automatic life events,
+        // so any extra BIRTH or DEATH must be a validation error.
+        let dir = temp_dir("access-duplicate-life-events");
+        let (_slot, project_id, access) = project_access(&dir);
+        let created = access
+            .create_person(CreatePersonRequest {
+                project_id,
+                person: dated_person("Ada", 1950, 2000),
+                dry_run: false,
+                expected_version: None,
+            })
+            .unwrap();
+        let person_id = created.entity_id.unwrap();
+
+        let life_event = |event_type, year| gentree_mcp::dto::EventInput {
+            person_id,
+            event_type,
+            date: year_date(year),
+            place: None,
+            description: None,
+            source_ids: Vec::new(),
+            details: None,
+        };
+
+        for (event_type, year) in [
+            (gentree_mcp::dto::EventTypeArg::Birth, 1951),
+            (gentree_mcp::dto::EventTypeArg::Death, 2001),
+        ] {
+            let error = access
+                .create_event(CreateEventRequest {
+                    project_id,
+                    event: life_event(event_type, year),
+                    dry_run: false,
+                    expected_version: None,
+                })
+                .unwrap_err();
+            assert_eq!(
+                error.code,
+                gentree_core::validation::LIFE_EVENT_ALREADY_EXISTS
+            );
+        }
+
+        // A repeatable type on the same person and a BIRTH for another person
+        // are not blocked by this rule.
+        access
+            .create_event(CreateEventRequest {
+                project_id,
+                event: life_event(gentree_mcp::dto::EventTypeArg::Residence, 1970),
+                dry_run: false,
+                expected_version: None,
+            })
+            .unwrap();
+        let other = access
+            .create_person(CreatePersonRequest {
+                project_id,
+                person: person_input("Bob"),
+                dry_run: false,
+                expected_version: None,
+            })
+            .unwrap()
+            .entity_id
+            .unwrap();
+        access
+            .create_event(CreateEventRequest {
+                project_id,
+                event: gentree_mcp::dto::EventInput {
+                    person_id: other,
+                    event_type: gentree_mcp::dto::EventTypeArg::Birth,
+                    date: year_date(1980),
+                    place: None,
+                    description: None,
+                    source_ids: Vec::new(),
+                    details: None,
+                },
+                dry_run: false,
+                expected_version: None,
+            })
+            .unwrap();
+
+        fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
     fn project_access_writes_through_storage_with_versions_and_dry_run() {
         let dir = temp_dir("mcp-access");
         let (slot, project_id, access) = project_access(&dir);

@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   AddRegular,
   InfoRegular,
@@ -49,6 +49,7 @@ import {
   eventTypeLabel,
   eventTypeSelectionValue,
   isEventDraftDirty,
+  lockedLifeEventTypes,
   parseDraftDateValue,
   readEventTypeSelection,
   type EventDraft,
@@ -80,6 +81,9 @@ const PRECISIONS: readonly DatePrecision[] = [
 
 /** Offered qualifiers; a stored legacy qualifier is appended while editing. */
 const QUALIFIERS: readonly DateQualifier[] = ["EXACT", "APPROXIMATE"];
+
+/** No stored birth/death event for the selected person (or not loaded yet). */
+const NO_LOCKED_TYPES: ReadonlySet<EventType> = new Set();
 
 /** Request to create an event of another type for the same person. */
 export type RelatedEventRequest = { type: EventType; personId: string };
@@ -161,6 +165,40 @@ export default function EventForm({
   // missing settings backend leaves built-in types and keys usable.
   const { customTypes, fieldGroups, geocoderEnabled, historicalEnabled } =
     useEventConfig();
+  // A person may own only one birth and one death. The stored events of the
+  // selected person tell the form which type options are already taken; a
+  // legacy duplicate stays editable through `initial`.
+  const [lockedTypes, setLockedTypes] =
+    useState<ReadonlySet<EventType>>(NO_LOCKED_TYPES);
+
+  useEffect(() => {
+    const personId = draft.personId;
+    if (personId === "") {
+      setLockedTypes(NO_LOCKED_TYPES);
+      return undefined;
+    }
+    let active = true;
+    eventsApi
+      .list({ personId })
+      .then((rows) => {
+        if (!active) return;
+        setLockedTypes(
+          lockedLifeEventTypes(
+            rows.map((row) => row.entity),
+            personId,
+            initial?.id,
+          ),
+        );
+      })
+      // An unavailable list must not block the form: the backend still refuses
+      // a duplicate, so the form stays usable without the local hint.
+      .catch(() => {
+        if (active) setLockedTypes(NO_LOCKED_TYPES);
+      });
+    return () => {
+      active = false;
+    };
+  }, [draft.personId, initial?.id]);
 
   const update = (patch: Partial<EventDraft>) => {
     setDraft((current) => ({ ...current, ...patch }));
@@ -357,15 +395,37 @@ export default function EventForm({
     secondRequired &&
     (draft.spouseId === "" || draft.spouseId === draft.personId);
   const noPersons = persons.length === 0;
+  // Editing a legacy row keeps its own type available even when another event
+  // of the same type exists; any other locked type stays disabled.
+  const keepsCurrentType =
+    initial !== null &&
+    draft.personId === initial.personId &&
+    draft.eventType === initial.type;
+  const typeLocked = !keepsCurrentType && lockedTypes.has(draft.eventType);
+  const lockedTypeLabels = useMemo(
+    () => [...lockedTypes].map((type) => t(`enums:eventType.${type}`)),
+    [lockedTypes, t],
+  );
+  const lockedTypeHint =
+    lockedTypeLabels.length > 0
+      ? t("event:typeAlreadyUsedHint", {
+          types: lockedTypeLabels.join(", "),
+        })
+      : undefined;
+  const typeOptionDisabled = (type: EventType) =>
+    lockedTypes.has(type) &&
+    !(keepsCurrentType && initial !== null && type === initial.type);
   const submitDisabled =
-    noPersons || personMissing || secondMissing || !dateValid;
+    noPersons || personMissing || secondMissing || !dateValid || typeLocked;
   const disabledReason = noPersons
     ? t("event:noPersons")
     : personMissing
       ? t("event:errors.personRequired")
       : secondMissing
         ? t("event:errors.participantRequired")
-        : dateError ?? undefined;
+        : typeLocked
+          ? lockedTypeHint
+          : dateError ?? undefined;
 
   const personServerError = pickFieldError(errors, "personId", "person");
   const spouseServerError = pickFieldError(
@@ -384,6 +444,9 @@ export default function EventForm({
     setSubmitted(true);
     setError(null);
     setStale(false);
+    // A disabled option is normally unreachable, but a stale list or an
+    // implicit form submission must not reach the backend with it.
+    if (typeLocked) return;
 
     const built = buildEventInput(draft, initial ?? undefined);
     if (!built.ok) {
@@ -622,7 +685,11 @@ export default function EventForm({
           <div className="events-form-grid">
             {/* The type decides every other field, so it opens the card. */}
             <div className="events-form-span">
-              <Field label={t("event:type")} htmlFor="event-type">
+              <Field
+                label={t("event:type")}
+                htmlFor="event-type"
+                hint={lockedTypeHint}
+              >
                 <Select
                   id="event-type"
                   value={eventTypeSelectionValue(
@@ -633,11 +700,18 @@ export default function EventForm({
                   disabled={busy}
                   onChange={(event) => changeType(event.target.value)}
                 >
-                  {EVENT_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {t(`enums:eventType.${type}`)}
-                    </option>
-                  ))}
+                  {EVENT_TYPES.map((type) => {
+                    const locked = typeOptionDisabled(type);
+                    return (
+                      <option key={type} value={type} disabled={locked}>
+                        {locked
+                          ? t("event:typeAlreadyExistsOption", {
+                              type: t(`enums:eventType.${type}`),
+                            })
+                          : t(`enums:eventType.${type}`)}
+                      </option>
+                    );
+                  })}
                   {customTypes.map((name) => (
                     <option
                       key={`${CUSTOM_EVENT_TYPE_PREFIX}${name}`}

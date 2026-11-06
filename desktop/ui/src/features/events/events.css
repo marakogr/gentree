@@ -283,10 +283,14 @@
 
 /* ---------- dialog form ---------- */
 
+/* One bounded column: an implicit `auto` track would size itself to the widest
+   child (a long file row) and push the form outside the dialog. */
 .events-dialog-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   min-width: 0;
+  min-height: 0;
 }
 
 /* Every grid/flex child may shrink below its content width; long German or
@@ -563,19 +567,23 @@
 }
 
 .event-files {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }
 
 .event-files-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .event-files-loading {
@@ -588,6 +596,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
   padding: 0;
 }
@@ -596,6 +606,8 @@
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
+  min-width: 0;
+  max-width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
@@ -633,6 +645,7 @@
 }
 
 .event-file-line > span:first-child {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

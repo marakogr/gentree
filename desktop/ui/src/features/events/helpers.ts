@@ -49,6 +49,42 @@ export function isEventType(value: string): value is EventType {
 }
 
 /**
+ * A person is born once and dies once, so the form offers BIRTH and DEATH only
+ * while the selected person has no event of that type. Imports and old projects
+ * may still contain duplicates; editing one keeps its own type selectable.
+ */
+export const SINGLE_LIFE_EVENT_TYPES: readonly EventType[] = [
+  "BIRTH",
+  "DEATH",
+];
+
+export function isSingleLifeEventType(
+  type: EventType,
+): type is "BIRTH" | "DEATH" {
+  return SINGLE_LIFE_EVENT_TYPES.includes(type);
+}
+
+/**
+ * Life-event types the person already owns, except the event being edited.
+ * `events` may be one person's list or the whole project; rows of another
+ * person are ignored.
+ */
+export function lockedLifeEventTypes(
+  events: readonly Pick<EventEntity, "id" | "personId" | "type">[],
+  personId: string,
+  editingId?: string | null,
+): ReadonlySet<EventType> {
+  const locked = new Set<EventType>();
+  if (personId === "") return locked;
+  for (const event of events) {
+    if (event.personId !== personId) continue;
+    if (editingId != null && event.id === editingId) continue;
+    if (isSingleLifeEventType(event.type)) locked.add(event.type);
+  }
+  return locked;
+}
+
+/**
  * Select values for custom names are prefixed so a user-defined name can never
  * collide with a built-in enum value such as `BIRTH`.
  */
