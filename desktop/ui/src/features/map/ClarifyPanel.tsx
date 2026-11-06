@@ -26,6 +26,39 @@ type ClarifyPanelProps = {
   tm: Translate;
 };
 
+type ClarifyFindButtonProps = {
+  label: string;
+  searchingLabel: string;
+  loading: boolean;
+  disabled: boolean;
+  onClick: () => void;
+};
+
+/**
+ * The Find action keeps one box in every state. Its label changes while the
+ * provider is queried and Fluent disables the button, so the width must come
+ * from the layout, not from the current word (issue #113).
+ */
+export function ClarifyFindButton({
+  label,
+  searchingLabel,
+  loading,
+  disabled,
+  onClick,
+}: ClarifyFindButtonProps) {
+  return (
+    <Button
+      className="map-clarify-find"
+      appearance="secondary"
+      onClick={onClick}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+    >
+      {loading ? searchingLabel : label}
+    </Button>
+  );
+}
+
 /**
  * Local list of events whose typed place has no point. The network is used only
  * by "Find"; every apply is one explicit, reviewed action (ADR-0020).
@@ -178,13 +211,13 @@ export function ClarifyPanel({
           </div>
           <div className="map-clarify-body">
             {geocoderEnabled ? (
-              <Button
-                appearance="secondary"
+              <ClarifyFindButton
+                label={t("clarifyFind")}
+                searchingLabel={t("clarifySearching")}
+                loading={loading}
+                disabled={applying}
                 onClick={() => void find()}
-                disabled={loading || applying}
-              >
-                {loading ? t("clarifySearching") : t("clarifyFind")}
-              </Button>
+              />
             ) : (
               <Text size={200}>{t("clarifyGeocoderOff")}</Text>
             )}
