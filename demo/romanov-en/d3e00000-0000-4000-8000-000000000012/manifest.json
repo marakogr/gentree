@@ -7,7 +7,7 @@
   "updatedAt": "2026-10-01T09:00:00Z",
   "appVersion": "0.4.0",
   "homePersonId": "00000000-0000-4000-8000-000000000005",
-  "contentHash": "sha256:aac36b42c70b48f92a34d6f6e1aa280192cf0a85f449dee2aa3ccb773230bd6e",
+  "contentHash": "sha256:e83887a582f98258fe088cf1c021d0c6043896336e260ae1325bfe1038eec186",
   "counts": {
     "persons": 17,
     "events": 52,
