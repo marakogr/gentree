@@ -7,8 +7,9 @@ use gentree_core::date::CivilDate;
 use gentree_core::error::codes;
 use gentree_core::record::{CitationTarget, Event, EventType};
 use gentree_core::{
-    backfill_relations, derive_event_relations, retract_event_relations, AppError, AppResult,
-    DateValue, PlaceGeo, RelationBackfillReport,
+    backfill_relations, derive_event_relations, fill_patronymic, retract_event_relations,
+    unique_father_given_name, AppError, AppResult, DateValue, Person, PlaceGeo,
+    RelationBackfillReport, Relationship,
 };
 use gentree_storage::{ProjectStore, EVENT_FILE};
 use serde::Deserialize;
@@ -180,15 +181,19 @@ pub fn event_create(
         gentree_core::ensure_life_events_compatible(&events, &entity, None)?;
         gentree_core::ensure_event_within_lifespan(&person, &entity)?;
         gentree_core::ensure_residence_ranges_do_not_overlap(&events, &entity, None)?;
-        let persons = store.persons()?;
+        let mut persons = store.persons()?;
         let mut relationships = store.relationships()?;
         let original_relationships = relationships.clone();
         derive_event_relations(&entity, &persons, &mut relationships)
             .map_err(map_derivation_error)?;
+        let patronymic_changed = fill_birth_patronymic(&mut persons, &relationships, &entity);
         events.push(entity.clone());
         store.save_events(&events)?;
         if relationships != original_relationships {
             store.save_relationships(&relationships)?;
+        }
+        if patronymic_changed {
+            store.save_persons(&persons)?;
         }
         let version = entity_version(store, EVENT_FILE, entity.id)?;
         Ok(Versioned { entity, version })
@@ -223,15 +228,19 @@ pub fn event_update(
         gentree_core::ensure_life_events_compatible(&events, &entity, Some(id))?;
         gentree_core::ensure_event_within_lifespan(&person, &entity)?;
         gentree_core::ensure_residence_ranges_do_not_overlap(&events, &entity, Some(id))?;
-        let persons = store.persons()?;
+        let mut persons = store.persons()?;
         let mut relationships = store.relationships()?;
         let original_relationships = relationships.clone();
         derive_event_relations(&entity, &persons, &mut relationships)
             .map_err(map_derivation_error)?;
+        let patronymic_changed = fill_birth_patronymic(&mut persons, &relationships, &entity);
         events[index] = entity.clone();
         store.save_events(&events)?;
         if relationships != original_relationships {
             store.save_relationships(&relationships)?;
+        }
+        if patronymic_changed {
+            store.save_persons(&persons)?;
         }
         let version = entity_version(store, EVENT_FILE, id)?;
         Ok(Versioned { entity, version })
@@ -304,6 +313,31 @@ pub fn event_delete(
         }
         Ok(())
     })
+}
+
+/// Fill the event owner's empty patronymic from a male biological parent that
+/// the birth event asserts. Only `BIRTH` is considered; any other event type is
+/// a no-op, and an ambiguous or non-Cyrillic father name leaves the field as it
+/// was.
+fn fill_birth_patronymic(
+    persons: &mut [Person],
+    relationships: &[Relationship],
+    event: &Event,
+) -> bool {
+    if event.event_type != EventType::Birth {
+        return false;
+    }
+    let Some(index) = persons
+        .iter()
+        .position(|person| person.id == event.person_id)
+    else {
+        return false;
+    };
+    let Some(father_given) = unique_father_given_name(persons, relationships, event.person_id)
+    else {
+        return false;
+    };
+    fill_patronymic(&mut persons[index], &father_given)
 }
 
 /// Keeps the stable code and points the form at the parent selection.
@@ -461,6 +495,48 @@ mod tests {
         let report = backfill_relations_on_open(&mut store).unwrap();
         assert_eq!(report.spouse_created, 1);
         assert_eq!(store.relationships().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn a_birth_event_fills_an_empty_patronymic_from_its_father() {
+        let mut father = person(DateValue::exact_year(1970));
+        father.gender = gentree_core::Gender::Male;
+        father.names[0].given = Some("Игорь".to_owned());
+        let mut child = person(DateValue::exact_year(2000));
+        child.gender = gentree_core::Gender::Female;
+        let relationship =
+            Relationship::new(RelationshipType::ParentChild, father.id, child.id).unwrap();
+        let mut event = Event::new(child.id, EventType::Birth);
+        event.participant_ids = vec![father.id];
+
+        let mut persons = vec![father, child.clone()];
+        assert!(fill_birth_patronymic(
+            &mut persons,
+            std::slice::from_ref(&relationship),
+            &event
+        ));
+        let stored = persons.iter().find(|person| person.id == child.id).unwrap();
+        assert_eq!(stored.names[0].patronymic.as_deref(), Some("Игоревна"));
+
+        // A non-birth event never triggers the fill.
+        let mut unfilled = child.clone();
+        unfilled.names[0].patronymic = None;
+        let mut persons = vec![persons.into_iter().next().unwrap(), unfilled.clone()];
+        let death = Event::new(child.id, EventType::Death);
+        assert!(!fill_birth_patronymic(
+            &mut persons,
+            std::slice::from_ref(&relationship),
+            &death
+        ));
+        assert_eq!(
+            persons
+                .iter()
+                .find(|person| person.id == unfilled.id)
+                .unwrap()
+                .names[0]
+                .patronymic,
+            None
+        );
     }
 
     #[test]

@@ -15,7 +15,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { mediaApi, personsApi, timelineApi } from "../../api/client";
+import { eventsApi, mediaApi, personsApi, timelineApi } from "../../api/client";
 import type {
   MediaItem,
   Person,
@@ -27,8 +27,16 @@ import type { Translate } from "../../lib/dates";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { cn } from "../../lib/utils";
 import { useScrollMemory, useViewState } from "../../lib/useViewState";
-import { useEventFilterState } from "../events/useEventFilterState";
-import { matchesEventQuery, type EventPersonScope } from "../events/helpers";
+import {
+  useEventFilterState,
+  usePruneEventPersonFilter,
+} from "../events/useEventFilterState";
+import {
+  eventYearBounds,
+  matchesEventQuery,
+  type EventPersonScope,
+} from "../events/helpers";
+import { ActiveFilterNotice } from "../events/ActiveFilterNotice";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
 import { toTimelineEvents } from "./adapter";
@@ -61,6 +69,7 @@ import {
 import type { TimelineEvent } from "./types";
 import {
   buildTimelineListParams,
+  resetTimelineView,
   resolveInitialTimelineView,
   timelineViewPatch,
   type TimelineView,
@@ -285,6 +294,7 @@ export default function TimelinePage({
   const sharedFromYear = eventFilters.filters.fromYear;
   const sharedToYear = eventFilters.filters.toYear;
   const sharedQuery = eventFilters.query;
+  const activeFilterCount = eventFilters.activeCount;
   const { setFilter: setSharedFilter } = eventFilters;
 
   // The stored view is the base; a one-shot person deep link from another
@@ -355,6 +365,12 @@ export default function TimelinePage({
   const [photos, setPhotos] = useState<ReadonlyMap<string, MediaItem>>(
     () => new Map(),
   );
+  // Scale of the shared year filter: the whole project, never the filtered line,
+  // so a range that hides every event can still be widened (issue #107).
+  const [yearScale, setYearScale] = useState(() => {
+    const currentYear = new Date().getFullYear();
+    return { minYear: currentYear, maxYear: currentYear, hasDated: false };
+  });
 
   /** Backend rows may send `personGender`; the loaded list is the fallback. */
   const genderById = useMemo(
@@ -370,6 +386,18 @@ export default function TimelinePage({
         ]),
       ),
     [persons, t],
+  );
+
+  // A stored person filter can outlive its person (deleted here or copied from
+  // another tree): drop it once this project's people are loaded.
+  const knownPersonIds = useMemo(
+    () => new Set(persons.map((person) => person.id)),
+    [persons],
+  );
+  usePruneEventPersonFilter(
+    eventFilters.filters,
+    knownPersonIds,
+    eventFilters.setFilter,
   );
 
   const focus = useMemo(
@@ -400,6 +428,24 @@ export default function TimelinePage({
           setPersons(page.items.map((item) => item.entity));
           setPhotos(photosByPerson(media));
         }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // The year filter is shared with the events screen. Load the project's scale
+  // once so this screen can show the same control and let the user widen a
+  // range that hides every event; a failure keeps the filter row without a
+  // slider instead of hiding the line.
+  useEffect(() => {
+    let active = true;
+    eventsApi
+      .list({})
+      .then((rows) => {
+        if (!active) return;
+        setYearScale(eventYearBounds(rows, new Date().getFullYear()));
       })
       .catch(() => undefined);
     return () => {
@@ -606,6 +652,16 @@ export default function TimelinePage({
     setReloadKey((current) => current + 1);
   }, []);
 
+  // One action clears everything that can hide events: the shared person/type/
+  // year filter, the shared search text and the timeline's own scope. The year
+  // range has no slider on this screen, so the reset must be reachable from the
+  // filter notice (issue #107).
+  const { reset: resetSharedFilters } = eventFilters;
+  const handleResetFilters = useCallback(() => {
+    resetSharedFilters();
+    setView((previous) => resetTimelineView(previous));
+  }, [resetSharedFilters]);
+
   const saveScroll = useCallback(
     (value: number) => patchView({ scrollTop: value }),
     [patchView],
@@ -720,6 +776,15 @@ export default function TimelinePage({
           onPersonChange={handlePersonChange}
           onPersonScopeChange={handlePersonScopeChange}
           onTypesChange={(types) => setSharedFilter("types", types)}
+          yearRange={{
+            from: sharedFromYear,
+            to: sharedToYear,
+            minYear: yearScale.minYear,
+            maxYear: yearScale.maxYear,
+            hasDated: yearScale.hasDated,
+            onFromChange: (value) => setSharedFilter("fromYear", value),
+            onToChange: (value) => setSharedFilter("toYear", value),
+          }}
           extra={
             <TimelineGenerations
               generations={generations}
@@ -728,6 +793,16 @@ export default function TimelinePage({
               }
             />
           }
+        />
+
+        <ActiveFilterNotice
+          activeCount={activeFilterCount}
+          fromYear={sharedFromYear}
+          toYear={sharedToYear}
+          query={sharedQuery}
+          showQuery
+          onReset={handleResetFilters}
+          testId="timeline-filters-active"
         />
 
         {line.truncated && (
@@ -792,11 +867,22 @@ export default function TimelinePage({
             </PageMessage>
           )}
 
-          {line.status === "empty" && (
-            <PageMessage title={t("line.emptyTitle")}>
-              {t("line.emptyHint")}
-            </PageMessage>
-          )}
+          {line.status === "empty" &&
+            (activeFilterCount > 0 || sharedQuery.trim() !== "" ? (
+              // Filters, not missing data: say so and offer the reset the
+              // timeline otherwise has no control for.
+              <PageMessage
+                title={t("line.emptyFilteredTitle")}
+                retry={handleResetFilters}
+                retryLabel={t("line.resetFilters")}
+              >
+                {t("line.emptyFilteredHint")}
+              </PageMessage>
+            ) : (
+              <PageMessage title={t("line.emptyTitle")}>
+                {t("line.emptyHint")}
+              </PageMessage>
+            ))}
 
           {showLine && window !== null && (
             <div className="relative flex min-h-[480px] flex-1 flex-col">

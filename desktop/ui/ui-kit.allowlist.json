@@ -33,7 +33,7 @@
     },
     {
       "rule": "raw-primitive",
-      "file": "src/features/events/EventsPage.tsx",
+      "file": "src/features/events/EventPersonCell.tsx",
       "count": 1,
       "reason": "Person name link in a table cell; migrates with the data table."
     },

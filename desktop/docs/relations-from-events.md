@@ -9,19 +9,43 @@ A marriage and a birth are the only events that assert kinship.
 
 ## Provenance
 
-Derived rows carry `origin: "EVENT"` and `sourceEventIds`. Manual rows omit both fields, so legacy projects and older builds read them as manual. An event edit or delete removes its id from `sourceEventIds`; the row is deleted only when no source event remains. A manual row is never cascade-deleted. Deleting a derived row directly is allowed: the next save of a source event recreates it.
+Derived rows carry `origin: "EVENT"` and `sourceEventIds`. Manual rows omit both fields, so legacy projects and older builds read them as manual. An event edit or delete removes its id from `sourceEventIds`; the row is deleted only when no source event remains. A manual row is never cascade-deleted. The person card renders an automatic row exactly like a manual one: provenance is stored and returned by the API, but no badge or source-event label is shown.
+
+Deleting an automatic spouse row directly is allowed and the next save of a source event recreates it. A biological parent row is different: deleting it also clears the parent from the child's birth event, so the next event save does not recreate it.
 
 Merge keeps the earliest relationship id, unions `sourceEventIds`, and makes the row manual when either side is manual.
 
+## Parent and birth-event sync
+
+Creating or deleting a biological `PARENT_CHILD` relation keeps the child's `BIRTH` event in sync:
+
+- create adds the parent to `participant_ids` once, in the earliest dated birth event that has a free parent slot; undated events sort last and ties break by event id;
+- slots are positional and father-first: male at index 0, female at index 1, unknown gender in the first free slot; the list stays compact, so a lone parent is the only element;
+- a birth whose two slots are occupied by other people is left untouched while the relation is still stored;
+- delete removes the parent from every birth event of the child; an event with no parents stays valid;
+- only `PARENT_CHILD` is mirrored. `ADOPTIVE_PARENT_CHILD` and spouse/partner edges never change an event.
+
+Both directions are idempotent: a parent already present is never added twice, a deleted parent is not re-derived from a cleared event, and saving the event after either operation leaves the relation count unchanged.
+
 ## Backfill
 
-Opening a writable project reconciles stored events once:
+Opening a writable project reconciles stored data once, in this order:
 
-- marriages with exactly two distinct people gain a missing spouse row;
-- births with one or two participants gain missing parent rows;
-- manual rows are untouched, births without participants are left alone, and casts with too many people are skipped as ambiguous.
+1. a person with a known birth or death date and no owned `BIRTH`/`DEATH` event gains the missing event from that date; an existing event with another date is never overwritten and a blank date creates nothing;
+2. marriages with exactly two distinct people gain a missing spouse row, and births with one or two participants gain missing parent rows;
+3. every biological `PARENT_CHILD` relation adds its parent to the child's earliest birth event with a free slot, using the same slot rules as a new relation.
 
-The report (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `readOnly`) contains counts only. Read-only projects are not written. A failed write leaves the project unchanged and the next open retries the same idempotent pass.
+Manual rows and manual events are untouched, births without participants are left alone, and casts with too many people are skipped as ambiguous. A second open changes nothing. The report (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`, `readOnly`) contains counts only: no names, dates, ids, places or paths. Read-only projects are not written. A failed write leaves the project unchanged and the next open retries the same idempotent pass.
+
+## Patronymic fill
+
+When a biological father becomes known, an empty patronymic is derived from his given name:
+
+- the fill runs when a `PARENT_CHILD` relation is created, when a `BIRTH` event that asserts the father is saved, and when the person form is saved with the father already stored;
+- only the primary name is touched, and only when its patronymic is absent or whitespace-only; a non-empty or imported value is never replaced;
+- exactly one male biological parent is required; zero, several, an adoptive-only parent or an unnamed father leaves the field empty without an error;
+- Cyrillic names use the East Slavic suffix rules (Russian, Ukrainian or Belarusian by spelling); Latin and mixed-script names are a no-op;
+- project open, backfill, import and export never write a patronymic, and the project format is unchanged.
 
 ## Spouse display
 

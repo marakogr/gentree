@@ -588,7 +588,9 @@ textarea {
 }
 
 /* Root card with direct-line depth controls. The card itself stays a button;
-   the level arrows are siblings, so both keep their own click target. */
+   the level arrows are siblings, so both keep their own click target. The two
+   columns and their gaps narrow the caption, so layout.ts widens the root card
+   by that footprint: a long full name keeps the same wrap width as any card. */
 .graph-node-main {
   display: flex;
   align-items: center;

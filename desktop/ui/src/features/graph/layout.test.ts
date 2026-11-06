@@ -9,16 +9,20 @@ import type {
 } from "../../api/types";
 import {
   H_GAP,
+  LEVEL_COLUMN_WIDTH,
   MAX_LEVEL_NODES,
+  NODE_CONTENT_GAP,
   NODE_HEIGHT,
   NODE_WIDTH,
   PADDING,
+  ROOT_NODE_WIDTH,
   SPOUSE_GAP,
   V_GAP,
   layoutAncestors,
   layoutDescendants,
   placeholderChildPersonId,
   spousePairKey,
+  type GraphLayout,
   type LayoutNode,
 } from "./layout";
 
@@ -233,7 +237,7 @@ describe("layoutAncestors", () => {
     for (const item of layout.nodes) {
       expect(item.placeholder).toBe(false);
       expect(Number.isFinite(item.x)).toBe(true);
-      expect(item.x + NODE_WIDTH).toBeLessThanOrEqual(layout.width);
+      expect(item.x + item.width).toBeLessThanOrEqual(layout.width);
       expect(item.y + NODE_HEIGHT).toBeLessThanOrEqual(layout.height);
     }
   });
@@ -267,7 +271,7 @@ describe("layoutAncestors", () => {
     expect(layout.nodes.map((item) => item.occurrenceKey)).toEqual(["0"]);
     expect(layout.edges).toEqual([]);
     expect(layout.height).toBe(PADDING * 2 + NODE_HEIGHT);
-    expect(layout.width).toBe(PADDING * 2 + NODE_WIDTH);
+    expect(layout.width).toBe(PADDING * 2 + ROOT_NODE_WIDTH);
   });
 
   it("keeps the layout width bounded by the widest generation", () => {
@@ -277,7 +281,7 @@ describe("layoutAncestors", () => {
     expect(layout.width).toBeLessThanOrEqual(bound);
     for (const item of layout.nodes) {
       expect(item.x).toBeGreaterThanOrEqual(0);
-      expect(item.x + NODE_WIDTH).toBeLessThanOrEqual(layout.width);
+      expect(item.x + item.width).toBeLessThanOrEqual(layout.width);
       expect(item.y + NODE_HEIGHT).toBeLessThanOrEqual(layout.height);
     }
   });
@@ -402,7 +406,7 @@ describe("layoutAncestors", () => {
     expect(layout.width).toBeGreaterThan(0);
     for (const item of layout.nodes) {
       expect(item.x).toBeGreaterThanOrEqual(0);
-      expect(item.x + NODE_WIDTH).toBeLessThanOrEqual(layout.width);
+      expect(item.x + item.width).toBeLessThanOrEqual(layout.width);
       expect(item.y + NODE_HEIGHT).toBeLessThanOrEqual(layout.height);
     }
   });
@@ -551,7 +555,10 @@ describe("layoutDescendants", () => {
       Math.abs(son.x - daughter.x),
     ).toBeGreaterThanOrEqual(NODE_WIDTH + H_GAP);
     // The root is centred over the span of its children.
-    expect(root.x).toBeCloseTo((son.x + daughter.x) / 2, 1);
+    expect(root.x + root.width / 2).toBeCloseTo(
+      (son.x + son.width / 2 + daughter.x + daughter.width / 2) / 2,
+      1,
+    );
   });
 
   it("draws one edge per parent-child link and keeps adoption", () => {
@@ -580,7 +587,7 @@ describe("layoutDescendants", () => {
     expect(layout.height).toBeGreaterThan(0);
     for (const item of layout.nodes) {
       expect(item.x).toBeGreaterThanOrEqual(PADDING);
-      expect(item.x + NODE_WIDTH).toBeLessThanOrEqual(layout.width);
+      expect(item.x + item.width).toBeLessThanOrEqual(layout.width);
       expect(item.y + NODE_HEIGHT).toBeLessThanOrEqual(layout.height);
       expect(item.placeholder).toBe(false);
     }
@@ -666,7 +673,7 @@ describe("layoutDescendants", () => {
     });
     expect(layout.nodes.map((item) => item.occurrenceKey)).toEqual(["0"]);
     expect(layout.edges).toEqual([]);
-    expect(layout.width).toBe(PADDING * 2 + NODE_WIDTH);
+    expect(layout.width).toBe(PADDING * 2 + ROOT_NODE_WIDTH);
     expect(layout.height).toBe(PADDING * 2 + NODE_HEIGHT);
     expect(layout.nodes[0].y).toBe(PADDING);
   });
@@ -709,7 +716,9 @@ describe("spouse slots", () => {
     expect(wife?.generation).toBe(root?.generation);
     expect(wife?.y).toBe(root?.y);
     expect(wife?.spouseOfKey).toBe("0");
-    expect((wife?.x ?? 0) - (root?.x ?? 0)).toBe(NODE_WIDTH + SPOUSE_GAP);
+    expect((wife?.x ?? 0) - (root?.x ?? 0)).toBe(
+      (root?.width ?? 0) + SPOUSE_GAP,
+    );
     const connector = layout.edges.find((edge) => edge.kind === "spouse");
     expect(connector).toBeDefined();
     expect(connector?.path).not.toContain("V");
@@ -878,7 +887,9 @@ describe("spouse slots", () => {
     const wife = layout.nodes.find((node) => node.occurrenceKey === "s:0:wife");
     expect(wife?.y).toBe(root?.y);
     expect(wife?.spouseOfKey).toBe("0");
-    expect((wife?.x ?? 0) - (root?.x ?? 0)).toBe(NODE_WIDTH + SPOUSE_GAP);
+    expect((wife?.x ?? 0) - (root?.x ?? 0)).toBe(
+      (root?.width ?? 0) + SPOUSE_GAP,
+    );
     expect(layout.edges.some((item) => item.kind === "spouse")).toBe(true);
   });
 
@@ -927,6 +938,164 @@ describe("spouse slots", () => {
       (node) => node.occurrenceKey === "s:0.f.f:second",
     );
     expect(spouse?.y).toBe(grandpa?.y);
-    expect(spouse?.x).toBe((grandpa?.x ?? 0) + NODE_WIDTH + SPOUSE_GAP);
+    expect(spouse?.x).toBe(
+      (grandpa?.x ?? 0) + (grandpa?.width ?? NODE_WIDTH) + SPOUSE_GAP,
+    );
+  });
+});
+
+/**
+ * #103: the root card also renders a depth-control column on each side of its
+ * caption. Those columns used to take half of the caption box, so a long full
+ * name was clipped while every other card wrapped onto three lines. The root
+ * card is now wider by exactly that footprint, so the name box is identical
+ * everywhere and the root keeps its own controls.
+ */
+describe("root card caption width", () => {
+  /** The box a clamped name gets: the card minus its depth-control columns. */
+  function captionWidth(node: LayoutNode, rootPersonId: string): number {
+    const columns =
+      rootPersonId !== "" && node.personId === rootPersonId
+        ? 2 * (LEVEL_COLUMN_WIDTH + NODE_CONTENT_GAP)
+        : 0;
+    return node.width - columns;
+  }
+
+  function byKey(layout: GraphLayout, key: string): LayoutNode {
+    const found = layout.nodes.find((node) => node.occurrenceKey === key);
+    if (!found) throw new Error(`missing node ${key}`);
+    return found;
+  }
+
+  it("gives the ancestor root the same name box as every other card", () => {
+    const layout = layoutAncestors(familyGraph());
+    const root = byKey(layout, "0");
+    const father = byKey(layout, "0.f");
+    expect(root.width).toBe(ROOT_NODE_WIDTH);
+    expect(father.width).toBe(NODE_WIDTH);
+    // The wider card pays for its two control columns, nothing else.
+    expect(captionWidth(root, "me")).toBe(NODE_WIDTH);
+    expect(captionWidth(root, "me")).toBe(captionWidth(father, "me"));
+  });
+
+  it("gives the descendant root the same name box as its children", () => {
+    const layout = layoutDescendants(descendantGraph());
+    const root = byKey(layout, "0");
+    expect(root.width).toBe(ROOT_NODE_WIDTH);
+    for (const key of ["0.c0", "0.c1", "0.c0.c0"]) {
+      const card = byKey(layout, key);
+      expect(card.width).toBe(NODE_WIDTH);
+      expect(captionWidth(card, "me")).toBe(captionWidth(root, "me"));
+    }
+  });
+
+  it("keeps the wider root clear of neighbours and the canvas edge", () => {
+    const ancestors = layoutAncestors(
+      familyGraph(),
+      new Set([spousePairKey("f", "m")]),
+    );
+    const root = byKey(ancestors, "0");
+    expect(root.x + root.width).toBeLessThanOrEqual(ancestors.width);
+
+    const descendants = layoutDescendants(descendantGraph());
+    const descendantRoot = byKey(descendants, "0");
+    const son = byKey(descendants, "0.c0");
+    // The next generation still starts one V_GAP below the card.
+    expect(son.y - (descendantRoot.y + descendantRoot.height)).toBe(V_GAP);
+
+    for (const layout of [ancestors, descendants]) {
+      const rows = new Map<number, LayoutNode[]>();
+      for (const card of layout.nodes) {
+        const row = rows.get(card.generation) ?? [];
+        row.push(card);
+        rows.set(card.generation, row);
+      }
+      for (const row of rows.values()) {
+        const ordered = [...row].sort((left, right) => left.x - right.x);
+        for (let index = 1; index < ordered.length; index += 1) {
+          const previous = ordered[index - 1];
+          expect(ordered[index].x).toBeGreaterThanOrEqual(
+            previous.x + previous.width,
+          );
+        }
+      }
+      for (const card of layout.nodes) {
+        expect(card.x + card.width).toBeLessThanOrEqual(layout.width);
+      }
+    }
+  });
+
+  it("places a root spouse after the wider card", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "me",
+      generations: 0,
+      nodes: [
+        descendantNode("0", 0, "me", "ROOT"),
+        descendantNode("s:0:wife", 0, "wife", "CHILD"),
+      ],
+      edges: [],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutDescendants(graph, {
+      spouseOf: new Map([["s:0:wife", "0"]]),
+      spousePairs: [["0", "s:0:wife"]],
+    });
+    const root = byKey(layout, "0");
+    const wife = byKey(layout, "s:0:wife");
+    expect(root.width).toBe(ROOT_NODE_WIDTH);
+    expect(wife.width).toBe(NODE_WIDTH);
+    expect(wife.x - (root.x + root.width)).toBe(SPOUSE_GAP);
+    expect(wife.x + wife.width).toBeLessThanOrEqual(layout.width);
+  });
+
+  it("finds the root in a person-id keyed tree (relatives mode)", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "me",
+      generations: 1,
+      nodes: [
+        descendantNode("me", 0, "me", "ROOT"),
+        descendantNode("son", 1, "son", "SON"),
+        descendantNode("cousin", 1, "cousin", "CHILD"),
+      ],
+      edges: [descendantEdge("me", "son"), descendantEdge("me", "cousin")],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    const layout = layoutDescendants(graph);
+    const root = byKey(layout, "me");
+    const son = byKey(layout, "son");
+    const cousin = byKey(layout, "cousin");
+    expect(root.width).toBe(ROOT_NODE_WIDTH);
+    expect(son.width).toBe(NODE_WIDTH);
+    expect(captionWidth(root, "me")).toBe(captionWidth(son, "me"));
+    expect(cousin.x - (son.x + son.width)).toBe(H_GAP);
+  });
+
+  it("keeps a rootless forest at the base width", () => {
+    const graph: DescendantGraph = {
+      rootPersonId: "",
+      generations: 1,
+      nodes: [
+        descendantNode("a", 0, "a", "ROOT"),
+        descendantNode("b", 1, "b", "CHILD"),
+      ],
+      edges: [descendantEdge("a", "b")],
+      truncated: false,
+      pedigreeCollapse: false,
+    };
+    for (const card of layoutDescendants(graph).nodes) {
+      expect(card.width).toBe(NODE_WIDTH);
+    }
+    // An explicit empty root also keeps a graph that names a root uniform.
+    for (const card of layoutDescendants(descendantGraph(), { rootPersonId: "" })
+      .nodes) {
+      expect(card.width).toBe(NODE_WIDTH);
+    }
+    for (const card of layoutAncestors(familyGraph(), new Set(), {
+      rootPersonId: "",
+    }).nodes) {
+      expect(card.width).toBe(NODE_WIDTH);
+    }
   });
 });

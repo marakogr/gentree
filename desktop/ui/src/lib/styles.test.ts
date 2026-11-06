@@ -48,6 +48,17 @@ describe("person captions", () => {
   );
 });
 
+describe("tree node cards", () => {
+  const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+
+  // layout.ts widens the root card by exactly the depth-control footprint, so
+  // a long root name keeps the caption width of every other card (#103).
+  it("keeps the depth-control footprint the layout pays for", () => {
+    expect(ruleBody(css, ".graph-node")).toMatch(/gap:\s*8px/);
+    expect(ruleBody(css, ".graph-node-level")).toMatch(/width:\s*16px/);
+  });
+});
+
 // Issue #115: the sidebar gutter, the gaps between page blocks and the
 // page-internal rows must share one shell step (SH-1). The pages read the
 // token instead of repeating a pixel value, so they stay aligned.
