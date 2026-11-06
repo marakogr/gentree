@@ -19,6 +19,7 @@ import {
   isEventDraftDirty,
   isEventPersonFilterStale,
   isYearRangeInvalid,
+  lockedLifeEventTypes,
   matchesEventQuery,
   normalizeEventText,
   paginateEventRows,
@@ -1303,5 +1304,33 @@ describe("shared event filter state (issue #107)", () => {
         }),
       ),
     ).toBe(3);
+  });
+});
+
+describe("life-event type locks (issue #129)", () => {
+  const birth = event("birth-1", "a", 1950, { type: "BIRTH" });
+  const death = event("death-1", "a", 2000, { type: "DEATH" });
+  const residence = event("residence-1", "a", 1970, { type: "RESIDENCE" });
+  const otherBirth = event("birth-2", "b", 1980, { type: "BIRTH" });
+
+  it("locks both life types the person already owns", () => {
+    expect([...lockedLifeEventTypes([birth, death, residence], "a")].sort()).toEqual([
+      "BIRTH",
+      "DEATH",
+    ]);
+  });
+
+  it("ignores other people and repeatable types", () => {
+    expect([...lockedLifeEventTypes([otherBirth, residence], "a")]).toEqual([]);
+  });
+
+  it("keeps the edited event's own type available", () => {
+    expect([...lockedLifeEventTypes([birth, death], "a", birth.id)].sort()).toEqual([
+      "DEATH",
+    ]);
+  });
+
+  it("does not lock a type without a selected person", () => {
+    expect([...lockedLifeEventTypes([birth], "")]).toEqual([]);
   });
 });

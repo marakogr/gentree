@@ -21,6 +21,8 @@
   "roleSpouseFirst": "Primer cónyuge",
   "roleSpouseSecond": "Segundo cónyuge",
   "type": "Tipo",
+  "typeAlreadyExistsOption": "{{type}} — ya registrado",
+  "typeAlreadyUsedHint": "Esta persona ya tiene: {{types}}. Ese tipo no se puede añadir de nuevo.",
   "from": "Fecha desde",
   "to": "Fecha hasta",
   "allPersons": "Todas las personas",

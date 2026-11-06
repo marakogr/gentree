@@ -21,6 +21,8 @@
   "roleSpouseFirst": "Перш(ы/ая) з сужонкаў",
   "roleSpouseSecond": "Друг(і/ая) з сужонкаў",
   "type": "Тып",
+  "typeAlreadyExistsOption": "{{type}} — ужо ёсць",
+  "typeAlreadyUsedHint": "У чалавека ўжо ёсць падзея: {{types}}. Такі тып нельга дадаць паўторна.",
   "from": "Дата ад",
   "to": "Дата да",
   "allPersons": "Усе людзі",

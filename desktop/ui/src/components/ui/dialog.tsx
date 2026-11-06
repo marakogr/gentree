@@ -31,9 +31,17 @@ export type DialogProps = {
 // definite width, capped by the viewport, so a dialog never depends on its
 // content to become wide or narrow.
 const useStyles = makeStyles({
+  // The surface is the flex column that owns the height budget. Fluent only
+  // caps DialogBody with a viewport-based `max-height`; since the surface is
+  // `height: fit-content`, a tall form could grow the body past the surface
+  // and paint its actions outside the frame. A constrained flex surface shrinks
+  // the body instead.
   surface: {
+    display: "flex",
+    flexDirection: "column",
     maxWidth: "calc(100vw - 48px)",
     minWidth: 0,
+    overflow: "hidden",
   },
   sm: {
     width: "420px",
@@ -52,6 +60,7 @@ const useStyles = makeStyles({
   body: {
     display: "flex",
     flexDirection: "column",
+    flex: "1 1 auto",
     minWidth: 0,
     minHeight: 0,
     overflow: "hidden",
@@ -68,6 +77,7 @@ const useStyles = makeStyles({
     minHeight: 0,
     flex: "1 1 auto",
     overflowY: "auto",
+    overflowX: "hidden",
     overscrollBehavior: "contain",
   },
   // The footer is not part of the scroll area, so its buttons stay reachable

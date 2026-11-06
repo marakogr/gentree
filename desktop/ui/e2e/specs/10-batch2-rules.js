@@ -570,6 +570,83 @@ describe("second-batch feedback rules", () => {
     expect(await consoleErrors()).toEqual([]);
   });
 
+  it("locks a second birth and keeps the footer and files inside the form", async () => {
+    // #129: the long-name person already owns one BIRTH event. A short window
+    // makes the form taller than the dialog body, so the geometry check also
+    // proves the body scrolls instead of pushing the footer out.
+    const originalSize = await browser.getWindowSize();
+    await browser.setWindowSize(960, 600);
+    await browser.pause(500);
+    await openEventForm();
+    await pickPerson("#event-person", LONG_NAME);
+    await browser.waitUntil(
+      async () =>
+        browser.execute(() => {
+          const option = document.querySelector(
+            '#event-type option[value="BIRTH"]',
+          );
+          return option?.disabled === true;
+        }),
+      { timeout: 10000, timeoutMsg: "the existing birth type stayed selectable" },
+    );
+
+    const audit = await browser.execute(() => {
+      const surface = document.querySelector('[role="dialog"]');
+      const content = surface?.querySelector(".fui-DialogContent") ?? null;
+      const actions = surface?.querySelector(".fui-DialogActions") ?? null;
+      const form = document.querySelector("form#event-form");
+      const box = (element) => {
+        const rect = element?.getBoundingClientRect();
+        return rect
+          ? {
+              top: rect.top,
+              right: rect.right,
+              bottom: rect.bottom,
+              left: rect.left,
+              width: rect.width,
+              height: rect.height,
+            }
+          : null;
+      };
+      return {
+        surface: box(surface),
+        content: box(content),
+        actions: box(actions),
+        form: box(form),
+        options: [...document.querySelectorAll("#event-type option")].map(
+          (option) => ({
+            value: option.value,
+            disabled: option.disabled,
+            text: (option.textContent ?? "").trim(),
+          }),
+        ),
+        scrollable: content
+          ? content.scrollHeight > content.clientHeight + 1
+          : false,
+      };
+    });
+
+    const birth = audit.options.find((option) => option.value === "BIRTH");
+    const death = audit.options.find((option) => option.value === "DEATH");
+    expect(birth.disabled).toBe(true);
+    expect(birth.text).toContain("уже есть");
+    expect(death.disabled).toBe(false);
+    // The body is the scroller; the actions row sits between it and the
+    // surface edge instead of floating over the fields.
+    expect(audit.scrollable).toBe(true);
+    expect(audit.actions.bottom).toBeLessThanOrEqual(audit.surface.bottom + 1);
+    expect(audit.actions.top).toBeGreaterThanOrEqual(audit.content.bottom - 1);
+    expect(audit.form.right).toBeLessThanOrEqual(audit.content.right + 1);
+    expect(audit.form.left).toBeGreaterThanOrEqual(audit.content.left - 1);
+
+    save("event-form-locked-type", audit);
+    await shot("event-form-locked-type");
+    await $('//button[normalize-space(.)="Отмена"]').click();
+    await browser.pause(400);
+    await browser.setWindowSize(originalSize.width, originalSize.height);
+    await browser.pause(400);
+  });
+
   it("fits the long root caption and shows only kinship on hover", async () => {
     // #103/#112: the root card owns the depth-control columns, so its caption
     // needs the same width as every other card instead of half of it.

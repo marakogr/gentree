@@ -21,6 +21,8 @@
   "roleSpouseFirst": "Erster Ehepartner",
   "roleSpouseSecond": "Zweiter Ehepartner",
   "type": "Typ",
+  "typeAlreadyExistsOption": "{{type}} — bereits vorhanden",
+  "typeAlreadyUsedHint": "Diese Person hat bereits: {{types}}. Dieser Typ kann nicht erneut angelegt werden.",
   "from": "Von-Datum",
   "to": "Bis-Datum",
   "allPersons": "Alle Personen",
