@@ -9,7 +9,6 @@ import {
   buildDensityBins,
   buildLineMarkers,
   clampWindow,
-  clampWindowToDomain,
   clusterLineMarkers,
   computeLineWindow,
   computeMarkerWindow,
@@ -283,32 +282,25 @@ describe("markerDomain", () => {
   );
   const firstStart = new Date(1900, 0, 1).getTime();
   const lastEnd = new Date(1981, 0, 1).getTime();
-  const span = lastEnd - firstStart;
 
-  it("pads the earliest start and the latest interval end by ten percent", () => {
-    const domain = markerDomain(markers, new Date(2026, 0, 1));
-    expect(domain?.start.getTime()).toBeCloseTo(
-      firstStart - span * LINE_EDGE_PADDING,
-      -3,
-    );
-    expect(domain?.end.getTime()).toBeCloseTo(
-      lastEnd + span * LINE_EDGE_PADDING,
-      -3,
-    );
+  it("spans the earliest start to the latest interval end, without padding", () => {
+    const domain = markerDomain(markers);
+    expect(domain?.start.getTime()).toBe(firstStart);
+    expect(domain?.end.getTime()).toBe(lastEnd);
   });
 
-  it("never pads past the current local date", () => {
-    const now = new Date(1970, 0, 1);
-    const domain = markerDomain(markers, now);
-    expect(domain?.start.getTime()).toBeCloseTo(
-      firstStart - span * LINE_EDGE_PADDING,
-      -3,
-    );
-    expect(domain?.start.getTime()).toBeLessThan(firstStart);
-    expect(domain?.end).toEqual(now);
+  it("is a navigation reference, not the initial fit", () => {
+    const domain = markerDomain(markers);
+    const window = computeMarkerWindow(markers);
+    expect(window).not.toBeNull();
+    if (window === null || domain === null) return;
+    expect(domain.start.getTime()).toBe(firstStart);
+    expect(domain.end.getTime()).toBe(lastEnd);
+    expect(window.start.getTime()).toBeLessThan(firstStart);
+    expect(window.end.getTime()).toBeGreaterThan(lastEnd);
   });
 
-  it("keeps future-only markers reachable with their padding", () => {
+  it("keeps future-only markers as their own domain", () => {
     const future = buildLineMarkers(
       [
         event("f1", "BIRTH", { start: "2100-01-01T00:00:00.000Z" }),
@@ -316,21 +308,12 @@ describe("markerDomain", () => {
       ],
       ru,
     );
-    const futureStart = new Date(2100, 0, 1).getTime();
-    const futureEnd = new Date(2111, 0, 1).getTime();
-    const futureSpan = futureEnd - futureStart;
-    const domain = markerDomain(future, new Date(2026, 0, 1));
-    expect(domain?.start.getTime()).toBeCloseTo(
-      futureStart - futureSpan * LINE_EDGE_PADDING,
-      -3,
-    );
-    expect(domain?.end.getTime()).toBeCloseTo(
-      futureEnd + futureSpan * LINE_EDGE_PADDING,
-      -3,
-    );
+    const domain = markerDomain(future);
+    expect(domain?.start.getTime()).toBe(new Date(2100, 0, 1).getTime());
+    expect(domain?.end.getTime()).toBe(new Date(2111, 0, 1).getTime());
   });
 
-  it("always returns a padded non-empty domain when a marker exists", () => {
+  it("always returns a non-empty domain when a marker exists", () => {
     const point = buildLineMarkers(
       [
         event("p1", "OTHER", {
@@ -340,31 +323,23 @@ describe("markerDomain", () => {
       ],
       ru,
     );
-    const domain = markerDomain(point, new Date(2026, 0, 1));
+    const domain = markerDomain(point);
     expect(domain).not.toBeNull();
     if (domain === null) return;
-    // No measurable data span: the fallback span is padded on both sides.
-    expect(domain.end.getTime() - domain.start.getTime()).toBeCloseTo(
-      LINE_EMPTY_DATA_SPAN * LINE_EDGE_PADDING * 2,
-      -3,
-    );
-    const window = computeMarkerWindow(point, LINE_EDGE_PADDING, domain);
+    // No measurable data span: one day keeps the single marker navigable.
+    expect(domain.end.getTime() - domain.start.getTime()).toBe(24 * 3600_000);
+    // The initial fit still centres a readable fallback span on it.
+    const window = computeMarkerWindow(point);
     expect(window).not.toBeNull();
     if (window === null) return;
-    expect(window.end.getTime()).toBeGreaterThan(window.start.getTime());
-  });
-
-  it("makes the fit window include the edge padding", () => {
-    const domain = markerDomain(markers, new Date(2026, 0, 1));
-    const window = computeMarkerWindow(markers, LINE_EDGE_PADDING, domain);
-    expect(window).toEqual(domain);
-    expect(window?.start.getTime()).toBeLessThan(firstStart);
-    expect(window?.end.getTime()).toBeGreaterThan(lastEnd);
+    expect(window.end.getTime() - window.start.getTime()).toBe(
+      LINE_EMPTY_DATA_SPAN,
+    );
   });
 
   it("returns null without dated markers", () => {
-    expect(markerDomain([], new Date(2026, 0, 1))).toBeNull();
-    expect(computeMarkerWindow([], LINE_EDGE_PADDING, null)).toBeNull();
+    expect(markerDomain([])).toBeNull();
+    expect(computeMarkerWindow([])).toBeNull();
   });
 });
 
@@ -453,40 +428,8 @@ describe("positionOnLine / pan / zoom / brush", () => {
   });
 });
 
-describe("timeline window bounds", () => {
-  const domain = { start: new Date(1900, 0, 1), end: new Date(2000, 0, 1) };
-  const window = { start: new Date(1950, 0, 1), end: new Date(1960, 0, 1) };
-  const span = window.end.getTime() - window.start.getTime();
-
-  it("does not pan before the earliest or after the latest marker", () => {
-    const left = panWindow(window, -10, domain);
-    expect(left.start.getTime()).toBe(domain.start.getTime());
-    expect(left.end.getTime() - left.start.getTime()).toBe(span);
-    const right = panWindow(window, 10, domain);
-    expect(right.end.getTime()).toBe(domain.end.getTime());
-    expect(right.end.getTime() - right.start.getTime()).toBe(span);
-  });
-
-  it("keeps every zoom anchor inside the domain", () => {
-    for (const factor of [0.1, 0.5, 2, 10]) {
-      for (const anchor of [0, 0.5, 1]) {
-        const next = zoomWindow(window, factor, anchor, domain);
-        expect(next.start.getTime()).toBeGreaterThanOrEqual(
-          domain.start.getTime(),
-        );
-        expect(next.end.getTime()).toBeLessThanOrEqual(domain.end.getTime());
-      }
-    }
-  });
-
-  it("collapses a window wider than the domain to the domain", () => {
-    const wide = { start: new Date(1800, 0, 1), end: new Date(2100, 0, 1) };
-    expect(clampWindowToDomain(wide, domain)).toEqual(domain);
-    expect(clampWindow(wide, domain)).toEqual(domain);
-  });
-});
-
-describe("padded navigation bounds", () => {
+describe("navigation bounds", () => {
+  const DAY = 24 * 3600_000;
   const markers = buildLineMarkers(
     [
       event("e1", "BIRTH", { start: "1900-01-01T00:00:00.000Z" }),
@@ -494,33 +437,103 @@ describe("padded navigation bounds", () => {
     ],
     ru,
   );
-  const now = new Date(2026, 0, 1);
-  const domain = markerDomain(markers, now);
+  const domain = markerDomain(markers);
+  if (domain === null) throw new Error("expected a data domain");
   const firstStart = new Date(1900, 0, 1).getTime();
-  const lastEnd = new Date(1981, 0, 1).getTime();
+  const lastTime = new Date(1980, 0, 1).getTime();
 
-  it("lets pan reach the padding but not leave the domain", () => {
-    if (domain === null) throw new Error("expected a domain");
-    const zoomed = zoomWindow(domain, 0.5, 0.5, domain);
-    const left = panWindow(zoomed, -10, domain);
-    expect(left.start.getTime()).toBe(domain.start.getTime());
-    expect(left.start.getTime()).toBeLessThan(firstStart);
-    const right = panWindow(zoomed, 10, domain);
-    expect(right.end.getTime()).toBe(domain.end.getTime());
-    expect(right.end.getTime()).toBeGreaterThan(lastEnd);
+  const overlaps = (next: { start: Date; end: Date }) =>
+    next.end.getTime() > domain.start.getTime() &&
+    next.start.getTime() < domain.end.getTime();
+
+  it("lets the first event be centred", () => {
+    const span = 20 * 366 * DAY;
+    const centred = {
+      start: new Date(firstStart - span / 2),
+      end: new Date(firstStart + span / 2),
+    };
+    expect(clampWindow(centred, domain)).toEqual(centred);
+    expect(positionOnLine(new Date(firstStart), centred)).toBeCloseTo(0.5);
+    expect(centred.start.getTime()).toBeLessThan(domain.start.getTime());
   });
 
-  it("keeps every marker visible in the fit window", () => {
-    const window = computeMarkerWindow(markers, LINE_EDGE_PADDING, domain);
-    expect(window).not.toBeNull();
-    if (window === null) return;
-    for (const marker of markers) {
-      expect(positionOnLine(marker.time, window)).not.toBeNull();
+  it("lets the last event be centred", () => {
+    const span = 20 * 366 * DAY;
+    const centred = {
+      start: new Date(lastTime - span / 2),
+      end: new Date(lastTime + span / 2),
+    };
+    expect(clampWindow(centred, domain)).toEqual(centred);
+    expect(positionOnLine(new Date(lastTime), centred)).toBeCloseTo(0.5);
+    // Much of that window is past the data; only the overlap rule matters.
+    expect(centred.end.getTime()).toBeGreaterThan(domain.end.getTime());
+    expect(overlaps(centred)).toBe(true);
+  });
+
+  it("stops panning once no event would stay in view", () => {
+    const window = { start: new Date(1950, 0, 1), end: new Date(1970, 0, 1) };
+    const span = window.end.getTime() - window.start.getTime();
+    const left = panWindow(window, -10, domain);
+    expect(left.end.getTime()).toBeGreaterThan(domain.start.getTime());
+    expect(left.end.getTime()).toBeLessThanOrEqual(domain.start.getTime() + DAY);
+    expect(left.start.getTime()).toBeLessThan(domain.start.getTime());
+    expect(left.end.getTime() - left.start.getTime()).toBe(span);
+    const right = panWindow(window, 10, domain);
+    expect(right.start.getTime()).toBeLessThan(domain.end.getTime());
+    expect(right.start.getTime()).toBeGreaterThanOrEqual(
+      domain.end.getTime() - DAY,
+    );
+    expect(right.end.getTime() - right.start.getTime()).toBe(span);
+  });
+
+  it("keeps at least one event in view for every zoom anchor", () => {
+    const window = { start: new Date(1950, 0, 1), end: new Date(1970, 0, 1) };
+    for (const factor of [0.1, 0.5, 2, 10]) {
+      for (const anchor of [0, 0.5, 1]) {
+        expect(overlaps(zoomWindow(window, factor, anchor, domain))).toBe(true);
+      }
     }
   });
 
-  it("never exposes empty future past today", () => {
-    expect(domain?.end.getTime()).toBeLessThanOrEqual(now.getTime());
+  it("keeps a window wider than the data while it still overlaps", () => {
+    const wide = { start: new Date(1800, 0, 1), end: new Date(2100, 0, 1) };
+    expect(clampWindow(wide, domain)).toEqual(wide);
+  });
+
+  it("does not invent a range without events", () => {
+    const window = { start: new Date(1950, 0, 1), end: new Date(1960, 0, 1) };
+    expect(clampWindow(window, null)).toEqual(window);
+    expect(markerDomain([])).toBeNull();
+  });
+
+  it("applies the same overlap rule to future-only data", () => {
+    const future = buildLineMarkers(
+      [
+        event("f1", "BIRTH", { start: "2100-01-01T00:00:00.000Z" }),
+        event("f2", "DEATH", { start: "2110-01-01T00:00:00.000Z" }),
+      ],
+      ru,
+    );
+    const futureDomain = markerDomain(future);
+    if (futureDomain === null) throw new Error("expected a future domain");
+    const futureLast = new Date(2110, 0, 1).getTime();
+    const span = 8 * 366 * DAY;
+    const centred = {
+      start: new Date(futureLast - span / 2),
+      end: new Date(futureLast + span / 2),
+    };
+    expect(clampWindow(centred, futureDomain)).toEqual(centred);
+    const before = panWindow(
+      { start: new Date(2101, 0, 1), end: new Date(2109, 0, 1) },
+      -10,
+      futureDomain,
+    );
+    expect(before.end.getTime()).toBeGreaterThan(
+      futureDomain.start.getTime(),
+    );
+    expect(before.end.getTime()).toBeLessThanOrEqual(
+      futureDomain.start.getTime() + DAY,
+    );
   });
 });
 

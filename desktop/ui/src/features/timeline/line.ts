@@ -296,18 +296,20 @@ export function positionOnLine(
 }
 
 /**
- * Edge padding around the loaded markers, as a fraction of their data span.
- * It belongs to the navigable domain and to the fit window, so the first and
- * last markers never sit on the edge of the axis.
+ * Edge padding of the initial fit window, as a fraction of the data span.
+ * It gives the first and last markers breathing room; it is not a navigation
+ * limit, so panning may move the window further as long as events stay visible.
  */
 export const LINE_EDGE_PADDING = 0.1;
 
 /**
- * Base span used for padding when the data has no measurable span (a single
- * marker without a known interval). Two years keep a readable axis around it
- * instead of collapsing the domain onto a point.
+ * Fallback span of the initial fit window when the data has no measurable span
+ * (a single marker without a known interval), so the axis never collapses onto
+ * a point.
  */
 export const LINE_EMPTY_DATA_SPAN = 2 * 366 * 24 * 3600_000;
+
+const DAY_MS = 24 * 3600_000;
 
 /** First marker start and last known marker end; null when none is usable. */
 function markerBounds(
@@ -331,48 +333,34 @@ function markerBounds(
 }
 
 /**
- * Navigable range of the loaded markers: the earliest marker start to the
- * latest known interval end, plus `LINE_EDGE_PADDING` of the data span on both
- * sides. The padding is reachable by pan, zoom and fit, but never extends into
- * an empty future past the current local date. A range entirely in the future
- * keeps its padded bounds so it stays reachable. Returns null when the set
- * carries no usable date, so no arbitrary range is shown.
+ * Bounds of the loaded events: the earliest marker start to the latest known
+ * interval end. This is the navigation reference, not the initial window: a
+ * window may extend well past it as long as it still overlaps the events.
+ * Returns null when no marker carries a usable date, so the empty state never
+ * shows an arbitrary range.
  */
 export function markerDomain(
   markers: readonly LineMarker[],
-  now: Date = new Date(),
 ): TimelineWindow | null {
   const bounds = markerBounds(markers);
   if (bounds === null) {
     return null;
   }
   const { min, max } = bounds;
-  const span = max - min;
-  const baseSpan = span > 0 ? span : LINE_EMPTY_DATA_SPAN;
-  const padding = baseSpan * LINE_EDGE_PADDING;
-  let start = min - padding;
-  let end = max + padding;
-  const today = now.getTime();
-  // A range entirely in the future is still loaded data: keep it reachable
-  // instead of collapsing it onto today. Past and mixed ranges stop at today.
-  if (Number.isFinite(today) && min <= today) {
-    end = Math.min(end, today);
-  }
-  // Never return a collapsed domain: a zero span would make clamping
-  // meaningless and hide the only marker.
-  if (!(end > start)) {
-    const middle = (start + end) / 2;
-    start = middle - baseSpan / 2;
-    end = middle + baseSpan / 2;
-  }
-  return { start: new Date(start), end: new Date(end) };
+  // A single point has no known interval; keep a non-empty reference range.
+  return {
+    start: new Date(min),
+    end: new Date(max > min ? max : min + DAY_MS),
+  };
 }
 
 /**
- * Clip `window` into `domain`. A window at least as wide as the domain becomes
- * exactly the domain; a narrower one shifts back inside without changing span.
+ * Stop a window that has lost all contact with the events at the nearest edge
+ * where at least one day of data stays in view. A window that still overlaps
+ * `domain` is returned unchanged, however empty most of it looks: the single
+ * navigation rule is that the visible window must intersect the events' range.
  */
-export function clampWindowToDomain(
+function clampToEventOverlap(
   window: TimelineWindow,
   domain: TimelineWindow | null,
 ): TimelineWindow {
@@ -384,31 +372,40 @@ export function clampWindowToDomain(
   if (
     !Number.isFinite(domainStart) ||
     !Number.isFinite(domainEnd) ||
-    domainEnd < domainStart
+    domainEnd <= domainStart
   ) {
     return window;
   }
   const start = window.start.getTime();
   const end = window.end.getTime();
-  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
+  const span = end - start;
+  if (!Number.isFinite(span) || span <= 0) {
     return window;
   }
-  const span = end - start;
-  const domainSpan = domainEnd - domainStart;
-  if (span >= domainSpan) {
-    return { start: new Date(domainStart), end: new Date(domainEnd) };
+  const overlap = Math.min(span, DAY_MS);
+  if (end <= domainStart) {
+    // Entirely before the first event: slide right until its start enters.
+    const shift = domainStart + overlap - end;
+    return {
+      start: new Date(start + shift),
+      end: new Date(end + shift),
+    };
   }
-  const nextStart = Math.min(Math.max(start, domainStart), domainEnd - span);
-  return {
-    start: new Date(nextStart),
-    end: new Date(nextStart + span),
-  };
+  if (start >= domainEnd) {
+    // Entirely after the last event: slide left until its end enters.
+    const shift = start - (domainEnd - overlap);
+    return {
+      start: new Date(start - shift),
+      end: new Date(end - shift),
+    };
+  }
+  return window;
 }
 
 /**
- * Initial window covering all loaded dated events plus the edge padding,
- * clipped to the marker domain so it never shows empty time before the first
- * or after the last loaded event.
+ * Initial window covering all loaded dated events plus the edge padding. The
+ * padding is only the starting view: navigation may move the window further,
+ * as long as it keeps overlapping the events.
  */
 export function computeLineWindow(
   events: readonly TimelineEvent[],
@@ -422,7 +419,6 @@ export function computeLineWindow(
 export function computeMarkerWindow(
   markers: readonly LineMarker[],
   paddingFraction = LINE_EDGE_PADDING,
-  domain: TimelineWindow | null = markerDomain(markers),
 ): TimelineWindow | null {
   const bounds = markerBounds(markers);
   if (bounds === null) {
@@ -430,18 +426,16 @@ export function computeMarkerWindow(
   }
   const { min, max } = bounds;
   const span = Math.max(max - min, 0);
-  const baseSpan = span > 0 ? span : LINE_EMPTY_DATA_SPAN;
+  if (span <= 0) {
+    // No measurable interval: centre the fallback span on the only marker.
+    const half = LINE_EMPTY_DATA_SPAN / 2;
+    return { start: new Date(min - half), end: new Date(min + half) };
+  }
   const fraction = Number.isFinite(paddingFraction)
     ? clamp(paddingFraction, 0, 0.25)
     : LINE_EDGE_PADDING;
-  const padding = baseSpan * fraction;
-  return clampWindowToDomain(
-    {
-      start: new Date(min - padding),
-      end: new Date(max + padding),
-    },
-    domain,
-  );
+  const padding = span * fraction;
+  return { start: new Date(min - padding), end: new Date(max + padding) };
 }
 
 /** Window around the events of one person; null when the person has none. */
@@ -481,8 +475,10 @@ export function panWindow(
 }
 
 /**
- * Keep the span between one day and 5000 years and stay inside `domain`
- * (when supplied); no negative/NaN windows.
+ * Keep the span between one day and 5000 years and, when a `domain` is given,
+ * keep the window overlapping the events: panning and zooming stop as soon as
+ * no event would stay in view. A window that already overlaps is returned
+ * unchanged, even if most of it lies outside the data. No negative/NaN windows.
  */
 export function clampWindow(
   window: TimelineWindow,
@@ -493,8 +489,8 @@ export function clampWindow(
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
     return window;
   }
-  const minSpan = 24 * 3600_000;
-  const maxSpan = 5000 * 366 * 24 * 3600_000;
+  const minSpan = DAY_MS;
+  const maxSpan = 5000 * 366 * DAY_MS;
   const span = end - start;
   let next = window;
   if (span < minSpan) {
@@ -510,7 +506,7 @@ export function clampWindow(
       end: new Date(middle + maxSpan / 2),
     };
   }
-  return clampWindowToDomain(next, domain);
+  return clampToEventOverlap(next, domain);
 }
 
 /** Zoom by `factor` around a fraction along the window (0 = left, 1 = right). */
