@@ -482,6 +482,15 @@ export function eventPersonIds(event: EventEntity): string[] {
   return [...new Set(ids)];
 }
 
+/**
+ * Owner shown in the «person» table column. Participants are deliberately left
+ * out: they stay in the event card. A blank owner yields `null` so the cell
+ * falls back to the neutral empty value.
+ */
+export function eventOwnerId(event: EventEntity): string | null {
+  return event.personId.trim() === "" ? null : event.personId;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Client-side list: search, filters, sorting, paging, columns                */
 /* ------------------------------------------------------------------------- */
