@@ -188,7 +188,6 @@
   "parentFirst": "Father",
   "parentSecond": "Mother",
   "clearParent": "Clear parent",
-  "parentsLinked": "Saving creates a parent–child relation",
   "parentFirstPlaceholder": "Select the father",
   "parentSecondPlaceholder": "Select the mother",
   "parentGenderUnknown": "Gender is not set for this person",

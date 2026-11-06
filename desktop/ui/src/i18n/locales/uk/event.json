@@ -188,7 +188,6 @@
   "parentFirst": "Батько",
   "parentSecond": "Мати",
   "clearParent": "Прибрати батька або матір",
-  "parentsLinked": "Під час збереження створюється зв'язок «батько або мати — дитина»",
   "parentFirstPlaceholder": "Виберіть батька",
   "parentSecondPlaceholder": "Виберіть матір",
   "parentGenderUnknown": "У цієї людини не вказано стать",

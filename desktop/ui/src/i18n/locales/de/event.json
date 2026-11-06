@@ -188,7 +188,6 @@
   "parentFirst": "Vater",
   "parentSecond": "Mutter",
   "clearParent": "Elternteil entfernen",
-  "parentsLinked": "Beim Speichern wird eine Eltern-Kind-Beziehung erstellt",
   "parentFirstPlaceholder": "Vater auswählen",
   "parentSecondPlaceholder": "Mutter auswählen",
   "parentGenderUnknown": "Für diese Person ist kein Geschlecht angegeben",

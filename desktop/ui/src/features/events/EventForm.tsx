@@ -615,6 +615,36 @@ export default function EventForm({
           ) : null}
 
           <div className="events-form-grid">
+            {/* The type decides every other field, so it opens the card. */}
+            <div className="events-form-span">
+              <Field label={t("event:type")} htmlFor="event-type">
+                <Select
+                  id="event-type"
+                  value={eventTypeSelectionValue(
+                    draft.eventType,
+                    draft.originalType,
+                    customTypes,
+                  )}
+                  disabled={busy}
+                  onChange={(event) => changeType(event.target.value)}
+                >
+                  {EVENT_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {t(`enums:eventType.${type}`)}
+                    </option>
+                  ))}
+                  {customTypes.map((name) => (
+                    <option
+                      key={`${CUSTOM_EVENT_TYPE_PREFIX}${name}`}
+                      value={`${CUSTOM_EVENT_TYPE_PREFIX}${name}`}
+                    >
+                      {name}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </div>
+
             <div className="events-form-span">
               <Field
                 label={primaryRole}
@@ -735,41 +765,8 @@ export default function EventForm({
                     </Field>
                   </div>
                 ))}
-                <div className="events-form-span">
-                  <p className="events-link-badge">
-                    <LinkRegular aria-hidden="true" />
-                    <span>{t("event:parentsLinked")}</span>
-                  </p>
-                </div>
               </>
             ) : null}
-
-            <Field label={t("event:type")} htmlFor="event-type">
-              <Select
-                id="event-type"
-                value={eventTypeSelectionValue(
-                  draft.eventType,
-                  draft.originalType,
-                  customTypes,
-                )}
-                disabled={busy}
-                onChange={(event) => changeType(event.target.value)}
-              >
-                {EVENT_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {t(`enums:eventType.${type}`)}
-                  </option>
-                ))}
-                {customTypes.map((name) => (
-                  <option
-                    key={`${CUSTOM_EVENT_TYPE_PREFIX}${name}`}
-                    value={`${CUSTOM_EVENT_TYPE_PREFIX}${name}`}
-                  >
-                    {name}
-                  </option>
-                ))}
-              </Select>
-            </Field>
 
             <Field
               label={placeLabel}
