@@ -107,8 +107,16 @@ async function addParentFromCard(parentName) {
   await form.waitForDisplayed({ timeout: 5000 });
 
   const related = await $('[aria-label="Кто"]');
+  await related.waitForClickable({ timeout: 10000 });
   await related.click();
   await browser.pause(400);
+  // The form re-renders once the person list arrives, so the input can be
+  // mid-layout right after it appears: wait for it to settle and retry one
+  // click if the list did not open. Nothing about the flow under test changes.
+  if ((await $$('//*[@role="option"]')).length === 0) {
+    await related.click();
+    await browser.pause(400);
+  }
   const option = await $(
     `//*[@role="option"][contains(., "${parentName}")]`,
   );
@@ -355,6 +363,20 @@ describe("0.6.0 feedback rules", () => {
     await clickNav("Дерево");
     await browser.pause(800);
     await rootGraphAt(LONG_CHILD);
+    // Persons, relations and the layout load in parallel; wait until the
+    // parents are drawn before measuring the cards.
+    await browser.waitUntil(
+      async () =>
+        browser.execute(
+          (name) =>
+            [...document.querySelectorAll(".graph-node-name")].some(
+              (element) => (element.textContent ?? "").trim() === name,
+            ),
+          LONG_FATHER,
+        ),
+      { timeout: 20000, timeoutMsg: "the parent cards did not render" },
+    );
+    await browser.pause(400);
 
     const cards = await graphCards();
     const father = cards.find((card) => card.name === LONG_FATHER);
@@ -603,7 +625,7 @@ describe("0.6.0 feedback rules", () => {
     expect(await consoleErrors()).toEqual([]);
   });
 
-  it("stops timeline panning and zooming at the loaded data bound", async () => {
+  it("stops timeline panning and zooming once no event stays in view", async () => {
     await clickNav("Хронология");
     await browser.waitUntil(async () => (await headingText()) === "Хронология", {
       timeout: 10000,
@@ -614,8 +636,12 @@ describe("0.6.0 feedback rules", () => {
 
     const initial = await axisYears();
     expect(initial.length).toBeGreaterThan(0);
+    // The fit window keeps a tenth of the data span on each side (#104), so
+    // the axis reaches a little past the latest loaded event (1990) instead of
+    // stopping exactly on it.
     const initialMax = Math.max(...initial);
-    expect(initialMax).toBeLessThanOrEqual(1991);
+    expect(initialMax).toBeGreaterThanOrEqual(1990);
+    expect(initialMax).toBeLessThanOrEqual(1994);
 
     const rect = await browser.execute(() => {
       const track = document.querySelector('[data-testid="timeline-line-track"]');
@@ -679,15 +705,19 @@ describe("0.6.0 feedback rules", () => {
     const moved = await axisYears();
     expect(moved.length).toBeGreaterThan(0);
     // The gesture really moved the window (otherwise the bound assertion is
-    // vacuous), but never beyond the latest event end.
+    // vacuous). Since #104 the window may pass the loaded range; the stop is
+    // the point where it no longer touches the events at all.
     expect(Math.min(...moved)).toBeGreaterThan(Math.min(...initial));
-    expect(Math.max(...moved)).toBeLessThanOrEqual(1991);
-    expect(await $('[data-testid="line-empty-range"]').isExisting()).toBe(false);
+    expect(Math.max(...moved)).toBeGreaterThan(1991);
     const visibleItems = await browser.execute(() => ({
       markers: document.querySelectorAll('[data-testid="line-marker"]').length,
       clusters: document.querySelectorAll('[data-testid="line-cluster"]').length,
     }));
-    // Dense neighbours collapse into one cluster, so count both kinds.
+    // #122: the clamp follows marker starts, so a window can never lose the
+    // last marker behind the tail end of a period event. Dense neighbours
+    // collapse into one cluster, so count both kinds.
+    const emptyRange = await $('[data-testid="line-empty-range"]').isExisting();
+    expect(emptyRange).toBe(false);
     expect(visibleItems.markers + visibleItems.clusters).toBeGreaterThan(0);
 
     save("feedback-timeline-bounds", {
@@ -695,13 +725,13 @@ describe("0.6.0 feedback rules", () => {
       moved,
       dataBound: initialMax,
       visibleItems,
-      emptyRange: await $('[data-testid="line-empty-range"]').isExisting(),
+      emptyRange,
     });
     await shot("feedback-timeline-bounds");
     expect(await consoleErrors()).toEqual([]);
   });
 
-  it("rejects a parent less than nine years older than the child", async () => {
+  it("rejects a parent less than eleven years older than the child", async () => {
     await clickNav("Люди");
     await browser.pause(600);
     await createPerson("Малыш Тестов", { birth: "1990-01-01" });
@@ -713,7 +743,7 @@ describe("0.6.0 feedback rules", () => {
     const alert = await $('[role="alert"]');
     await alert.waitForDisplayed({ timeout: 10000 });
     expect((await alert.getText()).trim()).toBe(
-      "Родитель должен быть старше ребёнка не менее чем на 9 лет",
+      "Родитель должен быть старше ребёнка не менее чем на 11 лет",
     );
     expect(
       rowWith(await familyRows(), "Родитель", "Юный Родитель"),
