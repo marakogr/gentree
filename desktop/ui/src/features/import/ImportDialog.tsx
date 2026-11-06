@@ -29,6 +29,7 @@ import {
   reportNotes,
   type ImportMode,
 } from "./helpers";
+import { ImportPreview } from "./ImportPreview";
 import "./import.css";
 
 type Props = {
@@ -442,28 +443,21 @@ export function ImportDialog({ open: dialogOpen, onClose, onImported }: Props) {
           ) : null}
 
           {!previewing && preview ? (
-            <div className="import-preview">
-              <div className="import-counts">
-                {reportCounts(preview).map(({ key, count }) => (
-                  <Badge key={key} appearance="tint" size="medium">
-                    {t(`import:counts.${key}`, { count })}
-                  </Badge>
-                ))}
-              </div>
-              {notes && (notes.warnings > 0 || notes.issues > 0) ? (
-                <Text as="p" size={200} className="import-muted">
-                  {t("import:warningsSummary", {
-                    warnings: notes.warnings,
-                    issues: notes.issues,
-                  })}
-                </Text>
-              ) : null}
-              {preview.media > 0 ? (
-                <Text as="p" size={200} className="import-muted">
-                  {mediaNotice}
-                </Text>
-              ) : null}
-            </div>
+            <ImportPreview
+              counts={reportCounts(preview).map(({ key, count }) => ({
+                key,
+                label: t(`import:counts.${key}`, { count }),
+              }))}
+              notes={
+                notes && (notes.warnings > 0 || notes.issues > 0)
+                  ? t("import:warningsSummary", {
+                      warnings: notes.warnings,
+                      issues: notes.issues,
+                    })
+                  : null
+              }
+              mediaNotice={preview.media > 0 ? mediaNotice : null}
+            />
           ) : null}
         </div>
 

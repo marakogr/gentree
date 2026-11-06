@@ -537,11 +537,25 @@
 }
 
 .map-clarify-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   border-top: 1px solid var(--colorNeutralStroke2, #d1d1d1);
   padding-top: 10px;
+}
+
+/* Both actions share one row and one width; a long label wraps inside its
+   button instead of pushing the pair onto two rows. */
+.map-clarify-actions > button {
+  width: 100%;
+  min-width: 0;
+}
+
+/* A very narrow window falls back to one full-width action per row. */
+@media (max-width: 480px) {
+  .map-clarify-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 720px) {

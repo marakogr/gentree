@@ -284,25 +284,51 @@ export function ClarifyPanel({
               </Text>
             ) : null}
 
-            <div className="map-clarify-actions">
-              <Button
-                appearance="primary"
-                onClick={() => void apply()}
-                disabled={!chosen?.point || eventIds.size === 0 || applying}
-              >
-                {t("clarifyApply")}
-              </Button>
-              <Button
-                appearance="secondary"
-                onClick={() => onManual(selected, [...eventIds])}
-                disabled={eventIds.size === 0 || applying}
-              >
-                {t("clarifyManual")}
-              </Button>
-            </div>
+            <ClarifyActions
+              applyLabel={t("clarifyApply")}
+              manualLabel={t("clarifyManual")}
+              applyDisabled={!chosen?.point || eventIds.size === 0 || applying}
+              manualDisabled={eventIds.size === 0 || applying}
+              onApply={() => void apply()}
+              onManual={() => onManual(selected, [...eventIds])}
+            />
           </div>
         </>
       )}
     </aside>
+  );
+}
+
+export type ClarifyActionsProps = {
+  applyLabel: string;
+  manualLabel: string;
+  applyDisabled: boolean;
+  manualDisabled: boolean;
+  onApply: () => void;
+  onManual: () => void;
+};
+
+/**
+ * The two review actions share one equal-width row: "apply to the selected
+ * events" and "point on the map". The stylesheet keeps them side by side and
+ * only stacks them on a very narrow window.
+ */
+export function ClarifyActions({
+  applyLabel,
+  manualLabel,
+  applyDisabled,
+  manualDisabled,
+  onApply,
+  onManual,
+}: ClarifyActionsProps) {
+  return (
+    <div className="map-clarify-actions">
+      <Button appearance="primary" onClick={onApply} disabled={applyDisabled}>
+        {applyLabel}
+      </Button>
+      <Button appearance="secondary" onClick={onManual} disabled={manualDisabled}>
+        {manualLabel}
+      </Button>
+    </div>
   );
 }
