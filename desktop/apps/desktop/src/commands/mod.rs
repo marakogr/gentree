@@ -1,6 +1,7 @@
 //! Tauri commands for persons, events, relationships and the ancestor graph.
 //! Contracts: design.md §3, §5, §7, §11; ADR-0014 (codes only, no localized text).
 
+pub mod backfill;
 pub mod chat;
 pub mod chat_history;
 pub mod event;

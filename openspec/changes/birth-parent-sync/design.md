@@ -25,7 +25,7 @@ Current state that shapes the approach:
 - A typed participant-role model that separates parents from witnesses.
 - Mirroring spouse/partner edges or adoption edges into events.
 - Changing deletion, merge, import or the parent-age threshold.
-- Recomputing or repairing historical data beyond the next create/delete/save.
+- Recomputing historical data beyond the idempotent on-open backfill described below.
 
 ## Decisions
 
@@ -77,16 +77,28 @@ The mirror never calls `derive_event_relations`; it only edits participants. Eve
 
 Core tests cover father/mother/unknown slots, a lone parent, fully occupied slots, idempotent add, earliest free birth among several, removal from every birth, and the event-save round trip. Command tests cover create and delete through a synthetic `ProjectStore`, adoptive exclusion, duplicate rejection before an event write, fully occupied slots, multiple births, and no recreation after delete. Parent and child birth years are at least 25 years apart so the tests do not depend on the threshold changed by issue #101.
 
+### D7. One idempotent backfill on writable open
+
+`commands/backfill.rs::backfill_on_open` runs after the legacy marriage repair on `project_open` and `project_restore_backup`:
+
+1. **Life events.** A single pass indexes the owners of stored `BIRTH`/`DEATH` events, then creates the missing event for every person with a known date. This is the batch form of `sync_life_events(events, person, None)`: an owned event of that type suppresses creation even when its date differs, and a blank date creates nothing. Indexing once keeps a large import linear; the per-person helper would rescan the event list for every person.
+2. **Relations.** The existing `backfill_relations_on_open` runs unchanged, so previously stored marriages and births still gain missing rows.
+3. **Parents.** For every biological `PARENT_CHILD` relation, `add_parent_to_birth_events` adds the parent to the child's earliest birth event with a free slot. The relation rows may be manual or were just derived in step 2; a parent already listed is a no-op.
+
+The steps write events at most twice and reuse the same core rule as `relationship_create`, so the migration and the commands cannot disagree. A read-only store returns early with `readOnly = true` and zero counts without writing. The report carries counts only. The second open sees the created events and participants, so all counts are zero.
+
+Alternative: call `sync_life_events` per person. Rejected because it is O(persons × events) and would stall opening a large imported tree.
+
+## Migration Plan
+
+Opening a writable project backfills it once; no file format changes. Read-only projects are untouched. Rollback is safe: older builds ignore the created events and the new report fields, and the pass can be repeated after any failed write because it is idempotent.
+
 ## Risks / Trade-offs
 
 - **Ambiguous sex data.** A birth with a same-sex pair still stores positions 0/1; the role label may not match. The card shows the relation label, not the slot, and the algorithm never drops a parent. A typed role model is a later change.
 - **Two files are not a transaction.** A failed second write is possible. The chosen ordering makes the failure repairable by the next event save; the command still reports the write error and never claims atomicity.
 - **Legacy lone mothers.** Historical data may store a lone mother at index 0. Adding a father inserts him at 0 and shifts her to 1, which is the intended role order but changes her array position; no data is lost.
 - **Direct delete warning.** The existing automatic-delete warning remains; after this change a biological parent delete also clears the event, so the warning may overstate recreation. It is kept for spouse rows and is out of scope for #100.
-
-## Migration Plan
-
-No migration. Stored rows and events keep their format. New creates/deletes update both collections immediately; existing projects are corrected the next time a parent relation is created or deleted. Rollback is safe: older builds ignore the new behavior and read the same files.
 
 ## Open Questions
 
