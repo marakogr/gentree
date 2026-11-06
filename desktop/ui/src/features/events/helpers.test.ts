@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import type { DateValue, EventEntity, EventType, PlaceGeo, Versioned } from "../../api/types";
-import { mergeViewState } from "../../lib/viewState";
 import {
   buildEventInput,
   clearEventFilterValues,
@@ -23,7 +22,6 @@ import {
   normalizeEventText,
   paginateEventRows,
   readEventFilters,
-  resetEventFilterSection,
   resolveEventColumns,
   sanitizeEventDetails,
   shouldShowPlaceColumn,
@@ -1241,32 +1239,6 @@ describe("shared event filter state (issue #107)", () => {
     const cleared = readEventFilters(clearEventFilterValues(stored));
     expect(countActiveEventFilters(cleared)).toBe(0);
     expect(filterEventRows(rows, "", cleared, contextOf)).toEqual(rows);
-  });
-
-  it("resets every filter of the section but keeps the layout keys", () => {
-    const stored = mergeViewState({
-      query: "ivan",
-      filters: {
-        personId: "p2",
-        personScope: "ancestors",
-        types: ["BIRTH"],
-        fromYear: "1900",
-        toYear: "1950",
-        columns: ["date"],
-        listWidth: "55",
-      },
-      page: 2,
-      scrollTop: 120,
-      selectedId: "e1",
-    });
-
-    const next = resetEventFilterSection(stored);
-    expect(next.query).toBe("");
-    expect(next.filters).toEqual({ columns: ["date"], listWidth: "55" });
-    // Paging, scroll and selection belong to the screen, not to the filter.
-    expect(next.page).toBe(2);
-    expect(next.scrollTop).toBe(120);
-    expect(next.selectedId).toBe("e1");
   });
 
   it("treats a person filter as stale only when the person list is known", () => {

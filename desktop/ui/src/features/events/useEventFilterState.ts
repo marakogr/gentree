@@ -3,11 +3,11 @@
 // "filters" view section, so switching views keeps them; each screen keeps its
 // own sort, page and selection next to it.
 //
-// A filter describes the events of one project: opening another project drops
-// the person/type/year values instead of hiding that project's events behind a
-// filter the user set somewhere else (issue #107).
+// The values are stored per project (`gentree.views.v1.<projectId>`) and each
+// project keeps its own filter: opening another project loads that project's
+// section, it never inherits or clears the previous one (issue #107).
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useViewState } from "../../lib/useViewState";
 import type { ViewFilters } from "../../lib/viewState";
 import {
@@ -15,7 +15,6 @@ import {
   countActiveEventFilters,
   isEventPersonFilterStale,
   readEventFilters,
-  resetEventFilterSection,
   withFilterValue,
   type EventListFilters,
 } from "./helpers";
@@ -32,21 +31,13 @@ export type EventFilterState = {
 };
 
 export function useEventFilterState(projectId: string): EventFilterState {
+  // `useViewState` reloads the section of the open project, so the values here
+  // always belong to `projectId`; a project switch needs no reset.
   const { state, patch } = useViewState(projectId, "filters");
   const filters = useMemo(
     () => readEventFilters(state.filters),
     [state.filters],
   );
-
-  // The stored values belong to the project they were set in. `useViewState`
-  // already reloads the section per project; this also clears a filter that the
-  // new project may keep from an earlier session.
-  const previousProjectId = useRef(projectId);
-  useEffect(() => {
-    if (previousProjectId.current === projectId) return;
-    previousProjectId.current = projectId;
-    patch(resetEventFilterSection);
-  }, [projectId, patch]);
 
   const setQuery = useCallback(
     (query: string) => patch({ query }),

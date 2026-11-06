@@ -23,7 +23,6 @@ import {
 } from "../../lib/dates";
 import { EMPTY_VALUE } from "../../lib/formatValue";
 import type {
-  SectionViewState,
   SortDirection,
   ViewFilters,
 } from "../../lib/viewState";
@@ -866,22 +865,6 @@ export function clearEventPersonFilter(filters: ViewFilters): ViewFilters {
     "personScope",
     "",
   );
-}
-
-/**
- * Filter section of a project that was just opened: no search text and no
- * person/type/year filter, because a filter describes the events of one
- * project. Layout keys such as the column choice and the list width stay: they
- * describe the screen, not the data it shows.
- */
-export function resetEventFilterSection(
-  state: SectionViewState,
-): SectionViewState {
-  return {
-    ...state,
-    query: "",
-    filters: clearEventFilterValues(state.filters),
-  };
 }
 
 /** Stored column choice, or `undefined` when the user never chose. */

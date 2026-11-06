@@ -15,7 +15,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { mediaApi, personsApi, timelineApi } from "../../api/client";
+import { eventsApi, mediaApi, personsApi, timelineApi } from "../../api/client";
 import type {
   MediaItem,
   Person,
@@ -31,7 +31,11 @@ import {
   useEventFilterState,
   usePruneEventPersonFilter,
 } from "../events/useEventFilterState";
-import { matchesEventQuery, type EventPersonScope } from "../events/helpers";
+import {
+  eventYearBounds,
+  matchesEventQuery,
+  type EventPersonScope,
+} from "../events/helpers";
 import { ActiveFilterNotice } from "../events/ActiveFilterNotice";
 import { photosByPerson } from "../media/helpers";
 import { displayName } from "../persons/helpers";
@@ -361,6 +365,12 @@ export default function TimelinePage({
   const [photos, setPhotos] = useState<ReadonlyMap<string, MediaItem>>(
     () => new Map(),
   );
+  // Scale of the shared year filter: the whole project, never the filtered line,
+  // so a range that hides every event can still be widened (issue #107).
+  const [yearScale, setYearScale] = useState(() => {
+    const currentYear = new Date().getFullYear();
+    return { minYear: currentYear, maxYear: currentYear, hasDated: false };
+  });
 
   /** Backend rows may send `personGender`; the loaded list is the fallback. */
   const genderById = useMemo(
@@ -418,6 +428,24 @@ export default function TimelinePage({
           setPersons(page.items.map((item) => item.entity));
           setPhotos(photosByPerson(media));
         }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // The year filter is shared with the events screen. Load the project's scale
+  // once so this screen can show the same control and let the user widen a
+  // range that hides every event; a failure keeps the filter row without a
+  // slider instead of hiding the line.
+  useEffect(() => {
+    let active = true;
+    eventsApi
+      .list({})
+      .then((rows) => {
+        if (!active) return;
+        setYearScale(eventYearBounds(rows, new Date().getFullYear()));
       })
       .catch(() => undefined);
     return () => {
@@ -748,6 +776,15 @@ export default function TimelinePage({
           onPersonChange={handlePersonChange}
           onPersonScopeChange={handlePersonScopeChange}
           onTypesChange={(types) => setSharedFilter("types", types)}
+          yearRange={{
+            from: sharedFromYear,
+            to: sharedToYear,
+            minYear: yearScale.minYear,
+            maxYear: yearScale.maxYear,
+            hasDated: yearScale.hasDated,
+            onFromChange: (value) => setSharedFilter("fromYear", value),
+            onToChange: (value) => setSharedFilter("toYear", value),
+          }}
           extra={
             <TimelineGenerations
               generations={generations}
