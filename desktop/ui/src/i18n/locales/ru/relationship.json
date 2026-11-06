@@ -30,7 +30,5 @@
     "adoptedSon": "Приёмный сын",
     "adoptedDaughter": "Приёмная дочь"
   },
-  "automatic": "Автоматически",
-  "automaticSeveralSources": "Событий-источников: {{count}}",
   "deleteAutomaticConfirm": "Связь создана из события. Удалить её? При следующем сохранении события она появится снова."
 }
