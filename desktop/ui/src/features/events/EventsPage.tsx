@@ -74,7 +74,10 @@ import { ValidationSummary } from "../projects/ValidationSummary";
 import EventForm from "./EventForm";
 import { EventCard } from "./EventCard";
 import { EVENT_TYPE_ICONS } from "./typeIcons";
-import { useEventFilterState } from "./useEventFilterState";
+import {
+  useEventFilterState,
+  usePruneEventPersonFilter,
+} from "./useEventFilterState";
 import { usePersonScopeIds } from "../persons/usePersonScopeIds";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
@@ -359,10 +362,7 @@ export default function EventsPage({
   );
   // The search text is not counted: it has its own clear button, and the reset
   // row should not appear for typing alone.
-  const activeFilterCount =
-    (filters.personId === "" ? 0 : 1) +
-    filters.types.length +
-    (filters.fromYear === "" && filters.toYear === "" ? 0 : 1);
+  const activeFilterCount = sharedFilters.activeCount;
   const storedColumns = useMemo(
     () => readEventColumns(view.filters),
     [filterSignature],
@@ -371,6 +371,18 @@ export default function EventsPage({
   const personsById = useMemo(
     () => new Map(persons.map((item) => [item.entity.id, item.entity])),
     [persons],
+  );
+
+  // A stored person filter can outlive its person (deleted here or imported
+  // from another tree). Drop it as soon as this project's people are known.
+  const knownPersonIds = useMemo(
+    () => new Set(personsById.keys()),
+    [personsById],
+  );
+  usePruneEventPersonFilter(
+    filters,
+    knownPersonIds,
+    sharedFilters.setFilter,
   );
 
   const personName = useCallback(

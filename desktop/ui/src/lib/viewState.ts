@@ -225,6 +225,20 @@ export function writeProjectViews(
 }
 
 /**
+ * The section of one project as the screen should open it: its stored values,
+ * validated, or the pristine defaults. Nothing from another project can reach
+ * the result, because the store is keyed by `projectId`.
+ */
+export function loadSectionView(
+  projectId: string,
+  section: SectionKey,
+  storage: ViewStorage | null = browserStorage(),
+): SectionViewState {
+  const stored = readProjectViews(projectId, storage)[section];
+  return mergeViewState(stored ?? DEFAULT_VIEW_STATE);
+}
+
+/**
  * Keeps at most `maxProjects` projects from `keepIds` (caller order is the
  * priority order: most recently used first). Only entries that are actually
  * present in `store` are returned, so the result is deterministic.

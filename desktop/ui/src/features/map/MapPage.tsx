@@ -31,7 +31,10 @@ import {
   matchesEventQuery,
   type EventPersonScope,
 } from "../events/helpers";
-import { useEventFilterState } from "../events/useEventFilterState";
+import {
+  useEventFilterState,
+  usePruneEventPersonFilter,
+} from "../events/useEventFilterState";
 import { usePersonScopeIds } from "../persons/usePersonScopeIds";
 import { photosByPerson } from "../media/helpers";
 import { toApiDate, toTimelineEvent } from "../timeline/adapter";
@@ -272,10 +275,14 @@ export default function MapPage({
     () => persons.map((item) => item.entity),
     [persons],
   );
-  const activeFilterCount =
-    (filters.personId === "" ? 0 : 1) +
-    filters.types.length +
-    (filters.fromYear === "" && filters.toYear === "" ? 0 : 1);
+  const activeFilterCount = sharedFilters.activeCount;
+  // Drop a stored person filter that does not resolve in this project once the
+  // people are loaded (a deleted person or an id from another tree).
+  const knownPersonIds = useMemo(
+    () => new Set(personEntities.map((person) => person.id)),
+    [personEntities],
+  );
+  usePruneEventPersonFilter(filters, knownPersonIds, setSharedFilter);
   const inRange = useMemo(
     () =>
       yearState

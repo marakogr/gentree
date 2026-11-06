@@ -1,10 +1,16 @@
 // React binding for the persisted per-project view state (see lib/viewState.ts).
 // Pure validation/normalisation lives in viewState.ts; this module only wires it
 // to React state, debounced localStorage writes and scroll restoration.
+//
+// The state is stored together with the project it belongs to. A project switch
+// therefore loads the target project's stored section instead of keeping the
+// previous project's values - A -> B -> A restores A's filters, and B only ever
+// sees its own (issue #107).
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DEFAULT_VIEW_STATE,
+  loadSectionView,
   mergeViewState,
   readProjectViews,
   writeProjectViews,
@@ -18,11 +24,19 @@ export type ViewPatch =
   | Partial<SectionViewState>
   | ((previous: SectionViewState) => SectionViewState);
 
-function initial(projectId: string, section: SectionKey): SectionViewState {
-  const stored = readProjectViews(projectId)[section];
-  return stored
-    ? mergeViewState(stored)
-    : { ...DEFAULT_VIEW_STATE, filters: {} };
+/** The loaded section plus the project it belongs to. */
+type LoadedSection = {
+  projectId: string;
+  section: SectionKey;
+  state: SectionViewState;
+};
+
+/** Writes one section of the project it was loaded for. Never throws. */
+function persistSection(loaded: LoadedSection): void {
+  if (loaded.projectId === "" || typeof window === "undefined") return;
+  const views = readProjectViews(loaded.projectId);
+  views[loaded.section] = loaded.state;
+  writeProjectViews(loaded.projectId, views);
 }
 
 export type UseViewState = {
@@ -36,51 +50,58 @@ export function useViewState(
   projectId: string,
   section: SectionKey,
 ): UseViewState {
-  const [state, setState] = useState<SectionViewState>(() =>
-    initial(projectId, section),
-  );
+  const [loaded, setLoaded] = useState<LoadedSection>(() => ({
+    projectId,
+    section,
+    state: loadSectionView(projectId, section),
+  }));
+  const state = loaded.state;
 
-  // Switching project must not leak the previous project's filters.
+  // Opening another project replaces the section with that project's own
+  // stored values; the values of the project being left are written first so
+  // the last edit of a session is not dropped.
   useEffect(() => {
-    setState(initial(projectId, section));
-  }, [projectId, section]);
-
-  useEffect(() => {
-    if (projectId === "") return;
-    if (typeof window === "undefined") return;
-    const timer = window.setTimeout(() => {
-      const views = readProjectViews(projectId);
-      views[section] = state;
-      writeProjectViews(projectId, views);
-    }, 200);
-    return () => window.clearTimeout(timer);
-  }, [projectId, section, state]);
-
-  // Flush synchronously on unmount: switching tabs faster than the debounce
-  // must not drop the last query/page/scroll offset.
-  const latest = useRef(state);
-  latest.current = state;
-  useEffect(
-    () => () => {
-      if (projectId === "" || typeof window === "undefined") return;
-      const views = readProjectViews(projectId);
-      views[section] = latest.current;
-      writeProjectViews(projectId, views);
-    },
-    [projectId, section],
-  );
+    if (loaded.projectId === projectId && loaded.section === section) return;
+    persistSection(loaded);
+    setLoaded({
+      projectId,
+      section,
+      state: loadSectionView(projectId, section),
+    });
+  }, [projectId, section, loaded]);
 
   const patch = useCallback((next: ViewPatch) => {
-    setState((previous) =>
-      mergeViewState(
-        typeof next === "function" ? next(previous) : { ...previous, ...next },
+    setLoaded((previous) => ({
+      ...previous,
+      state: mergeViewState(
+        typeof next === "function"
+          ? next(previous.state)
+          : { ...previous.state, ...next },
       ),
-    );
+    }));
   }, []);
 
   const reset = useCallback(() => {
-    setState({ ...DEFAULT_VIEW_STATE, filters: {} });
+    setLoaded((previous) => ({
+      ...previous,
+      state: mergeViewState(DEFAULT_VIEW_STATE),
+    }));
   }, []);
+
+  useEffect(() => {
+    // The render right after a switch still holds the previous project's
+    // values for one commit: never write them under the new project's key.
+    if (loaded.projectId !== projectId) return;
+    if (typeof window === "undefined") return;
+    const timer = window.setTimeout(() => persistSection(loaded), 200);
+    return () => window.clearTimeout(timer);
+  }, [loaded, projectId]);
+
+  // Flush synchronously on unmount: switching tabs faster than the debounce
+  // must not drop the last query/page/scroll offset.
+  const latest = useRef(loaded);
+  latest.current = loaded;
+  useEffect(() => () => persistSection(latest.current), []);
 
   return { state, patch, reset };
 }

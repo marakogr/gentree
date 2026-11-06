@@ -543,6 +543,22 @@ mod tests {
         event.validate().unwrap();
     }
 
+    /// A birth event without participants still belongs to its owner: the
+    /// person filters of the events list and the timeline must keep it
+    /// (issue #107).
+    #[test]
+    fn event_without_participants_belongs_to_its_owner() {
+        let owner = Uuid::now_v7();
+        let stranger = Uuid::now_v7();
+        let event = Event::new(owner, EventType::Birth);
+        assert!(event.participant_ids.is_empty());
+
+        assert!(event.involves(owner));
+        assert!(event.involves_any(&std::collections::BTreeSet::from([owner])));
+        assert!(!event.involves(stranger));
+        assert!(!event.involves_any(&std::collections::BTreeSet::from([stranger])));
+    }
+
     #[test]
     fn marriage_backfill_uses_the_only_spouse_link() {
         use crate::relationship::{Relationship, RelationshipType};
