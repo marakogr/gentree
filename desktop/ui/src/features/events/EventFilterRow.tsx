@@ -1,7 +1,6 @@
 import { useMemo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { EventType, MediaItem, Person } from "../../api/types";
-import { Button } from "../../components/ui/button";
 import type { EventPersonScope } from "./helpers";
 import { isEventPersonScope } from "./helpers";
 import { MultiSelectDropdown } from "../../components/filters/MultiSelectDropdown";
@@ -38,9 +37,6 @@ export type EventFilterRowProps = {
   };
   /** Screen-local controls (e.g. timeline generations) appended to the row. */
   extra?: ReactNode;
-  onReset?: () => void;
-  resetLabel?: string;
-  activeCount?: number;
   className?: string;
   /** Optional `data-testid` for the row. */
   testId?: string;
@@ -62,9 +58,6 @@ export function EventFilterRow({
   onTypesChange,
   yearRange,
   extra,
-  onReset,
-  resetLabel,
-  activeCount = 0,
   className,
   testId,
 }: EventFilterRowProps) {
@@ -136,17 +129,6 @@ export function EventFilterRow({
       ) : null}
 
       {extra}
-
-      {onReset && activeCount > 0 ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="event-filter-reset"
-          onClick={onReset}
-        >
-          {resetLabel}
-        </Button>
-      ) : null}
     </div>
   );
 }

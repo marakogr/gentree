@@ -6,6 +6,7 @@
 import { useTranslation } from "react-i18next";
 import type { EventType, MediaItem, Person } from "../../api/types";
 import { FilterBar } from "../../components/filters/FilterBar";
+import { ActiveFilterNotice } from "./ActiveFilterNotice";
 import type { EventPersonScope } from "./helpers";
 import { EventFilterRow } from "./EventFilterRow";
 import "../../components/filters/filters.css";
@@ -98,9 +99,13 @@ export function EventFilterHeader({
           onFromChange: onFromYearChange,
           onToChange: onToYearChange,
         }}
-        onReset={onReset}
-        resetLabel={t("event:resetFilters")}
+      />
+
+      <ActiveFilterNotice
         activeCount={activeCount}
+        fromYear={fromYear}
+        toYear={toYear}
+        onReset={onReset}
       />
     </div>
   );

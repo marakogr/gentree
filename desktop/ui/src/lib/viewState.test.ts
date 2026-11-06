@@ -4,6 +4,7 @@ import {
   MAX_STORED_PROJECTS,
   SECTION_KEYS,
   hasActiveFilters,
+  loadSectionView,
   mergeViewState,
   pruneProjects,
   readProjectViews,
@@ -283,6 +284,44 @@ describe("storage", () => {
     expect(mergeViewState(switched.persons)).toEqual(DEFAULT_VIEW_STATE);
     // ...and does not disturb the first project.
     expect(readProjectViews("project-a", storage).persons?.query).toBe("ann");
+  });
+
+  it("loads the target project's own event filters on A -> B -> A (issue #107)", () => {
+    const storage = fakeStorage();
+    const a = state({
+      query: "ivan",
+      filters: { personId: "a-person", fromYear: "1900", toYear: "1950" },
+      page: 1,
+    });
+    const b = state({ filters: { types: ["BIRTH"] } });
+    writeProjectViews("project-a", { filters: a }, storage);
+    writeProjectViews("project-b", { filters: b }, storage);
+
+    // The hook resolves the section of the project it is asked for.
+    expect(loadSectionView("project-a", "filters", storage)).toEqual(a);
+    expect(loadSectionView("project-b", "filters", storage)).toEqual(b);
+    // Coming back restores A exactly: nothing was cleared or inherited.
+    expect(loadSectionView("project-a", "filters", storage)).toEqual(a);
+
+    // Editing B never touches A, and A's filters keep working.
+    writeProjectViews(
+      "project-b",
+      { filters: state({ query: "petr", filters: { personId: "b-person" } }) },
+      storage,
+    );
+    expect(loadSectionView("project-a", "filters", storage)).toEqual(a);
+    expect(loadSectionView("project-b", "filters", storage).filters).toEqual({
+      personId: "b-person",
+    });
+  });
+
+  it("falls back to the pristine defaults for an unknown project", () => {
+    const storage = fakeStorage();
+    const fresh = loadSectionView("unknown", "filters", storage);
+    expect(fresh).toEqual(DEFAULT_VIEW_STATE);
+    // A mutable copy: the shared frozen defaults are never handed out.
+    fresh.filters.personId = "p1";
+    expect(DEFAULT_VIEW_STATE.filters).toEqual({});
   });
 
   it("survives garbage in localStorage", () => {
