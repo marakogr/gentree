@@ -188,7 +188,6 @@
   "parentFirst": "Padre",
   "parentSecond": "Madre",
   "clearParent": "Quitar progenitor",
-  "parentsLinked": "Al guardar se crea una relación progenitor-hijo",
   "parentFirstPlaceholder": "Selecciona al padre",
   "parentSecondPlaceholder": "Selecciona a la madre",
   "parentGenderUnknown": "Esta persona no tiene el sexo indicado",
