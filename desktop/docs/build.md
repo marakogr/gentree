@@ -28,6 +28,8 @@ make run       # release exe + запуск
 | `make run` | `make exe`, затем запуск этого бинарника |
 | `make build` | установщики текущей ОС: `.msi` + NSIS `.exe` на Windows, `.dmg` на macOS |
 | `make portable` | портативный архив Windows: один exe в zip, без установщика |
+| `make store` | MSIX для Microsoft Store: full-trust пакет без автообновления, см. `docs/store.md` |
+| `make store-test` | то же, но подписано локальным тестовым сертификатом — только для проверки установки |
 | `make rebuild` | `make clean` + `make build` |
 
 Пути:

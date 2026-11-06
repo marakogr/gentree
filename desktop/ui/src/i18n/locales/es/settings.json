@@ -99,6 +99,7 @@
   "updatesInstalled": "La actualización está instalada. Reinicie Gentree.",
   "updatesNotConfigured": "Las actualizaciones no están configuradas en esta compilación.",
   "updatesNotConfiguredHint": "El endpoint de actualizaciones y la clave pública siguen siendo marcadores. La configuración se describe en docs/releases.md.",
+  "updatesStoreManaged": "Las actualizaciones de esta compilación las distribuye Microsoft Store. Gentree no busca actualizaciones por sí mismo.",
   "updatesNotes": "Novedades",
   "updatesLastAutoCheck": "Última búsqueda automática: {{date}}",
   "updatesAutoCheckAvailable": "La búsqueda al iniciar encontró la versión {{version}}.",

@@ -388,6 +388,10 @@ export default function SettingsPage({
   // its version is still installable because install re-checks first.
   const availableUpdate =
     updateStatus?.availableVersion ?? autoCheck?.availableVersion ?? null;
+  // A Store build has no updater at all: the Store installs updates, so the
+  // screen shows that instead of controls that could only fail.
+  const storeManaged = updateStatus?.channel === "store";
+  const selfManaged = updateStatus?.configured === true && !storeManaged;
 
   // A path row keeps the existing label/value line and adds one compact button;
   // the fixed first column keeps every folder icon on the same left edge.
@@ -1071,7 +1075,14 @@ export default function SettingsPage({
             })}
           </Text>
         ) : null}
-        {updateStatus && !updateStatus.configured ? (
+        {updateStatus && storeManaged ? (
+          <MessageBar intent="info" politeness="polite">
+            <MessageBarBody>
+              {t("settings:updatesStoreManaged")}
+            </MessageBarBody>
+          </MessageBar>
+        ) : null}
+        {updateStatus && !updateStatus.configured && !storeManaged ? (
           <MessageBar intent="warning" politeness="polite">
             <MessageBarBody>
               {t("settings:updatesNotConfigured")}{" "}
@@ -1079,42 +1090,46 @@ export default function SettingsPage({
             </MessageBarBody>
           </MessageBar>
         ) : null}
-        <Switch
-          label={t("settings:updatesAutoCheck")}
-          checked={draft.updatesAutoCheck}
-          onChange={(_, data) =>
-            update({ updatesAutoCheck: data.checked === true })
-          }
-        />
-        <Text as="p" size={200}>
-          {t("settings:updatesAutoCheckHint")}
-        </Text>
-        <div className="actions">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={busy || updateBusy}
-            onClick={checkForUpdates}
-          >
-            {updateAction === "checking"
-              ? t("settings:updatesChecking")
-              : t("settings:updatesCheck")}
-          </Button>
-          {availableUpdate ? (
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              disabled={busy || updateBusy}
-              onClick={installUpdate}
-            >
-              {updateAction === "installing"
-                ? t("settings:updatesInstalling")
-                : t("settings:updatesInstall")}
-            </Button>
-          ) : null}
-        </div>
+        {selfManaged ? (
+          <>
+            <Switch
+              label={t("settings:updatesAutoCheck")}
+              checked={draft.updatesAutoCheck}
+              onChange={(_, data) =>
+                update({ updatesAutoCheck: data.checked === true })
+              }
+            />
+            <Text as="p" size={200}>
+              {t("settings:updatesAutoCheckHint")}
+            </Text>
+            <div className="actions">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={busy || updateBusy}
+                onClick={checkForUpdates}
+              >
+                {updateAction === "checking"
+                  ? t("settings:updatesChecking")
+                  : t("settings:updatesCheck")}
+              </Button>
+              {availableUpdate ? (
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  disabled={busy || updateBusy}
+                  onClick={installUpdate}
+                >
+                  {updateAction === "installing"
+                    ? t("settings:updatesInstalling")
+                    : t("settings:updatesInstall")}
+                </Button>
+              ) : null}
+            </div>
+          </>
+        ) : null}
         {updateError ? (
           <MessageBar intent="error">
             <MessageBarBody>

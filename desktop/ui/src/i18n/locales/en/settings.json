@@ -99,6 +99,7 @@
   "updatesInstalled": "The update is installed. Restart Gentree to use it.",
   "updatesNotConfigured": "Updates are not configured in this build.",
   "updatesNotConfiguredHint": "The release endpoint and public key are still placeholders. See docs/releases.md for the release setup.",
+  "updatesStoreManaged": "Updates for this build come from Microsoft Store. Gentree does not check for updates itself.",
   "updatesNotes": "What's new",
   "updatesLastAutoCheck": "Last automatic check: {{date}}",
   "updatesAutoCheckAvailable": "The startup check found version {{version}}.",

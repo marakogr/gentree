@@ -99,6 +99,7 @@
   "updatesInstalled": "Das Update ist installiert. Starten Sie Gentree neu.",
   "updatesNotConfigured": "Updates sind in diesem Build nicht eingerichtet.",
   "updatesNotConfiguredHint": "Update-Endpunkt und öffentlicher Schlüssel sind noch Platzhalter. Die Einrichtung steht in docs/releases.md.",
+  "updatesStoreManaged": "Updates für diese Build-Version liefert der Microsoft Store. Gentree prüft nicht selbst auf Updates.",
   "updatesNotes": "Neuerungen",
   "updatesLastAutoCheck": "Letzte automatische Suche: {{date}}",
   "updatesAutoCheckAvailable": "Die Suche beim Start hat Version {{version}} gefunden.",

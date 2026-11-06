@@ -473,9 +473,12 @@ fn person_add(
 }
 
 fn main() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
+    let builder = tauri::Builder::default().plugin(tauri_plugin_dialog::init());
+    // The Store build (`--features store`) is updated by the Store, so it does
+    // not link the updater plugin at all.
+    #[cfg(not(feature = "store"))]
+    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+    builder
         .manage(AppState::default())
         .manage(Mutex::new(settings::ConfigState::initial()))
         .manage(commands::chat::ChatState::default())

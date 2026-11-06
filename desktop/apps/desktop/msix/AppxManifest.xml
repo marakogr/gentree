@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Microsoft Store package manifest for Gentree.
+
+  The identity below is fixed by Partner Center (Package/Identity/...). Those
+  values are not secrets, but they must match exactly or the Store rejects the
+  package, so they live in one place: here, and the packager reads them back
+  instead of duplicating them.
+
+  `Version` is filled in by scripts/package-msix.mjs, which turns the app version
+  (0.7.0) into the four-part form the Store requires (0.7.0.0).
+
+  This is a full-trust desktop package: the app keeps its normal Win32 process,
+  file access and WebView2, and only gains package identity. The Store signs the
+  upload itself, so the file this manifest goes into stays unsigned. See
+  docs/store.md.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <Identity
+    Name="marakogr.Gentree"
+    Publisher="CN=CCBFC6D1-565E-4E3F-8A41-E60352A1730E"
+    Version="{{VERSION}}"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Gentree</DisplayName>
+    <PublisherDisplayName>marakogr</PublisherDisplayName>
+    <Description>Local-first family archive</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily
+      Name="Windows.Desktop"
+      MinVersion="10.0.17763.0"
+      MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Applications>
+    <!--
+      Windows.FullTrustApplication + the runFullTrust capability is the shape a
+      desktop app takes as MSIX: Start menu entry, Store updates, and an
+      ordinary Win32 process instead of an app container.
+    -->
+    <Application
+      Id="Gentree"
+      Executable="gentree-desktop.exe"
+      EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Gentree"
+        Description="Local-first family archive"
+        BackgroundColor="#0F1115"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:SplashScreen
+          Image="Assets\SplashScreen.png"
+          BackgroundColor="#0F1115" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- The optional chat talks to a provider the user configures. -->
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
