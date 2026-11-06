@@ -254,4 +254,79 @@ describe("card and table polish", () => {
     await shot("polish-event-card");
     expect(await consoleErrors()).toEqual([]);
   });
+
+  it("closes the person and event edit dialogs from the header X", async () => {
+    await clickNav("Люди");
+    await browser.waitUntil(async () => (await headingText()) === "Люди", {
+      timeout: 10000,
+    });
+    await browser.pause(600);
+    await openPerson(CHILD);
+
+    await $('.person-card-actions button[aria-label="Изменить"]').click();
+    await (await $("#person-surname")).waitForDisplayed({ timeout: 10000 });
+    await browser.pause(300);
+    const personDialog = await dialogHeader();
+    expect(personDialog.closeLabel).toBe("Закрыть");
+    expect(personDialog.isRightmost).toBe(true);
+    expect(personDialog.aboveContent).toBe(true);
+    await $('.ui-dialog-head button[aria-label="Закрыть"]').click();
+    await browser.waitUntil(
+      async () => !(await $("#person-surname").isExisting()),
+      { timeout: 10000, timeoutMsg: "the person form did not close" },
+    );
+
+    await clickNav("События");
+    await browser.pause(600);
+    const row = await $('//tr[contains(., "Рождение")]');
+    await row.waitForClickable({ timeout: 10000 });
+    await row.click();
+    await (await $(".events-card")).waitForDisplayed({ timeout: 10000 });
+    await browser.pause(300);
+    await $('.events-card-actions button[aria-label="Изменить"]').click();
+    await (await $("#event-type")).waitForDisplayed({ timeout: 10000 });
+    await browser.pause(300);
+    const eventDialog = await dialogHeader();
+    expect(eventDialog.closeLabel).toBe("Закрыть");
+    expect(eventDialog.isRightmost).toBe(true);
+    expect(eventDialog.aboveContent).toBe(true);
+    await $('.ui-dialog-head button[aria-label="Закрыть"]').click();
+    await browser.waitUntil(
+      async () => !(await $("#event-type").isExisting()),
+      { timeout: 10000, timeoutMsg: "the event form did not close" },
+    );
+
+    save("polish-dialog-close", { personDialog, eventDialog });
+    await shot("polish-dialog-close");
+    expect(await consoleErrors()).toEqual([]);
+  });
 });
+
+/** Geometry of the shared dialog header close control. */
+async function dialogHeader() {
+  return browser.execute(() => {
+    const head = document.querySelector(".ui-dialog-head");
+    const content = document.querySelector(".ui-dialog-content");
+    const close = head?.querySelector('button[aria-label="Закрыть"]') ?? null;
+    const title = head?.firstElementChild ?? null;
+    const buttons = [...(head?.querySelectorAll("button") ?? [])];
+    const box = (element) => {
+      const rect = element.getBoundingClientRect();
+      return { top: rect.top, right: rect.right, bottom: rect.bottom };
+    };
+    const closeBox = close ? box(close) : null;
+    const contentBox = content ? box(content) : null;
+    return {
+      closeLabel: close?.getAttribute("aria-label") ?? null,
+      isRightmost:
+        closeBox !== null &&
+        buttons.every((button) => box(button).right <= closeBox.right + 1),
+      titleRight: title ? box(title).right : null,
+      closeRight: closeBox?.right ?? null,
+      aboveContent:
+        closeBox !== null &&
+        contentBox !== null &&
+        closeBox.bottom <= contentBox.top + 1,
+    };
+  });
+}
