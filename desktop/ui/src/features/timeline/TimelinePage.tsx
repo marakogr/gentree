@@ -42,6 +42,7 @@ import {
   buildLineMarkers,
   clampWindow,
   computeMarkerWindow,
+  LINE_EDGE_PADDING,
   markerDomain,
   partitionLineEvents,
   personEventIds,
@@ -508,10 +509,11 @@ export default function TimelinePage({
     () => buildLineMarkers(partitioned.dated, t),
     [partitioned.dated, t],
   );
-  // The loaded events bound every navigation gesture, not the window span.
+  // The padded marker domain bounds every navigation gesture, not the window
+  // span: pan/zoom/fit may use the edge padding but never leave it.
   const domain = useMemo(() => markerDomain(markers), [markers]);
   const dataWindow = useMemo(
-    () => computeMarkerWindow(markers, 0.04, domain),
+    () => computeMarkerWindow(markers, LINE_EDGE_PADDING, domain),
     [markers, domain],
   );
 

@@ -18,6 +18,8 @@ import {
   formatLineDate,
   layoutLineLabels,
   lineDateKind,
+  LINE_EDGE_PADDING,
+  LINE_EMPTY_DATA_SPAN,
   lineIconKind,
   lineIntervalEnd,
   markerDomain,
@@ -228,7 +230,10 @@ describe("buildLineMarkers", () => {
 });
 
 describe("computeLineWindow", () => {
-  it("covers exactly the loaded events", () => {
+  it("covers the loaded events plus the ten percent edge padding", () => {
+    const first = new Date(1950, 0, 1);
+    const last = new Date(1981, 0, 1);
+    const span = last.getTime() - first.getTime();
     const window = computeLineWindow(
       [
         event("e1", "BIRTH", { start: "1950-01-01T00:00:00.000Z" }),
@@ -238,17 +243,26 @@ describe("computeLineWindow", () => {
     );
     expect(window).not.toBeNull();
     if (window === null) return;
-    expect(window.start).toEqual(new Date(1950, 0, 1));
-    expect(window.end).toEqual(new Date(1981, 0, 1));
+    expect(window.start.getTime()).toBeCloseTo(
+      first.getTime() - span * 0.1,
+      -3,
+    );
+    expect(window.end.getTime()).toBeCloseTo(last.getTime() + span * 0.1, -3);
   });
 
-  it("uses the marker interval for a single point", () => {
+  it("pads the marker interval of a single point", () => {
+    const start = new Date(1950, 0, 1);
+    const end = new Date(1951, 0, 1);
+    const span = end.getTime() - start.getTime();
     const window = computeLineWindow(
       [event("e1", "BIRTH", { start: "1950-01-01T00:00:00.000Z" })],
       ru,
     );
-    expect(window?.start).toEqual(new Date(1950, 0, 1));
-    expect(window?.end).toEqual(new Date(1951, 0, 1));
+    expect(window?.start.getTime()).toBeCloseTo(
+      start.getTime() - span * 0.1,
+      -3,
+    );
+    expect(window?.end.getTime()).toBeCloseTo(end.getTime() + span * 0.1, -3);
   });
 
   it("returns null for an empty or undated set", () => {
@@ -267,20 +281,34 @@ describe("markerDomain", () => {
     ],
     ru,
   );
+  const firstStart = new Date(1900, 0, 1).getTime();
+  const lastEnd = new Date(1981, 0, 1).getTime();
+  const span = lastEnd - firstStart;
 
-  it("spans the earliest marker to the latest interval end", () => {
+  it("pads the earliest start and the latest interval end by ten percent", () => {
     const domain = markerDomain(markers, new Date(2026, 0, 1));
-    expect(domain?.start).toEqual(new Date(1900, 0, 1));
-    expect(domain?.end).toEqual(new Date(1981, 0, 1));
+    expect(domain?.start.getTime()).toBeCloseTo(
+      firstStart - span * LINE_EDGE_PADDING,
+      -3,
+    );
+    expect(domain?.end.getTime()).toBeCloseTo(
+      lastEnd + span * LINE_EDGE_PADDING,
+      -3,
+    );
   });
 
-  it("never extends past the current local date", () => {
-    const domain = markerDomain(markers, new Date(1970, 0, 1));
-    expect(domain?.start).toEqual(new Date(1900, 0, 1));
-    expect(domain?.end).toEqual(new Date(1970, 0, 1));
+  it("never pads past the current local date", () => {
+    const now = new Date(1970, 0, 1);
+    const domain = markerDomain(markers, now);
+    expect(domain?.start.getTime()).toBeCloseTo(
+      firstStart - span * LINE_EDGE_PADDING,
+      -3,
+    );
+    expect(domain?.start.getTime()).toBeLessThan(firstStart);
+    expect(domain?.end).toEqual(now);
   });
 
-  it("keeps future-only markers reachable instead of collapsing to today", () => {
+  it("keeps future-only markers reachable with their padding", () => {
     const future = buildLineMarkers(
       [
         event("f1", "BIRTH", { start: "2100-01-01T00:00:00.000Z" }),
@@ -288,12 +316,21 @@ describe("markerDomain", () => {
       ],
       ru,
     );
+    const futureStart = new Date(2100, 0, 1).getTime();
+    const futureEnd = new Date(2111, 0, 1).getTime();
+    const futureSpan = futureEnd - futureStart;
     const domain = markerDomain(future, new Date(2026, 0, 1));
-    expect(domain?.start).toEqual(new Date(2100, 0, 1));
-    expect(domain?.end).toEqual(new Date(2111, 0, 1));
+    expect(domain?.start.getTime()).toBeCloseTo(
+      futureStart - futureSpan * LINE_EDGE_PADDING,
+      -3,
+    );
+    expect(domain?.end.getTime()).toBeCloseTo(
+      futureEnd + futureSpan * LINE_EDGE_PADDING,
+      -3,
+    );
   });
 
-  it("always returns a non-empty domain when a marker exists", () => {
+  it("always returns a padded non-empty domain when a marker exists", () => {
     const point = buildLineMarkers(
       [
         event("p1", "OTHER", {
@@ -306,21 +343,33 @@ describe("markerDomain", () => {
     const domain = markerDomain(point, new Date(2026, 0, 1));
     expect(domain).not.toBeNull();
     if (domain === null) return;
-    expect(domain.end.getTime()).toBeGreaterThan(domain.start.getTime());
-    const window = computeMarkerWindow(point, 0.04, domain);
+    // No measurable data span: the fallback span is padded on both sides.
+    expect(domain.end.getTime() - domain.start.getTime()).toBeCloseTo(
+      LINE_EMPTY_DATA_SPAN * LINE_EDGE_PADDING * 2,
+      -3,
+    );
+    const window = computeMarkerWindow(point, LINE_EDGE_PADDING, domain);
     expect(window).not.toBeNull();
     if (window === null) return;
     expect(window.end.getTime()).toBeGreaterThan(window.start.getTime());
   });
 
+  it("makes the fit window include the edge padding", () => {
+    const domain = markerDomain(markers, new Date(2026, 0, 1));
+    const window = computeMarkerWindow(markers, LINE_EDGE_PADDING, domain);
+    expect(window).toEqual(domain);
+    expect(window?.start.getTime()).toBeLessThan(firstStart);
+    expect(window?.end.getTime()).toBeGreaterThan(lastEnd);
+  });
+
   it("returns null without dated markers", () => {
     expect(markerDomain([], new Date(2026, 0, 1))).toBeNull();
-    expect(computeMarkerWindow([], 0.04, null)).toBeNull();
+    expect(computeMarkerWindow([], LINE_EDGE_PADDING, null)).toBeNull();
   });
 });
 
 describe("computePersonWindow", () => {
-  it("wraps only the events of the requested person", () => {
+  it("wraps only the events of the requested person, with edge padding", () => {
     const p1 = { personId: "p1", firstName: null, lastName: null, role: "SUBJECT" };
     const markers = buildLineMarkers(
       [
@@ -330,9 +379,22 @@ describe("computePersonWindow", () => {
       ],
       ru,
     );
+    const firstStart = new Date(1900, 0, 1).getTime();
+    const lastEnd = new Date(1981, 0, 1).getTime();
+    const span = lastEnd - firstStart;
     const window = computePersonWindow(markers, "p1");
-    expect(window?.start).toEqual(new Date(1900, 0, 1));
-    expect(window?.end).toEqual(new Date(1981, 0, 1));
+    expect(window?.start.getTime()).toBeCloseTo(
+      firstStart - span * LINE_EDGE_PADDING,
+      -3,
+    );
+    expect(window?.end.getTime()).toBeCloseTo(
+      lastEnd + span * LINE_EDGE_PADDING,
+      -3,
+    );
+    // The third event belongs to nobody else in view, so it stays outside.
+    expect(window?.end.getTime()).toBeLessThan(
+      new Date(2000, 0, 1).getTime(),
+    );
   });
 
   it("returns null without a person or events", () => {
@@ -421,6 +483,44 @@ describe("timeline window bounds", () => {
     const wide = { start: new Date(1800, 0, 1), end: new Date(2100, 0, 1) };
     expect(clampWindowToDomain(wide, domain)).toEqual(domain);
     expect(clampWindow(wide, domain)).toEqual(domain);
+  });
+});
+
+describe("padded navigation bounds", () => {
+  const markers = buildLineMarkers(
+    [
+      event("e1", "BIRTH", { start: "1900-01-01T00:00:00.000Z" }),
+      event("e2", "DEATH", { start: "1980-01-01T00:00:00.000Z" }),
+    ],
+    ru,
+  );
+  const now = new Date(2026, 0, 1);
+  const domain = markerDomain(markers, now);
+  const firstStart = new Date(1900, 0, 1).getTime();
+  const lastEnd = new Date(1981, 0, 1).getTime();
+
+  it("lets pan reach the padding but not leave the domain", () => {
+    if (domain === null) throw new Error("expected a domain");
+    const zoomed = zoomWindow(domain, 0.5, 0.5, domain);
+    const left = panWindow(zoomed, -10, domain);
+    expect(left.start.getTime()).toBe(domain.start.getTime());
+    expect(left.start.getTime()).toBeLessThan(firstStart);
+    const right = panWindow(zoomed, 10, domain);
+    expect(right.end.getTime()).toBe(domain.end.getTime());
+    expect(right.end.getTime()).toBeGreaterThan(lastEnd);
+  });
+
+  it("keeps every marker visible in the fit window", () => {
+    const window = computeMarkerWindow(markers, LINE_EDGE_PADDING, domain);
+    expect(window).not.toBeNull();
+    if (window === null) return;
+    for (const marker of markers) {
+      expect(positionOnLine(marker.time, window)).not.toBeNull();
+    }
+  });
+
+  it("never exposes empty future past today", () => {
+    expect(domain?.end.getTime()).toBeLessThanOrEqual(now.getTime());
   });
 });
 

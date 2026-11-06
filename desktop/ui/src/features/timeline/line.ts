@@ -296,14 +296,23 @@ export function positionOnLine(
 }
 
 /**
- * Navigable range of the loaded markers: from the earliest marker start to the
- * latest known interval end, capped at the current local date. Returns null
- * when the set carries no usable date, so no arbitrary future range is shown.
+ * Edge padding around the loaded markers, as a fraction of their data span.
+ * It belongs to the navigable domain and to the fit window, so the first and
+ * last markers never sit on the edge of the axis.
  */
-export function markerDomain(
+export const LINE_EDGE_PADDING = 0.1;
+
+/**
+ * Base span used for padding when the data has no measurable span (a single
+ * marker without a known interval). Two years keep a readable axis around it
+ * instead of collapsing the domain onto a point.
+ */
+export const LINE_EMPTY_DATA_SPAN = 2 * 366 * 24 * 3600_000;
+
+/** First marker start and last known marker end; null when none is usable. */
+function markerBounds(
   markers: readonly LineMarker[],
-  now: Date = new Date(),
-): TimelineWindow | null {
+): { min: number; max: number } | null {
   let min: number | null = null;
   let max: number | null = null;
   for (const marker of markers) {
@@ -318,17 +327,45 @@ export function markerDomain(
   if (min === null || max === null) {
     return null;
   }
+  return { min, max };
+}
+
+/**
+ * Navigable range of the loaded markers: the earliest marker start to the
+ * latest known interval end, plus `LINE_EDGE_PADDING` of the data span on both
+ * sides. The padding is reachable by pan, zoom and fit, but never extends into
+ * an empty future past the current local date. A range entirely in the future
+ * keeps its padded bounds so it stays reachable. Returns null when the set
+ * carries no usable date, so no arbitrary range is shown.
+ */
+export function markerDomain(
+  markers: readonly LineMarker[],
+  now: Date = new Date(),
+): TimelineWindow | null {
+  const bounds = markerBounds(markers);
+  if (bounds === null) {
+    return null;
+  }
+  const { min, max } = bounds;
+  const span = max - min;
+  const baseSpan = span > 0 ? span : LINE_EMPTY_DATA_SPAN;
+  const padding = baseSpan * LINE_EDGE_PADDING;
+  let start = min - padding;
+  let end = max + padding;
   const today = now.getTime();
   // A range entirely in the future is still loaded data: keep it reachable
   // instead of collapsing it onto today. Past and mixed ranges stop at today.
-  const domainEnd =
-    Number.isFinite(today) && min <= today ? Math.min(max, today) : max;
-  // A single point has no known interval; keep a non-empty axis for it.
-  const day = 24 * 3600_000;
-  return {
-    start: new Date(min),
-    end: new Date(domainEnd > min ? domainEnd : min + day),
-  };
+  if (Number.isFinite(today) && min <= today) {
+    end = Math.min(end, today);
+  }
+  // Never return a collapsed domain: a zero span would make clamping
+  // meaningless and hide the only marker.
+  if (!(end > start)) {
+    const middle = (start + end) / 2;
+    start = middle - baseSpan / 2;
+    end = middle + baseSpan / 2;
+  }
+  return { start: new Date(start), end: new Date(end) };
 }
 
 /**
@@ -369,14 +406,14 @@ export function clampWindowToDomain(
 }
 
 /**
- * Initial window covering all loaded dated events, clipped to the marker
- * domain so it never shows empty time before the first or after the last
- * loaded event.
+ * Initial window covering all loaded dated events plus the edge padding,
+ * clipped to the marker domain so it never shows empty time before the first
+ * or after the last loaded event.
  */
 export function computeLineWindow(
   events: readonly TimelineEvent[],
   t: Translate,
-  paddingFraction = 0.04,
+  paddingFraction = LINE_EDGE_PADDING,
 ): TimelineWindow | null {
   return computeMarkerWindow(buildLineMarkers(events, t), paddingFraction);
 }
@@ -384,32 +421,20 @@ export function computeLineWindow(
 /** Same rule as `computeLineWindow`, over already built markers. */
 export function computeMarkerWindow(
   markers: readonly LineMarker[],
-  paddingFraction = 0.04,
+  paddingFraction = LINE_EDGE_PADDING,
   domain: TimelineWindow | null = markerDomain(markers),
 ): TimelineWindow | null {
-  let min: number | null = null;
-  let max: number | null = null;
-  for (const marker of markers) {
-    const start = marker.time.getTime();
-    if (!Number.isFinite(start)) {
-      continue;
-    }
-    const end = marker.end?.getTime() ?? start;
-    min = min === null ? start : Math.min(min, start);
-    max = max === null ? end : Math.max(max, end);
-  }
-  if (min === null || max === null) {
+  const bounds = markerBounds(markers);
+  if (bounds === null) {
     return null;
   }
+  const { min, max } = bounds;
   const span = Math.max(max - min, 0);
-  const twoYears = 2 * 366 * 24 * 3600_000;
-  const padding =
-    span > 0
-      ? Math.max(
-          span * clamp(paddingFraction, 0.02, 0.05),
-          markers.length === 1 ? twoYears : 0,
-        )
-      : twoYears;
+  const baseSpan = span > 0 ? span : LINE_EMPTY_DATA_SPAN;
+  const fraction = Number.isFinite(paddingFraction)
+    ? clamp(paddingFraction, 0, 0.25)
+    : LINE_EDGE_PADDING;
+  const padding = baseSpan * fraction;
   return clampWindowToDomain(
     {
       start: new Date(min - padding),
@@ -432,7 +457,7 @@ export function computePersonWindow(
       (participant) => participant.personId === personId,
     ),
   );
-  return computeMarkerWindow(personMarkers, 0.04);
+  return computeMarkerWindow(personMarkers);
 }
 
 /** Shift the window by a fraction of its own span (positive = later). */
