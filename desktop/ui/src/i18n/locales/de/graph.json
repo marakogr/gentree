@@ -44,5 +44,6 @@
   "wholeTreeWarning": "Der Baum des gesamten Projekts ist vollständig aufgeklappt unleserlich. Verwenden Sie ihn nur für einen Überblick.",
   "showSpouses": "Ehepartner anzeigen",
   "showSpousesHint": "Ehepartner und Partner der Wurzelperson und sichtbarer Blutsverwandter auf derselben Ebene anzeigen.",
-  "spouseRole": "Ehepartner"
+  "spouseRole": "Ehepartner",
+  "hoverUnknownKinship": "Verwandtschaftsgrad unbekannt"
 }
