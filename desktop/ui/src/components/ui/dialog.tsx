@@ -12,6 +12,8 @@ import {
   mergeClasses,
   tokens,
 } from "@fluentui/react-components";
+import { DismissRegular } from "@fluentui/react-icons";
+import { IconButton } from "./icon-button";
 
 export type DialogProps = {
   open: boolean;
@@ -22,6 +24,11 @@ export type DialogProps = {
   size?: "sm" | "md" | "lg" | "full";
   /** Keeps the title for assistive tech but renders its own heading inside. */
   titleHidden?: boolean;
+  /**
+   * Localized accessible name for the header close control. When omitted no
+   * close control is rendered; the footer still owns its Cancel action.
+   */
+  closeLabel?: string;
   footer?: ReactNode;
   children: ReactNode;
   initialFocusRef?: RefObject<HTMLElement>;
@@ -106,6 +113,22 @@ const useStyles = makeStyles({
     marginBottom: tokens.spacingVerticalM,
     color: tokens.colorNeutralForeground2,
   },
+  // The optional header close control sits on the title row, outside the
+  // scrollable content, at the far right. The title keeps its width and wraps.
+  head: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: tokens.spacingHorizontalS,
+    minWidth: 0,
+  },
+  headTitle: {
+    flex: "1 1 auto",
+    minWidth: 0,
+  },
+  close: {
+    flexShrink: 0,
+  },
 });
 
 export function Dialog({
@@ -116,6 +139,7 @@ export function Dialog({
   busy = false,
   size = "md",
   titleHidden = false,
+  closeLabel,
   footer,
   children,
   initialFocusRef,
@@ -155,10 +179,33 @@ export function Dialog({
         aria-describedby={description ? descriptionId : undefined}
       >
         <DialogBody aria-busy={busy || undefined} className={styles.body}>
-          <DialogTitle className={titleHidden ? styles.titleHidden : undefined}>
-            {title}
-          </DialogTitle>
-          <DialogContent className={styles.content}>
+          {closeLabel ? (
+            <div className={mergeClasses("ui-dialog-head", styles.head)}>
+              <DialogTitle
+                className={mergeClasses(
+                  styles.headTitle,
+                  titleHidden ? styles.titleHidden : undefined,
+                )}
+              >
+                {title}
+              </DialogTitle>
+              <IconButton
+                className={mergeClasses("ui-dialog-close", styles.close)}
+                label={closeLabel}
+                onClick={onClose}
+                disabled={busy}
+              >
+                <DismissRegular aria-hidden="true" />
+              </IconButton>
+            </div>
+          ) : (
+            <DialogTitle className={titleHidden ? styles.titleHidden : undefined}>
+              {title}
+            </DialogTitle>
+          )}
+          <DialogContent
+            className={mergeClasses("ui-dialog-content", styles.content)}
+          >
             {description ? (
               <Text
                 id={descriptionId}
@@ -171,7 +218,11 @@ export function Dialog({
             {children}
           </DialogContent>
           {footer ? (
-            <DialogActions className={styles.actions}>{footer}</DialogActions>
+            <DialogActions
+              className={mergeClasses("ui-dialog-footer", styles.actions)}
+            >
+              {footer}
+            </DialogActions>
           ) : null}
         </DialogBody>
       </DialogSurface>

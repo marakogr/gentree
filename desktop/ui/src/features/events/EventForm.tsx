@@ -636,6 +636,7 @@ export default function EventForm({
       }}
       busy={busy}
       size={size}
+      closeLabel={t("common:actions.close")}
       footer={footer}
     >
       {confirmDelete ? (

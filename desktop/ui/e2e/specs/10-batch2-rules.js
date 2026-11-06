@@ -127,7 +127,7 @@ function rowWith(rows, ...parts) {
 
 /** Fill the relationship form on the open card with a parent. */
 async function addParentFromCard(parentName) {
-  await $('//button[normalize-space(.)="+ Добавить связь"]').click();
+  await $('//button[normalize-space(.)="Добавить связь"]').click();
   const form = await $("form.person-relationship-form");
   await form.waitForDisplayed({ timeout: 5000 });
 

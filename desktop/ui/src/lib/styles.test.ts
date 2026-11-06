@@ -92,3 +92,38 @@ describe("shell rhythm", () => {
     expect(page).not.toMatch(/calc\(100vh/);
   });
 });
+
+// Issue #131: the platform scrollbars were thick opaque slabs in both themes.
+describe("scrollbars", () => {
+  const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+
+  it("keeps them thin and token-driven", () => {
+    expect(css).toMatch(
+      /\*\s*\{[^}]*scrollbar-width:\s*thin[^}]*scrollbar-color:[^}]*transparent[^}]*\}/,
+    );
+    expect(css).toMatch(/::-webkit-scrollbar\s*\{[^}]*width:\s*8px[^}]*\}/);
+    const thumb = css.match(/::-webkit-scrollbar-thumb\s*\{([^}]*)\}/)?.[1] ?? "";
+    expect(thumb).toMatch(/background-clip:\s*padding-box/);
+    expect(thumb).toMatch(/background-color:\s*var\(--scrollbar-thumb\)/);
+    expect(thumb).not.toMatch(/#000|black/);
+  });
+});
+
+// Issue #131: a finished column drag left a black focus/selection ring on the
+// header. Only the thin accent line may indicate the handle.
+describe("column resize handle", () => {
+  const css = readFileSync(
+    new URL("../components/patterns/patterns.css", import.meta.url),
+    "utf8",
+  );
+
+  it("never paints a focus ring or a text selection", () => {
+    expect(ruleBody(css, ".col-resize-handle")).toMatch(/user-select:\s*none/);
+    const states = css.match(
+      /\.col-resize-handle:focus,[\s\S]*?\.col-resize-handle:active\s*\{([^}]*)\}/,
+    )?.[1];
+    expect(states).toBeDefined();
+    expect(states).toMatch(/outline:\s*none/);
+    expect(states).toMatch(/box-shadow:\s*none/);
+  });
+});
