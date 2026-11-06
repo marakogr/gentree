@@ -311,7 +311,11 @@ export const LINE_EMPTY_DATA_SPAN = 2 * 366 * 24 * 3600_000;
 
 const DAY_MS = 24 * 3600_000;
 
-/** First marker start and last known marker end; null when none is usable. */
+/**
+ * First marker start and last known marker end, used by the initial fit so a
+ * long period is fully visible. Only marker starts render markers, so this is
+ * not the navigation reference.
+ */
 function markerBounds(
   markers: readonly LineMarker[],
 ): { min: number; max: number } | null {
@@ -332,22 +336,42 @@ function markerBounds(
   return { min, max };
 }
 
+/** First and last marker start times; null when none is usable. */
+function markerStartBounds(
+  markers: readonly LineMarker[],
+): { min: number; max: number } | null {
+  let min: number | null = null;
+  let max: number | null = null;
+  for (const marker of markers) {
+    const start = marker.time.getTime();
+    if (!Number.isFinite(start)) {
+      continue;
+    }
+    min = min === null ? start : Math.min(min, start);
+    max = max === null ? start : Math.max(max, start);
+  }
+  if (min === null || max === null) {
+    return null;
+  }
+  return { min, max };
+}
+
 /**
- * Bounds of the loaded events: the earliest marker start to the latest known
- * interval end. This is the navigation reference, not the initial window: a
- * window may extend well past it as long as it still overlaps the events.
- * Returns null when no marker carries a usable date, so the empty state never
- * shows an arbitrary range.
+ * Navigable range of the loaded markers: the earliest to the latest marker
+ * start, the positions that actually render a marker. Interval ends are left
+ * out so a long period cannot leave a window that overlaps only its tail while
+ * no marker is visible. Returns null when no marker carries a usable date, so
+ * the empty state never shows an arbitrary range.
  */
 export function markerDomain(
   markers: readonly LineMarker[],
 ): TimelineWindow | null {
-  const bounds = markerBounds(markers);
+  const bounds = markerStartBounds(markers);
   if (bounds === null) {
     return null;
   }
   const { min, max } = bounds;
-  // A single point has no known interval; keep a non-empty reference range.
+  // A single start has no extent; keep a non-empty reference range.
   return {
     start: new Date(min),
     end: new Date(max > min ? max : min + DAY_MS),
@@ -355,10 +379,10 @@ export function markerDomain(
 }
 
 /**
- * Stop a window that has lost all contact with the events at the nearest edge
- * where at least one day of data stays in view. A window that still overlaps
- * `domain` is returned unchanged, however empty most of it looks: the single
- * navigation rule is that the visible window must intersect the events' range.
+ * Stop a window that has lost all contact with the markers at the nearest edge
+ * where at least one marker start stays in view. A window that still overlaps
+ * the marker starts is returned unchanged, however empty the rest of it looks:
+ * the single navigation rule is that at least one marker start remains visible.
  */
 function clampToEventOverlap(
   window: TimelineWindow,

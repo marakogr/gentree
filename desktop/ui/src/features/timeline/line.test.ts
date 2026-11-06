@@ -281,12 +281,13 @@ describe("markerDomain", () => {
     ru,
   );
   const firstStart = new Date(1900, 0, 1).getTime();
+  const lastStart = new Date(1980, 5, 15).getTime();
   const lastEnd = new Date(1981, 0, 1).getTime();
 
-  it("spans the earliest start to the latest interval end, without padding", () => {
+  it("spans the earliest to the latest marker start, without padding", () => {
     const domain = markerDomain(markers);
     expect(domain?.start.getTime()).toBe(firstStart);
-    expect(domain?.end.getTime()).toBe(lastEnd);
+    expect(domain?.end.getTime()).toBe(lastStart);
   });
 
   it("is a navigation reference, not the initial fit", () => {
@@ -295,7 +296,8 @@ describe("markerDomain", () => {
     expect(window).not.toBeNull();
     if (window === null || domain === null) return;
     expect(domain.start.getTime()).toBe(firstStart);
-    expect(domain.end.getTime()).toBe(lastEnd);
+    expect(domain.end.getTime()).toBe(lastStart);
+    // The fit still covers the whole known interval, padding included.
     expect(window.start.getTime()).toBeLessThan(firstStart);
     expect(window.end.getTime()).toBeGreaterThan(lastEnd);
   });
@@ -310,7 +312,7 @@ describe("markerDomain", () => {
     );
     const domain = markerDomain(future);
     expect(domain?.start.getTime()).toBe(new Date(2100, 0, 1).getTime());
-    expect(domain?.end.getTime()).toBe(new Date(2111, 0, 1).getTime());
+    expect(domain?.end.getTime()).toBe(new Date(2110, 5, 15).getTime());
   });
 
   it("always returns a non-empty domain when a marker exists", () => {
@@ -534,6 +536,29 @@ describe("navigation bounds", () => {
     expect(before.end.getTime()).toBeLessThanOrEqual(
       futureDomain.start.getTime() + DAY,
     );
+  });
+
+  it("stops where a long period's marker start is still visible", () => {
+    const withPeriod = buildLineMarkers(
+      [
+        event("e1", "BIRTH", { start: "1950-01-01T00:00:00.000Z" }),
+        event("e2", "MARR", {
+          start: "1980-01-01T00:00:00.000Z",
+          end: "2000-01-01T00:00:00.000Z",
+          qualifier: "RANGE",
+        }),
+      ],
+      ru,
+    );
+    const periodDomain = markerDomain(withPeriod);
+    if (periodDomain === null) throw new Error("expected a period domain");
+    // Only marker starts count: the interval end must not extend the range.
+    expect(periodDomain.end).toEqual(new Date(1980, 0, 1));
+    const tailOnly = { start: new Date(1990, 0, 1), end: new Date(2010, 0, 1) };
+    expect(positionOnLine(new Date(1980, 0, 1), tailOnly)).toBeNull();
+    const clamped = clampWindow(tailOnly, periodDomain);
+    expect(clamped.start.getTime()).toBe(new Date(1980, 0, 1).getTime() - DAY);
+    expect(positionOnLine(new Date(1980, 0, 1), clamped)).not.toBeNull();
   });
 });
 
