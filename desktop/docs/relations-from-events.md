@@ -37,6 +37,16 @@ Opening a writable project reconciles stored data once, in this order:
 
 Manual rows and manual events are untouched, births without participants are left alone, and casts with too many people are skipped as ambiguous. A second open changes nothing. The report (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`, `readOnly`) contains counts only: no names, dates, ids, places or paths. Read-only projects are not written. A failed write leaves the project unchanged and the next open retries the same idempotent pass.
 
+## Patronymic fill
+
+When a biological father becomes known, an empty patronymic is derived from his given name:
+
+- the fill runs when a `PARENT_CHILD` relation is created, when a `BIRTH` event that asserts the father is saved, and when the person form is saved with the father already stored;
+- only the primary name is touched, and only when its patronymic is absent or whitespace-only; a non-empty or imported value is never replaced;
+- exactly one male biological parent is required; zero, several, an adoptive-only parent or an unnamed father leaves the field empty without an error;
+- Cyrillic names use the East Slavic suffix rules (Russian, Ukrainian or Belarusian by spelling); Latin and mixed-script names are a no-op;
+- project open, backfill, import and export never write a patronymic, and the project format is unchanged.
+
 ## Spouse display
 
 Kinship and the graph resolve a spouse only from `SPOUSE`/`PARTNER` rows. Two people who share a child are co-parents, never spouses, unless a spouse row exists.
