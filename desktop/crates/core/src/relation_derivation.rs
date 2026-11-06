@@ -36,13 +36,20 @@ pub struct RelationBackfillReport {
     pub spouse_created: usize,
     pub parent_created: usize,
     pub ambiguous_skipped: usize,
+    /// Missing `BIRTH`/`DEATH` events created from the person's own dates.
+    pub life_events_created: usize,
+    /// Biological parents added to an existing child birth event.
+    pub parents_added: usize,
     pub read_only: bool,
 }
 
 impl RelationBackfillReport {
     #[must_use]
     pub fn has_changes(self) -> bool {
-        self.spouse_created > 0 || self.parent_created > 0
+        self.spouse_created > 0
+            || self.parent_created > 0
+            || self.life_events_created > 0
+            || self.parents_added > 0
     }
 }
 

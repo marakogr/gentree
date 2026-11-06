@@ -29,13 +29,13 @@ Both directions are idempotent: a parent already present is never added twice, a
 
 ## Backfill
 
-Opening a writable project reconciles stored events once:
+Opening a writable project reconciles stored data once, in this order:
 
-- marriages with exactly two distinct people gain a missing spouse row;
-- births with one or two participants gain missing parent rows;
-- manual rows are untouched, births without participants are left alone, and casts with too many people are skipped as ambiguous.
+1. a person with a known birth or death date and no owned `BIRTH`/`DEATH` event gains the missing event from that date; an existing event with another date is never overwritten and a blank date creates nothing;
+2. marriages with exactly two distinct people gain a missing spouse row, and births with one or two participants gain missing parent rows;
+3. every biological `PARENT_CHILD` relation adds its parent to the child's earliest birth event with a free slot, using the same slot rules as a new relation.
 
-The report (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `readOnly`) contains counts only. Read-only projects are not written. A failed write leaves the project unchanged and the next open retries the same idempotent pass.
+Manual rows and manual events are untouched, births without participants are left alone, and casts with too many people are skipped as ambiguous. A second open changes nothing. The report (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`, `readOnly`) contains counts only: no names, dates, ids, places or paths. Read-only projects are not written. A failed write leaves the project unchanged and the next open retries the same idempotent pass.
 
 ## Spouse display
 

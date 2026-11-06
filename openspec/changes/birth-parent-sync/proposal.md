@@ -15,6 +15,8 @@ Issue #100 asks for both changes. This is a relation-model change requested by t
 - Deleting a biological `PARENT_CHILD` relation removes that parent from the child's `BIRTH` events. A birth event with no parents stays valid.
 - Only `PARENT_CHILD` is mirrored. `ADOPTIVE_PARENT_CHILD` never touches a birth event, and no spouse or partner edge is affected.
 - When a child has several `BIRTH` events, the earliest dated one with a free parent slot is updated; undated events sort last, ties break by id. A parent already asserted by any birth event of that child makes the sync a no-op.
+- Opening a writable project runs one idempotent pass for projects created before this behavior: it creates a missing `BIRTH`/`DEATH` event from a person's own date (never overwriting an event with another date), then derives missing relations from events, then mirrors every biological parent relation into the child's birth event with the same slot rules. Read-only projects are left byte-identical.
+- The on-open report stays aggregate-only and gains `lifeEventsCreated` and `parentsAdded` next to the existing counts and `readOnly`; it carries no ids, names, dates, places or paths.
 - The reverse sync is idempotent: it creates no second relation, never re-adds a parent after the relation is deleted, and event save still derives missing relations from participants without duplicating existing manual rows.
 - Localized copy for the removed labels is removed from every shipped locale; no new user-facing string is required.
 
@@ -34,9 +36,9 @@ None accepted yet. The delta adds requirements to `relationships`: automatic row
 
 ## Impact
 
-- `desktop/crates/core`: two pure functions in `relation_derivation.rs` that add/remove a birth participant, with unit tests for slots, multiple births, idempotency and event-save interaction.
-- `desktop/apps/desktop`: `relationship_create` and `relationship_delete` delegate to testable helpers that update the relation and the child's birth events in one command; command tests use a synthetic project store.
-- `desktop/ui`: `PersonCard` drops the badge and source label; `persons.css` drops their classes; `ru`, `uk`, `en`, `be`, `de`, `es` relationship dictionaries drop the now-unused keys.
+- `desktop/crates/core`: two pure functions in `relation_derivation.rs` that add/remove a birth participant, with unit tests for slots, multiple births, idempotency and event-save interaction. The aggregate open report gains `lifeEventsCreated` and `parentsAdded`.
+- `desktop/apps/desktop`: `relationship_create` and `relationship_delete` delegate to testable helpers that update the relation and the child's birth events in one command; command tests use a synthetic project store. A `commands/backfill.rs` module runs the three-step on-open migration for writable projects and is covered by synthetic-project tests.
+- `desktop/ui`: `PersonCard` drops the badge and source label; `persons.css` drops their classes; `ru`, `uk`, `en`, `be`, `de`, `es` relationship dictionaries drop the now-unused keys. The `RelationBackfillReport` type mirrors the two new counts.
 - Storage format, checksums, IPC surface, search, import and media are unchanged. No new tool is exposed to the chat model.
 
 ## HITL
@@ -45,6 +47,7 @@ This changes relation behavior, which `AGENTS.md` reserves for a human decision.
 
 - automatic relations look manual in the card while provenance stays stored;
 - reverse sync of biological parent relations into birth events, in both directions;
+- the idempotent on-open backfill of missing life events and birth parents for existing projects, requested by the same user in issue #106;
 - no project-format change, so `origin` and `sourceEventIds` remain additive and optional.
 
 The parent-age change is explicitly not part of this approval and is handled by issue #101.

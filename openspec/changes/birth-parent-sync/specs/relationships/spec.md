@@ -136,3 +136,45 @@ The reverse sync SHALL NOT create duplicate relations, SHALL NOT re-add a parent
 
 - **WHEN** the parent already appears in one birth event of the child
 - **THEN** the reverse sync leaves all birth events unchanged
+
+### Requirement: Opening a writable project backfills life events and birth parents
+
+Opening a writable project SHALL, in this order, create each missing life event, derive missing relations from events, and mirror every biological parent relation into the child's birth event. Read-only projects SHALL NOT be written. The pass SHALL be idempotent and SHALL report counts only.
+
+#### Scenario: A missing life event is created
+
+- **WHEN** a person has a known birth or death date and no owned `BIRTH` or `DEATH` event of that type
+- **THEN** opening the project creates the missing event from that date
+- **AND** a blank date creates nothing
+
+#### Scenario: A manual event with another date is kept
+
+- **WHEN** a person already owns a `BIRTH` or `DEATH` event whose date differs from the person's date
+- **THEN** the event is not overwritten and no duplicate is created
+
+#### Scenario: An existing parent relation fills the birth event
+
+- **WHEN** a biological `PARENT_CHILD` relation predates the open and the child's birth event lacks that parent
+- **THEN** the parent is added to the earliest birth event with a free slot using the slot rules above
+
+#### Scenario: Fully occupied slots stay untouched
+
+- **WHEN** every birth event of the child already lists two other people
+- **THEN** the participants are unchanged and the relation is kept
+
+#### Scenario: Opening twice changes nothing
+
+- **WHEN** a project is opened a second time after the backfill wrote its result
+- **THEN** no event or relation is created, updated or removed
+
+#### Scenario: A read-only project is not written
+
+- **WHEN** an existing project is opened read-only
+- **THEN** `events.jsonl` and `relationships.jsonl` stay byte-identical
+- **AND** the report says `readOnly = true` with zero counts
+
+#### Scenario: The report carries no personal data
+
+- **WHEN** the open reports what it changed
+- **THEN** the report contains only counts (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`) and the `readOnly` flag
+- **AND** no id, name, date, place or path is included
