@@ -13,6 +13,19 @@ import type {
 
 export const NODE_WIDTH = 168;
 /**
+ * The root card carries a depth-control column on each side of its caption
+ * (`.graph-node-levels`). Each column and its flex gap take 24px, so a root
+ * caption would get half the width of every other caption and clip a long full
+ * name instead of wrapping onto three lines. The root card adds that footprint
+ * back, so its caption keeps the same width as every other card. The numbers
+ * mirror styles.css: `.graph-node-level` is 16px wide and `.graph-node` uses
+ * an 8px gap (pinned by styles.test.ts).
+ */
+export const LEVEL_COLUMN_WIDTH = 16;
+export const NODE_CONTENT_GAP = 8;
+export const ROOT_NODE_WIDTH =
+  NODE_WIDTH + 2 * (LEVEL_COLUMN_WIDTH + NODE_CONTENT_GAP);
+/**
  * Three 13px caption lines, the 11px meta line, their gap and the card padding
  * (8px top and bottom) plus the border. A clamped name therefore never spills
  * onto the neighbouring generation.
@@ -69,6 +82,11 @@ export type LayoutOptions = {
   spouseOf?: ReadonlyMap<string, string>;
   /** Occurrence-key pairs joined by a spouse connector. */
   spousePairs?: readonly (readonly [string, string])[];
+  /**
+   * Person whose card also renders the depth controls, so it needs the wider
+   * box. Defaults to the graph root; pass "" for a rootless forest.
+   */
+  rootPersonId?: string;
 };
 
 type SpouseSlots = {
@@ -95,10 +113,39 @@ function spouseSlots(
   return { spouseOf: mapping, spouseKeys, spousesOf: byAnchor };
 }
 
-function blockWidthOf(keys: readonly string[]): number {
-  return keys.length === 0
-    ? NODE_WIDTH
-    : keys.length * NODE_WIDTH + (keys.length - 1) * SPOUSE_GAP;
+/**
+ * Card width for a person: only the root owns the depth-control columns, so
+ * only it needs the extra width. A rootless forest has an empty root id and
+ * keeps the base width everywhere.
+ */
+function widthOfPerson(personId: string | null, rootPersonId: string): number {
+  return rootPersonId !== "" && personId === rootPersonId
+    ? ROOT_NODE_WIDTH
+    : NODE_WIDTH;
+}
+
+function blockWidthOf(
+  keys: readonly string[],
+  widthOfKey: (key: string) => number,
+): number {
+  if (keys.length === 0) return NODE_WIDTH;
+  return keys.reduce(
+    (sum, key, index) => sum + widthOfKey(key) + (index === 0 ? 0 : SPOUSE_GAP),
+    0,
+  );
+}
+
+/** Left offset of a block slot: every earlier card plus its spouse gap. */
+function slotOffset(
+  keys: readonly string[],
+  slot: number,
+  widthOfKey: (key: string) => number,
+): number {
+  let offset = 0;
+  for (let index = 0; index < slot && index < keys.length; index += 1) {
+    offset += widthOfKey(keys[index]) + SPOUSE_GAP;
+  }
+  return offset;
 }
 
 /**
@@ -164,6 +211,15 @@ export function layoutAncestors(
   const sourceNodes = includePlaceholders
     ? graph.nodes
     : graph.nodes.filter((node) => !node.placeholder);
+  const rootPersonId = options.rootPersonId ?? graph.rootPersonId;
+  const widthByKey = new Map(
+    sourceNodes.map((node) => [
+      node.occurrenceKey,
+      widthOfPerson(node.personId, rootPersonId),
+    ]),
+  );
+  const widthOfKey = (key: string): number =>
+    widthByKey.get(key) ?? NODE_WIDTH;
   const slots = spouseSlots(sourceNodes, options.spouseOf);
   const sourceKeys = new Set(sourceNodes.map((node) => node.occurrenceKey));
   const sourceEdges = includePlaceholders
@@ -237,7 +293,7 @@ export function layoutAncestors(
   }
 
   type Block = { keys: string[]; width: number; x: number };
-  const blockWidth = (keys: string[]): number => blockWidthOf(keys);
+  const blockWidth = (keys: string[]): number => blockWidthOf(keys, widthOfKey);
 
   // Blocks keep the tree order of the level: parents of one child stay
   // together, and the father slot stays left of the mother slot. Spouse-only
@@ -329,16 +385,18 @@ export function layoutAncestors(
       placeholder: node.placeholder,
       spouseOfKey: slots.spouseOf.get(node.occurrenceKey) ?? null,
       x: round(
-        (block?.x ?? 0) + shift + slot * (NODE_WIDTH + SPOUSE_GAP),
+        (block?.x ?? 0) +
+          shift +
+          slotOffset(block?.keys ?? [], slot, widthOfKey),
       ),
       y: round(PADDING + (deepest - node.generation) * (NODE_HEIGHT + V_GAP)),
-      width: NODE_WIDTH,
+      width: widthOfKey(node.occurrenceKey),
       height: NODE_HEIGHT,
     };
   });
 
   const right = Math.max(
-    ...nodes.map((node) => node.x + NODE_WIDTH),
+    ...nodes.map((node) => node.x + node.width),
     PADDING,
   );
   const width = round(right + PADDING);
@@ -353,9 +411,9 @@ export function layoutAncestors(
     const parent = positioned.get(edge.parentKey);
     const child = positioned.get(edge.childKey);
     if (!parent || !child) continue;
-    const startX = parent.x + NODE_WIDTH / 2;
-    const startY = parent.y + NODE_HEIGHT;
-    const endX = child.x + NODE_WIDTH / 2;
+    const startX = parent.x + parent.width / 2;
+    const startY = parent.y + parent.height;
+    const endX = child.x + child.width / 2;
     const endY = child.y;
     const middleY = (startY + endY) / 2;
     edges.push({
@@ -413,6 +471,15 @@ export function layoutDescendants(
   const nodesByKey = new Map(
     graph.nodes.map((node) => [node.occurrenceKey, node]),
   );
+  const rootPersonId = options.rootPersonId ?? graph.rootPersonId;
+  const widthByKey = new Map(
+    graph.nodes.map((node) => [
+      node.occurrenceKey,
+      widthOfPerson(node.personId, rootPersonId),
+    ]),
+  );
+  const widthOfKey = (key: string): number =>
+    widthByKey.get(key) ?? NODE_WIDTH;
   const slots = spouseSlots(graph.nodes, options.spouseOf);
 
   // Placement edges define the tree: one band per child. A child listed twice
@@ -433,7 +500,7 @@ export function layoutDescendants(
   const widths = new Map<string, number>();
   const visiting = new Set<string>();
   const blockWidthAt = (key: string): number =>
-    blockWidthOf([key, ...(slots.spousesOf.get(key) ?? [])]);
+    blockWidthOf([key, ...(slots.spousesOf.get(key) ?? [])], widthOfKey);
   const subtreeWidth = (key: string): number => {
     const cached = widths.get(key);
     if (cached !== undefined) return cached;
@@ -512,10 +579,11 @@ export function layoutDescendants(
     if (slots.spouseKeys.has(node.occurrenceKey)) continue;
     const anchorX = (x.get(node.occurrenceKey) ?? 0) + shift;
     positions.set(node.occurrenceKey, anchorX);
-    let spouseCursor = anchorX + NODE_WIDTH + SPOUSE_GAP;
+    let spouseCursor =
+      anchorX + widthOfKey(node.occurrenceKey) + SPOUSE_GAP;
     for (const spouseKey of slots.spousesOf.get(node.occurrenceKey) ?? []) {
       positions.set(spouseKey, spouseCursor);
-      spouseCursor += NODE_WIDTH + SPOUSE_GAP;
+      spouseCursor += widthOfKey(spouseKey) + SPOUSE_GAP;
     }
   }
   for (const spouseKey of slots.spouseKeys) {
@@ -533,12 +601,12 @@ export function layoutDescendants(
     spouseOfKey: slots.spouseOf.get(node.occurrenceKey) ?? null,
     x: round(positions.get(node.occurrenceKey) ?? 0),
     y: round(PADDING + node.generation * (NODE_HEIGHT + V_GAP)),
-    width: NODE_WIDTH,
+    width: widthOfKey(node.occurrenceKey),
     height: NODE_HEIGHT,
   }));
 
   const right = Math.max(
-    ...nodes.map((node) => node.x + NODE_WIDTH),
+    ...nodes.map((node) => node.x + node.width),
     PADDING,
   );
   const width = round(right + PADDING);
@@ -553,9 +621,9 @@ export function layoutDescendants(
     const parent = positioned.get(edge.parentKey);
     const child = positioned.get(edge.childKey);
     if (!parent || !child) return;
-    const startX = parent.x + NODE_WIDTH / 2;
-    const startY = parent.y + NODE_HEIGHT;
-    const endX = child.x + NODE_WIDTH / 2;
+    const startX = parent.x + parent.width / 2;
+    const startY = parent.y + parent.height;
+    const endX = child.x + child.width / 2;
     const endY = child.y;
     const middleY = (startY + endY) / 2;
     edges.push({
