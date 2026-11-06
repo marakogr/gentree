@@ -887,6 +887,7 @@ export default function TimelinePage({
               <LineCanvas
                 markers={markers}
                 window={window}
+                domain={domain}
                 fullWindow={dataWindow}
                 selectedEventId={selectedEventId}
                 rootPersonId={personId}

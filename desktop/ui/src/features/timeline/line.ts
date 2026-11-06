@@ -309,6 +309,20 @@ export const LINE_EDGE_PADDING = 0.1;
  */
 export const LINE_EMPTY_DATA_SPAN = 2 * 366 * 24 * 3600_000;
 
+/**
+ * Longest window a gesture may zoom out to, as a multiple of the marker
+ * domain span. Without it a burst of wheel notches would stop only at the
+ * absolute five-millennium cap and leave the axis on empty centuries around
+ * the events; a data-relative cap keeps a scroll inside the loaded range.
+ */
+export const LINE_MAX_ZOOM_OUT = 6;
+
+/**
+ * Largest single zoom step of a wheel event or a pinch frame. One delta is a
+ * step, never a jump: trackpads send large and often coalesced deltas.
+ */
+export const LINE_MAX_ZOOM_STEP = 2;
+
 const DAY_MS = 24 * 3600_000;
 
 /**
@@ -501,8 +515,10 @@ export function panWindow(
 /**
  * Keep the span between one day and 5000 years and, when a `domain` is given,
  * keep the window overlapping the events: panning and zooming stop as soon as
- * no event would stay in view. A window that already overlaps is returned
- * unchanged, even if most of it lies outside the data. No negative/NaN windows.
+ * no event would stay in view. With a domain the zoom-out span is also capped
+ * relative to the data span, so a gesture cannot drift into empty centuries
+ * around the events. A window that already overlaps is returned unchanged,
+ * even if most of it lies outside the data. No negative/NaN windows.
  */
 export function clampWindow(
   window: TimelineWindow,
@@ -514,7 +530,8 @@ export function clampWindow(
     return window;
   }
   const minSpan = DAY_MS;
-  const maxSpan = 5000 * 366 * DAY_MS;
+  const absoluteMaxSpan = 5000 * 366 * DAY_MS;
+  const maxSpan = Math.min(absoluteMaxSpan, maxZoomOutSpan(domain));
   const span = end - start;
   let next = window;
   if (span < minSpan) {
@@ -531,6 +548,49 @@ export function clampWindow(
     };
   }
   return clampToEventOverlap(next, domain);
+}
+
+/**
+ * Data-relative zoom-out limit: `LINE_MAX_ZOOM_OUT` times the marker domain
+ * span, with the empty-data fallback so a single marker stays navigable.
+ */
+function maxZoomOutSpan(domain: TimelineWindow | null): number {
+  if (domain === null) {
+    return Number.POSITIVE_INFINITY;
+  }
+  const domainSpan = domain.end.getTime() - domain.start.getTime();
+  if (!Number.isFinite(domainSpan) || domainSpan <= 0) {
+    return Number.POSITIVE_INFINITY;
+  }
+  return Math.max(LINE_EMPTY_DATA_SPAN, domainSpan * LINE_MAX_ZOOM_OUT);
+}
+
+/** Bound one gesture factor to a readable step; 1 when it is unusable. */
+export function clampZoomStep(factor: number): number {
+  if (!Number.isFinite(factor) || factor <= 0) {
+    return 1;
+  }
+  return clamp(factor, 1 / LINE_MAX_ZOOM_STEP, LINE_MAX_ZOOM_STEP);
+}
+
+/**
+ * Wheel, trackpad and pinch zoom: one event is one bounded step through the
+ * same clamp as dragging and the zoom buttons, so a large or coalesced delta
+ * cannot throw the axis to extreme years.
+ */
+export function wheelZoomWindow(
+  window: TimelineWindow,
+  deltaY: number,
+  anchorFraction = 0.5,
+  domain: TimelineWindow | null = null,
+): TimelineWindow {
+  if (!Number.isFinite(deltaY)) {
+    return window;
+  }
+  const raw = Math.exp(deltaY * 0.0015);
+  // A very large negative delta underflows to 0; that is still one full step.
+  const factor = raw > 0 ? clampZoomStep(raw) : 1 / LINE_MAX_ZOOM_STEP;
+  return zoomWindow(window, factor, anchorFraction, domain);
 }
 
 /** Zoom by `factor` around a fraction along the window (0 = left, 1 = right). */
