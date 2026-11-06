@@ -10,6 +10,7 @@ import {
   emptyEventDraft,
   eventDateLabel,
   eventMatchesFilters,
+  eventOwnerId,
   eventPersonIds,
   eventYear,
   eventYearBounds,
@@ -1152,6 +1153,23 @@ describe("eventPersonIds", () => {
       participantIds: ["", "b", ""],
     });
     expect(eventPersonIds(blankParticipants)).toEqual(["a", "b"]);
+  });
+});
+
+describe("eventOwnerId", () => {
+  it("returns only the owner for a birth with both parents", () => {
+    const birth = event("b1", "child", 1990, {
+      type: "BIRTH",
+      participantIds: ["mother", "father"],
+    });
+    expect(eventOwnerId(birth)).toBe("child");
+  });
+
+  it("returns null for an event without an owner", () => {
+    const orphan = event("1", "", 1950, {
+      participantIds: ["mother"],
+    });
+    expect(eventOwnerId(orphan)).toBeNull();
   });
 });
 
