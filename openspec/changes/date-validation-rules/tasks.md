@@ -17,7 +17,7 @@
 - [x] 3.1 Change `ensure_event_within_lifespan` and `lifespan_issues` to the start-unit rule: reject only when `S_end <= birth anchor`, and skip events with no start; verify tests for same-year, same-month, exact day, earlier year, open-ended start before birth (rejected), open-ended start unit containing birth (accepted), ranged start before birth (rejected), and unknown date.
 - [x] 3.2 Keep `ensure_life_events_compatible` on the whole-interval comparison and reuse the interval helper for the birth/death order; verify same-year birth and death are accepted and a birth wholly after the death interval is rejected.
 - [x] 3.3 Add residence overlap detection per person using the interval helper, allowing adjacency and skipping unknown dates; verify tests cover overlap, adjacency, open end, open start, and unknown date.
-- [x] 3.4 Add the `PARENT_CHILD` nine-year check as a pure function over two birth values, excluding `ADOPTIVE_PARENT_CHILD`, clamping 29 February, with the canonical code `PARENT_CHILD_AGE_GAP`; verify tests cover 8 years, exactly 9 years, older parent, unknown birth, range birth, and an adoptive edge.
+- [x] 3.4 Add the `PARENT_CHILD` eleven-year check as a pure function over two birth values, excluding `ADOPTIVE_PARENT_CHILD`, clamping 29 February, with the canonical code `PARENT_CHILD_AGE_GAP`; verify tests cover 10 years 364 days, exactly 11 years, older parent, unknown birth, range birth, and an adoptive edge.
 - [x] 3.5 Add the stable constants `RESIDENCE_RANGE_OVERLAP` and `PARENT_CHILD_AGE_GAP`, wire them into `validate_project` with the approved warning severity for legacy overlaps, and keep id-only parameters; verify a report test asserts the codes, severity and parameter keys.
 - [x] 3.6 Add a contract test file `desktop/crates/core/tests/date_validation_contract.rs` with synthetic fixtures for every scenario in `specs/data-validation/spec.md`; verify `cargo test -p gentree-core` passes.
 - [x] 3.7 Confirm the merge contract still passes, including a merge whose output contains a legacy overlap; verify `cargo test -p gentree-core --test merge_contract` passes and no existing fixture expects an error for these codes.
@@ -25,7 +25,7 @@
 ## 4. Command layer
 
 - [x] 4.1 Call the residence overlap check in `event_create` and `event_update` after the date is validated and before saving; verify a core-level test proves the same guard rejects the second overlapping row.
-- [x] 4.2 Call the parent age check in `relationship_create` using the stored persons, after `ensure_persons` and before saving; verify a test proves a too-young parent is rejected and exactly nine years is accepted.
+- [x] 4.2 Call the parent age check in `relationship_create` using the stored persons, after `ensure_persons` and before saving; verify a test proves a too-young parent is rejected and exactly eleven years is accepted.
 - [x] 4.3 Verify the import and merge paths do not call the new checks, so re-import stays idempotent and legacy data is untouched; verify by code inspection plus the existing import and merge tests.
 
 ## 5. UI

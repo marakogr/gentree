@@ -142,21 +142,26 @@ date is unknown.
 - **WHEN** a parent or child has an unknown birth date
 - **THEN** the parent/child age check is skipped
 
-### Requirement: Parent must be at least nine years older than the child
+### Requirement: Parent must be at least eleven years older than the child
 
-A `PARENT_CHILD` relation SHALL be rejected when the parent's birth anchor plus nine calendar years
-is later than the child's birth anchor. Exactly nine years SHALL be accepted. The check SHALL apply
+A `PARENT_CHILD` relation SHALL be rejected when the parent's birth anchor plus eleven calendar years
+is later than the child's birth anchor. Exactly eleven years SHALL be accepted. The check SHALL apply
 to `PARENT_CHILD` only, not to `ADOPTIVE_PARENT_CHILD`. A manual create SHALL be rejected with the
 stable code `PARENT_CHILD_AGE_GAP`.
 
-#### Scenario: Parent younger by less than nine years is rejected
+#### Scenario: Parent younger by less than eleven years is rejected
 
-- **WHEN** the parent is born in 1900 and the child in 1908
+- **WHEN** the parent is born in 1900 and the child in 1910
 - **THEN** the relation is rejected with `PARENT_CHILD_AGE_GAP`
 
-#### Scenario: Exactly nine years is accepted
+#### Scenario: Parent younger by ten years and 364 days is rejected
 
-- **WHEN** the parent is born on 1 January 1900 and the child on 1 January 1909
+- **WHEN** the parent is born on 1 January 1900 and the child on 31 December 1910
+- **THEN** the relation is rejected with `PARENT_CHILD_AGE_GAP`
+
+#### Scenario: Exactly eleven years is accepted
+
+- **WHEN** the parent is born on 1 January 1900 and the child on 1 January 1911
 - **THEN** the relation is accepted
 
 #### Scenario: Older parent is accepted
@@ -166,7 +171,7 @@ stable code `PARENT_CHILD_AGE_GAP`.
 
 #### Scenario: Adoptive parent is not subject to the age gap
 
-- **WHEN** an `ADOPTIVE_PARENT_CHILD` relation is created with less than nine years between the
+- **WHEN** an `ADOPTIVE_PARENT_CHILD` relation is created with less than eleven years between the
   births
 - **THEN** the relation is accepted
 
