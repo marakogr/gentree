@@ -47,3 +47,37 @@ describe("person captions", () => {
     },
   );
 });
+
+// Issue #115: the sidebar gutter, the gaps between page blocks and the
+// page-internal rows must share one shell step (SH-1). The pages read the
+// token instead of repeating a pixel value, so they stay aligned.
+describe("shell rhythm", () => {
+  const css = readFileSync(
+    new URL("../styles.css", import.meta.url),
+    "utf8",
+  );
+
+  it("declares one shell spacing step and derives the page height from it", () => {
+    const root = ruleBody(css, ":root");
+    expect(root).toMatch(/--shell-space:\s*16px/);
+    expect(root).toMatch(/--shell-page-height:\s*calc\(/);
+    expect(root).toContain("var(--shell-space) * 2");
+  });
+
+  it("derives the content gutter and gap from the shell step", () => {
+    const content = ruleBody(css, ".content");
+    expect(content).toMatch(/gap:\s*var\(--shell-space\)/);
+    expect(content).toMatch(/padding:\s*var\(--shell-space\)/);
+  });
+
+  it.each([
+    ["../features/persons/persons.css", ".persons-page"],
+    ["../features/events/events.css", ".events-page"],
+  ])("%s uses the shell step for its page frame", (file, selector) => {
+    const pageCss = readFileSync(new URL(file, import.meta.url), "utf8");
+    const page = ruleBody(pageCss, selector);
+    expect(page).toMatch(/gap:\s*var\(--shell-space\)/);
+    expect(page).toMatch(/height:\s*var\(--shell-page-height\)/);
+    expect(page).not.toMatch(/calc\(100vh/);
+  });
+});

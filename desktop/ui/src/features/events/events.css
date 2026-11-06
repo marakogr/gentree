@@ -7,11 +7,11 @@
 .events-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--shell-space);
   min-width: 0;
   /* Match the people screen: the panels use the window height, so the table
      scrolls inside its own panel. */
-  height: calc(100vh - 48px);
+  height: var(--shell-page-height);
 }
 
 /* Toolbar row: search and filters on the left, table actions on the right. */

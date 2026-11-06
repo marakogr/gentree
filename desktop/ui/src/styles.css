@@ -36,6 +36,12 @@ h6 {
   font-family: var(--font-medeo-sans);
   background: var(--legacy-bg);
   color: var(--legacy-fg);
+  /* One shell rhythm step: the gutter around the page frame, the gap between
+     page blocks and the page-internal rows all use it (SH-1). Full-height
+     screens derive their height from the same step instead of a hand-tuned
+     value, so changing the rhythm cannot desync them. */
+  --shell-space: 16px;
+  --shell-page-height: calc(100vh - (var(--shell-space) * 2));
 }
 
 * {
@@ -58,9 +64,9 @@ body {
 .content {
   display: grid;
   align-content: start;
-  gap: 16px;
+  gap: var(--shell-space);
   min-width: 0;
-  padding: 24px;
+  padding: var(--shell-space);
   overflow-x: auto;
 }
 
@@ -247,10 +253,6 @@ body {
   .sidebar-project-name {
     justify-content: center;
     padding: 6px 0;
-  }
-
-  .content {
-    padding: 16px;
   }
 }
 

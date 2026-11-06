@@ -14,17 +14,17 @@
 .persons-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--shell-space);
   min-width: 0;
   /* Leave only the shell padding around the page so the table can use the
      whole window height instead of stopping at a fixed max-height. The panel
      padding and border are part of that height (border-box). */
-  height: calc(100vh - 48px);
+  height: var(--shell-page-height);
 }
 
 /* The optional back breadcrumb is one more row above the page. */
 .content:has(> .app-breadcrumb) .persons-page {
-  height: calc(100vh - 48px - 48px);
+  height: calc(var(--shell-page-height) - 48px);
 }
 
 /* `.card-head` already spaces the title and the actions; here the row is allowed

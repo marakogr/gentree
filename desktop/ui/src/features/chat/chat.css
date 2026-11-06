@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height: calc(100vh - 48px);
+  height: var(--shell-page-height);
   min-height: 20rem;
   padding: 16px 18px;
   overflow: hidden;
@@ -22,7 +22,6 @@
 
 @media (max-width: 899px) {
   .chat.chat-screen {
-    height: calc(100vh - 32px);
     padding: 12px;
   }
 }
