@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { AncestorGraph, DescendantGraph } from "../../api/types";
 import { combineLayouts } from "./combined";
-import { layoutAncestors, layoutDescendants } from "./layout";
+import {
+  NODE_WIDTH,
+  ROOT_NODE_WIDTH,
+  layoutAncestors,
+  layoutDescendants,
+} from "./layout";
 
 const ANCESTORS: AncestorGraph = {
   rootPersonId: "root",
@@ -103,6 +108,22 @@ describe("combineLayouts", () => {
         (edge) => edge.fromKey === "0.f" && edge.toKey === "0",
       ),
     ).toBe(true);
+  });
+
+  it("keeps one wider root card with a full-width caption box", () => {
+    const layout = combined();
+    const root = layout.nodes.find((node) => node.occurrenceKey === "0");
+    expect(root?.width).toBe(ROOT_NODE_WIDTH);
+    for (const node of layout.nodes) {
+      if (node.occurrenceKey === "0") continue;
+      expect(node.width).toBe(NODE_WIDTH);
+    }
+    // Both halves still attach at the centre of the wider card.
+    const centre = (root?.x ?? 0) + (root?.width ?? 0) / 2;
+    const parentEdge = layout.edges.find((edge) => edge.toKey === "0");
+    const childEdge = layout.edges.find((edge) => edge.fromKey === "0");
+    expect(parentEdge?.path).toContain(`H ${centre}`);
+    expect(childEdge?.path.startsWith(`M ${centre} `)).toBe(true);
   });
 
   it("normalizes the merged bounds to the usual padding", () => {
