@@ -36,10 +36,12 @@ import {
   brushWindow,
   buildAxisTicks,
   buildDensityBins,
+  clampZoomStep,
   clusterLineMarkers,
   layoutLineLabels,
   panWindow,
   positionOnLine,
+  wheelZoomWindow,
   zoomWindow,
   type LineCluster,
   type LineIconKind,
@@ -396,6 +398,8 @@ interface PinchState {
 export interface LineCanvasProps {
   markers: LineMarker[];
   window: TimelineWindow;
+  /** Tight marker-start domain; every gesture clamp keeps a marker in it. */
+  domain: TimelineWindow | null;
   /** Tight data window; the minimap always shows this range. */
   fullWindow: TimelineWindow | null;
   selectedEventId: string | null;
@@ -417,6 +421,7 @@ export interface LineCanvasProps {
 export function LineCanvas({
   markers,
   window,
+  domain,
   fullWindow,
   selectedEventId,
   rootPersonId,
@@ -571,13 +576,14 @@ export function LineCanvas({
       const rect = element.getBoundingClientRect();
       const width = rect.width > 0 ? rect.width : 1;
       const fraction = clamp((event.clientX - rect.left) / width, 0, 1);
-      const factor = Math.exp(event.deltaY * 0.0015);
-      onWindowChange(zoomWindow(windowRef.current, factor, fraction));
+      onWindowChange(
+        wheelZoomWindow(windowRef.current, event.deltaY, fraction, domain),
+      );
       rememberHint();
     };
     element.addEventListener("wheel", listener, { passive: false });
     return () => element.removeEventListener("wheel", listener);
-  }, [onWindowChange, rememberHint]);
+  }, [domain, onWindowChange, rememberHint]);
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -632,8 +638,10 @@ export function LineCanvas({
         const [a, b] = Array.from(pointersRef.current.values());
         if (a !== undefined && b !== undefined) {
           const distance = Math.max(1, Math.abs(a.x - b.x));
-          const factor = pinch.startDistance / distance;
-          onWindowChange(zoomWindow(pinch.startWindow, factor, pinch.anchor));
+          const factor = clampZoomStep(pinch.startDistance / distance);
+          onWindowChange(
+            zoomWindow(pinch.startWindow, factor, pinch.anchor, domain),
+          );
           rememberHint();
         }
         return;
@@ -647,10 +655,10 @@ export function LineCanvas({
         drag.moved = true;
       }
       const width = Math.max(1, size.width);
-      onWindowChange(panWindow(drag.startWindow, -dx / width));
+      onWindowChange(panWindow(drag.startWindow, -dx / width, domain));
       rememberHint();
     },
-    [onWindowChange, rememberHint, size.width],
+    [domain, onWindowChange, rememberHint, size.width],
   );
 
   const endPointer = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
@@ -678,10 +686,10 @@ export function LineCanvas({
         0,
         1,
       );
-      onWindowChange(zoomWindow(windowRef.current, 0.45, fraction));
+      onWindowChange(zoomWindow(windowRef.current, 0.45, fraction, domain));
       rememberHint();
     },
-    [onWindowChange, rememberHint],
+    [domain, onWindowChange, rememberHint],
   );
 
   const handleMinimapPointerDown = useCallback(
@@ -1325,7 +1333,9 @@ export function LineCanvas({
             <button
               type="button"
               data-testid="line-zoom-out"
-              onClick={() => onWindowChange(zoomWindow(window, 1.6, 0.5))}
+              onClick={() =>
+                onWindowChange(zoomWindow(window, 1.6, 0.5, domain))
+              }
               aria-label={t("zoomOut")}
               title={t("zoomOut")}
               className={cn(
@@ -1338,7 +1348,9 @@ export function LineCanvas({
             <button
               type="button"
               data-testid="line-zoom-in"
-              onClick={() => onWindowChange(zoomWindow(window, 0.6, 0.5))}
+              onClick={() =>
+                onWindowChange(zoomWindow(window, 0.6, 0.5, domain))
+              }
               aria-label={t("zoomIn")}
               title={t("zoomIn")}
               className={cn(

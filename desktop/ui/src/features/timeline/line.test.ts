@@ -9,6 +9,7 @@ import {
   buildDensityBins,
   buildLineMarkers,
   clampWindow,
+  clampZoomStep,
   clusterLineMarkers,
   computeLineWindow,
   computeMarkerWindow,
@@ -19,6 +20,8 @@ import {
   lineDateKind,
   LINE_EDGE_PADDING,
   LINE_EMPTY_DATA_SPAN,
+  LINE_MAX_ZOOM_OUT,
+  LINE_MAX_ZOOM_STEP,
   lineIconKind,
   lineIntervalEnd,
   markerDomain,
@@ -27,6 +30,7 @@ import {
   personEventIds,
   positionOnLine,
   relatedEventIds,
+  wheelZoomWindow,
   zoomWindow,
 } from "./line";
 import type { ApiDate, TimelineEvent } from "./types";
@@ -500,6 +504,57 @@ describe("navigation bounds", () => {
   it("keeps a window wider than the data while it still overlaps", () => {
     const wide = { start: new Date(1800, 0, 1), end: new Date(2100, 0, 1) };
     expect(clampWindow(wide, domain)).toEqual(wide);
+  });
+
+  it("caps an over-wide window at a data-relative zoom-out", () => {
+    // A single huge step used to stop only at the five-millennium cap.
+    const extreme = { start: new Date(-3000, 0, 1), end: new Date(7000, 0, 1) };
+    const clamped = clampWindow(extreme, domain);
+    const domainSpan = domain.end.getTime() - domain.start.getTime();
+    expect(clamped.end.getTime() - clamped.start.getTime()).toBeLessThanOrEqual(
+      Math.max(LINE_EMPTY_DATA_SPAN, domainSpan * LINE_MAX_ZOOM_OUT),
+    );
+    expect(clamped.start.getUTCFullYear()).toBeGreaterThan(1600);
+    expect(clamped.end.getUTCFullYear()).toBeLessThan(2300);
+  });
+
+  it("keeps a whole wheel burst next to the loaded markers", () => {
+    const initial = computeMarkerWindow(markers);
+    if (initial === null) throw new Error("expected an initial window");
+    let next = initial;
+    for (let step = 0; step < 500; step += 1) {
+      next = wheelZoomWindow(next, 400, 0.5, domain);
+    }
+    expect(overlaps(next)).toBe(true);
+    // Far from the -3000/+7000 extremes the wheel used to reach.
+    expect(next.start.getUTCFullYear()).toBeGreaterThan(1600);
+    expect(next.end.getUTCFullYear()).toBeLessThan(2300);
+    const domainSpan = domain.end.getTime() - domain.start.getTime();
+    expect(next.end.getTime() - next.start.getTime()).toBeLessThanOrEqual(
+      domainSpan * LINE_MAX_ZOOM_OUT + DAY,
+    );
+  });
+
+  it("turns one large wheel delta into one bounded step", () => {
+    const window = { start: new Date(1950, 0, 1), end: new Date(1970, 0, 1) };
+    expect(wheelZoomWindow(window, 10_000, 0.5, domain)).toEqual(
+      zoomWindow(window, LINE_MAX_ZOOM_STEP, 0.5, domain),
+    );
+    expect(wheelZoomWindow(window, -10_000, 0.5, domain)).toEqual(
+      zoomWindow(window, 1 / LINE_MAX_ZOOM_STEP, 0.5, domain),
+    );
+    expect(wheelZoomWindow(window, -1e9, 0.5, domain)).toEqual(
+      zoomWindow(window, 1 / LINE_MAX_ZOOM_STEP, 0.5, domain),
+    );
+    expect(wheelZoomWindow(window, Number.NaN, 0.5, domain)).toEqual(window);
+  });
+
+  it("ignores unusable gesture factors", () => {
+    expect(clampZoomStep(0)).toBe(1);
+    expect(clampZoomStep(-2)).toBe(1);
+    expect(clampZoomStep(Number.NaN)).toBe(1);
+    expect(clampZoomStep(100)).toBe(LINE_MAX_ZOOM_STEP);
+    expect(clampZoomStep(0.001)).toBe(1 / LINE_MAX_ZOOM_STEP);
   });
 
   it("does not invent a range without events", () => {
