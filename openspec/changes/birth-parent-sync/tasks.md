@@ -29,3 +29,11 @@
 - [x] 5.1 Run the targeted core and desktop command tests.
 - [x] 5.2 Run `make check` (or report the exact unavailable target) and `git diff --check`.
 - [x] 5.3 Re-read the diff for privacy and scope: synthetic fixtures only, no real personal data, no absolute paths, no format or IPC change.
+
+## 6. On-open backfill for existing projects (#106)
+
+- [x] 6.1 Add `create_missing_life_events` as the linear batch form of `sync_life_events(..., None)`; create only when the date is known and no owned event of that type exists.
+- [x] 6.2 Add `commands/backfill.rs::backfill_on_open` running life events, the existing relation backfill, then `add_parent_to_birth_events` for every biological `PARENT_CHILD` relation; keep read-only stores untouched and extend the report with `lifeEventsCreated` and `parentsAdded`.
+- [x] 6.3 Route `project_open` and `project_restore_backup` through the new pass.
+- [x] 6.4 Cover a missing life event, an existing event with another date, an existing parent relation filling a birth, full slots, a second open, a read-only project and a counts-only report with synthetic fixtures.
+- [x] 6.5 Update the `relationships` delta, design, tasks and `desktop/docs/relations-from-events.md`.

@@ -209,6 +209,10 @@ export type RelationBackfillReport = {
   spouseCreated: number;
   parentCreated: number;
   ambiguousSkipped: number;
+  /** Missing BIRTH/DEATH events created from person dates. */
+  lifeEventsCreated: number;
+  /** Biological parents added to an existing child birth event. */
+  parentsAdded: number;
   readOnly: boolean;
 };
 
