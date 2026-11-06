@@ -108,14 +108,17 @@ both use the same six UI locales (en, ru, uk, be, de, es).
 1. **Packages**: upload the `.msix` file. It must stay unsigned — the Store
    signs it after certification. A self-signed package (`make store-test`) is
    only for a local install and is rejected on upload.
-2. **Properties**: category *Productivity*, the three UI languages (en, ru, uk),
-   Windows 10 1809+ x64.
-3. **Age rating**: the IARC questionnaire.
-4. **Privacy policy URL**: required, and honest here — projects stay on disk,
+2. **Properties**: category *Productivity*, the six UI languages (en, ru, uk,
+   be, de, es — the same list the package declares), Windows 10 1809+ x64.
+3. **Store listing**: the description, short description, features and keywords
+   in English and Russian live in `docs/store-listing.md`, sized to the Store's
+   character limits.
+4. **Age rating**: the IARC questionnaire.
+5. **Privacy policy URL**: required, and honest here — projects stay on disk,
    the only network egress is the chat provider the user configures.
-5. **Notes for certification**: explain `runFullTrust` (a desktop app that opens
+6. **Notes for certification**: explain `runFullTrust` (a desktop app that opens
    the user's own project folders) and `internetClient` (the optional chat).
-6. **Pricing and availability**: free, the markets you want.
+7. **Pricing and availability**: free, the markets you want.
 
 The first certification takes longer than later ones; a new package for an
 existing app usually clears within a day.
