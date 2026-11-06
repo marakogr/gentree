@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { DateValue, EventEntity, EventType, PlaceGeo, Versioned } from "../../api/types";
+import { mergeViewState } from "../../lib/viewState";
 import {
   buildEventInput,
   clearEventFilterValues,
+  clearEventPersonFilter,
+  countActiveEventFilters,
   dateOverlaps,
   draftFromEvent,
   emptyEventDraft,
@@ -14,11 +17,13 @@ import {
   eventYearOverlaps,
   filterEventRows,
   isEventDraftDirty,
+  isEventPersonFilterStale,
   isYearRangeInvalid,
   matchesEventQuery,
   normalizeEventText,
   paginateEventRows,
   readEventFilters,
+  resetEventFilterSection,
   resolveEventColumns,
   sanitizeEventDetails,
   shouldShowPlaceColumn,
@@ -1201,5 +1206,112 @@ describe("view-state helpers", () => {
         columns: ["date", "person"],
       }),
     ).toEqual({ columns: ["date", "person"] });
+  });
+});
+
+describe("shared event filter state (issue #107)", () => {
+  // A complete BIRTH event whose participant list is empty: the owner stored in
+  // `person_id` is the only person of the event.
+  const owner = "a";
+  const birth = event("birth-1", owner, 1950, { participantIds: [] });
+
+  it("shows an event with no participants to its owner under default filters", () => {
+    const rows = [versioned(birth)];
+    expect(filterEventRows(rows, "", noFilters, contextOf)).toEqual(rows);
+    // The events screen narrows through the resolved person set as well, so an
+    // empty participant list must not fall out of the owner's list.
+    expect(
+      filterEventRows(
+        rows,
+        "",
+        { ...noFilters, personId: owner },
+        contextOf,
+        new Set([owner]),
+      ),
+    ).toEqual(rows);
+  });
+
+  it("hides the same event behind a stored year range and shows it after a reset", () => {
+    const rows = [versioned(birth)];
+    const stored = { fromYear: "1990", toYear: "2000" };
+    const stale = readEventFilters(stored);
+    expect(countActiveEventFilters(stale)).toBe(1);
+    expect(filterEventRows(rows, "", stale, contextOf)).toHaveLength(0);
+
+    const cleared = readEventFilters(clearEventFilterValues(stored));
+    expect(countActiveEventFilters(cleared)).toBe(0);
+    expect(filterEventRows(rows, "", cleared, contextOf)).toEqual(rows);
+  });
+
+  it("resets every filter of the section but keeps the layout keys", () => {
+    const stored = mergeViewState({
+      query: "ivan",
+      filters: {
+        personId: "p2",
+        personScope: "ancestors",
+        types: ["BIRTH"],
+        fromYear: "1900",
+        toYear: "1950",
+        columns: ["date"],
+        listWidth: "55",
+      },
+      page: 2,
+      scrollTop: 120,
+      selectedId: "e1",
+    });
+
+    const next = resetEventFilterSection(stored);
+    expect(next.query).toBe("");
+    expect(next.filters).toEqual({ columns: ["date"], listWidth: "55" });
+    // Paging, scroll and selection belong to the screen, not to the filter.
+    expect(next.page).toBe(2);
+    expect(next.scrollTop).toBe(120);
+    expect(next.selectedId).toBe("e1");
+  });
+
+  it("treats a person filter as stale only when the person list is known", () => {
+    const gone = readEventFilters({ personId: "gone" });
+    expect(isEventPersonFilterStale(gone, null)).toBe(false);
+    expect(isEventPersonFilterStale(gone, new Set())).toBe(false);
+    expect(isEventPersonFilterStale(gone, new Set(["kept"]))).toBe(true);
+    expect(isEventPersonFilterStale(gone, new Set(["kept", "gone"]))).toBe(
+      false,
+    );
+    expect(isEventPersonFilterStale(readEventFilters({}), new Set(["kept"]))).toBe(
+      false,
+    );
+  });
+
+  it("drops the person and its scope, keeping types, years and columns", () => {
+    expect(
+      clearEventPersonFilter({
+        personId: "p1",
+        personScope: "descendants",
+        types: ["BIRTH"],
+        fromYear: "1900",
+        columns: ["date"],
+      }),
+    ).toEqual({ types: ["BIRTH"], fromYear: "1900", columns: ["date"] });
+  });
+
+  it("counts the person, every type and the year range once", () => {
+    expect(countActiveEventFilters(readEventFilters({}))).toBe(0);
+    expect(countActiveEventFilters(readEventFilters({ personId: "p1" }))).toBe(1);
+    expect(
+      countActiveEventFilters(readEventFilters({ types: ["BIRTH", "DEATH"] })),
+    ).toBe(2);
+    expect(
+      countActiveEventFilters(readEventFilters({ fromYear: "1900" })),
+    ).toBe(1);
+    expect(
+      countActiveEventFilters(
+        readEventFilters({
+          personId: "p1",
+          types: ["BIRTH"],
+          fromYear: "1900",
+          toYear: "1950",
+        }),
+      ),
+    ).toBe(3);
   });
 });

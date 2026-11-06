@@ -22,7 +22,11 @@ import {
   type ParsedDateInput,
 } from "../../lib/dates";
 import { EMPTY_VALUE } from "../../lib/formatValue";
-import type { SortDirection, ViewFilters } from "../../lib/viewState";
+import type {
+  SectionViewState,
+  SortDirection,
+  ViewFilters,
+} from "../../lib/viewState";
 import { parsePeriodInput, periodFromDate, supportsDateRange } from "./datePeriod";
 import { isPairedEventType } from "./eventRoles";
 
@@ -823,6 +827,60 @@ export function readEventFilters(filters: ViewFilters): EventListFilters {
     types,
     fromYear: typeof filters.fromYear === "string" ? filters.fromYear : "",
     toYear: typeof filters.toYear === "string" ? filters.toYear : "",
+  };
+}
+
+/**
+ * How many filters narrow the list: the person (with its scope), every chosen
+ * type and the year range as one. The search text is counted separately by the
+ * screens, so it never shows up here twice.
+ */
+export function countActiveEventFilters(filters: EventListFilters): number {
+  return (
+    (filters.personId === "" ? 0 : 1) +
+    filters.types.length +
+    (filters.fromYear === "" && filters.toYear === "" ? 0 : 1)
+  );
+}
+
+/**
+ * True when the stored person filter points at nobody in the open project: a
+ * deleted person, an id copied from another project or a restored backup. Such
+ * a filter hides every event while looking like an ordinary selection, so the
+ * screens drop it. An unknown person list (still loading, or a project without
+ * people) never counts as stale.
+ */
+export function isEventPersonFilterStale(
+  filters: EventListFilters,
+  knownPersonIds: ReadonlySet<string> | null | undefined,
+): boolean {
+  if (filters.personId === "") return false;
+  if (!knownPersonIds || knownPersonIds.size === 0) return false;
+  return !knownPersonIds.has(filters.personId);
+}
+
+/** Drops the person filter and its relation scope, keeping every other key. */
+export function clearEventPersonFilter(filters: ViewFilters): ViewFilters {
+  return withFilterValue(
+    withFilterValue(filters, "personId", ""),
+    "personScope",
+    "",
+  );
+}
+
+/**
+ * Filter section of a project that was just opened: no search text and no
+ * person/type/year filter, because a filter describes the events of one
+ * project. Layout keys such as the column choice and the list width stay: they
+ * describe the screen, not the data it shows.
+ */
+export function resetEventFilterSection(
+  state: SectionViewState,
+): SectionViewState {
+  return {
+    ...state,
+    query: "",
+    filters: clearEventFilterValues(state.filters),
   };
 }
 

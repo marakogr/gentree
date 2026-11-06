@@ -315,4 +315,20 @@
     margin-top: 4px;
     margin-inline-start: auto;
   }
+
+  /* The shared filter is active somewhere: never hide the count or the reset
+     action, even when the controls themselves wrap out of view. */
+  .event-filter-active {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    min-width: 0;
+  }
+
+  .event-filter-active-years {
+    color: var(--muted-foreground);
+    font-size: 12px;
+    white-space: nowrap;
+  }
 }
