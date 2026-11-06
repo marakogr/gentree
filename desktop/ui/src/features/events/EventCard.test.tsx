@@ -74,4 +74,20 @@ describe("EventCard", () => {
     expect(html).not.toContain("Характер даты");
     expect(html).not.toContain("Интервал");
   });
+
+  it("renders a labelled pencil instead of the text edit button (#131)", () => {
+    const html = renderToStaticMarkup(
+      <EventCard
+        event={{ entity: birthEvent, version: "v1" }}
+        persons={[]}
+        onEdit={noop}
+        onClose={noop}
+      />,
+    );
+    const edit = html.indexOf('aria-label="Изменить"');
+    const close = html.indexOf('aria-label="Закрыть"');
+    expect(edit).toBeGreaterThanOrEqual(0);
+    expect(html).not.toContain(">Изменить<");
+    expect(close).toBeGreaterThan(edit);
+  });
 });

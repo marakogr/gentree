@@ -20,8 +20,6 @@ import {
   TableBody,
   TableCell,
   TableCellLayout,
-  TableHeader,
-  TableHeaderCell,
   TableRow,
   Text,
   Title3,
@@ -31,6 +29,7 @@ import {
 } from "@fluentui/react-components";
 import type { AccordionToggleEventHandler } from "@fluentui/react-components";
 import {
+  AddRegular,
   ArrowDownloadRegular,
   ArrowMaximizeRegular,
   AttachRegular,
@@ -38,6 +37,7 @@ import {
   DeleteRegular,
   DismissRegular,
   DocumentRegular,
+  EditRegular,
   HistoryRegular,
   OpenRegular,
   OrganizationRegular,
@@ -790,20 +790,28 @@ export default function PersonCard({
               <ArrowMaximizeRegular aria-hidden="true" />
             </IconButton>
           ) : null}
-          {onBack ? (
-            <IconButton label={t("person:closeCard")} onClick={onBack}>
-              <DismissRegular aria-hidden="true" />
-            </IconButton>
-          ) : null}
-          <Button variant="secondary" size="sm" onClick={onEdit} disabled={busy}>
-            {t("common:actions.edit")}
-          </Button>
+          <IconButton
+            label={t("common:actions.edit")}
+            onClick={onEdit}
+            disabled={busy}
+          >
+            <EditRegular aria-hidden="true" />
+          </IconButton>
           <MenuButton
             label={t("person:moreActions")}
             items={menuItems}
             iconOnly
             align="end"
           />
+          {onBack ? (
+            <IconButton
+              className="person-card-close"
+              label={t("person:closeCard")}
+              onClick={onBack}
+            >
+              <DismissRegular aria-hidden="true" />
+            </IconButton>
+          ) : null}
         </div>
       </header>
 
@@ -925,7 +933,8 @@ export default function PersonCard({
               disabled={saving}
               onClick={openNewEvent}
             >
-              + {t("event:new")}
+              <AddRegular fontSize={16} aria-hidden="true" />
+              {t("event:new")}
             </Button>
           }
         >
@@ -1066,23 +1075,17 @@ export default function PersonCard({
               disabled={saving}
               onClick={openRelationshipForm}
             >
-              + {t("relationship:add")}
+              <AddRegular fontSize={16} aria-hidden="true" />
+              {t("relationship:add")}
             </Button>
           }
         >
           {hasRelationships ? (
-            <Table size="small" className={styles.table}>
-              <TableHeader>
-                <TableRow>
-                  <TableHeaderCell>{t("relationship:type")}</TableHeaderCell>
-                  <TableHeaderCell>
-                    {t("relationship:relatedPerson")}
-                  </TableHeaderCell>
-                  <TableHeaderCell className={styles.actionsCell}>
-                    {t("common:fields.actions")}
-                  </TableHeaderCell>
-                </TableRow>
-              </TableHeader>
+            <Table
+              size="small"
+              className={styles.table}
+              aria-label={t("person:sections.family")}
+            >
               <TableBody>
                 {detail.relationships.map((row) => {
                   const otherId = relatedPersonId(row.entity);
@@ -1240,14 +1243,6 @@ export default function PersonCard({
           ) : media.length === 0 ? (
             <div className="person-media-empty">
               <EmptyState compact text={t("person:noMedia")} />
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={attaching}
-                onClick={attachMedia}
-              >
-                <AttachRegular aria-hidden="true" /> {t("person:attachMedia")}
-              </Button>
             </div>
           ) : (
             <div className="person-media">

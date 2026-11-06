@@ -14,7 +14,13 @@ import EventForm from "./EventForm";
 // server. The test only inspects the form body, so a plain container stands in
 // for the portal.
 vi.mock("../../components/ui/dialog", () => ({
-  Dialog: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  Dialog: ({
+    children,
+    closeLabel,
+  }: {
+    children?: ReactNode;
+    closeLabel?: string;
+  }) => <div data-close-label={closeLabel}>{children}</div>,
 }));
 
 beforeAll(async () => {
@@ -119,6 +125,10 @@ describe("EventForm layout", () => {
     const html = renderForm();
     expect(html).not.toContain("При сохранении создаётся связь");
     expect(html).not.toContain("родитель — ребёнок");
+  });
+
+  it("asks the dialog for a header close control", () => {
+    expect(renderForm()).toContain('data-close-label="Закрыть"');
   });
 });
 

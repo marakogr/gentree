@@ -252,6 +252,7 @@ export default function PersonForm({
       onClose={onCancel}
       busy={busy}
       size="lg"
+      closeLabel={t("common:actions.close")}
       initialFocusRef={firstFieldRef}
       footer={
         <>

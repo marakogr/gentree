@@ -102,7 +102,7 @@ function rowWith(rows, ...parts) {
 
 /** Fill the relationship form on the open card with a parent. */
 async function addParentFromCard(parentName) {
-  await $('//button[normalize-space(.)="+ Добавить связь"]').click();
+  await $('//button[normalize-space(.)="Добавить связь"]').click();
   const form = await $("form.person-relationship-form");
   await form.waitForDisplayed({ timeout: 5000 });
 
@@ -583,7 +583,7 @@ describe("0.6.0 feedback rules", () => {
     await row.click();
     const card = await $(".events-card");
     await card.waitForDisplayed({ timeout: 10000 });
-    await $('//button[normalize-space(.)="Изменить"]').click();
+    await $('//button[@aria-label="Изменить"]').click();
     const end = await $("#event-date-end");
     await end.waitForDisplayed({ timeout: 10000 });
     expect(await end.getValue()).toBe("");
