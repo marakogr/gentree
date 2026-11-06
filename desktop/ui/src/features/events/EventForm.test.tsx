@@ -7,7 +7,7 @@ import ruCommon from "../../i18n/locales/ru/common.json";
 import ruEnums from "../../i18n/locales/ru/enums.json";
 import ruEvent from "../../i18n/locales/ru/event.json";
 import ruPerson from "../../i18n/locales/ru/person.json";
-import type { EventType } from "../../api/types";
+import type { DateValue, EventEntity, EventType, Gender, Person } from "../../api/types";
 import EventForm from "./EventForm";
 
 // Fluent renders a dialog into a client-side portal, which is empty on the
@@ -55,6 +55,44 @@ function indexOfId(html: string, id: string): number {
   return html.indexOf(`id="${id}"`);
 }
 
+const unknownDate: DateValue = {
+  start: null,
+  end: null,
+  precision: "UNKNOWN",
+  qualifier: "UNKNOWN",
+  original: null,
+};
+
+function person(id: string, given: string, gender: Gender): Person {
+  return {
+    id,
+    gender,
+    names: [
+      {
+        surname: null,
+        given,
+        patronymic: null,
+        prefix: null,
+        suffix: null,
+        nameType: "BIRTH",
+        isPrimary: true,
+      },
+    ],
+    birth: unknownDate,
+    death: unknownDate,
+    notes: null,
+    externalIds: [],
+  };
+}
+
+/** `value` of the input that carries `id`, wherever the attribute order puts it. */
+function inputValue(html: string, id: string): string {
+  const at = indexOfId(html, id);
+  if (at < 0) return "";
+  const tag = html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1);
+  return /value="([^"]*)"/.exec(tag)?.[1] ?? "";
+}
+
 describe("EventForm layout", () => {
   it.each<[string, EventType | undefined]>([
     ["birth", undefined],
@@ -81,5 +119,56 @@ describe("EventForm layout", () => {
     const html = renderForm();
     expect(html).not.toContain("При сохранении создаётся связь");
     expect(html).not.toContain("родитель — ребёнок");
+  });
+});
+
+describe("EventForm birth parent slots", () => {
+  const child = person("child", "Иван", "MALE");
+  const mother = person("mother", "Анна", "FEMALE");
+  const father = person("father", "Пётр", "MALE");
+
+  function birth(participantIds: string[]): EventEntity {
+    return {
+      id: "e-1",
+      personId: child.id,
+      type: "BIRTH",
+      date: unknownDate,
+      place: null,
+      description: null,
+      sourceIds: [],
+      originalType: null,
+      participantIds,
+    };
+  }
+
+  function renderBirth(event: EventEntity): string {
+    return renderToStaticMarkup(
+      <EventForm
+        initial={event}
+        version={null}
+        persons={[child, mother, father].map((entity) => ({ entity }))}
+        onSaved={noop}
+        onCancel={noop}
+        onReload={noop}
+      />,
+    );
+  }
+
+  it("shows each stored parent in the slot its gender names", () => {
+    const html = renderBirth(birth([mother.id, father.id]));
+    expect(inputValue(html, "event-parent-0")).toBe("Пётр");
+    expect(inputValue(html, "event-parent-1")).toBe("Анна");
+  });
+
+  it("keeps the mother in the mother slot after the father is deleted", () => {
+    const html = renderBirth(birth([mother.id]));
+    expect(inputValue(html, "event-parent-0")).toBe("");
+    expect(inputValue(html, "event-parent-1")).toBe("Анна");
+  });
+
+  it("keeps the father in the father slot after the mother is deleted", () => {
+    const html = renderBirth(birth([father.id]));
+    expect(inputValue(html, "event-parent-0")).toBe("Пётр");
+    expect(inputValue(html, "event-parent-1")).toBe("");
   });
 });

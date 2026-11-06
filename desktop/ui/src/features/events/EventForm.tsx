@@ -125,7 +125,12 @@ export default function EventForm({
   const formatDate = useDateFormatter();
 
   const [draft, setDraft] = useState<EventDraft>(() => {
-    if (initial) return draftFromEvent(initial);
+    if (initial) {
+      return draftFromEvent(
+        initial,
+        persons.map((item) => item.entity),
+      );
+    }
     const preselected =
       defaultPersonId && defaultPersonId !== ""
         ? defaultPersonId

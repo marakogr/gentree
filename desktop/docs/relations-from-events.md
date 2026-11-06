@@ -21,6 +21,7 @@ Creating or deleting a biological `PARENT_CHILD` relation keeps the child's `BIR
 
 - create adds the parent to `participant_ids` once, in the earliest dated birth event that has a free parent slot; undated events sort last and ties break by event id;
 - slots are positional and father-first: male at index 0, female at index 1, unknown gender in the first free slot; the list stays compact, so a lone parent is the only element;
+- the stored index is only a hint. The UI resolves which picker holds a person from their gender, so deleting the father leaves a lone mother at index 0 and she still reads as the mother (and the reverse for a lone father);
 - a birth whose two slots are occupied by other people is left untouched while the relation is still stored;
 - delete removes the parent from every birth event of the child; an event with no parents stays valid;
 - only `PARENT_CHILD` is mirrored. `ADOPTIVE_PARENT_CHILD` and spouse/partner edges never change an event.
@@ -33,19 +34,20 @@ Opening a writable project reconciles stored data once, in this order:
 
 1. a person with a known birth or death date and no owned `BIRTH`/`DEATH` event gains the missing event from that date; an existing event with another date is never overwritten and a blank date creates nothing;
 2. marriages with exactly two distinct people gain a missing spouse row, and births with one or two participants gain missing parent rows;
-3. every biological `PARENT_CHILD` relation adds its parent to the child's earliest birth event with a free slot, using the same slot rules as a new relation.
+3. every biological `PARENT_CHILD` relation adds its parent to the child's earliest birth event with a free slot, using the same slot rules as a new relation;
+4. a child with an empty primary patronymic and exactly one male biological father gains the patronymic derived from that father's given name, using the same rules as a new relation.
 
-Manual rows and manual events are untouched, births without participants are left alone, and casts with too many people are skipped as ambiguous. A second open changes nothing. The report (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`, `readOnly`) contains counts only: no names, dates, ids, places or paths. Read-only projects are not written. A failed write leaves the project unchanged and the next open retries the same idempotent pass.
+Manual rows and manual events are untouched, births without participants are left alone, and casts with too many people are skipped as ambiguous. A second open changes nothing. The report (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`, `patronymicsFilled`, `readOnly`) contains counts only: no names, dates, ids, places or paths. Read-only projects are not written. A failed write leaves the project unchanged and the next open retries the same idempotent pass.
 
 ## Patronymic fill
 
 When a biological father becomes known, an empty patronymic is derived from his given name:
 
-- the fill runs when a `PARENT_CHILD` relation is created, when a `BIRTH` event that asserts the father is saved, and when the person form is saved with the father already stored;
+- the fill runs when a `PARENT_CHILD` relation is created, when a `BIRTH` event that asserts the father is saved, when the person form is saved with the father already stored, and once for an already-stored father when a writable project opens;
 - only the primary name is touched, and only when its patronymic is absent or whitespace-only; a non-empty or imported value is never replaced;
 - exactly one male biological parent is required; zero, several, an adoptive-only parent or an unnamed father leaves the field empty without an error;
 - Cyrillic names use the East Slavic suffix rules (Russian, Ukrainian or Belarusian by spelling); Latin and mixed-script names are a no-op;
-- project open, backfill, import and export never write a patronymic, and the project format is unchanged.
+- import and export never write a patronymic, the open pass reports only an aggregate count, and the project format is unchanged.
 
 ## Spouse display
 

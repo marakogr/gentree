@@ -5,7 +5,49 @@ import type { Person } from "../../api/types";
 
 export type BirthParentSlot = 0 | 1;
 
+/** Father slot, then mother slot. Both are empty strings when unset. */
+export type BirthParentSlots = [string, string];
+
 const NIL_ID = "00000000-0000-0000-0000-000000000000";
+
+/**
+ * Map stored participant ids onto the father/mother pickers by gender.
+ *
+ * `participantIds` is compact and positional only by convention, so deleting a
+ * father leaves a lone mother at index 0. Reading that index as "father" would
+ * relabel and later overwrite her, so the role comes from the person's gender
+ * instead: a man takes the father slot, a woman the mother slot, and an
+ * unknown-gender (or unknown) person the first free slot. The stored array is
+ * never reordered or otherwise changed here.
+ */
+export function birthParentSlots(
+  participantIds: readonly string[],
+  persons: readonly Person[],
+): BirthParentSlots {
+  const slots: BirthParentSlots = ["", ""];
+  const pending: string[] = [];
+  const seen = new Set<string>();
+
+  for (const id of participantIds) {
+    if (id === "" || id === NIL_ID || seen.has(id)) continue;
+    seen.add(id);
+    const gender = persons.find((person) => person.id === id)?.gender;
+    const slot: BirthParentSlot | null =
+      gender === "MALE" ? 0 : gender === "FEMALE" ? 1 : null;
+    if (slot !== null && slots[slot] === "") {
+      slots[slot] = id;
+    } else {
+      pending.push(id);
+    }
+  }
+
+  for (const id of pending) {
+    if (slots[0] === "") slots[0] = id;
+    else if (slots[1] === "") slots[1] = id;
+  }
+
+  return slots;
+}
 
 /**
  * People offered in one birth parent slot.

@@ -94,6 +94,13 @@ Deleting a `PARENT_CHILD` relation SHALL remove that parent from every `BIRTH` e
 - **AND** the other parent stays listed
 - **AND** the relation row is deleted
 
+#### Scenario: The surviving parent keeps their role
+
+- **WHEN** the father is deleted from a birth event that listed both parents, leaving a lone mother at index 0
+- **THEN** the UI resolves each picker by the person's gender, so she is still shown and saved as the mother
+- **AND** deleting the mother symmetrically leaves the father as the father
+- **AND** no project-format field is added and the stored array stays compact
+
 #### Scenario: The last parent is removed
 
 - **WHEN** the deleted relation was the only parent in the child's birth event
@@ -176,5 +183,5 @@ Opening a writable project SHALL, in this order, create each missing life event,
 #### Scenario: The report carries no personal data
 
 - **WHEN** the open reports what it changed
-- **THEN** the report contains only counts (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`) and the `readOnly` flag
+- **THEN** the report contains only counts (`spouseCreated`, `parentCreated`, `ambiguousSkipped`, `lifeEventsCreated`, `parentsAdded`, `patronymicsFilled`) and the `readOnly` flag
 - **AND** no id, name, date, place or path is included
