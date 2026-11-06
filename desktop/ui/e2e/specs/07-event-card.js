@@ -91,7 +91,7 @@ describe("event card", () => {
     expect(cardText).toContain("файлы");
 
     // The form opens from the card in the full window and closes back to it.
-    await $('//button[normalize-space(.)="Изменить"]').click();
+    await $('//button[@aria-label="Изменить"]').click();
     await (await $("#event-type")).waitForDisplayed({ timeout: 10000 });
     const surface = await $(".fui-DialogSurface");
     const size = await surface.getSize();

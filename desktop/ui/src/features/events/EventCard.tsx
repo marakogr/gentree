@@ -21,7 +21,6 @@ import type {
   Person,
   Versioned,
 } from "../../api/types";
-import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
 import { EMPTY_VALUE } from "../../lib/formatValue";
 import { useDateFormatter } from "../../lib/useDateFormatter";
@@ -111,12 +110,15 @@ export function EventCard({
           </h3>
         </div>
         <div className="events-card-actions">
-          <Button variant="secondary" size="sm" onClick={onEdit}>
-            <EditRegular fontSize={12} aria-hidden="true" />
-            {t("common:actions.edit")}
-          </Button>
-          <IconButton label={t("common:actions.close")} onClick={onClose}>
-            <DismissRegular />
+          <IconButton label={t("common:actions.edit")} onClick={onEdit}>
+            <EditRegular fontSize={16} aria-hidden="true" />
+          </IconButton>
+          <IconButton
+            className="events-card-close"
+            label={t("common:actions.close")}
+            onClick={onClose}
+          >
+            <DismissRegular aria-hidden="true" />
           </IconButton>
         </div>
       </div>

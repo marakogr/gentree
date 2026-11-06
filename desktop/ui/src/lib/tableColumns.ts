@@ -172,6 +172,11 @@ export function columnResizeHandle(
     if (event.button !== 0) return;
     event.preventDefault();
     event.stopPropagation();
+    // A drag on the narrow handle can otherwise start a text selection that
+    // stays painted on the sticky header after the width is applied (#131).
+    if (typeof window !== "undefined") {
+      window.getSelection()?.removeAllRanges();
+    }
     const cell = event.currentTarget.parentElement;
     const width = cell?.getBoundingClientRect().width ?? 0;
     if (width <= 0) return;
@@ -188,6 +193,14 @@ export function columnResizeHandle(
     api.endResize();
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    // WebKit can still paint a selection that began before the first
+    // pointermove; drop it once the gesture is over (#131).
+    if (typeof window !== "undefined") {
+      const selection = window.getSelection();
+      if (selection !== null && !selection.isCollapsed) {
+        selection.removeAllRanges();
+      }
     }
   };
 

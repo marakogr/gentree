@@ -332,9 +332,11 @@
   color: var(--muted-foreground);
 }
 
+/* The identity may shrink, but the action row always stays on the first line at
+   the right edge; the close control is its last item (#131). */
 .person-card-head {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
@@ -342,6 +344,7 @@
 
 .person-card-identity {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: 12px;
   min-width: 0;
@@ -363,9 +366,11 @@
 
 .person-card-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex: none;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
+  margin-left: auto;
 }
 
 .person-facts {
@@ -605,12 +610,15 @@
   line-height: 1.6;
 }
 
-/* Section actions may carry an icon inside the kit button label. */
+/* Section actions may carry an icon inside the kit button label; the icon and
+   the label share one baseline and never split across lines (#131). */
 .person-section-head .btn-label,
 .person-media-empty .btn-label {
   display: inline-flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 6px;
+  white-space: nowrap;
 }
 
 /* ---------- relationship form ---------- */
@@ -656,7 +664,8 @@
   gap: 8px;
 }
 
-/* Empty files section: the hint plus the attach action. */
+/* Empty files section: the hint only; the section header owns the single attach
+   action (#131). */
 .person-media-empty {
   display: grid;
   justify-items: center;

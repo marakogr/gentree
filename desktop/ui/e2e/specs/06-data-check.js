@@ -68,7 +68,7 @@ async function setBirthDate(date) {
     async () => (await $("#person-card-title")).isExisting(),
     { timeout: 10000, timeoutMsg: "the person card did not open" },
   );
-  await $('//button[normalize-space(.)="Изменить"]').click();
+  await $('//button[@aria-label="Изменить"]').click();
 
   // An edited person may start with UNKNOWN precision (plain text field); a
   // calendar date needs DAY precision so the wheel parses it.
