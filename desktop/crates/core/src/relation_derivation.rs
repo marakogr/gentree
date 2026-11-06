@@ -40,6 +40,8 @@ pub struct RelationBackfillReport {
     pub life_events_created: usize,
     /// Biological parents added to an existing child birth event.
     pub parents_added: usize,
+    /// Empty patronymics filled from an already-stored biological father.
+    pub patronymics_filled: usize,
     pub read_only: bool,
 }
 
@@ -50,6 +52,7 @@ impl RelationBackfillReport {
             || self.parent_created > 0
             || self.life_events_created > 0
             || self.parents_added > 0
+            || self.patronymics_filled > 0
     }
 }
 

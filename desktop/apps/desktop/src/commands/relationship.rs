@@ -461,6 +461,48 @@ mod tests {
     }
 
     #[test]
+    fn delete_keeps_the_surviving_parent_in_the_role_their_gender_names() {
+        let (_tmp, mut store) = setup();
+        let father = person(Gender::Male, 1970);
+        let mother = person(Gender::Female, 1972);
+        let child = person(Gender::Unknown, 2000);
+        let (father_id, mother_id, child_id) = (father.id, mother.id, child.id);
+        store.save_persons(&[father, mother, child]).unwrap();
+        store.save_events(&[birth(child_id, &[], 2000)]).unwrap();
+        let father_row = create_relationship(&mut store, parent_edge(father_id, child_id)).unwrap();
+        create_relationship(&mut store, parent_edge(mother_id, child_id)).unwrap();
+
+        let version = version_of(&store, father_row.entity.id);
+        delete_relationship(&mut store, father_row.entity.id, &version).unwrap();
+
+        // The compact array holds one id. It must be the mother, and she must
+        // still be stored and related as a female parent, never as the father.
+        let events = store.events().unwrap();
+        assert_eq!(events[0].participant_ids, vec![mother_id]);
+        assert_eq!(stored_person(&store, mother_id).gender, Gender::Female);
+        let rows = store.relationships().unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].person_id, mother_id);
+        assert_eq!(rows[0].related_person_id, child_id);
+
+        // Symmetrically, deleting the mother keeps the father in his role.
+        let mother_row = &rows[0];
+        let mother_version = version_of(&store, mother_row.id);
+        delete_relationship(&mut store, mother_row.id, &mother_version).unwrap();
+        let events = store.events().unwrap();
+        assert!(events[0].participant_ids.is_empty());
+        assert!(store.relationships().unwrap().is_empty());
+
+        let father_again =
+            create_relationship(&mut store, parent_edge(father_id, child_id)).unwrap();
+        assert_eq!(store.events().unwrap()[0].participant_ids, vec![father_id]);
+        let version = version_of(&store, father_again.entity.id);
+        delete_relationship(&mut store, father_again.entity.id, &version).unwrap();
+        assert!(store.events().unwrap()[0].participant_ids.is_empty());
+        assert_eq!(stored_person(&store, father_id).gender, Gender::Male);
+    }
+
+    #[test]
     fn delete_does_not_recreate_the_row_on_the_next_event_save() {
         let (_tmp, mut store) = setup();
         let father = person(Gender::Male, 1970);

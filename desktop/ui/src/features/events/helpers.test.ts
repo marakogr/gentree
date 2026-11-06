@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import type { DateValue, EventEntity, EventType, PlaceGeo, Versioned } from "../../api/types";
+import type {
+  DateValue,
+  EventEntity,
+  EventType,
+  Gender,
+  Person,
+  PlaceGeo,
+  Versioned,
+} from "../../api/types";
 import {
   buildEventInput,
   clearEventFilterValues,
@@ -40,6 +48,18 @@ const unknownDate: DateValue = {
   qualifier: "UNKNOWN",
   original: null,
 };
+
+function person(id: string, gender: Gender): Person {
+  return {
+    id,
+    gender,
+    names: [],
+    birth: unknownDate,
+    death: unknownDate,
+    notes: null,
+    externalIds: [],
+  };
+}
 
 type EventOptions = {
   type?: EventType;
@@ -234,6 +254,30 @@ describe("emptyEventDraft", () => {
     if (result.ok) {
       expect(result.event.participantIds).toEqual(["parent-2"]);
     }
+  });
+
+  it("resolves birth parent slots by gender after a parent is deleted", () => {
+    const people: Person[] = [
+      person("father", "MALE"),
+      person("mother", "FEMALE"),
+    ];
+    const both = event("e-1", "child", 2000, {
+      type: "BIRTH",
+      participantIds: ["mother", "father"],
+    });
+    expect(draftFromEvent(both, people).parentIds).toEqual(["father", "mother"]);
+    expect(isEventDraftDirty(draftFromEvent(both, people), both)).toBe(false);
+
+    // Deleting the father leaves only the mother at index 0.
+    const motherOnly = event("e-1", "child", 2000, {
+      type: "BIRTH",
+      participantIds: ["mother"],
+    });
+    const draft = draftFromEvent(motherOnly, people);
+    expect(draft.parentIds).toEqual(["", "mother"]);
+    expect(isEventDraftDirty(draft, motherOnly)).toBe(false);
+    const saved = buildEventInput(draft, motherOnly);
+    expect(saved.ok && saved.event.participantIds).toEqual(["mother"]);
   });
 
   it("never lets the child or a non-birth event become a parent", () => {

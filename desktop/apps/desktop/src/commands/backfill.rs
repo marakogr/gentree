@@ -3,7 +3,8 @@
 //!
 //! 1. create the `BIRTH`/`DEATH` event a person's own date implies;
 //! 2. derive missing relations from stored events (the relation backfill);
-//! 3. mirror every biological parent relation into the child's birth event.
+//! 3. mirror every biological parent relation into the child's birth event;
+//! 4. fill an empty patronymic from an already-stored biological father.
 //!
 //! The report carries counts only: never ids, names, dates, places or paths.
 
@@ -11,7 +12,10 @@ use std::collections::HashMap;
 
 use gentree_core::person::Person;
 use gentree_core::relationship::RelationshipType;
-use gentree_core::{add_parent_to_birth_events, AppResult, RelationBackfillReport};
+use gentree_core::{
+    add_parent_to_birth_events, fill_patronymic, unique_father_given_name, AppResult,
+    RelationBackfillReport,
+};
 use gentree_storage::ProjectStore;
 use uuid::Uuid;
 
@@ -33,6 +37,7 @@ pub(crate) fn backfill_on_open(store: &mut ProjectStore) -> AppResult<RelationBa
         ..backfill_relations_on_open(store)?
     };
     report.parents_added = fill_birth_parents(store)?;
+    report.patronymics_filled = fill_patronymics(store)?;
     Ok(report)
 }
 
@@ -83,6 +88,43 @@ fn fill_birth_parents(store: &mut ProjectStore) -> AppResult<usize> {
         store.save_events(&events)?;
     }
     Ok(added)
+}
+
+/// Step 4: fill an empty primary patronymic from the child's single biological
+/// father, using the same #108 rules as a new relation. Relatives with a stored
+/// patronymic, no father, two fathers, an unknown-gender child or a Latin name
+/// are left untouched, so a second open is a no-op.
+fn fill_patronymics(store: &mut ProjectStore) -> AppResult<usize> {
+    let relationships = store.relationships()?;
+    let mut children: Vec<Uuid> = relationships
+        .iter()
+        .filter(|row| row.rel_type == RelationshipType::ParentChild)
+        .map(|row| row.related_person_id)
+        .collect();
+    if children.is_empty() {
+        return Ok(0);
+    }
+    children.sort_unstable();
+    children.dedup();
+
+    let mut persons = store.persons()?;
+    let mut filled = 0;
+    for child_id in children {
+        let Some(father_given) = unique_father_given_name(&persons, &relationships, child_id)
+        else {
+            continue;
+        };
+        let Some(index) = persons.iter().position(|person| person.id == child_id) else {
+            continue;
+        };
+        if fill_patronymic(&mut persons[index], &father_given) {
+            filled += 1;
+        }
+    }
+    if filled > 0 {
+        store.save_persons(&persons)?;
+    }
+    Ok(filled)
 }
 
 #[cfg(test)]
@@ -215,6 +257,111 @@ mod tests {
     }
 
     #[test]
+    fn an_existing_father_relation_fills_an_empty_patronymic_once() {
+        let (_tmp, mut store) = synthetic_project();
+        let father = person("Игорь", DateValue::exact_year(1950), Gender::Male);
+        let son = person("Synthetic", DateValue::exact_year(1980), Gender::Male);
+        let daughter = person("Synthetic", DateValue::exact_year(1982), Gender::Female);
+        let (father_id, son_id, daughter_id) = (father.id, son.id, daughter.id);
+        store.save_persons(&[father, son, daughter]).unwrap();
+        store
+            .save_relationships(&[
+                parent_edge(father_id, son_id),
+                parent_edge(father_id, daughter_id),
+            ])
+            .unwrap();
+
+        let report = backfill_on_open(&mut store).unwrap();
+        assert_eq!(report.patronymics_filled, 2);
+        let persons = store.persons().unwrap();
+        let patronymic = |id: Uuid| {
+            persons.iter().find(|person| person.id == id).unwrap().names[0]
+                .patronymic
+                .clone()
+        };
+        assert_eq!(patronymic(son_id).as_deref(), Some("Игоревич"));
+        assert_eq!(patronymic(daughter_id).as_deref(), Some("Игоревна"));
+
+        // A second open has nothing left to fill and does not touch the names.
+        let second = backfill_on_open(&mut store).unwrap();
+        assert_eq!(second.patronymics_filled, 0);
+        assert_eq!(store.persons().unwrap(), persons);
+    }
+
+    #[test]
+    fn a_stored_patronymic_is_never_replaced_by_the_backfill() {
+        let (_tmp, mut store) = synthetic_project();
+        let father = person("Иван", DateValue::exact_year(1950), Gender::Male);
+        let mut child = person("Synthetic", DateValue::exact_year(1980), Gender::Male);
+        child.names[0].patronymic = Some("Своё".to_owned());
+        let (father_id, child_id) = (father.id, child.id);
+        store.save_persons(&[father, child.clone()]).unwrap();
+        store
+            .save_relationships(&[parent_edge(father_id, child_id)])
+            .unwrap();
+
+        let report = backfill_on_open(&mut store).unwrap();
+        assert_eq!(report.patronymics_filled, 0);
+        let stored = store
+            .persons()
+            .unwrap()
+            .into_iter()
+            .find(|person| person.id == child_id)
+            .unwrap();
+        assert_eq!(stored.names[0].patronymic.as_deref(), Some("Своё"));
+    }
+
+    #[test]
+    fn a_latin_father_name_leaves_the_patronymic_empty() {
+        let (_tmp, mut store) = synthetic_project();
+        let father = person("Ivan", DateValue::exact_year(1950), Gender::Male);
+        let child = person("Synthetic", DateValue::exact_year(1980), Gender::Male);
+        let (father_id, child_id) = (father.id, child.id);
+        store.save_persons(&[father, child]).unwrap();
+        store
+            .save_relationships(&[parent_edge(father_id, child_id)])
+            .unwrap();
+
+        let report = backfill_on_open(&mut store).unwrap();
+        assert_eq!(report.patronymics_filled, 0);
+        let stored = store
+            .persons()
+            .unwrap()
+            .into_iter()
+            .find(|person| person.id == child_id)
+            .unwrap();
+        assert_eq!(stored.names[0].patronymic, None);
+    }
+
+    #[test]
+    fn two_biological_fathers_leave_the_patronymic_empty() {
+        let (_tmp, mut store) = synthetic_project();
+        let first = person("Игорь", DateValue::exact_year(1950), Gender::Male);
+        let second = person("Иван", DateValue::exact_year(1952), Gender::Male);
+        let child = person("Synthetic", DateValue::exact_year(1980), Gender::Male);
+        let (first_id, second_id, child_id) = (first.id, second.id, child.id);
+        store.save_persons(&[first, second, child]).unwrap();
+        store
+            .save_relationships(&[
+                parent_edge(first_id, child_id),
+                parent_edge(second_id, child_id),
+            ])
+            .unwrap();
+
+        let report = backfill_on_open(&mut store).unwrap();
+        assert_eq!(report.patronymics_filled, 0);
+        assert!(store
+            .persons()
+            .unwrap()
+            .into_iter()
+            .find(|person| person.id == child_id)
+            .unwrap()
+            .names[0]
+            .patronymic
+            .is_none());
+    }
+
+    #[test]
     fn fully_occupied_slots_are_left_alone() {
         let (_tmp, mut store) = synthetic_project();
         let father = person("Father", DateValue::exact_year(1950), Gender::Male);
@@ -289,8 +436,10 @@ mod tests {
     #[test]
     fn a_read_only_project_is_byte_identical() {
         let (_tmp, mut store) = synthetic_project();
-        let father = person("Father", DateValue::exact_year(1950), Gender::Male);
-        let child = person("Child", DateValue::exact_year(1980), Gender::Unknown);
+        // A Cyrillic father with an empty patronymic: a writable pass would
+        // fill it, so the byte comparison proves a read-only open wrote nothing.
+        let father = person("Игорь", DateValue::exact_year(1950), Gender::Male);
+        let child = person("Child", DateValue::exact_year(1980), Gender::Male);
         let (father_id, child_id) = (father.id, child.id);
         store.save_persons(&[father, child]).unwrap();
         store
@@ -301,18 +450,24 @@ mod tests {
 
         let events_before = std::fs::read(root.join(EVENT_FILE)).unwrap();
         let relations_before = std::fs::read(root.join(RELATIONSHIP_FILE)).unwrap();
+        let persons_before = std::fs::read(root.join(gentree_storage::PERSON_FILE)).unwrap();
 
         let mut read_only = ProjectStore::open(&root, false).unwrap();
         let report = backfill_on_open(&mut read_only).unwrap();
         assert!(report.read_only);
         assert_eq!(report.life_events_created, 0);
         assert_eq!(report.parents_added, 0);
+        assert_eq!(report.patronymics_filled, 0);
         drop(read_only);
 
         assert_eq!(std::fs::read(root.join(EVENT_FILE)).unwrap(), events_before);
         assert_eq!(
             std::fs::read(root.join(RELATIONSHIP_FILE)).unwrap(),
             relations_before
+        );
+        assert_eq!(
+            std::fs::read(root.join(gentree_storage::PERSON_FILE)).unwrap(),
+            persons_before
         );
     }
 
@@ -324,6 +479,7 @@ mod tests {
             ambiguous_skipped: 3,
             life_events_created: 4,
             parents_added: 5,
+            patronymics_filled: 6,
             read_only: false,
         };
         let json = serde_json::to_value(report).unwrap();
@@ -337,6 +493,7 @@ mod tests {
                 "lifeEventsCreated",
                 "parentCreated",
                 "parentsAdded",
+                "patronymicsFilled",
                 "readOnly",
                 "spouseCreated",
             ]

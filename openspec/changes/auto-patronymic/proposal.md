@@ -14,8 +14,9 @@ The user asked for this behavior directly. It does not change the relation model
 - The fill runs where the father becomes known:
   - creating a biological `PARENT_CHILD` relation through `relationship_create`;
   - saving a `BIRTH` event whose participants include the father;
-  - saving the person form with an empty patronymic while a stored biological father exists.
-- Reading a project does not write a patronymic: the fill happens only inside a command that already writes the person or the relation.
+  - saving the person form with an empty patronymic while a stored biological father exists;
+  - opening a writable project that already stores the father relation (issue #130), once and idempotently.
+- A read-only open, import and export never write a patronymic; the writable on-open pass reports only an aggregate count.
 - No new IPC command, dependency, relation type, validation rule or storage field is added. The person form and the person card need no markup change because the saved person response already carries the name.
 
 Out of scope: patronymics from a mother or an adoptive parent, a full name lexicon, surname or given-name inflection, locale selection for a name, and any retroactive rewrite of imported projects. Import writes its bundle directly and is not touched.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Gender, Person } from "../../api/types";
-import { birthParentCandidates } from "./birthParents";
+import { birthParentCandidates, birthParentSlots } from "./birthParents";
 
 const unknownDate = {
   start: null,
@@ -76,5 +76,56 @@ describe("birthParentCandidates", () => {
   it("keeps a preselected unknown-gender parent visible", () => {
     const rows = birthParentCandidates(people, 0, ["unknown", ""], "child");
     expect(rows.map((row) => row.id)).toEqual(["male", "unknown"]);
+  });
+});
+
+describe("birthParentSlots", () => {
+  it("keeps a stored father-first pair in its slots", () => {
+    expect(birthParentSlots(["male", "female"], people)).toEqual([
+      "male",
+      "female",
+    ]);
+  });
+
+  it("resolves slots by gender, not by array index", () => {
+    expect(birthParentSlots(["female", "male"], people)).toEqual([
+      "male",
+      "female",
+    ]);
+  });
+
+  it("keeps a lone mother in the mother slot after the father is deleted", () => {
+    // Deleting the father leaves the compact array `[mother]`; index 0 must
+    // still not turn her into the father.
+    expect(birthParentSlots(["female"], people)).toEqual(["", "female"]);
+  });
+
+  it("keeps a lone father in the father slot after the mother is deleted", () => {
+    expect(birthParentSlots(["male"], people)).toEqual(["male", ""]);
+  });
+
+  it("gives an unknown-gender parent the first free slot", () => {
+    expect(birthParentSlots(["unknown"], people)).toEqual(["unknown", ""]);
+    expect(birthParentSlots(["female", "unknown"], people)).toEqual([
+      "unknown",
+      "female",
+    ]);
+    expect(birthParentSlots(["male", "unknown"], people)).toEqual([
+      "male",
+      "unknown",
+    ]);
+  });
+
+  it("treats an id without a stored person as unknown gender", () => {
+    expect(birthParentSlots(["missing"], people)).toEqual(["missing", ""]);
+  });
+
+  it("drops blank, nil and duplicate ids", () => {
+    expect(
+      birthParentSlots(
+        ["", "00000000-0000-0000-0000-000000000000", "female", "female"],
+        people,
+      ),
+    ).toEqual(["", "female"]);
   });
 });
