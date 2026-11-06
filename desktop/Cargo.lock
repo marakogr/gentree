@@ -1313,7 +1313,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-chat"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "gentree-core",
  "reqwest 0.12.28",
@@ -1326,7 +1326,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-config"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "directories",
  "gentree-core",
@@ -1338,7 +1338,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-core"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -1349,7 +1349,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-desktop"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "gentree-chat",
  "gentree-config",
@@ -1373,7 +1373,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-import"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "ged_io",
  "gentree-core",
@@ -1391,7 +1391,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-launcher"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "hex",
  "reqwest 0.12.28",
@@ -1409,7 +1409,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-mcp"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "gentree-core",
  "rmcp",
@@ -1423,7 +1423,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-search"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "gentree-core",
  "rust-stemmers",
@@ -1436,7 +1436,7 @@ dependencies = [
 
 [[package]]
 name = "gentree-storage"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "atomicwrites",
  "fs2",
