@@ -123,11 +123,12 @@
   gap: 6px;
 }
 
+/* Preview results: a quiet tinted block, not a framed box. The old border read
+   as a black frame against the dark theme. */
 .import-preview {
   display: grid;
   gap: 8px;
   padding: 12px;
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: color-mix(in oklab, var(--muted) 45%, var(--card));
 }
