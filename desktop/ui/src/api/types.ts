@@ -213,6 +213,8 @@ export type RelationBackfillReport = {
   lifeEventsCreated: number;
   /** Biological parents added to an existing child birth event. */
   parentsAdded: number;
+  /** Empty patronymics filled from an already-stored biological father. */
+  patronymicsFilled: number;
   readOnly: boolean;
 };
 

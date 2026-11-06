@@ -69,9 +69,9 @@ The system SHALL leave the patronymic empty without an error when there is no bi
 - **WHEN** the child has two distinct male `PARENT_CHILD` parents
 - **THEN** neither name is chosen and the patronymic stays empty
 
-### Requirement: The fill runs on relation, birth-event and person saves
+### Requirement: The fill runs on relation, birth-event, person saves and project open
 
-The system SHALL apply the fill when a biological `PARENT_CHILD` relation is created, when a `BIRTH` event that asserts the father is saved, and when the person form is saved with the father already stored. It SHALL NOT write during project open, backfill, import, export or a read-only request.
+The system SHALL apply the fill when a biological `PARENT_CHILD` relation is created, when a `BIRTH` event that asserts the father is saved, when the person form is saved with the father already stored, and once when a writable project with an already-stored biological father is opened. It SHALL NOT write during a read-only open, import or export, and a second open of the same project SHALL change nothing.
 
 #### Scenario: Creating the father relation
 
@@ -89,7 +89,9 @@ The system SHALL apply the fill when a biological `PARENT_CHILD` relation is cre
 - **THEN** the submitted empty patronymic is filled before the person is written
 - **AND** the saved response carries the filled value
 
-#### Scenario: Opening a project does not fill
+#### Scenario: Opening an older project backfills a stored father
 
-- **WHEN** a writable or read-only project is opened or backfilled
-- **THEN** no patronymic is written by that pass
+- **WHEN** a writable project with an empty patronymic and one already-stored biological father is opened
+- **THEN** the derived patronymic is written and the on-open report counts one filled patronymic
+- **AND** a second open writes nothing
+- **AND** a read-only open writes nothing

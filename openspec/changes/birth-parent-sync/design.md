@@ -7,7 +7,7 @@ See `proposal.md` for motivation and `specs/relationships/spec.md` for the behav
 Current state that shapes the approach:
 
 - `Relationship` stores optional `origin` (`MANUAL`/`EVENT`) and `sourceEventIds`. Event saves derive rows from `MARRIAGE` and `BIRTH` participants; relation commands write manual rows.
-- `Event.participant_ids` is an untyped list. For a `BIRTH` event the list doubles as the selected parents, and the UI presents index 0 as "Father" and index 1 as "Mother". The list is compact: `Event::validate` rejects nil ids, so there are no placeholders.
+- `Event.participant_ids` is an untyped list. For a `BIRTH` event the list doubles as the selected parents. The list is compact: `Event::validate` rejects nil ids, so there are no placeholders. Since issue #130 the UI resolves the father/mother picker from the person's gender instead of the raw index, so a lone mother stored at index 0 is not relabelled as the father.
 - `relationship_create` and `relationship_delete` currently touch only `relationships.jsonl`. `event_update` already writes events first, then relationships, and treats the event as the source of truth for derivation.
 - The person card is the only surface that exposes `origin` and `sourceEventIds`; chat DTOs keep the fields but do not label rows.
 

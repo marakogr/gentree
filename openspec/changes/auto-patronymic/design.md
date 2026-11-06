@@ -79,7 +79,7 @@ The fill is applied in the commands that already write the child or the link:
 - `event_create` / `event_update`: only for a `BIRTH` event; after `derive_event_relations` adds the parent rows, fill the event owner. Persons are written after events and relationships.
 - `person_update`: before replacing the stored person, read the existing relationships and fill the submitted entity. This is the form-save path; the saved response carries the filled value back to the form.
 
-`person_create` does nothing because a newly created person has no relation yet. `person_get`, project open, backfill, export and import do not fill: reading must not write, and imported values keep priority.
+`person_create` does nothing because a newly created person has no relation yet. `person_get` and export/import do not fill. A writable project open runs the idempotent pass once for already-stored fathers (issue #130); a read-only open does not. Reading must never write outside that one migration, and imported values keep priority.
 
 Alternative: fill in `person_get` so the form shows the value on open. Rejected because a read command would write the project, and because the value would not be durable if the user never saves.
 
@@ -101,4 +101,4 @@ Core unit tests cover the required common names for both genders, soft/hard/irre
 
 ## Migration Plan
 
-No migration. Existing projects keep their names and relations; the field is filled only on a later relation, birth-event or person save. Rollback is safe: older builds ignore the new helper and read the same files.
+A writable project open backfills an empty patronymic from an already-stored biological father (issue #130). The pass is idempotent, fills only an empty value, and reports an aggregate count; a read-only project is untouched. Imported non-empty values and existing relations are never rewritten. Rollback is safe: older builds ignore the new helper and read the same files.

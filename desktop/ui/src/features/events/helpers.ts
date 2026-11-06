@@ -10,6 +10,7 @@ import type {
   EventEntity,
   EventInput,
   EventType,
+  Person,
   PlaceGeo,
 } from "../../api/types";
 import {
@@ -27,6 +28,7 @@ import type {
   ViewFilters,
 } from "../../lib/viewState";
 import { parsePeriodInput, periodFromDate, supportsDateRange } from "./datePeriod";
+import { birthParentSlots } from "./birthParents";
 import { isPairedEventType } from "./eventRoles";
 
 /** Every event type in the order used by the form select and the type chips. */
@@ -189,14 +191,22 @@ export function emptyEventDraft(
   };
 }
 
-export function draftFromEvent(event: EventEntity): EventDraft {
+export function draftFromEvent(
+  event: EventEntity,
+  persons: readonly Person[] = [],
+): EventDraft {
   const period = supportsDateRange(event.type)
     ? periodFromDate(event.date)
     : null;
   return {
     personId: event.personId,
     spouseId: event.participantIds?.[0] ?? "",
-    parentIds: event.type === "BIRTH" ? [...(event.participantIds ?? [])] : [],
+    // Parent slots are resolved by gender, not by the stored array index: after
+    // a father is deleted a lone mother stays in the mother slot.
+    parentIds:
+      event.type === "BIRTH"
+        ? birthParentSlots(event.participantIds ?? [], persons)
+        : [],
     eventType: event.type,
     originalType: event.originalType ?? null,
     date: dateValueToInput(event.date),
@@ -222,6 +232,17 @@ function sameDetails(
 }
 
 /**
+ * Parent ids are compared as a set: the same parents in a different slot order
+ * are the same stored event, so resolving slots by gender must not make a
+ * freshly opened form look edited.
+ */
+function sameParentIds(left: readonly string[], right: readonly string[]): boolean {
+  const normalize = (ids: readonly string[]): string =>
+    ids.filter((id) => id !== "").sort().join("|");
+  return normalize(left) === normalize(right);
+}
+
+/**
  * True when the form holds edits the stored event does not have. Used to keep
  * "add a related event" from silently discarding unsaved input.
  */
@@ -233,7 +254,7 @@ export function isEventDraftDirty(
   return (
     draft.personId !== stored.personId ||
     draft.spouseId !== stored.spouseId ||
-    draft.parentIds.join("|") !== stored.parentIds.join("|") ||
+    !sameParentIds(draft.parentIds, stored.parentIds) ||
     draft.eventType !== stored.eventType ||
     draft.originalType !== stored.originalType ||
     draft.date !== stored.date ||
