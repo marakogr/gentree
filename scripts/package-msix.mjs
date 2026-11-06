@@ -23,7 +23,7 @@
 
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import {
   copyFile,
   cp,
@@ -261,6 +261,39 @@ function generateTiles(shell, layoutAssets, backgroundColor) {
   );
 }
 
+/** The resource index the Store resolves display strings and images through.
+ * Without `resources.pri` Partner Center reports every declared image as
+ * missing and reads PublisherDisplayName as empty, because both are looked up
+ * in MRT rather than at the literal path. */
+function generateResourceIndex(makepri, layout, workDir, assets) {
+  const config = path.join(workDir, "priconfig.xml");
+  const index = path.join(layout, "resources.pri");
+  run(
+    makepri,
+    ["createconfig", "/cf", config, "/dq", "en-US", "/o"],
+    "makepri createconfig",
+  );
+  run(
+    makepri,
+    ["new", "/pr", layout, "/cf", config, "/of", index, "/o"],
+    "makepri new",
+  );
+  if (!existsSync(index)) fail("makepri did not produce resources.pri");
+
+  // Prove what the Store reads: the index must name every tile asset, because a
+  // missing entry is exactly the "image not found" rejection it reports.
+  const dump = path.join(workDir, "resources.dump.xml");
+  run(makepri, ["dump", "/if", index, "/of", dump, "/o"], "makepri dump");
+  const text = readFileSync(dump, "utf8");
+  for (const asset of assets) {
+    const reference = `Assets\\${asset}`;
+    if (!text.includes(reference)) {
+      fail(`resources.pri does not index ${reference}`);
+    }
+  }
+  return index;
+}
+
 /** A local-only certificate: subject == the Store publisher, so the package
  * identity stays the same and a test install replaces the Store one cleanly. */
 function devSign(shell, signtool, msixPath, publisher, workDir) {
@@ -343,6 +376,7 @@ async function main() {
   const shell = findPowerShell();
   if (!shell) fail("PowerShell is required to render the tile assets");
   const makeappx = findSdkTool("makeappx.exe");
+  const makepri = findSdkTool("makepri.exe");
   const msixVersion = `${options.version}.0`;
 
   const template = await readFile(MANIFEST_PATH, "utf8");
@@ -365,6 +399,11 @@ async function main() {
     }
     generateTiles(shell, layoutAssets, identity.backgroundColor);
     await writeFile(path.join(layout, "AppxManifest.xml"), manifest, "utf8");
+    const pri = generateResourceIndex(makepri, layout, workDir, [
+      ...COPIED_ASSETS,
+      "Wide310x150Logo.png",
+      "SplashScreen.png",
+    ]);
 
     run(makeappx, ["pack", "/d", layout, "/p", msixPath, "/o"], "makeappx pack");
     const files = await unpackCheck(makeappx, msixPath, workDir);

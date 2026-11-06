@@ -83,6 +83,26 @@ Three packaging consequences are worth knowing:
 - **`bundle.targets` is irrelevant here.** Nothing is bundled by Tauri; the MSIX
   layout is produced from the plain release executable.
 
+## What Partner Center validates first
+
+Three package details fail an upload before certification and none of them fail
+on a local install, so the packager and CI check them explicitly:
+
+- **`resources.pri`** — the resource index (`makepri.exe`) through which the
+  Store resolves the manifest's display strings and tile images. Without it the
+  upload reports "the following image(s) specified in the appxManifest.xml were
+  not found" for every asset and reads `PublisherDisplayName` as empty, although
+  the manifest and the files are correct. `scripts/package-msix.mjs` generates
+  the index and dumps it to prove all five assets are indexed.
+- **At least one declared language** — `<Resources><Resource Language="…"/></Resources>`
+  in the manifest, first entry = default. A package without it is rejected even
+  though Windows installs it.
+- **`runFullTrust`** — a warning rather than an error: explain the capability in
+  **Notes for certification**.
+
+The declared languages must also appear in the Store listing's language list, so
+both use the same six UI locales (en, ru, uk, be, de, es).
+
 ## Submitting
 
 1. **Packages**: upload the `.msix` file. It must stay unsigned — the Store
