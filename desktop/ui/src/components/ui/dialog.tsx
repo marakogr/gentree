@@ -44,9 +44,17 @@ const useStyles = makeStyles({
   lg: {
     width: "720px",
   },
+  // A long dialog must scroll its body instead of pushing the footer outside
+  // the window. Fluent lays DialogBody out as a grid whose `1fr` content row
+  // keeps its content height when only `max-height` bounds the body, so the
+  // actions row could leave the surface. A flex column with a shrinkable
+  // content row keeps the footer inside the surface at any height.
   body: {
+    display: "flex",
+    flexDirection: "column",
     minWidth: 0,
-    overflowY: "auto",
+    minHeight: 0,
+    overflow: "hidden",
   },
   // Fluent gives DialogContent `margin: -4px; padding: 4px; overflow-y: auto`.
   // The negative margin widens it past the surface by 8px, and the computed
@@ -57,6 +65,16 @@ const useStyles = makeStyles({
     margin: 0,
     padding: 0,
     minWidth: 0,
+    minHeight: 0,
+    flex: "1 1 auto",
+    overflowY: "auto",
+    overscrollBehavior: "contain",
+  },
+  // The footer is not part of the scroll area, so its buttons stay reachable
+  // while the content above scrolls.
+  actions: {
+    flexShrink: 0,
+    justifyContent: "flex-end",
   },
   full: {
     maxWidth: "1120px",
@@ -142,7 +160,9 @@ export function Dialog({
             ) : null}
             {children}
           </DialogContent>
-          {footer ? <DialogActions>{footer}</DialogActions> : null}
+          {footer ? (
+            <DialogActions className={styles.actions}>{footer}</DialogActions>
+          ) : null}
         </DialogBody>
       </DialogSurface>
     </FluentDialog>

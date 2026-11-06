@@ -142,13 +142,6 @@ export function EventCard({
         </div>
 
         <div className="events-card-row">
-          <div>
-            <dt>{t("event:qualifier")}</dt>
-            <dd>{t(`enums:dateQualifier.${entity.date.qualifier}`)}</dd>
-          </div>
-        </div>
-
-        <div className="events-card-row">
           <LocationRegular
             className="events-card-icon"
             fontSize={16}

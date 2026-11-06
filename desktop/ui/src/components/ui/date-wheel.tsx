@@ -23,13 +23,17 @@ import { CalendarLtrRegular } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 import type { DatePrecision } from "../../api/types";
 import { daysInMonth, formatDateTyping, parseManualDateInput } from "../../lib/dates";
+import {
+  WHEEL_COLUMN_HEIGHT,
+  WHEEL_COLUMN_PADDING,
+  WHEEL_ITEM_HEIGHT,
+  wheelScrollTop,
+} from "../../lib/dateWheel";
 
 type Parts = { year: number; month: number; day: number };
 type Chosen = { year: boolean; month: boolean; day: boolean };
 type PartKey = keyof Parts;
 
-/** One row in a wheel column; 5 rows stay visible inside the popover. */
-const COLUMN_MAX_HEIGHT = "220px";
 // The column always covers the last millennium plus a drafted earlier year;
 // this keeps the DOM near a thousand rows instead of the whole CivilDate range.
 const DEFAULT_YEAR = 1000;
@@ -152,13 +156,17 @@ const useStyles = makeStyles({
   column: {
     display: "flex",
     flexDirection: "column",
+    boxSizing: "border-box",
     minWidth: 0,
-    maxHeight: COLUMN_MAX_HEIGHT,
+    height: `${WHEEL_COLUMN_HEIGHT}px`,
+    maxHeight: `${WHEEL_COLUMN_HEIGHT}px`,
+    // Symmetric padding keeps the first/last option centreable and gives every
+    // selected row the same resting position.
+    padding: `${WHEEL_COLUMN_PADDING}px ${tokens.spacingHorizontalXS}`,
     overflowY: "auto",
     overflowX: "hidden",
     overscrollBehavior: "contain",
     scrollSnapType: "y proximity",
-    padding: `0 ${tokens.spacingHorizontalXS}`,
   },
   dayColumn: {
     width: "56px",
@@ -171,6 +179,10 @@ const useStyles = makeStyles({
   },
   item: {
     flex: "none",
+    display: "flex",
+    boxSizing: "border-box",
+    alignItems: "center",
+    justifyContent: "center",
     appearance: "none",
     border: 0,
     borderRadius: tokens.borderRadiusMedium,
@@ -179,8 +191,10 @@ const useStyles = makeStyles({
     fontFamily: tokens.fontFamilyBase,
     fontSize: tokens.fontSizeBase300,
     lineHeight: tokens.lineHeightBase300,
-    padding: `${tokens.spacingVerticalXS} ${tokens.spacingHorizontalS}`,
-    minHeight: "36px",
+    padding: `0 ${tokens.spacingHorizontalS}`,
+    height: `${WHEEL_ITEM_HEIGHT}px`,
+    minHeight: `${WHEEL_ITEM_HEIGHT}px`,
+    maxHeight: `${WHEEL_ITEM_HEIGHT}px`,
     textAlign: "center",
     whiteSpace: "nowrap",
     cursor: "pointer",
@@ -295,24 +309,23 @@ export function DateWheel({
   const showMonth = precision === "DAY" || precision === "MONTH";
   const showDay = precision === "DAY";
 
-  // Re-centre every wheel once the popover is mounted. Later clicks already
-  // happen inside a scrolled column, so no further jump is needed.
+  // Re-centre every wheel on its chosen row whenever the popover opens or the
+  // draft changes. The symmetric column padding means no column clamps at the
+  // first or last row, so the selected day, month and year stay on one line.
   useEffect(() => {
     if (!open) return;
     const frame = window.requestAnimationFrame(() => {
-      const columns = [
-        showMonth ? monthColumnRef.current : null,
-        showDay ? dayColumnRef.current : null,
-        yearColumnRef.current,
+      const columns: Array<[HTMLDivElement | null, number]> = [
+        [showDay ? dayColumnRef.current : null, days.indexOf(parts.day)],
+        [showMonth ? monthColumnRef.current : null, parts.month - 1],
+        [yearColumnRef.current, years.indexOf(parts.year)],
       ];
-      for (const column of columns) {
-        column
-          ?.querySelector<HTMLElement>('[data-selected="true"]')
-          ?.scrollIntoView({ block: "center", inline: "nearest" });
+      for (const [column, index] of columns) {
+        if (column && index >= 0) column.scrollTop = wheelScrollTop(index);
       }
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [open, precision, showDay, showMonth]);
+  }, [open, precision, showDay, showMonth, parts, days, years]);
 
   if (precision === "UNKNOWN") return null;
 
