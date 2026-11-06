@@ -181,18 +181,18 @@ Derivation SHALL enforce the relationship invariants: no self-link, no duplicate
 
 ### Requirement: Parent age is validated
 
-A derived or manual `PARENT_CHILD` relation SHALL require the parent to be at least 9 years older than the child when both birth dates are known. The comparison SHALL use the start of each date's precision range and SHALL be skipped when either date is unknown, as specified by the date rules of issue #79. Exactly 9 years SHALL be accepted. Rejection SHALL use the canonical `PARENT_CHILD_AGE_GAP` code from #79.
+A derived or manual `PARENT_CHILD` relation SHALL require the parent to be at least 11 years older than the child when both birth dates are known. The comparison SHALL use the start of each date's precision range and SHALL be skipped when either date is unknown, as specified by the date rules of issue #79. Exactly 11 years SHALL be accepted. Rejection SHALL use the canonical `PARENT_CHILD_AGE_GAP` code from #79.
 
-#### Scenario: Less than nine years is rejected
+#### Scenario: Less than eleven years is rejected
 
-- **WHEN** both birth dates are known and the parent is less than 9 years older
+- **WHEN** both birth dates are known and the parent is less than 11 years older
 - **THEN** the save fails with `PARENT_CHILD_AGE_GAP`
 - **AND** `params.field` identifies the parent selection
 - **AND** clearing the parents allows the event to save
 
-#### Scenario: Exactly nine years is accepted
+#### Scenario: Exactly eleven years is accepted
 
-- **WHEN** the parent is exactly 9 years older than the child by the available dates
+- **WHEN** the parent is exactly 11 years older than the child by the available dates
 - **THEN** the relation is created
 
 #### Scenario: Unknown dates do not block the relation

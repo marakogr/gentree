@@ -4,13 +4,13 @@
 
 - [x] 1.1 Record the approved D1 option A (2026-11-05) in the PR and a `hitl` issue: additive optional provenance fields, legacy rows manual, direct delete warn-only, merge earliest id with unioned sources. Verify the record names the project-format consequence and the approver.
 - [x] 1.2 Add core unit tests for the desired-set derivation with synthetic people: marriage pair, birth with one and two parents, no participants, ambiguous casts, existing `PARTNER`, existing `ADOPTIVE_PARENT_CHILD`. Verify the tests fail for the missing behavior and encode D3.
-- [x] 1.3 Add core unit tests for self-link, duplicate idempotency, parent cycle and the 9-year boundary (8 years 364 days rejects, exactly 9 years passes, unknown date skips). Verify each test asserts `PARENT_CHILD_AGE_GAP` and its `params`.
+- [x] 1.3 Add core unit tests for self-link, duplicate idempotency, parent cycle and the 11-year boundary (10 years 364 days rejects, exactly 11 years passes, unknown date skips). Verify each test asserts `PARENT_CHILD_AGE_GAP` and its `params`.
 
 ## 2. Core relation model and derivation
 
 - [x] 2.1 Add the optional `origin` and `sourceEventIds` fields to `Relationship` with serde defaults so legacy rows read as manual; reject a derived row without a source event. Verify round-trip unit tests keep old JSON byte-compatible and new JSON camelCase fields stable.
 - [x] 2.2 Implement one pure derivation function over event, persons, existing rows and birth dates that returns rows to create, rows to annotate and row ids to retract, following D3. Verify tests cover every branch from 1.2 and that the function performs no I/O.
-- [x] 2.3 Implement the parent-age check against #79 date boundaries, or call the shared helper when it lands; accept exactly 9 years and skip unknown dates. Verify tests cover year, month and exact-date precision plus unknown precision.
+- [x] 2.3 Implement the parent-age check against #79 date boundaries, or call the shared helper when it lands; accept exactly 11 years and skip unknown dates. Verify tests cover year, month and exact-date precision plus unknown precision.
 - [x] 2.4 Add `PARENT_CHILD_AGE_GAP` to the core error codes and document its params in the code comment. Verify the new code is exported and existing error tests still pass.
 - [x] 2.5 Add the spouse-versus-co-parent regression tests: shared child without a spouse row yields no husband/wife/partner; a spouse row plus shared child yields the spouse term and a spouse edge. Verify both directions.
 

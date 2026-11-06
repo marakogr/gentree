@@ -73,7 +73,7 @@ Validation runs before any write and uses the same core checks as the relationsh
 - self-link: `VALIDATION_ERROR`, `params.field = participantIds`, `params.rule = selfLink`; the event owner is never selectable.
 - duplicate: not an error; the pair is already satisfied (D3).
 - cycle: `RELATIONSHIP_CYCLE` with the two person ids.
-- parent age: the canonical `PARENT_CHILD_AGE_GAP` from #79, `params.field = participantIds`, `params.years` with the smallest observed gap. Exactly 9 years passes; unknown or unknown-precision dates skip the check.
+- parent age: the canonical `PARENT_CHILD_AGE_GAP` from #79, `params.field = participantIds`, `params.years` with the smallest observed gap. Exactly 11 years passes; unknown or unknown-precision dates skip the check.
 
 The age check consumes the date-precision boundaries defined by #79 (the start of a year/month range). The check must run for both derived and manual parent relations; otherwise the same edge could be created through two paths.
 
@@ -125,7 +125,7 @@ Failure handling: because only one collection is written, a failed write leaves 
 - **Two file writes are not atomic for a save.** Mitigation: validate first, event first, idempotent repair, and tests for interruption in both directions. Do not present the save as all-or-nothing.
 - **Backfill writes during open.** Mitigation: one atomic relationship write, read-only skip, idempotent second open, aggregate-only reporting, and a failure that leaves the project unchanged.
 - **A direct delete of an automatic row is undone by the next event save.** Approved as UI-warning-only; the source of truth is the event.
-- **Age validation may reject plausible historical data.** Mitigation: apply only when both dates are known with usable precision, exactly 9 years passes, and clearing parents always allows the event to save.
+- **Age validation may reject plausible historical data.** Mitigation: apply only when both dates are known with usable precision, exactly 11 years passes, and clearing parents always allows the event to save.
 
 ## Migration Plan
 

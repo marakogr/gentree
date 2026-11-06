@@ -25,7 +25,7 @@ birth values, which the command layer and `validate_project` already have.
 - Let a residence be saved as an open-ended period without inventing a date.
 - Reject overlapping residence periods, allow adjacency, skip unknown dates.
 - Make birth ordering precision-aware in the write path and in project validation.
-- Require at least nine calendar years between a parent and a child.
+- Require at least eleven calendar years between a parent and a child.
 - Keep stable codes, localization and the existing project format.
 - Leave imported and legacy data untouched.
 
@@ -113,9 +113,9 @@ whose start unit is wholly before the birth anchor is rejected even when it exte
 A `BEFORE`-qualified event has no start and is not compared. The UI anomaly logic must be verified
 against this rule and aligned if it diverges.
 
-### D4. Nine-year parent gap uses birth anchors and is conservative
+### D4. Eleven-year parent gap uses birth anchors and is conservative
 
-The parent's birth anchor plus nine calendar years must not be later than the child's birth anchor.
+The parent's birth anchor plus eleven calendar years must not be later than the child's birth anchor.
 A 29 February anchor is clamped to 28 February in a non-leap target year. The rule applies only to
 `PARENT_CHILD`. It is skipped when either birth is unknown or has no start.
 
@@ -123,17 +123,18 @@ A 29 February anchor is clamped to 28 February in a non-leap target year. The ru
 
 1. Compare points as today. Rejects valid same-year data and depends on the accident of 1 January.
 2. Compare anchors. Rejects only pairs that are too close under every reading consistent with the
-   stored precision; may allow a pair whose true gap is under nine years when the data is coarse.
+   stored precision; may allow a pair whose true gap is under eleven years when the data is coarse.
 3. Compare the latest possible parent birth with the earliest possible child birth. Strictest, but
    would reject many plausible historical pairs and needs a second convention for ranges.
 
-**Recommendation:** option 2. It is deterministic, needs no invented dates and honours "exactly nine
+**Recommendation:** option 2. It is deterministic, needs no invented dates and honours "exactly eleven
 years is allowed".
 
 **Consequences:** coarse data stays admissible when the gap is uncertain. The check lives in the
 core as a pure function over two `DateValue` values and is called by `relationship_create`, where
 both persons are already loaded, and by `validate_project`. Approved in review on 2026-11-05 as
-biological-only (`PARENT_CHILD`, not adoption) with no maximum age gap.
+biological-only (`PARENT_CHILD`, not adoption) with no maximum age gap. Revised to eleven years in
+#101.
 
 ### D5. Codes, parameters and localization
 
@@ -159,7 +160,7 @@ command, chat tool, dependency or migration is proposed.
   `end`.
 - Reporting overlaps as warnings means a legacy project can show a warning that the user can only
   fix by editing data. That is the intended non-destructive behavior.
-- Anchor-based age comparison can accept a pair that is truly under nine years apart when both
+- Anchor-based age comparison can accept a pair that is truly under eleven years apart when both
   births are coarse. Rejecting instead would produce false errors on valid historical records.
 - `ADOPTIVE_PARENT_CHILD` is deliberately exempt. If reviewers want a minimum adopter age, that is
   a separate decision.
@@ -194,6 +195,6 @@ This change alters date semantics and a relation constraint, so the PR must:
 ## Resolved by review (2026-11-05)
 
 1. Legacy overlaps are reported as warnings in project validation; the write path stays an error.
-2. The nine-year gap stays biological-only and does not extend to `ADOPTIVE_PARENT_CHILD`.
+2. The eleven-year gap stays biological-only and does not extend to `ADOPTIVE_PARENT_CHILD`.
 3. The open end is offered for residence only in this change, not for occupation or education.
 4. No maximum plausible age gap is added; it is out of scope for this rule set.
