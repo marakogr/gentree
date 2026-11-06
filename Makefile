@@ -29,7 +29,8 @@ APP_EXE := desktop/target/release/gentree-desktop
 endif
 
 .PHONY: help setup doctor install fmt fmt-check lint test ui-check check ci i18n dev exe run \
-	build rebuild portable clean hooks ux-setup ux-review demo-project demo-screenshots release
+	build rebuild portable store store-test clean hooks ux-setup ux-review demo-project \
+	demo-screenshots release
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -107,6 +108,14 @@ release: ## Tag the version in tauri.conf.json and push it; CI builds a draft
 portable: ## Package the portable Windows archive (no installer)
 	cd desktop/apps/desktop && $(TAURI_APP) build --no-bundle --config tauri.portable.conf.json
 	$(NODE) scripts/package-portable.mjs --exe $(APP_EXE) --version $(shell node -p "require('./desktop/apps/desktop/tauri.conf.json').version") --out release-assets
+
+store: ## Build the Microsoft Store MSIX for Partner Center (unsigned, updater off)
+	cd desktop/apps/desktop && $(TAURI_APP) build --no-bundle --features store
+	$(NODE) scripts/package-msix.mjs --exe $(APP_EXE) --version $(shell node -p "require('./desktop/apps/desktop/tauri.conf.json').version") --out release-assets/store
+
+store-test: ## Build the Store MSIX and sign it with a local test certificate
+	cd desktop/apps/desktop && $(TAURI_APP) build --no-bundle --features store
+	$(NODE) scripts/package-msix.mjs --exe $(APP_EXE) --version $(shell node -p "require('./desktop/apps/desktop/tauri.conf.json').version") --out release-assets/store --dev-sign
 
 clean: ## Remove Rust build artifacts and the UI build output
 	cd desktop && $(CARGO) clean

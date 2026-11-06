@@ -10,6 +10,12 @@
 //! (`plugins.updater`), never in the user config: a settings file must not be
 //! able to point updates at another host. Both values are public; the signing
 //! private key stays in CI secrets (see `docs/releases.md`).
+//!
+//! The Microsoft Store build is compiled with `--features store`. It carries no
+//! updater plugin at all: Store policy requires a packaged app to be updated by
+//! the Store, and the package directory is read-only, so a self-update would
+//! fight the package manager. Such a build reports `channel = "store"` and
+//! refuses both update commands. See `docs/store.md`.
 
 use std::sync::Mutex;
 
@@ -18,9 +24,20 @@ use gentree_core::AppError;
 use serde::Serialize;
 use serde_json::Value;
 use tauri::{AppHandle, Manager, State};
+#[cfg(not(feature = "store"))]
 use tauri_plugin_updater::UpdaterExt;
 
 use crate::settings::ConfigState;
+
+/// Distribution channel reported by `update_status`. `direct` builds update
+/// themselves from the release feed, `store` builds are updated by the Store.
+#[cfg(feature = "store")]
+pub const CHANNEL: &str = "store";
+#[cfg(not(feature = "store"))]
+pub const CHANNEL: &str = "direct";
+
+/// `true` in the Microsoft Store flavour, which never updates itself.
+const STORE_MANAGED: bool = cfg!(feature = "store");
 
 /// Plugin id in `tauri.conf.json`: `plugins.updater`.
 const PLUGIN_NAME: &str = "updater";
@@ -45,6 +62,9 @@ impl Readiness {
     }
 
     /// Stable machine-readable reason; never contains a URL or a key.
+    ///
+    /// The Store flavour never builds this: it has no updater to refuse.
+    #[cfg(any(not(feature = "store"), test))]
     fn reason(self) -> &'static str {
         match self {
             Self::Ready => "ready",
@@ -145,6 +165,10 @@ fn is_loopback_http(endpoint: &str) -> bool {
 
 /// The guard every network command calls first. It returns before an updater
 /// (and therefore an HTTP client) exists, so it cannot make a request.
+///
+/// The Store flavour has no network commands to guard; it only keeps this for
+/// its tests, which still check the shipped config.
+#[cfg(any(not(feature = "store"), test))]
 pub fn ensure_ready(config: &UpdaterConfig) -> Result<(), AppError> {
     let readiness = config.readiness();
     if readiness.is_ready() {
@@ -173,6 +197,7 @@ pub struct UpdateState {
 }
 
 impl UpdateState {
+    #[cfg(not(feature = "store"))]
     fn record(&self, outcome: AutoCheckOutcome) {
         if let Ok(mut slot) = self.last_auto_check.lock() {
             *slot = Some(outcome);
@@ -188,6 +213,7 @@ impl UpdateState {
 
     /// Drops the startup result after an install: it describes a version that
     /// is no longer the one on disk.
+    #[cfg(not(feature = "store"))]
     fn clear(&self) {
         if let Ok(mut slot) = self.last_auto_check.lock() {
             *slot = None;
@@ -200,6 +226,9 @@ impl UpdateState {
 #[serde(rename_all = "camelCase")]
 pub struct UpdateStatus {
     pub current_version: String,
+    /// `"direct"` (in-app updater) or `"store"` (Microsoft Store delivers
+    /// updates). The UI keys its wording off this, not off `configured` alone.
+    pub channel: &'static str,
     pub configured: bool,
     pub auto_check: bool,
     /// Version announced by the check that produced this status, if any.
@@ -216,6 +245,7 @@ fn base_status(
 ) -> UpdateStatus {
     UpdateStatus {
         current_version: app.package_info().version.to_string(),
+        channel: CHANNEL,
         configured,
         auto_check,
         available_version: None,
@@ -240,10 +270,12 @@ fn read_auto_check(app: &AppHandle) -> bool {
 }
 
 /// No secrets and no URLs are logged or returned: only this stable code.
+#[cfg(not(feature = "store"))]
 fn check_failed() -> AppError {
     AppError::new(codes::UPDATE_CHECK_FAILED, "the update check failed")
 }
 
+#[cfg(not(feature = "store"))]
 fn install_failed() -> AppError {
     AppError::new(
         codes::UPDATE_INSTALL_FAILED,
@@ -251,6 +283,18 @@ fn install_failed() -> AppError {
     )
 }
 
+/// The Store flavour refuses update actions: the Store is the only installer.
+/// The UI never offers them (`channel = "store"`), the code stays defensive.
+#[cfg(feature = "store")]
+fn store_managed_error() -> AppError {
+    AppError::new(
+        codes::UPDATE_NOT_CONFIGURED,
+        "updates are delivered by Microsoft Store",
+    )
+    .with_param("reason", "storeManaged")
+}
+
+#[cfg(not(feature = "store"))]
 fn now_display() -> String {
     time::OffsetDateTime::now_utc()
         .format(&time::format_description::well_known::Rfc3339)
@@ -264,10 +308,11 @@ pub fn update_status(
     state: State<'_, UpdateState>,
 ) -> Result<UpdateStatus, AppError> {
     let config = updater_config(&app);
+    let configured = !STORE_MANAGED && config.readiness().is_ready();
     Ok(base_status(
         &app,
         read_auto_check(&app),
-        config.readiness().is_ready(),
+        configured,
         state.last(),
     ))
 }
@@ -275,6 +320,14 @@ pub fn update_status(
 /// `update_check`: the only manual network command besides install.
 #[tauri::command]
 pub async fn update_check(
+    app: AppHandle,
+    state: State<'_, UpdateState>,
+) -> Result<UpdateStatus, AppError> {
+    check_update(app, state).await
+}
+
+#[cfg(not(feature = "store"))]
+async fn check_update(
     app: AppHandle,
     state: State<'_, UpdateState>,
 ) -> Result<UpdateStatus, AppError> {
@@ -291,11 +344,27 @@ pub async fn update_check(
     Ok(status)
 }
 
+#[cfg(feature = "store")]
+async fn check_update(
+    _app: AppHandle,
+    _state: State<'_, UpdateState>,
+) -> Result<UpdateStatus, AppError> {
+    Err(store_managed_error())
+}
+
 /// `update_install`: downloads the announced release, verifies its signature
 /// and installs it. The plugin exits the app on Windows; other platforms need a
 /// manual restart, so the UI says so.
 #[tauri::command]
 pub async fn update_install(
+    app: AppHandle,
+    state: State<'_, UpdateState>,
+) -> Result<UpdateStatus, AppError> {
+    install_update(app, state).await
+}
+
+#[cfg(not(feature = "store"))]
+async fn install_update(
     app: AppHandle,
     state: State<'_, UpdateState>,
 ) -> Result<UpdateStatus, AppError> {
@@ -321,8 +390,17 @@ pub async fn update_install(
     Ok(status)
 }
 
+#[cfg(feature = "store")]
+async fn install_update(
+    _app: AppHandle,
+    _state: State<'_, UpdateState>,
+) -> Result<UpdateStatus, AppError> {
+    Err(store_managed_error())
+}
+
 /// Runs the startup check once, and only when the user opted in. Called from
 /// `setup`; a build that is not configured returns before any task is spawned.
+#[cfg(not(feature = "store"))]
 pub fn spawn_auto_check(app: AppHandle) {
     if !read_auto_check(&app) {
         return;
@@ -362,6 +440,10 @@ pub fn spawn_auto_check(app: AppHandle) {
     });
 }
 
+/// The Store delivers updates, so a packaged build never checks on its own.
+#[cfg(feature = "store")]
+pub fn spawn_auto_check(_app: AppHandle) {}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -369,6 +451,27 @@ mod tests {
 
     fn configured_endpoint() -> &'static str {
         "https://updates.invalid/gentree/latest.json"
+    }
+
+    #[cfg(not(feature = "store"))]
+    #[test]
+    fn a_direct_build_reports_its_own_update_channel() {
+        assert_eq!(CHANNEL, "direct");
+    }
+
+    /// The Store flavour must not be able to replace itself: the store channel
+    /// and a refusal are the whole contract the UI and the policy rely on.
+    #[cfg(feature = "store")]
+    #[test]
+    fn a_store_build_reports_the_store_channel_and_refuses_update_actions() {
+        assert_eq!(CHANNEL, "store");
+
+        let error = store_managed_error();
+        assert_eq!(error.code, codes::UPDATE_NOT_CONFIGURED);
+        assert_eq!(
+            error.params.get("reason").map(String::as_str),
+            Some("storeManaged")
+        );
     }
 
     #[test]

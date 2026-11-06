@@ -99,6 +99,7 @@
   "updatesInstalled": "Обновление установлено. Перезапустите Gentree.",
   "updatesNotConfigured": "В этой сборке обновления не настроены.",
   "updatesNotConfiguredHint": "Адрес сервера обновлений и открытый ключ пока заменены заглушками. Порядок настройки описан в docs/releases.md.",
+  "updatesStoreManaged": "Обновления для этой сборки поставляет Microsoft Store. Gentree не проверяет обновления самостоятельно.",
   "updatesNotes": "Что нового",
   "updatesLastAutoCheck": "Последняя автоматическая проверка: {{date}}",
   "updatesAutoCheckAvailable": "При проверке при запуске найдена версия {{version}}.",

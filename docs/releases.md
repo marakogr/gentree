@@ -20,6 +20,10 @@ The updater is **opt-in**: the app makes no update request until the user turns
 on **Settings → Updates → Check for updates at startup** (`updates.auto_check`,
 off by default) or presses **Check for updates**. There is no telemetry.
 
+The Microsoft Store is a second channel with its own packaging and updates: the
+Store build is a full-trust MSIX that the Store signs and updates, and it ships
+without the in-app updater. See [`store.md`](store.md) (`docs/ru/store.md`).
+
 ## How the app decides whether updates are configured
 
 The release-side settings live in `desktop/apps/desktop/tauri.conf.json`:

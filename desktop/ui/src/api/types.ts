@@ -813,6 +813,9 @@ export type AutoCheckOutcome = {
  */
 export type UpdateStatus = {
   currentVersion: string;
+  /** `"direct"`: the app updates itself from the release feed. `"store"`: the
+   * Microsoft Store delivers updates and this build never checks on its own. */
+  channel: "direct" | "store";
   /** False while the endpoint or public key is a release placeholder. */
   configured: boolean;
   autoCheck: boolean;

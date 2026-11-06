@@ -5,6 +5,13 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
+[features]
+# Microsoft Store flavour: no in-app updater (the Store delivers updates) and
+# `update_status` reports the "store" channel. Built with
+# `tauri build --features store`; packaged by `scripts/package-msix.mjs`.
+# See docs/store.md.
+store = []
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
