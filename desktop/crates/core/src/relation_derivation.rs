@@ -8,13 +8,14 @@
 //! and every event id that currently asserts the pair. Manual rows are never
 //! re-typed, rewritten or deleted.
 
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::error::AppResult;
-use crate::person::Person;
+use crate::person::{Gender, Person};
 use crate::record::{Event, EventType};
 use crate::relationship::{RelationOrigin, Relationship, RelationshipSet, RelationshipType};
 use crate::validation::ensure_parent_child_age_gap;
@@ -435,6 +436,99 @@ pub fn backfill_relations(
     report
 }
 
+/// Role slots of a birth event's participants: father first, mother second.
+/// The stored list is compact, so a lone parent always sits at index 0.
+const FATHER_SLOT: usize = 0;
+const MOTHER_SLOT: usize = 1;
+const MAX_BIRTH_PARENTS: usize = 2;
+
+fn event_date_order(left: &Event, right: &Event) -> Ordering {
+    match (left.date.start, right.date.start) {
+        (Some(a), Some(b)) => a.cmp(&b).then_with(|| left.id.cmp(&right.id)),
+        (Some(_), None) => Ordering::Less,
+        (None, Some(_)) => Ordering::Greater,
+        (None, None) => left.id.cmp(&right.id),
+    }
+}
+
+/// Birth events of `child_id`, earliest first; undated events come last.
+fn birth_indices_earliest_first(events: &[Event], child_id: Uuid) -> Vec<usize> {
+    let mut indices: Vec<usize> = events
+        .iter()
+        .enumerate()
+        .filter(|(_, event)| event.event_type == EventType::Birth && event.person_id == child_id)
+        .map(|(index, _)| index)
+        .collect();
+    indices.sort_by(|left, right| event_date_order(&events[*left], &events[*right]));
+    indices
+}
+
+/// Mirror a biological parent relation into the child's birth event.
+///
+/// Only the caller-decided `PARENT_CHILD` edge reaches this function; adoptive
+/// edges are never mirrored. The parent is added once, to the earliest birth
+/// event that still has a free parent slot. A birth whose two slots are taken
+/// by other people is left untouched, and the relation is still created by the
+/// caller. Returns whether any event changed.
+pub fn add_parent_to_birth_events(events: &mut [Event], child_id: Uuid, parent: &Person) -> bool {
+    if parent.id.is_nil() || parent.id == child_id {
+        return false;
+    }
+    let births = birth_indices_earliest_first(events, child_id);
+    if births.is_empty() {
+        return false;
+    }
+    // A parent already asserted by any birth event makes the reverse sync a
+    // no-op, so two birth events never duplicate the same parent.
+    if births
+        .iter()
+        .any(|index| events[*index].participant_ids.contains(&parent.id))
+    {
+        return false;
+    }
+    let Some(index) = births
+        .into_iter()
+        .find(|index| events[*index].participant_ids.len() < MAX_BIRTH_PARENTS)
+    else {
+        return false;
+    };
+    let participants = &mut events[index].participant_ids;
+    let slot = match parent.gender {
+        Gender::Male => FATHER_SLOT,
+        Gender::Female => MOTHER_SLOT,
+        Gender::Unknown => participants.len(),
+    };
+    // The list has no nil placeholders: a role slot past the end is the next
+    // free position. Inserting a father before a lone mother keeps fathers
+    // first; a lone mother (or unknown parent) is the only element.
+    let position = slot.min(participants.len());
+    participants.insert(position, parent.id);
+    true
+}
+
+/// Mirror the deletion of a biological parent relation into the child's birth
+/// events. Every birth event of the child drops that participant; an event
+/// without parents stays valid. Returns whether any event changed.
+pub fn remove_parent_from_birth_events(
+    events: &mut [Event],
+    child_id: Uuid,
+    parent_id: Uuid,
+) -> bool {
+    if parent_id.is_nil() {
+        return false;
+    }
+    let mut changed = false;
+    for event in events
+        .iter_mut()
+        .filter(|event| event.event_type == EventType::Birth && event.person_id == child_id)
+    {
+        let before = event.participant_ids.len();
+        event.participant_ids.retain(|id| *id != parent_id);
+        changed |= event.participant_ids.len() != before;
+    }
+    changed
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -445,6 +539,12 @@ mod tests {
         let mut person = Person::new(Vec::new()).unwrap();
         person.id = id;
         person.birth = birth;
+        person
+    }
+
+    fn gendered(id: Uuid, birth: DateValue, gender: Gender) -> Person {
+        let mut person = person(id, birth);
+        person.gender = gender;
         person
     }
 
@@ -640,6 +740,163 @@ mod tests {
         let mut rows = Vec::new();
         let report = backfill_relations(&events, &[], &mut rows, false);
         assert!(report.read_only);
+        assert!(rows.is_empty());
+    }
+
+    #[test]
+    fn reverse_sync_adds_a_father_to_the_first_slot() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let father_person = gendered(father, DateValue::exact_year(1970), Gender::Male);
+        let mut events = vec![birth(child, &[])];
+        assert!(add_parent_to_birth_events(
+            &mut events,
+            child,
+            &father_person
+        ));
+        assert_eq!(events[0].participant_ids, vec![father]);
+    }
+
+    #[test]
+    fn reverse_sync_places_a_mother_after_the_father() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let mother = Uuid::now_v7();
+        let mother_person = gendered(mother, DateValue::exact_year(1972), Gender::Female);
+        let mut events = vec![birth(child, &[father])];
+        assert!(add_parent_to_birth_events(
+            &mut events,
+            child,
+            &mother_person
+        ));
+        assert_eq!(events[0].participant_ids, vec![father, mother]);
+    }
+
+    #[test]
+    fn reverse_sync_keeps_a_lone_mother_compact() {
+        let child = Uuid::now_v7();
+        let mother = Uuid::now_v7();
+        let mother_person = gendered(mother, DateValue::exact_year(1972), Gender::Female);
+        let mut events = vec![birth(child, &[])];
+        assert!(add_parent_to_birth_events(
+            &mut events,
+            child,
+            &mother_person
+        ));
+        assert_eq!(events[0].participant_ids, vec![mother]);
+
+        let father = Uuid::now_v7();
+        let father_person = gendered(father, DateValue::exact_year(1970), Gender::Male);
+        assert!(add_parent_to_birth_events(
+            &mut events,
+            child,
+            &father_person
+        ));
+        assert_eq!(events[0].participant_ids, vec![father, mother]);
+    }
+
+    #[test]
+    fn reverse_sync_gives_an_unknown_parent_the_first_free_slot() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let unknown = Uuid::now_v7();
+        let unknown_person = gendered(unknown, DateValue::exact_year(1971), Gender::Unknown);
+        let mut events = vec![birth(child, &[father])];
+        assert!(add_parent_to_birth_events(
+            &mut events,
+            child,
+            &unknown_person
+        ));
+        assert_eq!(events[0].participant_ids, vec![father, unknown]);
+    }
+
+    #[test]
+    fn reverse_sync_leaves_fully_occupied_slots_untouched() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let mother = Uuid::now_v7();
+        let other = Uuid::now_v7();
+        let other_person = gendered(other, DateValue::exact_year(1968), Gender::Male);
+        let mut events = vec![birth(child, &[father, mother])];
+        assert!(!add_parent_to_birth_events(
+            &mut events,
+            child,
+            &other_person
+        ));
+        assert_eq!(events[0].participant_ids, vec![father, mother]);
+    }
+
+    #[test]
+    fn reverse_sync_is_idempotent_for_the_same_parent() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let father_person = gendered(father, DateValue::exact_year(1970), Gender::Male);
+        let mut events = vec![birth(child, &[father])];
+        assert!(!add_parent_to_birth_events(
+            &mut events,
+            child,
+            &father_person
+        ));
+        assert_eq!(events[0].participant_ids, vec![father]);
+    }
+
+    #[test]
+    fn reverse_sync_updates_the_earliest_birth_with_a_free_slot() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let mother = Uuid::now_v7();
+        let later_parent = Uuid::now_v7();
+        let later_person = gendered(later_parent, DateValue::exact_year(1975), Gender::Male);
+
+        let mut occupied = birth(child, &[father, mother]);
+        occupied.date = DateValue::exact_year(1900);
+        let mut free = birth(child, &[]);
+        free.date = DateValue::exact_year(1905);
+        let mut events = vec![free, occupied];
+        assert!(add_parent_to_birth_events(
+            &mut events,
+            child,
+            &later_person
+        ));
+        // The undated/earliest slot search sorts by date, not by input order.
+        assert_eq!(events[1].participant_ids, vec![father, mother]);
+        assert_eq!(events[0].participant_ids, vec![later_parent]);
+    }
+
+    #[test]
+    fn reverse_sync_removes_a_parent_from_every_birth_event() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let mother = Uuid::now_v7();
+        let mut events = vec![birth(child, &[father, mother]), birth(child, &[father])];
+        assert!(remove_parent_from_birth_events(&mut events, child, father));
+        assert_eq!(events[0].participant_ids, vec![mother]);
+        assert_eq!(events[1].participant_ids, Vec::<Uuid>::new());
+        assert!(!remove_parent_from_birth_events(&mut events, child, father));
+    }
+
+    #[test]
+    fn reverse_sync_does_not_duplicate_or_recreate_relations() {
+        let child = Uuid::now_v7();
+        let father = Uuid::now_v7();
+        let father_person = gendered(father, DateValue::exact_year(1970), Gender::Male);
+        let child_person = gendered(child, DateValue::exact_year(2000), Gender::Unknown);
+        let persons = vec![father_person.clone(), child_person];
+        let mut events = vec![birth(child, &[])];
+        add_parent_to_birth_events(&mut events, child, &father_person);
+        let mut rows = Vec::new();
+
+        // Saving the event after the reverse sync derives the same single row
+        // and repeated saves stay stable.
+        derive_event_relations(&events[0], &persons, &mut rows).unwrap();
+        derive_event_relations(&events[0], &persons, &mut rows).unwrap();
+        assert_eq!(rows.len(), 1);
+
+        // Deleting the relation also removes the participant, so the next
+        // event save does not recreate it.
+        rows.clear();
+        remove_parent_from_birth_events(&mut events, child, father);
+        derive_event_relations(&events[0], &persons, &mut rows).unwrap();
         assert!(rows.is_empty());
     }
 }

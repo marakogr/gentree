@@ -30,7 +30,5 @@
     "adoptedSon": "Прийомний син",
     "adoptedDaughter": "Прийомна донька"
   },
-  "automatic": "Автоматично",
-  "automaticSeveralSources": "Подій-джерел: {{count}}",
   "deleteAutomaticConfirm": "Зв'язок створено з події. Видалити його? Під час наступного збереження події він з'явиться знову."
 }

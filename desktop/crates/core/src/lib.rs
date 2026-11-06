@@ -40,7 +40,8 @@ pub use place::{apply_place_geo, normalize_place_text, ApplyPlaceGeoResult};
 pub use project::{Counts, Manifest, ProjectId, FORMAT_VERSION, SCHEMA_VERSION};
 pub use record::{Citation, CitationTarget, Confidence, Event, EventType, Media, Source};
 pub use relation_derivation::{
-    backfill_relations, derive_event_relations, retract_event_relations, DerivationReport,
+    add_parent_to_birth_events, backfill_relations, derive_event_relations,
+    remove_parent_from_birth_events, retract_event_relations, DerivationReport,
     RelationBackfillReport,
 };
 pub use relationship::{RelationOrigin, Relationship, RelationshipSet, RelationshipType};
