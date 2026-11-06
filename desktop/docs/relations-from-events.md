@@ -5,7 +5,7 @@ A marriage and a birth are the only events that assert kinship.
 - A `MARRIAGE` event with exactly two distinct people ensures one `SPOUSE` relation. A `PARTNER` row already covering the pair satisfies it and is never re-typed. Fewer or more than two people derive nothing.
 - A `BIRTH` event uses `participant_ids` as zero, one or two selected parents. Each parent becomes a `PARENT_CHILD` row with the parent on `person_id` and the child (the event owner) on `related_person_id`. No parent is inferred from a spouse relation.
 - Existing manual rows win: derivation never overwrites, re-types or deletes them. An existing `PARTNER` or `ADOPTIVE_PARENT_CHILD` row for the pair counts as satisfied.
-- Saving the same event again is idempotent. A parent must be at least 9 years older than the child when both birth dates are known; exactly 9 years is accepted and unknown dates skip the check (`PARENT_CHILD_AGE_GAP`).
+- Saving the same event again is idempotent. A parent must be at least 11 years older than the child when both birth dates are known; exactly 11 years is accepted and unknown dates skip the check (`PARENT_CHILD_AGE_GAP`).
 
 ## Provenance
 

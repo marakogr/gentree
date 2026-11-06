@@ -308,17 +308,21 @@ fn birth_and_death_contradiction_stays_on_whole_intervals() {
 // --- Parent age -----------------------------------------------------------
 
 #[test]
-fn parent_must_be_at_least_nine_years_older() {
+fn parent_must_be_at_least_eleven_years_older() {
     let parent = person(id(1), day(1900, 1, 1));
-    let eight = person(id(2), day(1908, 1, 1));
-    let nine = person(id(3), day(1909, 1, 1));
-    let older = person(id(4), day(1930, 1, 1));
+    let nine = person(id(2), day(1909, 1, 1));
+    let ten = person(id(3), day(1910, 1, 1));
+    let ten_and_364 = person(id(4), day(1910, 12, 31));
+    let eleven = person(id(5), day(1911, 1, 1));
+    let older = person(id(6), day(1930, 1, 1));
 
-    let error = ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &eight)
-        .expect_err("eight years");
-    assert_eq!(error.code, PARENT_CHILD_AGE_GAP);
-    assert_eq!(error.params.get("minYears").map(String::as_str), Some("9"));
-    ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &nine).unwrap();
+    for too_young in [&nine, &ten, &ten_and_364] {
+        let error = ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, too_young)
+            .expect_err("less than eleven years");
+        assert_eq!(error.code, PARENT_CHILD_AGE_GAP);
+        assert_eq!(error.params.get("minYears").map(String::as_str), Some("11"));
+    }
+    ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &eleven).unwrap();
     ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &older).unwrap();
 }
 

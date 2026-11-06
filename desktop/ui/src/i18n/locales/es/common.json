@@ -116,7 +116,7 @@
     "DUPLICATE_LIFE_EVENT": "Varios eventos de nacimiento o defunción",
     "LIFE_EVENT_ALREADY_EXISTS": "Esta persona ya tiene un evento de nacimiento o defunción",
     "RESIDENCE_RANGE_OVERLAP": "Los periodos de residencia se solapan",
-    "PARENT_CHILD_AGE_GAP": "El progenitor debe ser al menos 9 años mayor que el hijo",
+    "PARENT_CHILD_AGE_GAP": "El progenitor debe ser al menos 11 años mayor que el hijo",
     "CHAT_HISTORY_CORRUPTED": "El archivo de la conversación está dañado",
     "CHAT_HISTORY_LIMIT": "Se alcanzó el límite del historial del chat"
   },

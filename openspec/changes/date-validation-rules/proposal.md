@@ -9,7 +9,7 @@ saved at all. At the same time nothing rejects two overlapping residence periods
 a parent linked to a child born a few months later.
 
 The user asked for four related rules (issue #79): an optional residence end, no overlapping
-residence periods, precision-aware birth ordering, and a minimum nine-year parent/child age gap.
+residence periods, precision-aware birth ordering, and a minimum eleven-year parent/child age gap.
 Because they change date semantics and a relation constraint, they need a spec and a human
 decision record even though the intent is already approved.
 
@@ -27,7 +27,7 @@ decision record even though the intent is already approved.
 - **Unknown dates never block.** `UNKNOWN` dates and missing bounds skip the comparison instead of
   being filled with an assumed value.
 - **Parent/child age gap.** A `PARENT_CHILD` edge is rejected when the parent's birth anchor is less
-  than nine calendar years before the child's birth anchor. Exactly nine years is allowed. Either
+  than eleven calendar years before the child's birth anchor. Exactly eleven years is allowed. Either
   birth unknown → the check is skipped.
 - **Stable error codes and localization.** New machine-readable codes with id parameters, localized
   in the UI dictionaries. No Cyrillic and no paths in source.

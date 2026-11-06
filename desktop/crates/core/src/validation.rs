@@ -39,7 +39,7 @@ pub const RESIDENCE_RANGE_OVERLAP: &str = "RESIDENCE_RANGE_OVERLAP";
 /// Error code: a `PARENT_CHILD` edge has less than the minimum birth gap.
 pub const PARENT_CHILD_AGE_GAP: &str = "PARENT_CHILD_AGE_GAP";
 /// Minimum number of calendar years between a parent and a child.
-pub const MIN_PARENT_AGE_GAP_YEARS: i32 = 9;
+pub const MIN_PARENT_AGE_GAP_YEARS: i32 = 11;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -640,7 +640,7 @@ fn add_years(date: CivilDate, years: i32) -> CivilDate {
 /// Rejects a `PARENT_CHILD` edge when the parent is less than
 /// [`MIN_PARENT_AGE_GAP_YEARS`] older than the child.
 ///
-/// Both sides use their birth anchor; exactly nine years is accepted, unknown
+/// Both sides use their birth anchor; exactly eleven years is accepted, unknown
 /// births skip the check and `ADOPTIVE_PARENT_CHILD` is exempt.
 pub fn ensure_parent_child_age_gap(
     rel_type: RelationshipType,
@@ -1739,51 +1739,60 @@ mod tests {
     }
 
     #[test]
-    fn parent_child_age_gap_is_nine_calendar_years() {
+    fn parent_child_age_gap_is_eleven_calendar_years() {
         let parent = person_with_birth(
             uuid(1),
             DateValue::exact_day(CivilDate::new(1900, 1, 1).unwrap()),
         );
-        let eight = person_with_birth(
-            uuid(2),
-            DateValue::exact_day(CivilDate::new(1908, 1, 1).unwrap()),
-        );
         let nine = person_with_birth(
-            uuid(3),
+            uuid(2),
             DateValue::exact_day(CivilDate::new(1909, 1, 1).unwrap()),
         );
-        let older = person_with_birth(
+        let ten = person_with_birth(
+            uuid(3),
+            DateValue::exact_day(CivilDate::new(1910, 1, 1).unwrap()),
+        );
+        let ten_and_364 = person_with_birth(
             uuid(4),
+            DateValue::exact_day(CivilDate::new(1910, 12, 31).unwrap()),
+        );
+        let eleven = person_with_birth(
+            uuid(5),
+            DateValue::exact_day(CivilDate::new(1911, 1, 1).unwrap()),
+        );
+        let older = person_with_birth(
+            uuid(6),
             DateValue::exact_day(CivilDate::new(1930, 1, 1).unwrap()),
         );
 
-        let error = ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &eight)
-            .expect_err("too young");
-        assert_eq!(error.code, PARENT_CHILD_AGE_GAP);
-        assert_eq!(error.params.get("minYears").map(String::as_str), Some("9"));
-        assert!(ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &nine).is_ok());
+        for too_young in [&nine, &ten, &ten_and_364] {
+            let error =
+                ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, too_young)
+                    .expect_err("less than eleven years");
+            assert_eq!(error.code, PARENT_CHILD_AGE_GAP);
+            assert_eq!(error.params.get("minYears").map(String::as_str), Some("11"));
+        }
+        assert!(
+            ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &eleven).is_ok()
+        );
         assert!(
             ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &older).is_ok()
         );
 
         // Unknown births skip, and adoption is exempt.
-        let unknown = person(uuid(5), None, None);
+        let unknown = person(uuid(7), None, None);
+        assert!(ensure_parent_child_age_gap(RelationshipType::ParentChild, &unknown, &ten).is_ok());
         assert!(
-            ensure_parent_child_age_gap(RelationshipType::ParentChild, &unknown, &eight).is_ok()
+            ensure_parent_child_age_gap(RelationshipType::AdoptiveParentChild, &parent, &ten)
+                .is_ok()
         );
-        assert!(ensure_parent_child_age_gap(
-            RelationshipType::AdoptiveParentChild,
-            &parent,
-            &eight
-        )
-        .is_ok());
 
         // A range anchor is its start.
-        let ranged = person_with_birth(uuid(6), open_range(CivilDate::new(1900, 1, 1).unwrap()));
+        let ranged = person_with_birth(uuid(8), open_range(CivilDate::new(1900, 1, 1).unwrap()));
+        assert!(ensure_parent_child_age_gap(RelationshipType::ParentChild, &ranged, &ten).is_err());
         assert!(
-            ensure_parent_child_age_gap(RelationshipType::ParentChild, &ranged, &eight).is_err()
+            ensure_parent_child_age_gap(RelationshipType::ParentChild, &ranged, &eleven).is_ok()
         );
-        assert!(ensure_parent_child_age_gap(RelationshipType::ParentChild, &ranged, &nine).is_ok());
     }
 
     #[test]
@@ -1792,14 +1801,14 @@ mod tests {
             uuid(1),
             DateValue::exact_day(CivilDate::new(1904, 2, 29).unwrap()),
         );
-        // 1913 is not a leap year: the threshold is 28 February.
+        // 1915 is not a leap year: the threshold is 28 February.
         let before = person_with_birth(
             uuid(2),
-            DateValue::exact_day(CivilDate::new(1913, 2, 27).unwrap()),
+            DateValue::exact_day(CivilDate::new(1915, 2, 27).unwrap()),
         );
         let at = person_with_birth(
             uuid(3),
-            DateValue::exact_day(CivilDate::new(1913, 2, 28).unwrap()),
+            DateValue::exact_day(CivilDate::new(1915, 2, 28).unwrap()),
         );
         assert!(
             ensure_parent_child_age_gap(RelationshipType::ParentChild, &parent, &before).is_err()
