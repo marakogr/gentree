@@ -4,7 +4,8 @@
 use gentree_core::record::CitationTarget;
 use gentree_core::relationship::{Relationship, RelationshipSet, RelationshipType};
 use gentree_core::{
-    add_parent_to_birth_events, remove_parent_from_birth_events, AppError, AppResult, Person,
+    add_parent_to_birth_events, fill_patronymic, remove_parent_from_birth_events,
+    unique_father_given_name, AppError, AppResult, Person,
 };
 use gentree_storage::{ProjectStore, RELATIONSHIP_FILE};
 use serde::Deserialize;
@@ -95,6 +96,24 @@ pub(crate) fn create_relationship(
     // must leave both collections unchanged.
     RelationshipSet::new(rows.clone())?;
 
+    // A biological father with an unambiguous given name fills an empty
+    // patronymic. The fill is computed from the future relation set, so a
+    // second male biological parent makes the rule ambiguous and leaves the
+    // field untouched.
+    let mut persons = store.persons()?;
+    let mut persons_changed = false;
+    if entity.rel_type == RelationshipType::ParentChild {
+        if let Some(index) = persons
+            .iter()
+            .position(|person| person.id == entity.related_person_id)
+        {
+            let father_given = unique_father_given_name(&persons, &rows, entity.related_person_id);
+            if let Some(father_given) = father_given {
+                persons_changed = fill_patronymic(&mut persons[index], &father_given);
+            }
+        }
+    }
+
     // Only a biological parent edge is mirrored. `person_id` is the parent and
     // `related_person_id` the child; adoptive edges never touch a birth event.
     if entity.rel_type == RelationshipType::ParentChild {
@@ -104,6 +123,9 @@ pub(crate) fn create_relationship(
         }
     }
     store.save_relationships(&rows)?;
+    if persons_changed {
+        store.save_persons(&persons)?;
+    }
     let version = entity_version(store, RELATIONSHIP_FILE, entity.id)?;
     Ok(Versioned { entity, version })
 }
@@ -174,6 +196,21 @@ mod tests {
         person
     }
 
+    fn named(gender: Gender, given: &str, birth_year: i32) -> Person {
+        let mut person = person(gender, birth_year);
+        person.names[0].given = Some(given.to_owned());
+        person
+    }
+
+    fn stored_person(store: &ProjectStore, id: Uuid) -> Person {
+        store
+            .persons()
+            .unwrap()
+            .into_iter()
+            .find(|person| person.id == id)
+            .unwrap()
+    }
+
     fn birth(child: Uuid, parents: &[Uuid], year: i32) -> Event {
         let mut event = Event::new(child, EventType::Birth);
         event.date = DateValue::exact_year(year);
@@ -233,6 +270,59 @@ mod tests {
         derive_event_relations(&events[0], &persons, &mut rows).unwrap();
         derive_event_relations(&events[0], &persons, &mut rows).unwrap();
         assert_eq!(rows.len(), 2);
+    }
+
+    #[test]
+    fn create_fills_an_empty_patronymic_from_a_male_father() {
+        let (_tmp, mut store) = setup();
+        let father = named(Gender::Male, "Игорь", 1970);
+        let son = named(Gender::Male, "Synthetic", 2000);
+        let daughter = named(Gender::Female, "Synthetic", 2002);
+        let (father_id, son_id, daughter_id) = (father.id, son.id, daughter.id);
+        store.save_persons(&[father, son, daughter]).unwrap();
+
+        create_relationship(&mut store, parent_edge(father_id, son_id)).unwrap();
+        assert_eq!(
+            stored_person(&store, son_id).names[0].patronymic.as_deref(),
+            Some("Игоревич")
+        );
+
+        create_relationship(&mut store, parent_edge(father_id, daughter_id)).unwrap();
+        assert_eq!(
+            stored_person(&store, daughter_id).names[0]
+                .patronymic
+                .as_deref(),
+            Some("Игоревна")
+        );
+    }
+
+    #[test]
+    fn create_keeps_a_non_empty_patronymic_and_skips_unknown_cases() {
+        let (_tmp, mut store) = setup();
+        let father = named(Gender::Male, "Иван", 1970);
+        let latin_father = named(Gender::Male, "Ivan", 1968);
+        let mut kept = named(Gender::Male, "Synthetic", 2000);
+        kept.names[0].patronymic = Some("Своё".to_owned());
+        let unknown = named(Gender::Unknown, "Synthetic", 2002);
+        let latin = named(Gender::Male, "Synthetic", 2004);
+        let (father_id, latin_father_id) = (father.id, latin_father.id);
+        let (kept_id, unknown_id, latin_id) = (kept.id, unknown.id, latin.id);
+        store
+            .save_persons(&[father, latin_father, kept, unknown, latin])
+            .unwrap();
+
+        create_relationship(&mut store, parent_edge(father_id, kept_id)).unwrap();
+        create_relationship(&mut store, parent_edge(father_id, unknown_id)).unwrap();
+        create_relationship(&mut store, parent_edge(latin_father_id, latin_id)).unwrap();
+
+        assert_eq!(
+            stored_person(&store, kept_id).names[0]
+                .patronymic
+                .as_deref(),
+            Some("Своё")
+        );
+        assert_eq!(stored_person(&store, unknown_id).names[0].patronymic, None);
+        assert_eq!(stored_person(&store, latin_id).names[0].patronymic, None);
     }
 
     #[test]

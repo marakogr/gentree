@@ -9,6 +9,7 @@ pub mod graph;
 pub mod kinship;
 pub mod merge;
 pub mod path;
+pub mod patronymic;
 pub mod person;
 pub mod place;
 pub mod project;
@@ -35,6 +36,7 @@ pub use merge::{
     MergePreviewCounts, MergeReport, MergeWarning, PersonDecision, PersonMatch, Side,
 };
 pub use path::{EdgeDirection, PathResult, PathStep, MAX_ALTERNATIVES};
+pub use patronymic::{derive_patronymic, fill_patronymic, unique_father_given_name};
 pub use person::{ExternalId, Gender, Name, NameType, Person, PersonId};
 pub use place::{apply_place_geo, normalize_place_text, ApplyPlaceGeoResult};
 pub use project::{Counts, Manifest, ProjectId, FORMAT_VERSION, SCHEMA_VERSION};

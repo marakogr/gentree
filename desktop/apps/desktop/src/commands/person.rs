@@ -9,7 +9,7 @@ use gentree_core::person::{ExternalId, Gender, Name, Person};
 use gentree_core::record::{Citation, Event, EventType, Media};
 use gentree_core::relationship::Relationship;
 use gentree_core::validation::{removal_plan, RemovalPlan};
-use gentree_core::{AppError, AppResult, DateValue};
+use gentree_core::{fill_patronymic, unique_father_given_name, AppError, AppResult, DateValue};
 use gentree_storage::{ProjectStore, EVENT_FILE, PERSON_FILE, RELATIONSHIP_FILE};
 use serde::{Deserialize, Serialize};
 use tauri::State;
@@ -454,7 +454,7 @@ pub fn person_update(
 ) -> Result<Versioned<Person>, AppError> {
     with_store(&state, |store| {
         let id = person.require_id()?;
-        let entity = person.into_person();
+        let mut entity = person.into_person();
         entity.validate()?;
         require_version(store, PERSON_FILE, id, &expected_version)?;
 
@@ -464,6 +464,12 @@ pub fn person_update(
             .position(|existing| existing.id == id)
             .ok_or_else(|| person_not_found(id))?;
         let previous = persons[index].clone();
+        // Saving the form fills an empty patronymic from the stored biological
+        // father. A non-empty value from the form or from an import is kept.
+        let relationships = store.relationships()?;
+        if let Some(father_given) = unique_father_given_name(&persons, &relationships, id) {
+            fill_patronymic(&mut entity, &father_given);
+        }
         persons[index] = entity.clone();
         store.save_persons(&persons)?;
         let mut events = store.events()?;
