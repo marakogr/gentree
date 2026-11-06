@@ -126,6 +126,16 @@ jobs:
             if (-not $manifest.Contains($required)) { throw "AppxManifest.xml is missing $required" }
           }
 
+          # Partner Center resolves display strings and images through the
+          # resource index and rejects a package that declares no language, so
+          # both are release-blocking, not cosmetic.
+          if (-not (Test-Path (Join-Path $layout 'resources.pri'))) {
+            throw 'the package has no resources.pri; the Store would report every image as missing'
+          }
+          if ($manifest -notmatch '<Resource Language="') {
+            throw 'AppxManifest.xml declares no language; the Store requires at least one'
+          }
+
           $sums = 'release-assets/store/SHA256SUMS-store-x64.txt'
           if (-not (Test-Path $sums)) { throw 'the packager did not write the checksum file' }
           Get-Content $sums
