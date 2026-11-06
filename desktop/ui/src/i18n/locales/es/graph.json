@@ -44,5 +44,6 @@
   "wholeTreeWarning": "El árbol de todo el proyecto es ilegible cuando está completamente expandido. Úselo solo para una visión general.",
   "showSpouses": "Mostrar cónyuges",
   "showSpousesHint": "Mostrar los cónyuges y parejas de la persona raíz y de los parientes de sangre visibles en el mismo nivel.",
-  "spouseRole": "Cónyuge"
+  "spouseRole": "Cónyuge",
+  "hoverUnknownKinship": "Parentesco desconocido"
 }

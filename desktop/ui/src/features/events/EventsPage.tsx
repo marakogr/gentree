@@ -73,14 +73,19 @@ import { displayName } from "../persons/helpers";
 import { ValidationSummary } from "../projects/ValidationSummary";
 import EventForm from "./EventForm";
 import { EventCard } from "./EventCard";
+import { EventPersonCell } from "./EventPersonCell";
 import { EVENT_TYPE_ICONS } from "./typeIcons";
-import { useEventFilterState } from "./useEventFilterState";
+import {
+  useEventFilterState,
+  usePruneEventPersonFilter,
+} from "./useEventFilterState";
 import { usePersonScopeIds } from "../persons/usePersonScopeIds";
 import { ANOMALY_CODES, anomalySummary, detectAnomalies } from "./anomalies";
 import {
   EVENT_COLUMNS,
   EVENT_PAGE_SIZE,
   eventDateLabel,
+  eventOwnerId,
   eventPersonIds,
   eventTypeLabel,
   eventYearBounds,
@@ -359,10 +364,7 @@ export default function EventsPage({
   );
   // The search text is not counted: it has its own clear button, and the reset
   // row should not appear for typing alone.
-  const activeFilterCount =
-    (filters.personId === "" ? 0 : 1) +
-    filters.types.length +
-    (filters.fromYear === "" && filters.toYear === "" ? 0 : 1);
+  const activeFilterCount = sharedFilters.activeCount;
   const storedColumns = useMemo(
     () => readEventColumns(view.filters),
     [filterSignature],
@@ -371,6 +373,18 @@ export default function EventsPage({
   const personsById = useMemo(
     () => new Map(persons.map((item) => [item.entity.id, item.entity])),
     [persons],
+  );
+
+  // A stored person filter can outlive its person (deleted here or imported
+  // from another tree). Drop it as soon as this project's people are known.
+  const knownPersonIds = useMemo(
+    () => new Set(personsById.keys()),
+    [personsById],
+  );
+  usePruneEventPersonFilter(
+    filters,
+    knownPersonIds,
+    sharedFilters.setFilter,
   );
 
   const personName = useCallback(
@@ -383,11 +397,11 @@ export default function EventsPage({
     [personsById, t],
   );
 
+  // Search and the person sort still see everyone in the event, while the
+  // «person» column itself renders only the owner (see `eventOwnerId`).
   const eventPeople = useCallback(
     (event: EventEntity): string =>
-      [event.personId, ...(event.participantIds ?? [])]
-        .map(personName)
-        .join(", "),
+      eventPersonIds(event).map(personName).join(", "),
     [personName],
   );
 
@@ -1088,6 +1102,7 @@ export default function EventsPage({
                           .join("; ")
                       : null;
                     const selected = view.selectedId === entity.id;
+                    const ownerId = eventOwnerId(entity);
                     const dateText = eventDateText(entity.date);
                     const fileCount = filesByEvent[entity.id] ?? 0;
                     return (
@@ -1164,36 +1179,13 @@ export default function EventsPage({
                         {columns.includes("person") ? (
                           <TableCell>
                             <TableCellLayout>
-                              {onOpenPerson ? (
-                                <span className="events-person-links">
-                                  {eventPersonIds(entity).map((personId, index) => (
-                                    <span key={personId}>
-                                      {index > 0 ? (
-                                        <span
-                                          className="events-person-sep"
-                                          aria-hidden="true"
-                                        >
-                                          ,{" "}
-                                        </span>
-                                      ) : null}
-                                      <button
-                                        type="button"
-                                        className="events-person-link"
-                                        onClick={(event) => {
-                                          event.stopPropagation();
-                                          onOpenPerson(personId);
-                                        }}
-                                      >
-                                        {personName(personId)}
-                                      </button>
-                                    </span>
-                                  ))}
-                                </span>
-                              ) : (
-                                <span className="events-person-static">
-                                  {eventPeople(entity)}
-                                </span>
-                              )}
+                              <EventPersonCell
+                                ownerId={ownerId}
+                                name={
+                                  ownerId === null ? "" : personName(ownerId)
+                                }
+                                onOpenPerson={onOpenPerson}
+                              />
                             </TableCellLayout>
                           </TableCell>
                         ) : null}

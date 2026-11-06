@@ -58,6 +58,7 @@ import {
   photosByPerson,
 } from "../media/helpers";
 import { showsNodeLabels } from "./detail";
+import { cardHoverLabel } from "./hover";
 import {
   layoutAncestors,
   layoutDescendants,
@@ -1122,18 +1123,21 @@ export default function GraphPage({
                           })
                         : null;
                     const meta = kinshipLabel ?? role;
-                    const cardTitle = kinshipLabel
-                      ? role
-                        ? `${kinshipLabel} · ${role}`
-                        : kinshipLabel
-                      : undefined;
+                    const isRoot =
+                      rootGraphId !== "" && node.personId === rootGraphId;
+                    // The tooltip carries the kinship to the root only and
+                    // never the structural role that the card body shows.
+                    const cardTitle = cardHoverLabel({
+                      hasRoot: rootGraphId !== "",
+                      isRoot,
+                      kinshipLabel,
+                      unknownLabel: t("graph:hoverUnknownKinship"),
+                    });
                     const photo = node.personId
                       ? photos.get(node.personId)
                       : undefined;
                     const initials = initialsFromName(name);
                     const classes = ["graph-node"];
-                    const isRoot =
-                      rootGraphId !== "" && node.personId === rootGraphId;
                     if (isRoot) classes.push("root");
                     if (selected?.person.entity.id === node.personId)
                       classes.push("selected");

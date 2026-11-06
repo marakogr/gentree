@@ -30,7 +30,5 @@
     "adoptedSon": "Прыёмны сын",
     "adoptedDaughter": "Прыёмная дачка"
   },
-  "automatic": "Аўтаматычна",
-  "automaticSeveralSources": "Падзей-крыніц: {{count}}",
   "deleteAutomaticConfirm": "Сувязь створана з падзеі. Выдаліць яе? Пры наступным захаванні падзеі яна з'явіцца зноў."
 }

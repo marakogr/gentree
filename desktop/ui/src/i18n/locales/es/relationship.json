@@ -30,7 +30,5 @@
     "adoptedSon": "Hijo adoptivo",
     "adoptedDaughter": "Hija adoptiva"
   },
-  "automatic": "Automática",
-  "automaticSeveralSources": "{{count}} eventos de origen",
   "deleteAutomaticConfirm": "Esta relación se creó desde un evento. ¿Eliminarla aquí? Al volver a guardar un evento de origen se recreará."
 }

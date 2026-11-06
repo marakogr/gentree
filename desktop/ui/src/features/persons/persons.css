@@ -875,13 +875,3 @@
 .person-form .field > span {
   width: 100%;
 }
-
-.person-relation-origin {
-  display: inline-flex;
-  margin-inline-start: 8px;
-}
-
-.person-relation-source {
-  display: block;
-  color: var(--colorNeutralForeground3);
-}

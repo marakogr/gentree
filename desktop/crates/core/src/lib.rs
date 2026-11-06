@@ -9,6 +9,7 @@ pub mod graph;
 pub mod kinship;
 pub mod merge;
 pub mod path;
+pub mod patronymic;
 pub mod person;
 pub mod place;
 pub mod project;
@@ -35,12 +36,14 @@ pub use merge::{
     MergePreviewCounts, MergeReport, MergeWarning, PersonDecision, PersonMatch, Side,
 };
 pub use path::{EdgeDirection, PathResult, PathStep, MAX_ALTERNATIVES};
+pub use patronymic::{derive_patronymic, fill_patronymic, unique_father_given_name};
 pub use person::{ExternalId, Gender, Name, NameType, Person, PersonId};
 pub use place::{apply_place_geo, normalize_place_text, ApplyPlaceGeoResult};
 pub use project::{Counts, Manifest, ProjectId, FORMAT_VERSION, SCHEMA_VERSION};
 pub use record::{Citation, CitationTarget, Confidence, Event, EventType, Media, Source};
 pub use relation_derivation::{
-    backfill_relations, derive_event_relations, retract_event_relations, DerivationReport,
+    add_parent_to_birth_events, backfill_relations, derive_event_relations,
+    remove_parent_from_birth_events, retract_event_relations, DerivationReport,
     RelationBackfillReport,
 };
 pub use relationship::{RelationOrigin, Relationship, RelationshipSet, RelationshipType};

@@ -2,14 +2,14 @@
 //! Deletion follows [`gentree_core::removal_plan`]; see design.md §4 and §7.
 
 use std::cmp::Ordering;
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 use gentree_core::date::CivilDate;
 use gentree_core::person::{ExternalId, Gender, Name, Person};
 use gentree_core::record::{Citation, Event, EventType, Media};
 use gentree_core::relationship::Relationship;
 use gentree_core::validation::{removal_plan, RemovalPlan};
-use gentree_core::{AppError, AppResult, DateValue};
+use gentree_core::{fill_patronymic, unique_father_given_name, AppError, AppResult, DateValue};
 use gentree_storage::{ProjectStore, EVENT_FILE, PERSON_FILE, RELATIONSHIP_FILE};
 use serde::{Deserialize, Serialize};
 use tauri::State;
@@ -212,12 +212,55 @@ fn sync_life_event(
     }
 
     if owned.is_empty() && !is_blank_date(date) {
-        let mut event = Event::new(person_id, event_type);
-        event.date = date.clone();
-        events.push(event);
+        events.push(life_event(person_id, event_type, date));
         return true;
     }
     false
+}
+
+/// A `BIRTH`/`DEATH` event carrying one person's date.
+fn life_event(person_id: Uuid, event_type: EventType, date: &DateValue) -> Event {
+    let mut event = Event::new(person_id, event_type);
+    event.date = date.clone();
+    event
+}
+
+/// Creates the `BIRTH`/`DEATH` events implied by every person's dates.
+///
+/// This is the batch form of calling [`sync_life_events`] with `previous =
+/// None` for each person: only a person with a known date and no owned event of
+/// that type gains one, so a manual event with another date is never
+/// overwritten. The stored events are indexed once, which keeps opening a large
+/// import linear instead of rescanning the event list per person. Returns the
+/// number of created events.
+pub(crate) fn create_missing_life_events(events: &mut Vec<Event>, persons: &[Person]) -> usize {
+    let mut has_birth = HashSet::new();
+    let mut has_death = HashSet::new();
+    for event in events.iter() {
+        match event.event_type {
+            EventType::Birth => {
+                has_birth.insert(event.person_id);
+            }
+            EventType::Death => {
+                has_death.insert(event.person_id);
+            }
+            _ => {}
+        }
+    }
+    let mut created = 0;
+    for person in persons {
+        for (event_type, date, owned) in [
+            (EventType::Birth, &person.birth, &has_birth),
+            (EventType::Death, &person.death, &has_death),
+        ] {
+            if is_blank_date(date) || owned.contains(&person.id) {
+                continue;
+            }
+            events.push(life_event(person.id, event_type, date));
+            created += 1;
+        }
+    }
+    created
 }
 
 fn versioned_persons(store: &ProjectStore) -> AppResult<Vec<Versioned<Person>>> {
@@ -454,7 +497,7 @@ pub fn person_update(
 ) -> Result<Versioned<Person>, AppError> {
     with_store(&state, |store| {
         let id = person.require_id()?;
-        let entity = person.into_person();
+        let mut entity = person.into_person();
         entity.validate()?;
         require_version(store, PERSON_FILE, id, &expected_version)?;
 
@@ -464,6 +507,12 @@ pub fn person_update(
             .position(|existing| existing.id == id)
             .ok_or_else(|| person_not_found(id))?;
         let previous = persons[index].clone();
+        // Saving the form fills an empty patronymic from the stored biological
+        // father. A non-empty value from the form or from an import is kept.
+        let relationships = store.relationships()?;
+        if let Some(father_given) = unique_father_given_name(&persons, &relationships, id) {
+            fill_patronymic(&mut entity, &father_given);
+        }
         persons[index] = entity.clone();
         store.save_persons(&persons)?;
         let mut events = store.events()?;
@@ -918,6 +967,34 @@ mod tests {
 
         assert!(!sync_life_events(&mut events, &person, None));
         assert!(events.is_empty());
+    }
+
+    #[test]
+    fn the_batch_create_matches_per_person_sync() {
+        let a = person(110, "Alpha", Some(1900), Some(1970));
+        let mut b = person(111, "Beta", None, Some(1980));
+        b.birth = DateValue::default();
+        let c = person(112, "Gamma", Some(1920), None);
+
+        // One person already owns a BIRTH event with another date.
+        let mut manual = Event::new(c.id, EventType::Birth);
+        manual.date = date(1919);
+        let seed = vec![manual];
+
+        let mut expected = seed.clone();
+        for row in [&a, &b, &c] {
+            sync_life_events(&mut expected, row, None);
+        }
+        let mut actual = seed;
+        let created = create_missing_life_events(&mut actual, &[a, b, c]);
+        let shape = |events: &[Event]| {
+            events
+                .iter()
+                .map(|event| (event.person_id, event.event_type, event.date.clone()))
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(shape(&actual), shape(&expected));
+        assert_eq!(created, 3);
     }
 
     #[test]
