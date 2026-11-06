@@ -52,6 +52,14 @@ function nextYear(iso) {
 
 /** A DateValue with an exclusive end that matches its precision. */
 function date(iso, precision = "DAY", qualifier = "EXACT") {
+  // `DateValue::validate` requires bounds aligned to the declared precision
+  // (ADR-0010 rule 7), so catch a misaligned demo date while generating it.
+  if (precision === "YEAR" && !/^\d{4}-01-01$/.test(iso)) {
+    throw new Error(`YEAR precision requires YYYY-01-01, got "${iso}"`);
+  }
+  if (precision === "MONTH" && !/^\d{4}-\d{2}-01$/.test(iso)) {
+    throw new Error(`MONTH precision requires YYYY-MM-01, got "${iso}"`);
+  }
   const end =
     precision === "DAY" ? nextDay(iso) : precision === "MONTH" ? nextMonth(iso) : nextYear(iso);
   return { start: iso, end, precision, qualifier, original: null };
@@ -465,7 +473,7 @@ const EVENTS = [
   { person: 3, type: "BIRTH", date: date("1845-03-10"), place: "spb", sources: [1] },
   { person: 3, type: "MARRIAGE", date: date("1866-10-28"), place: "spb", participants: [4], sources: [2], details: { marriage_rite: { ru: "Православное венчание", en: "Orthodox wedding" } } },
   { person: 3, type: "OCCUPATION", date: date("1881-03-13"), place: "spb", details: { position: { ru: "Император Всероссийский", en: "Emperor of All Russia" }, employer: { ru: "Российская империя", en: "Russian Empire" } } },
-  { person: 3, type: "RESIDENCE", date: date("1881-04-01", "YEAR", "APPROXIMATE"), place: "gatchina", details: { address: { ru: "Большой Гатчинский дворец", en: "Gatchina Palace" } } },
+  { person: 3, type: "RESIDENCE", date: date("1881-01-01", "YEAR", "APPROXIMATE"), place: "gatchina", details: { address: { ru: "Большой Гатчинский дворец", en: "Gatchina Palace" } } },
   { person: 3, type: "DEATH", date: date("1894-11-01"), place: "livadia", sources: [3], details: { cause: { ru: "Болезнь почек", en: "Kidney disease" } } },
   // Maria Feodorovna
   { person: 4, type: "BIRTH", date: date("1847-11-26"), place: "copenhagen", sources: [1] },
