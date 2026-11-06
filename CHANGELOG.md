@@ -4,6 +4,27 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.7.0] — 2026-11-06
+
+Gentree is on its way to the Microsoft Store: the same app is built as a
+full-trust MSIX package that the Store signs and updates for you, while the
+GitHub build keeps its own installer and in-app updater.
+
+### Added
+
+- A Microsoft Store package (`make store`): a full-trust MSIX generated from
+  `msix/AppxManifest.xml` with the Partner Center identity, tile assets and the
+  Store-assigned four-part version.
+- A Store build flavour (`--features store`) that ships without the updater
+  plugin: the Store delivers updates, so the app never replaces its own package.
+- The Updates screen names the channel: a Store build says the Store handles
+  updates instead of offering buttons that could only fail.
+
+### Changed
+
+- The update check and install buttons are hidden in a build that cannot update
+  itself, instead of failing with a localized error when pressed.
+
 ## [0.6.0] — 2026-11-06
 
 Family tree and relations: parents, spouses and birth events now agree with each
@@ -257,6 +278,7 @@ Windows SmartScreen or macOS Gatekeeper may ask for confirmation on first launch
 - The "Show from selected" and "Show siblings" tree buttons. The root picker
   already chooses the person the tree is built from.
 
+[0.7.0]: ../../releases/tag/v0.7.0
 [0.6.0]: ../../releases/tag/v0.6.0
 [0.5.0]: ../../releases/tag/v0.5.0
 [0.4.0]: ../../releases/tag/v0.4.0
