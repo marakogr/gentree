@@ -257,7 +257,9 @@
 }
 
 :root[data-style="swiss"] .content {
-  gap: var(--space-3);
+  /* The shell rhythm is shared by both styles; do not fall back to the
+     denser Swiss inner step, or the sidebar gutter stops matching it. */
+  gap: var(--shell-space);
 }
 
 :root[data-style="swiss"] .sidebar {

@@ -1,5 +1,6 @@
 import { auditPage } from "../lib/audit.js";
 import { save, shot } from "../lib/report.js";
+import { measureShellSpacing } from "../lib/spacing.js";
 import {
   clickNav,
   consoleErrors,
@@ -79,6 +80,20 @@ describe("project tour", () => {
         throw new Error(`section ${label} renders no heading`);
       }
       expect(heading).not.toBe("");
+
+      // Issue #115: the sidebar → page block gutter and the page-internal row
+      // step are the same token, on every screen that shows a page block.
+      if (["persons", "events", "graph", "kinship"].includes(slug)) {
+        const spacing = await browser.execute(measureShellSpacing);
+        expect(spacing).not.toBeNull();
+        save(`spacing-${slug}`, spacing);
+        // eslint-disable-next-line no-console
+        console.log(`spacing ${slug}: ${JSON.stringify(spacing)}`);
+        expect(spacing.gutter).toBe(spacing.gap);
+        if (spacing.pageGap !== null) {
+          expect(spacing.pageGap).toBe(spacing.gap);
+        }
+      }
     }
 
     expect(await consoleErrors()).toEqual([]);
