@@ -44,5 +44,6 @@
   "wholeTreeWarning": "The whole project tree is hard to read when fully expanded. Use it for an overview only.",
   "showSpouses": "Show spouses",
   "showSpousesHint": "Show the spouses and partners of the root and of visible blood relatives on the same level.",
-  "spouseRole": "Spouse"
+  "spouseRole": "Spouse",
+  "hoverUnknownKinship": "Kinship unknown"
 }
