@@ -741,10 +741,11 @@ fn parent_child_age_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssu
 
 /// Deletion plan for one person (ADR-0009 §delete).
 ///
-/// Relationships touching the person are removed. An event owned by the person
-/// is removed when there are no co-participants; an event with co-participants
-/// survives, the person is detached and the first co-participant becomes the
-/// owner (handled by the caller with [`Event::detach_person`]). Citations whose
+/// Relationships touching the person are removed. Every event owned by the
+/// person is removed, even when it has co-participants: a birth event belongs to
+/// the child, not to the parents who witnessed it. An event owned by someone
+/// else survives; the caller detaches the person from it with
+/// [`Event::detach_person`] and the owner stays unchanged. Citations whose
 /// target is one of the removed entities are removed too. Media rows and files
 /// are untouched: a media *link* is not the file, and unlinking is a separate
 /// operation.
@@ -755,12 +756,12 @@ fn parent_child_age_issues(snapshot: &ProjectSnapshot<'_>) -> Vec<ValidationIssu
 #[serde(rename_all = "camelCase")]
 pub struct RemovalPlan {
     pub removed_persons: Vec<Uuid>,
-    /// Events that have nobody left after detaching the person.
+    /// Events owned by the person; they go away with the person.
     pub removed_event_ids: Vec<Uuid>,
     pub removed_relationship_ids: Vec<Uuid>,
     pub removed_citation_ids: Vec<Uuid>,
-    /// Events that reference the person but survive because other participants
-    /// remain. The caller must detach the person from each of them.
+    /// Events owned by someone else where the person is only a co-participant.
+    /// They survive with their owner; the caller must detach the person.
     pub kept_event_ids: Vec<Uuid>,
 }
 
@@ -780,12 +781,9 @@ pub fn removal_plan(
     let mut removed_event_ids = Vec::new();
     let mut kept_event_ids = Vec::new();
     for event in events {
-        if !event.involves(person_id) {
-            continue;
-        }
-        if event.person_id == person_id && event.participant_ids.is_empty() {
+        if event.person_id == person_id {
             removed_event_ids.push(event.id);
-        } else {
+        } else if event.involves(person_id) {
             kept_event_ids.push(event.id);
         }
     }
@@ -1488,6 +1486,51 @@ mod tests {
         assert!(!plan
             .removed_relationship_ids
             .contains(&unrelated_relationship.id));
+    }
+
+    #[test]
+    fn removal_plan_removes_an_owned_event_even_with_co_participants() {
+        let child = uuid(1);
+        let father = uuid(2);
+        let persons = vec![person(child, None, None), person(father, None, None)];
+        let mut birth = event(uuid(10), child, EventType::Birth, DateValue::default());
+        birth.participant_ids = vec![father];
+        let events = vec![birth.clone()];
+        let source_id = uuid(3);
+        let citations = vec![Citation::new(source_id, CitationTarget::Event, birth.id)];
+
+        let plan = removal_plan(child, &persons, &events, &[], &citations);
+
+        assert_eq!(plan.removed_event_ids, vec![birth.id]);
+        assert!(plan.kept_event_ids.is_empty());
+        assert_eq!(plan.removed_citation_ids, vec![citations[0].id]);
+    }
+
+    #[test]
+    fn removal_plan_keeps_an_event_owned_by_another_person() {
+        let removed = uuid(1);
+        let owner = uuid(2);
+        let witness = uuid(4);
+        let persons = vec![
+            person(removed, None, None),
+            person(owner, None, None),
+            person(witness, None, None),
+        ];
+        let mut shared = event(uuid(10), owner, EventType::Marriage, DateValue::default());
+        shared.participant_ids = vec![removed, witness];
+        let owned_by_another = event(uuid(11), owner, EventType::Birth, DateValue::default());
+        let events = vec![shared.clone(), owned_by_another.clone()];
+        let source_id = uuid(3);
+        let citations = vec![
+            Citation::new(source_id, CitationTarget::Event, shared.id),
+            Citation::new(source_id, CitationTarget::Event, owned_by_another.id),
+        ];
+
+        let plan = removal_plan(removed, &persons, &events, &[], &citations);
+
+        assert_eq!(plan.kept_event_ids, vec![shared.id]);
+        assert!(plan.removed_event_ids.is_empty());
+        assert!(plan.removed_citation_ids.is_empty());
     }
 
     #[test]

@@ -95,8 +95,9 @@ pub trait ProjectAccess: Send + Sync {
     /// Applies a person patch. `STALE_WRITE` on a version mismatch.
     fn update_person(&self, request: UpdatePersonRequest) -> AppResult<WriteResult>;
 
-    /// Deletes a person together with their private events and citations.
-    /// Shared events are never removed (see ADR-0005 / `removal_plan`).
+    /// Deletes a person, the events they own and their citations. An event
+    /// owned by someone else survives with the person detached
+    /// (see `removal_plan`).
     fn delete_person(&self, request: DeletePersonRequest) -> AppResult<WriteResult>;
 
     /// Creates an event for one person.
