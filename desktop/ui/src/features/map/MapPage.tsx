@@ -37,7 +37,7 @@ import {
 } from "../events/useEventFilterState";
 import { usePersonScopeIds } from "../persons/usePersonScopeIds";
 import { photosByPerson } from "../media/helpers";
-import { toApiDate, toTimelineEvent } from "../timeline/adapter";
+import { toApiDate } from "../timeline/adapter";
 import { formatTimelineDate } from "../timeline/dates";
 import { EventPopover } from "../timeline/EventPopover";
 import { eventTypeLabel } from "../timeline/format";
@@ -631,8 +631,8 @@ export default function MapPage({
           <aside className="map-side-panel map-event-panel">
             <EventPopover
               key={selectedEntry.event.id}
-              event={toTimelineEvent(selectedEntry)}
-              personId={selectedEntry.event.personId}
+              event={selectedEntry.event}
+              persons={personEntities}
               onClose={() => {
                 setSelectedEntry(null);
                 setSelectedGroupKey(placePanel?.key ?? null);

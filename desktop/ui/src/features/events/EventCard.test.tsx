@@ -90,4 +90,36 @@ describe("EventCard", () => {
     expect(html).not.toContain(">Изменить<");
     expect(close).toBeGreaterThan(edit);
   });
+
+  it("keeps the shared field order and legacy detail keys (#144)", () => {
+    const withDetails: EventEntity = {
+      ...birthEvent,
+      place: "Казань",
+      description: "Запись",
+      details: { hospital: "Городская больница", legacy_note: "старое" },
+    };
+    const html = renderToStaticMarkup(
+      <EventCard
+        event={{ entity: withDetails, version: "v1" }}
+        persons={[]}
+        onEdit={noop}
+        onClose={noop}
+      />,
+    );
+    const order = [...html.matchAll(/data-field="([^"]+)"/g)].map(
+      (match) => match[1],
+    );
+    expect(order).toEqual([
+      "date",
+      "precision",
+      "place",
+      "participants",
+      "description",
+      "detail:birth_certificate",
+      "detail:hospital",
+      "detail:legacy_note",
+      "files",
+    ]);
+    expect(html).toContain("старое");
+  });
 });

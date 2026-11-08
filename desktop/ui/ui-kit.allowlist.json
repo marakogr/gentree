@@ -27,9 +27,9 @@
     },
     {
       "rule": "raw-primitive",
-      "file": "src/features/events/EventCard.tsx",
-      "count": 2,
-      "reason": "Card text actions are inline links inside a card heading; migrate in cleanup."
+      "file": "src/features/events/EventReadBody.tsx",
+      "count": 3,
+      "reason": "Participant link and event file buttons mirror the card/drawer read body; migrate with the shared primitives."
     },
     {
       "rule": "raw-primitive",
@@ -112,8 +112,8 @@
     {
       "rule": "raw-primitive",
       "file": "src/features/timeline/EventPopover.tsx",
-      "count": 6,
-      "reason": "Timeline popover links and close action; migrate in cleanup."
+      "count": 5,
+      "reason": "Timeline popover actions; migrate in cleanup."
     },
     {
       "rule": "raw-primitive",
