@@ -313,7 +313,7 @@ impl<A: ProjectAccess + ?Sized + 'static> McpServer<A> {
 
     #[tool(
         name = "delete_person",
-        description = "Delete a person and their private events and citations. Requires confirm=true; dryRun=true returns the removal plan without deleting.",
+        description = "Delete a person, the events they own and their citations. Events owned by someone else survive with the person detached. Requires confirm=true; dryRun=true returns the removal plan without deleting.",
         annotations(
             read_only_hint = false,
             destructive_hint = true,

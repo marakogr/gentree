@@ -559,8 +559,8 @@ pub(crate) fn plan_removal(store: &ProjectStore, id: Uuid) -> AppResult<Removal>
                 return None;
             }
             if event.involves(id) {
-                // Shared events survive; the caller detaches the person and
-                // promotes a remaining co-participant.
+                // Events owned by someone else survive; the person is detached
+                // and the owner is unchanged. Owned events were removed above.
                 event.detach_person(id);
             }
             Some(event)
@@ -1021,5 +1021,61 @@ mod tests {
         assert_eq!(event.source_ids, birth.source_ids);
         assert_eq!(event.participant_ids, birth.participant_ids);
         assert_eq!(event.original_type, birth.original_type);
+    }
+
+    #[test]
+    fn deletion_removes_the_owned_event_instead_of_promoting_a_parent() {
+        // Issue #147: a child's BIRTH event lists the father as a participant.
+        // The event belongs to the child, so deleting the child removes it and
+        // the father never becomes its owner.
+        let dir = std::env::temp_dir().join(format!("gentree-delete-owned-{}", Uuid::now_v7()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let mut store = ProjectStore::create(&dir, "Synthetic project").unwrap();
+        let father = person(1, "Father", None, None);
+        let child = person(2, "Child", Some(1980), None);
+        let mut birth = Event::new(child.id, EventType::Birth);
+        birth.date = date(1980);
+        birth.participant_ids = vec![father.id];
+        store
+            .save_persons(&[father.clone(), child.clone()])
+            .unwrap();
+        store.save_events(std::slice::from_ref(&birth)).unwrap();
+        let checksum = "a".repeat(64);
+        let media = Media {
+            id: Uuid::from_u128(900),
+            file_name: "scan.jpg".to_owned(),
+            mime_type: "image/jpeg".to_owned(),
+            checksum: checksum.clone(),
+            caption: None,
+            source_id: None,
+            person_id: None,
+            event_id: Some(birth.id),
+            primary: false,
+        };
+        store.save_media(std::slice::from_ref(&media)).unwrap();
+
+        let removal = plan_removal(&store, child.id).unwrap();
+        assert_eq!(removal.plan.removed_event_ids, vec![birth.id]);
+        assert!(removal.plan.kept_event_ids.is_empty());
+        assert_eq!(
+            apply_removal(&mut store, removal)
+                .unwrap()
+                .removed_event_ids,
+            vec![birth.id]
+        );
+
+        let events = store.events().unwrap();
+        assert!(events.iter().all(|event| event.id != birth.id));
+        assert!(events.iter().all(|event| event.person_id != father.id));
+        // The attachment row and its file survive; only the dead event link goes.
+        let media = store.media().unwrap();
+        assert_eq!(media.len(), 1);
+        assert_eq!(media[0].event_id, None);
+        assert_eq!(media[0].checksum, checksum);
+        let persons = store.persons().unwrap();
+        assert_eq!(persons.len(), 1);
+        assert_eq!(persons[0].id, father.id);
+        drop(store);
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 }

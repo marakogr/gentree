@@ -1512,6 +1512,78 @@ mod tests {
     }
 
     #[test]
+    fn project_access_delete_removes_the_owned_event_not_the_co_participant() {
+        // Issue #147: a child's BIRTH event has the father as a co-participant.
+        // Deleting the child removes the event owned by the child; the father is
+        // never promoted into it. The chat/MCP path shares `plan_removal` with
+        // the IPC command, so this covers both.
+        let dir = temp_dir("mcp-access-delete-owned-event");
+        let (slot, project_id, access) = project_access(&dir);
+
+        let child = person_input("Child").to_person().expect("synthetic child");
+        let father = person_input("Father")
+            .to_person()
+            .expect("synthetic father");
+        let mut birth = Event::new(child.id, EventType::Birth);
+        birth.participant_ids = vec![father.id];
+        {
+            let mut guard = slot.lock().unwrap();
+            let store = guard.as_mut().expect("open store");
+            store
+                .save_persons(&[child.clone(), father.clone()])
+                .expect("save persons");
+            store
+                .save_events(std::slice::from_ref(&birth))
+                .expect("save events");
+        }
+
+        // A dry run reports the plan and writes nothing.
+        let dry = access
+            .delete_person(DeletePersonRequest {
+                project_id,
+                person_id: child.id,
+                confirm: true,
+                dry_run: true,
+                expected_version: None,
+            })
+            .unwrap();
+        assert!(dry.dry_run);
+        assert!(!dry.changed);
+        assert_eq!(
+            slot.lock().unwrap().as_ref().unwrap().events().unwrap(),
+            vec![birth.clone()]
+        );
+
+        access
+            .delete_person(DeletePersonRequest {
+                project_id,
+                person_id: child.id,
+                confirm: true,
+                dry_run: false,
+                expected_version: None,
+            })
+            .unwrap();
+
+        let guard = slot.lock().unwrap();
+        let store = guard.as_ref().expect("open store");
+        let events = store.events().unwrap();
+        assert!(
+            events.iter().all(|event| event.id != birth.id),
+            "the event owned by the deleted child must be gone"
+        );
+        assert!(
+            events.iter().all(|event| event.person_id != father.id),
+            "the father must not become the owner of the child's event"
+        );
+        let persons = store.persons().unwrap();
+        assert_eq!(persons.len(), 1);
+        assert_eq!(persons[0].id, father.id);
+        drop(guard);
+
+        fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
     fn project_access_refuses_a_second_birth_or_death_event() {
         // Issue #129: the IPC/chat create path enforces the same uniqueness the
         // form shows. Person creation already owns the automatic life events,
