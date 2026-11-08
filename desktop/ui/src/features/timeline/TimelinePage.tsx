@@ -933,8 +933,8 @@ export default function TimelinePage({
         {selectedEvent !== null && selectedEntry !== null && (
           <aside className="contents min-h-0 md:block md:overflow-y-auto">
             <EventPopover
-              event={selectedEvent}
-              personId={selectedEntry.event.personId}
+              event={selectedEntry.event}
+              persons={persons}
               onClose={closeEvent}
               onOpenPerson={onOpenPerson}
               onOpenEvent={onOpenEvent}

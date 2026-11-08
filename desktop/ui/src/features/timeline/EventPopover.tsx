@@ -5,26 +5,20 @@ import {
   CalendarLtrRegular,
   DismissRegular,
   EditRegular,
-  LocationRegular,
-  PeopleRegular,
 } from "@fluentui/react-icons";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { eventsApi, personsApi } from "../../api/client";
 import type { EventEntity, Person, Versioned } from "../../api/types";
 import { ErrorBanner } from "../../components/feedback";
-import type { Translate } from "../../lib/dates";
 import { normalizeError, type AppErrorEnvelope } from "../../lib/errors";
 import { cn } from "../../lib/utils";
-import EventForm from "../events/EventForm";
-import { formatTimelineDate } from "./dates";
 import {
-  eventTypeLabel,
-  participantName,
-  participantRoleLabel,
-  sourceCountLabel,
-} from "./format";
+  EventReadBody,
+  eventOwnerLabel,
+} from "../events/EventReadBody";
+import EventForm from "../events/EventForm";
+import { eventTypeLabel, sourceCountLabel } from "./format";
 import { useTimelineTranslate } from "./i18n";
-import type { TimelineEvent } from "./types";
 
 // Fluent tokens only: the popover keeps its responsive-sheet layout, the theme
 // decides the surface, text and accent colours.
@@ -76,21 +70,11 @@ const useStyles = makeStyles({
   separator: {
     borderTop: `1px solid ${tokens.colorNeutralStroke2}`,
   },
-  link: {
-    color: tokens.colorNeutralForeground1,
-    ":hover": {
-      color: tokens.colorBrandForegroundInverted,
-    },
-    ":focus-visible": {
-      outline: `2px solid ${tokens.colorStrokeFocus2}`,
-      outlineOffset: "2px",
-    },
-  },
 });
 
 interface EventPopoverProps {
-  event: TimelineEvent;
-  personId: string;
+  event: EventEntity;
+  persons: readonly Person[];
   onClose: () => void;
   onOpenPerson: (personId: string) => void;
   /** Optional: open the same event in the Events tab. */
@@ -106,10 +90,13 @@ interface EventPopoverProps {
  * (`event_list` for the owning person) and hands it to `EventForm`. A failed
  * load keeps the popover in read mode and shows the error; a failed save keeps
  * the form draft.
+ *
+ * The read mode reuses `EventReadBody`, the same field set and order as the
+ * events card, and adds only the popover actions and the sources block.
  */
 export function EventPopover({
   event,
-  personId,
+  persons,
   onClose,
   onOpenPerson,
   onOpenEvent,
@@ -120,7 +107,7 @@ export function EventPopover({
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const [editing, setEditing] = useState(false);
   const [fullEvent, setFullEvent] = useState<Versioned<EventEntity> | null>(null);
-  const [persons, setPersons] = useState<Versioned<Person>[]>([]);
+  const [formPersons, setFormPersons] = useState<Versioned<Person>[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<AppErrorEnvelope | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
@@ -161,7 +148,7 @@ export function EventPopover({
     void (async () => {
       try {
         const [rows, page] = await Promise.all([
-          eventsApi.list({ personId }),
+          eventsApi.list({ personId: event.personId }),
           personsApi.list({ limit: 1000, sort: "name" }),
         ]);
         const found = rows.find((row) => row.entity.id === event.id) ?? null;
@@ -169,7 +156,7 @@ export function EventPopover({
           setLoadError({ code: "NOT_FOUND" });
         } else {
           setFullEvent(found);
-          setPersons(page.items);
+          setFormPersons(page.items);
         }
       } catch (caught: unknown) {
         setLoadError(normalizeError(caught));
@@ -177,10 +164,15 @@ export function EventPopover({
         setLoading(false);
       }
     })();
-  }, [event.id, personId]);
+  }, [event.id, event.personId]);
 
-  const title = event.title?.trim() || eventTypeLabel(event.type, t);
-  const sourceCount = event.sourceIds?.length ?? event.mediaIds.length;
+  const customType = event.originalType?.trim() ?? "";
+  const typeLabel =
+    event.type === "OTHER" && customType !== ""
+      ? customType
+      : eventTypeLabel(event.type, t);
+  const title = eventOwnerLabel(event, persons, typeLabel, t("unknownPerson"));
+  const sourceCount = event.sourceIds.length;
 
   return (
     <section
@@ -202,7 +194,7 @@ export function EventPopover({
               "text-[11px] font-medium uppercase tracking-wide",
             )}
           >
-            {eventTypeLabel(event.type, t)}
+            {typeLabel}
           </span>
           <h3
             id="event-popover-heading"
@@ -305,8 +297,8 @@ export function EventPopover({
             <EventForm
               initial={fullEvent.entity}
               version={fullEvent.version}
-              persons={persons}
-              defaultPersonId={personId}
+              persons={formPersons}
+              defaultPersonId={event.personId}
               onSaved={() => {
                 setFullEvent(null);
                 setEditing(false);
@@ -326,64 +318,13 @@ export function EventPopover({
           )}
         </div>
       ) : (
-        <dl className="mt-3 space-y-2.5 text-sm">
-          <div className="flex gap-2">
-            <CalendarLtrRegular
-              fontSize={16}
-              className={cn(styles.muted, "mt-0.5 shrink-0")}
-              aria-hidden="true"
-            />
-            <div>
-              <dt className={styles.muted}>{t("popover.date")}</dt>
-              <dd>{formatTimelineDate(event.date, t)}</dd>
-            </div>
-          </div>
-
-          {event.place !== null && event.place.trim().length > 0 && (
-            <div className="flex gap-2">
-              <LocationRegular
-                fontSize={16}
-                className={cn(styles.muted, "mt-0.5 shrink-0")}
-                aria-hidden="true"
-              />
-              <div>
-                <dt className={styles.muted}>{t("popover.place")}</dt>
-                <dd className="break-words">{event.place}</dd>
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <PeopleRegular
-              fontSize={16}
-              className={cn(styles.muted, "mt-0.5 shrink-0")}
-              aria-hidden="true"
-            />
-            <div className="min-w-0">
-              <dt className={styles.muted}>
-                {t("popover.participants")}
-              </dt>
-              <dd>
-                <ParticipantList
-                  event={event}
-                  t={t}
-                  onOpenPerson={onOpenPerson}
-                />
-              </dd>
-            </div>
-          </div>
-
-          {event.description !== null && event.description.trim().length > 0 && (
-            <div>
-              <dt className={styles.muted}>
-                {t("popover.description")}
-              </dt>
-              <dd className="mt-0.5 whitespace-pre-wrap break-words leading-relaxed">
-                {event.description}
-              </dd>
-            </div>
-          )}
-        </dl>
+        <div className="mt-3">
+          <EventReadBody
+            event={event}
+            persons={persons}
+            onOpenPerson={onOpenPerson}
+          />
+        </div>
       )}
 
       <div
@@ -405,44 +346,5 @@ export function EventPopover({
         </div>
       </div>
     </section>
-  );
-}
-
-function ParticipantList({
-  event,
-  t,
-  onOpenPerson,
-}: {
-  event: TimelineEvent;
-  t: Translate;
-  onOpenPerson: (personId: string) => void;
-}) {
-  const styles = useStyles();
-  if (event.participants.length === 0) {
-    return <p>{t("popover.noParticipants")}</p>;
-  }
-  return (
-    <ul className="space-y-1">
-      {event.participants.map((participant) => (
-        <li
-          key={`${participant.personId}:${participant.role}`}
-          className="flex flex-wrap items-baseline gap-x-1.5"
-        >
-          <button
-            type="button"
-            onClick={() => onOpenPerson(participant.personId)}
-            className={cn(
-              styles.link,
-              "p-0 break-words text-left underline-offset-2 hover:underline",
-            )}
-          >
-            {participantName(participant, t)}
-          </button>
-          <span className={cn(styles.muted, "text-[11px]")}>
-            {participantRoleLabel(participant.role, t)}
-          </span>
-        </li>
-      ))}
-    </ul>
   );
 }
