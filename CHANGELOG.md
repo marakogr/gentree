@@ -4,7 +4,7 @@ All notable changes to Gentree are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [0.7.0] — 2026-11-06
+## [0.7.0] — 2026-11-08
 
 Gentree is on its way to the Microsoft Store: the same app is built as a
 full-trust MSIX package that the Store signs and updates for you, while the
@@ -24,6 +24,21 @@ GitHub build keeps its own installer and in-app updater.
 
 - The update check and install buttons are hidden in a build that cannot update
   itself, instead of failing with a localized error when pressed.
+
+### Fixed
+
+- The timeline drawer now shows the same fields in the same order as the event
+  card, including events without a date.
+- The event form no longer offers people who already have the selected
+  BIRTH/DEATH event; editing a legacy duplicate keeps its current person.
+- GEDCOM: an ongoing residence period is exported as `FROM <date>` and restored
+  on import; a `FROM` on another record keeps the event with an unknown date
+  instead of dropping it.
+- Deleting a person removes the events they own even when co-participants exist,
+  so a child's birth event is no longer promoted to a parent.
+- GEDCOM event place coordinates round-trip through `PLAC.MAP.LATI/LONG` with a
+  `GEDCOM` provenance source; incomplete or invalid points are reported and
+  skipped.
 
 ## [0.6.0] — 2026-11-06
 
