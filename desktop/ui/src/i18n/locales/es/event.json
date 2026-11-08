@@ -107,6 +107,7 @@
   "clearSpouse": "Quitar el cónyuge",
   "clearPerson": "Quitar la persona",
   "noPersonMatches": "No se encontró nada",
+  "noEligiblePersons": "Todas las personas ya tienen un evento de este tipo",
   "participantsLinked": "El evento vinculará ambos perfiles en el árbol automáticamente",
   "deleteConfirm": "¿Eliminar este evento?",
   "deleteTitle": "¿Eliminar el evento?",

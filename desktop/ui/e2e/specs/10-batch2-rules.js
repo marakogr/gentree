@@ -571,13 +571,14 @@ describe("second-batch feedback rules", () => {
   });
 
   it("locks a second birth and keeps the footer and files inside the form", async () => {
-    // #129: the long-name person already owns one BIRTH event. A short window
-    // makes the form taller than the dialog body, so the geometry check also
-    // proves the body scrolls instead of pushing the footer out.
+    // #129/#145: the long-name person already owns one BIRTH event. The person
+    // picker now hides them while BIRTH is selected, so start from a repeatable
+    // type and verify that BIRTH itself is locked for this person.
     const originalSize = await browser.getWindowSize();
     await browser.setWindowSize(960, 600);
     await browser.pause(500);
     await openEventForm();
+    await setEventType("RESIDENCE");
     await pickPerson("#event-person", LONG_NAME);
     await browser.waitUntil(
       async () =>

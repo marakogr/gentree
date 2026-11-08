@@ -107,6 +107,7 @@
   "clearSpouse": "Убрать супруга",
   "clearPerson": "Убрать человека",
   "noPersonMatches": "Ничего не найдено",
+  "noEligiblePersons": "У всех людей уже есть событие этого типа",
   "participantsLinked": "Событие автоматически свяжет оба профиля в древе",
   "deleteConfirm": "Удалить событие?",
   "deleteTitle": "Удалить событие?",

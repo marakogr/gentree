@@ -107,6 +107,7 @@
   "clearSpouse": "Clear the spouse",
   "clearPerson": "Clear the person",
   "noPersonMatches": "Nothing found",
+  "noEligiblePersons": "Everyone already has an event of this type",
   "participantsLinked": "The event links both profiles in the tree automatically",
   "deleteConfirm": "Delete this event?",
   "deleteTitle": "Delete the event?",

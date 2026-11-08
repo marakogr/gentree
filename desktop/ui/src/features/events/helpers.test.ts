@@ -15,6 +15,7 @@ import {
   countActiveEventFilters,
   dateOverlaps,
   draftFromEvent,
+  eligibleLifeEventPersons,
   emptyEventDraft,
   eventDateLabel,
   eventMatchesFilters,
@@ -31,6 +32,7 @@ import {
   matchesEventQuery,
   normalizeEventText,
   paginateEventRows,
+  personsWithLifeEvent,
   readEventFilters,
   resolveEventColumns,
   sanitizeEventDetails,
@@ -1376,5 +1378,67 @@ describe("life-event type locks (issue #129)", () => {
 
   it("does not lock a type without a selected person", () => {
     expect([...lockedLifeEventTypes([birth], "")]).toEqual([]);
+  });
+});
+
+describe("life-event person eligibility (issue #145)", () => {
+  const birth = event("birth-1", "a", 1950, { type: "BIRTH" });
+  const secondBirth = event("birth-2", "a", 1951, { type: "BIRTH" });
+  const otherBirth = event("birth-3", "b", 1980, { type: "BIRTH" });
+  const marriage = event("marriage-1", "a", 1970, { type: "MARRIAGE" });
+  const people = [
+    { id: "a", label: "Ivanov Ivan" },
+    { id: "b", label: "Petrova Anna" },
+    { id: "c", label: "Sidorov Petr" },
+  ];
+
+  it("collects the owners of one life type only", () => {
+    expect([...personsWithLifeEvent([birth, marriage, otherBirth], "BIRTH")]).toEqual([
+      "a",
+      "b",
+    ]);
+    expect([...personsWithLifeEvent([birth], "DEATH")]).toEqual([]);
+    expect([...personsWithLifeEvent([birth], "MARRIAGE")]).toEqual([]);
+  });
+
+  it("does not count the event being edited", () => {
+    expect([...personsWithLifeEvent([birth, secondBirth], "BIRTH", birth.id)]).toEqual([
+      "a",
+    ]);
+    expect([...personsWithLifeEvent([birth], "BIRTH", birth.id)]).toEqual([]);
+  });
+
+  it("hides people who already own the chosen life event", () => {
+    expect(
+      eligibleLifeEventPersons(people, [birth], "BIRTH", {
+        keepPersonId: "",
+      }),
+    ).toEqual([
+      { id: "b", label: "Petrova Anna" },
+      { id: "c", label: "Sidorov Petr" },
+    ]);
+  });
+
+  it("keeps the full list for repeatable types", () => {
+    expect(eligibleLifeEventPersons(people, [marriage], "MARRIAGE")).toEqual(
+      people,
+    );
+    expect(eligibleLifeEventPersons(people, [], "OTHER")).toEqual(people);
+  });
+
+  it("keeps the draft person selectable", () => {
+    expect(
+      eligibleLifeEventPersons(people, [birth], "BIRTH", { keepPersonId: "a" }),
+    ).toEqual(people);
+  });
+
+  it("keeps a legacy duplicate's owner while editing one of the events", () => {
+    // Two births for the same person: editing either one must keep that person.
+    expect(
+      eligibleLifeEventPersons(people, [birth, secondBirth], "BIRTH", {
+        keepPersonId: "a",
+        editingId: birth.id,
+      }),
+    ).toEqual(people);
   });
 });
