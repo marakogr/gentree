@@ -110,7 +110,7 @@ export type PlacePrecision =
   | "UNKNOWN";
 
 /** Where a confirmed map point came from; manual points are never overwritten. */
-export type PlaceSource = "PHOTON" | "DADATA" | "WIKIDATA" | "MANUAL";
+export type PlaceSource = "PHOTON" | "DADATA" | "WIKIDATA" | "GEDCOM" | "MANUAL";
 
 /** A confirmed WGS84 point for an event place (ADR-0020). */
 export type PlaceGeo = {

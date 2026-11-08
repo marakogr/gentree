@@ -38,6 +38,7 @@ use ged_io::types::individual::name::{Name as GedcomName, NameType as GedcomName
 use ged_io::types::individual::Individual;
 use ged_io::types::multimedia::Multimedia;
 use ged_io::types::note::Note as GedcomNote;
+use ged_io::types::place::Place as GedcomPlace;
 use ged_io::types::GedcomData;
 use ged_io::{GedcomBuilder, GedcomError};
 use gentree_core::date::{days_in_month, CivilDate, DatePrecision, DateQualifier, DateValue};
@@ -48,6 +49,7 @@ use gentree_core::event_fields::{
 use gentree_core::person::{ExternalId, Gender, Name, NameType, Person, PersonId};
 use gentree_core::record::{Citation, Confidence, Event, EventType, Media, Source};
 use gentree_core::relationship::{Relationship, RelationshipSet, RelationshipType};
+use gentree_core::{PlaceGeo, PlacePrecision, PlaceSource};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -1013,9 +1015,7 @@ fn write_event_details(
     version: GedcomVersion,
     report: &mut ExportReport,
 ) {
-    if let Some(place) = trimmed(event.place.as_deref()) {
-        write_text(out, level, "PLAC", &single_line(&place), version, report);
-    }
+    write_event_place(out, level, event, version, report);
     // Details with a standard tag stay visible to other apps; whatever is left
     // travels in one machine-readable NOTE so Gentree round-trips its export.
     let mut remaining = event.details.clone();
@@ -1045,6 +1045,73 @@ fn write_event_details(
             );
         }
     }
+}
+
+/// `PLAC` with its optional `MAP` coordinates.
+///
+/// GEDCOM has no structure for a point without a name, so a confirmed point
+/// keeps its `PLAC` line even when the event has no place text; the line then
+/// has no value and the name is never invented. A point that fails validation
+/// is left out and reported, because `NNaN` would corrupt the file.
+fn write_event_place(
+    out: &mut String,
+    level: usize,
+    event: &Event,
+    version: GedcomVersion,
+    report: &mut ExportReport,
+) {
+    let place = trimmed(event.place.as_deref());
+    let point = match event.place_geo.as_ref() {
+        Some(point) if point.validate().is_ok() => Some(point),
+        Some(_) => {
+            report.warn("event place coordinates are invalid; omitted from the export");
+            None
+        }
+        None => None,
+    };
+    if let Some(place) = place {
+        write_text(out, level, "PLAC", &single_line(&place), version, report);
+        if let Some(point) = point {
+            write_place_map(out, level + 1, point);
+        }
+    } else if let Some(point) = point {
+        line(out, level, "PLAC", None);
+        write_place_map(out, level + 1, point);
+    }
+}
+
+/// `MAP` -> `LATI`/`LONG`. Both 5.5.1 and 7.0 define a coordinate as a
+/// hemisphere letter followed by decimal degrees (`N57.4321`, `E049.1234`):
+/// 7.0's Latitude/Longitude data types require the letter and allow no minutes
+/// or seconds, so one form is valid for both writers.
+fn write_place_map(out: &mut String, level: usize, point: &PlaceGeo) {
+    line(out, level, "MAP", None);
+    line(
+        out,
+        level + 1,
+        "LATI",
+        Some(&format_coordinate(point.lat, 'N', 'S')),
+    );
+    line(
+        out,
+        level + 1,
+        "LONG",
+        Some(&format_coordinate(point.lon, 'E', 'W')),
+    );
+}
+
+/// Seven fractional digits keep about a centimetre; trailing zeros are dropped
+/// but one fraction digit stays, as 5.5.1 writes a decimal fraction.
+fn format_coordinate(value: f64, positive: char, negative: char) -> String {
+    let hemisphere = if value < 0.0 { negative } else { positive };
+    let mut degrees = format!("{:.7}", value.abs());
+    while degrees.ends_with('0') {
+        degrees.pop();
+    }
+    if degrees.ends_with('.') {
+        degrees.push('0');
+    }
+    format!("{hemisphere}{degrees}")
 }
 
 /// Standard GEDCOM child tags for details that have one, per event type. Keys
@@ -2415,16 +2482,17 @@ fn convert_individual_events(
         let tag = attribute_tag(&attribute.attribute);
         let (notes, mut details) = split_details_notes(data, &attribute.notes, report);
         fill_attribute_details(event_type, attribute, &mut details);
+        let place = attribute
+            .place
+            .as_ref()
+            .and_then(|place| trimmed(place.value.as_deref()));
         let event = Event {
             id: Uuid::now_v7(),
             person_id,
             event_type,
             date: attribute_date(attribute, tag, report),
-            place: attribute
-                .place
-                .as_ref()
-                .and_then(|place| trimmed(place.value.as_deref())),
-            place_geo: None,
+            place_geo: place_geo_from_place(attribute.place.as_ref(), place.as_deref(), report),
+            place,
             description: attribute_description(attribute, notes),
             source_ids: Vec::new(),
             original_type: None,
@@ -2446,22 +2514,50 @@ fn detail_event(
     let (event_type, original_type) = domain_event_type(&detail.event, tag, report);
     let (notes, mut details) = split_details_notes(data, &detail.notes, report);
     fill_event_details(event_type, detail, &mut details);
+    let place = detail
+        .place
+        .as_ref()
+        .and_then(|place| trimmed(place.value.as_deref()));
     Event {
         id: Uuid::now_v7(),
         person_id,
         event_type,
         date: detail_date(detail, tag, report),
-        place: detail
-            .place
-            .as_ref()
-            .and_then(|place| trimmed(place.value.as_deref())),
-        place_geo: None,
+        place_geo: place_geo_from_place(detail.place.as_ref(), place.as_deref(), report),
+        place,
         description: detail_description(event_type, detail, notes),
         source_ids: Vec::new(),
         original_type,
         participant_ids: Vec::new(),
         details: sanitize_details(details, report),
     }
+}
+
+/// Maps `PLAC.MAP.LATI`/`LONG` to a confirmed point.
+///
+/// GEDCOM states neither precision nor provider, so the point is
+/// [`PlacePrecision::Unknown`] and the file itself is the source; the place
+/// text, when the file has one, becomes the label. Incomplete, unreadable or
+/// out-of-range coordinates keep the event and are reported without repeating
+/// any values.
+fn place_geo_from_place(
+    place: Option<&GedcomPlace>,
+    place_text: Option<&str>,
+    report: &mut GEDCOMReport,
+) -> Option<PlaceGeo> {
+    let place = place?;
+    place.map.as_ref()?;
+    let (Some(lat), Some(lon)) = (place.latitude(), place.longitude()) else {
+        report.warn("PLAC.MAP without a readable LATI and LONG; place coordinates not imported");
+        return None;
+    };
+    let Ok(mut point) = PlaceGeo::new(lat, lon, PlacePrecision::Unknown, PlaceSource::Gedcom)
+    else {
+        report.warn("PLAC.MAP coordinates are out of range; place coordinates not imported");
+        return None;
+    };
+    point.label = place_text.map(str::to_owned);
+    Some(point)
 }
 
 /// Domain type for a GEDCOM event; unmapped tags keep their raw tag.
@@ -2829,6 +2925,7 @@ fn same_event(left: &Event, right: &Event) -> bool {
         && left.event_type == right.event_type
         && left.date == right.date
         && left.place == right.place
+        && left.place_geo == right.place_geo
         && left.description == right.description
         && left.original_type == right.original_type
         && left.details == right.details
