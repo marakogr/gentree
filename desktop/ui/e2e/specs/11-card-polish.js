@@ -139,6 +139,13 @@ async function cardMetrics() {
   });
 }
 
+/** The synthetic project has a birth for the child and the parent; use the first row. */
+async function firstBirthRow() {
+  const rows = await $$('//tr[contains(., "Рождение")]');
+  expect(rows.length).toBeGreaterThan(0);
+  return rows[0];
+}
+
 describe("card and table polish", () => {
   it("aligns the add action and tidies the card controls", async () => {
     await createProject();
@@ -185,7 +192,9 @@ describe("card and table polish", () => {
   });
 
   it("leaves the resize handle neutral after a keyboard resize", async () => {
-    const handle = await $(".col-resize-handle");
+    const handles = await $$(".col-resize-handle");
+    expect(handles.length).toBeGreaterThan(0);
+    const handle = handles[0];
     await handle.waitForDisplayed({ timeout: 10000 });
     const before = await handle.getAttribute("aria-valuenow");
     await browser.execute(() => {
@@ -224,7 +233,7 @@ describe("card and table polish", () => {
       timeout: 10000,
     });
     await browser.pause(700);
-    const row = await $('//tr[contains(., "Рождение")]');
+    const row = await firstBirthRow();
     await row.waitForClickable({ timeout: 10000 });
     await row.click();
     const card = await $(".events-card");
@@ -278,7 +287,7 @@ describe("card and table polish", () => {
 
     await clickNav("События");
     await browser.pause(600);
-    const row = await $('//tr[contains(., "Рождение")]');
+    const row = await firstBirthRow();
     await row.waitForClickable({ timeout: 10000 });
     await row.click();
     await (await $(".events-card")).waitForDisplayed({ timeout: 10000 });
