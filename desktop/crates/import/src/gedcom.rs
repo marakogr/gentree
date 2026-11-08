@@ -2811,15 +2811,33 @@ fn event_date_value(raw: Option<&str>, tag: &str, report: &mut GEDCOMReport) -> 
     value
 }
 
-fn push_event(events: &mut Vec<Event>, event: Event, report: &mut GEDCOMReport) {
+fn push_event(events: &mut Vec<Event>, mut event: Event, report: &mut GEDCOMReport) {
     if let Err(err) = event.validate() {
-        report.issue(format!("event skipped ({})", err.code));
-        return;
+        if event.event_type == EventType::Residence || !is_open_range(&event.date) {
+            report.issue(format!("event skipped ({})", err.code));
+            return;
+        }
+        // GEDCOM allows `FROM x` on any fact or event, but only a residence has
+        // an ongoing form in the domain. Keep the record with an unknown date
+        // instead of dropping it; the original text still carries the bound.
+        let original = event.date.original.clone();
+        event.date = DateValue::unknown(original);
+        if let Err(err) = event.validate() {
+            report.issue(format!("event skipped ({})", err.code));
+            return;
+        }
+        report.issue("ongoing period outside a residence; kept as an unknown date");
     }
     if events.iter().any(|existing| same_event(existing, &event)) {
         return;
     }
     events.push(event);
+}
+
+/// `RANGE` with a start and no end: the "ongoing" shape only a residence may
+/// carry. Validation rejects it for every other event type.
+fn is_open_range(date: &DateValue) -> bool {
+    date.qualifier == DateQualifier::Range && date.start.is_some() && date.end.is_none()
 }
 
 /// Two events are the same when nothing but the id differs; a repeated
@@ -3062,11 +3080,19 @@ fn find_media_file(relative: &str, base_name: &str, roots: &[PathBuf]) -> Option
 /// Parse one GEDCOM 5.5.1 date value.
 ///
 /// Recognised: `YYYY`, `MON YYYY`, `DD MON YYYY`, the `ABT`/`CAL`/`EST`
-/// (approximate), `BEF`, `AFT`, `BET … AND …` and `FROM … TO …` forms, and a
-/// parenthesised date phrase. Numeric forms (`YYYY-MM`, `YYYY-MM-DD`,
-/// `DD.MM.YYYY`) fall back to the AT5 parser, so both importers share one set
-/// of date rules. Everything else stays `UNKNOWN` with the text in
-/// [`DateValue::original`]; no day is ever invented.
+/// (approximate), `BEF`, `AFT`, `BET … AND …` and `FROM … TO …` forms, a lone
+/// `FROM …` period with no end, and a parenthesised date phrase. Numeric forms
+/// (`YYYY-MM`, `YYYY-MM-DD`, `DD.MM.YYYY`) fall back to the AT5 parser, so both
+/// importers share one set of date rules. Everything else stays `UNKNOWN` with
+/// the text in [`DateValue::original`]; no day is ever invented.
+///
+/// A lone `FROM …` becomes an open `RANGE` (`start` only, `end = None`), the
+/// same shape [`EventType::Residence`] permits with
+/// [`DateValue::validate_open_range`]. Parsing uses `validate_open_range` for
+/// that reason: whether an open range is legal depends on the event type, so
+/// the type-specific rule stays in [`Event::validate`]. GEDCOM allows `FROM x`
+/// on other facts and events too, so the importer keeps such a record with an
+/// unknown date instead of dropping it.
 pub fn parse_gedcom_date(raw: &str) -> DateValue {
     let text = raw.trim();
     if text.is_empty() {
@@ -3089,6 +3115,7 @@ pub fn parse_gedcom_date(raw: &str) -> DateValue {
     } else if let Some(rest) = upper.strip_prefix("FROM ") {
         rest.split_once(" TO ")
             .and_then(|(low, high)| range_value(low, high, text))
+            .or_else(|| open_range_value(rest, text))
     } else if let Some(rest) = upper.strip_prefix("BEF ") {
         bound_value(rest, DateQualifier::Before, text)
     } else if let Some(rest) = upper.strip_prefix("AFT ") {
@@ -3104,7 +3131,7 @@ pub fn parse_gedcom_date(raw: &str) -> DateValue {
     };
 
     match value {
-        Some(value) if value.validate().is_ok() => value,
+        Some(value) if value.validate_open_range().is_ok() => value,
         _ => DateValue::unknown(Some(text.to_owned())),
     }
 }
@@ -3150,6 +3177,24 @@ fn bound_value(parts: &str, qualifier: DateQualifier, original: &str) -> Option<
             end,
             precision: parsed.precision,
             qualifier,
+            original: None,
+        },
+        original,
+    ))
+}
+
+/// A period that has a start and no end, e.g. `FROM 1990`.
+///
+/// The end stays `None` because GEDCOM has no end date to read: the range is
+/// still ongoing. Only residence events accept this shape.
+fn open_range_value(parts: &str, original: &str) -> Option<DateValue> {
+    let start = parse_parts(parts)?;
+    Some(with_original(
+        DateValue {
+            start: Some(start.start),
+            end: None,
+            precision: start.precision,
+            qualifier: DateQualifier::Range,
             original: None,
         },
         original,
@@ -3287,6 +3332,9 @@ fn finer(left: DatePrecision, right: DatePrecision) -> DatePrecision {
 }
 
 /// Render a [`DateValue`] as a GEDCOM 5.5.1 date, without inventing precision.
+///
+/// A closed `RANGE` becomes `BET low AND high`; an ongoing `RANGE` (a start and
+/// no end) becomes `FROM low`, so a known bound is never dropped.
 fn format_gedcom_date(value: &DateValue) -> Option<String> {
     if value.precision == DatePrecision::Unknown {
         let original = value.original.as_deref().map(str::trim)?;
@@ -3302,8 +3350,14 @@ fn format_gedcom_date(value: &DateValue) -> Option<String> {
         }
         DateQualifier::Range => {
             let low = format_partial(value.start?, value.precision)?;
-            let high = format_partial(previous_day(value.end?), value.precision)?;
-            format!("BET {low} AND {high}")
+            // An ongoing period has no end to write: GEDCOM says `FROM x` then.
+            match value.end {
+                Some(end) => {
+                    let high = format_partial(previous_day(end), value.precision)?;
+                    format!("BET {low} AND {high}")
+                }
+                None => format!("FROM {low}"),
+            }
         }
         DateQualifier::Before => format!("BEF {}", format_partial(value.end?, value.precision)?),
         DateQualifier::After => format!("AFT {}", format_partial(value.start?, value.precision)?),
@@ -3406,6 +3460,15 @@ mod tests {
         assert_eq!(from_to.start.unwrap().to_iso(), "1900-05-01");
         assert_eq!(from_to.end.unwrap().to_iso(), "1900-07-01");
 
+        let open = parse_gedcom_date("FROM 15 MAY 1900");
+        assert_eq!(open.qualifier, DateQualifier::Range);
+        assert_eq!(open.precision, DatePrecision::Day);
+        assert_eq!(open.start.unwrap().to_iso(), "1900-05-15");
+        assert_eq!(open.end, None, "an ongoing period keeps no end date");
+        // A lone `TO …` has no start and stays unrepresentable.
+        let to_only = parse_gedcom_date("TO 1900");
+        assert_eq!(to_only.precision, DatePrecision::Unknown);
+
         // Shared AT5 rules for numeric forms.
         let iso = parse_gedcom_date("1950-05-06");
         assert_eq!(iso.precision, DatePrecision::Day);
@@ -3454,12 +3517,61 @@ mod tests {
             Some("BET 1900 AND 1910")
         );
 
+        // An ongoing period keeps its start and gains no end.
+        let open = parse_gedcom_date("FROM MAY 1950");
+        assert_eq!(format_gedcom_date(&open).as_deref(), Some("FROM MAY 1950"));
+        for (raw, expected) in [
+            ("FROM 1900", "FROM 1900"),
+            ("FROM 07 MAY 1950", "FROM 07 MAY 1950"),
+        ] {
+            assert_eq!(
+                format_gedcom_date(&parse_gedcom_date(raw)).as_deref(),
+                Some(expected),
+                "raw: {raw}"
+            );
+        }
+        // A range with only an end has no GEDCOM form here.
+        let end_only = DateValue {
+            start: None,
+            end: Some(CivilDate::new(1900, 1, 1).unwrap()),
+            precision: DatePrecision::Year,
+            qualifier: DateQualifier::Range,
+            original: None,
+        };
+        assert_eq!(format_gedcom_date(&end_only), None);
+
         let year = parse_gedcom_date("1950");
         let formatted = format_gedcom_date(&year).unwrap();
         let reparsed = parse_gedcom_date(&formatted);
         assert_eq!(reparsed.precision, DatePrecision::Year);
         assert_eq!(reparsed.start.unwrap().to_iso(), "1950-01-01");
         assert_eq!(reparsed.end.unwrap().to_iso(), "1951-01-01");
+    }
+
+    #[test]
+    fn an_open_period_is_only_valid_for_a_residence() {
+        let open = parse_gedcom_date("FROM 1990");
+        assert_eq!(open.qualifier, DateQualifier::Range);
+        assert_eq!(open.precision, DatePrecision::Year);
+        assert!(open.end.is_none());
+        // The parser accepts the shape; the event type decides.
+        open.validate_open_range().unwrap();
+        assert!(open.validate().is_err());
+
+        let person_id = Uuid::now_v7();
+        let mut residence = Event::new(person_id, EventType::Residence);
+        residence.date = open.clone();
+        residence.validate().unwrap();
+
+        // Birth and death have no ongoing form, so validation rejects it.
+        for event_type in [EventType::Birth, EventType::Death] {
+            let mut event = Event::new(person_id, event_type);
+            event.date = open.clone();
+            assert!(
+                event.validate().is_err(),
+                "{event_type:?} must reject an open range"
+            );
+        }
     }
 
     #[test]
