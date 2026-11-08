@@ -32,6 +32,8 @@ pub enum PlaceSource {
     Dadata,
     /// A historical name resolved through Wikidata (ADR-0021).
     Wikidata,
+    /// Coordinates read from `PLAC.MAP` in an imported GEDCOM file.
+    Gedcom,
     Manual,
 }
 
@@ -176,6 +178,16 @@ mod tests {
         assert_eq!(
             value.validate().expect_err("label").params["rule"],
             "labelTooLong"
+        );
+    }
+
+    #[test]
+    fn gedcom_source_serializes_as_screaming_snake_case() {
+        let json = serde_json::to_value(PlaceSource::Gedcom).expect("serialize");
+        assert_eq!(json, "GEDCOM");
+        assert_eq!(
+            serde_json::from_value::<PlaceSource>(json).expect("deserialize"),
+            PlaceSource::Gedcom
         );
     }
 

@@ -201,6 +201,7 @@ make dev      # run the app in dev mode
 - **AT5** is opened read-only on import and never modified.
 - **GEDCOM 5.5.1 and 7.0** import detects the version from the header. Export
   offers both and defaults to 5.5.1; 7.0 also writes sources and citations.
+  Confirmed event place coordinates travel as `PLAC.MAP.LATI`/`LONG`.
   Problems are reported as warnings; records don't quietly disappear.
 - **JSON/ZIP** exchanges whole projects. Merging shows a review step first.
 - **The project format is versioned.** Older builds refuse to open a newer
