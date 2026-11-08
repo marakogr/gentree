@@ -23,6 +23,34 @@ vi.mock("../../components/ui/dialog", () => ({
   }) => <div data-close-label={closeLabel}>{children}</div>,
 }));
 
+// Fluent renders the listbox only after the combobox is opened, which a server
+// render never does. The stand-in keeps the visible contract of the field: the
+// selected label in `value`, and every offered option in `data-items`.
+vi.mock("../../components/ui/combobox", () => ({
+  Combobox: ({
+    id,
+    items,
+    value,
+    disabled,
+  }: {
+    id?: string;
+    items: { id: string; label: string }[];
+    value: string;
+    disabled?: boolean;
+  }) => {
+    const selected = items.find((item) => item.id === value) ?? null;
+    return (
+      <input
+        id={id}
+        value={selected?.label ?? ""}
+        disabled={disabled}
+        readOnly
+        data-items={items.map((item) => item.label).join("|")}
+      />
+    );
+  },
+}));
+
 beforeAll(async () => {
   await i18n.use(initReactI18next).init({
     lng: "ru",
@@ -97,6 +125,20 @@ function inputValue(html: string, id: string): string {
   if (at < 0) return "";
   const tag = html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1);
   return /value="([^"]*)"/.exec(tag)?.[1] ?? "";
+}
+
+/** Labels the combobox behind `id` offers, read from the test stand-in. */
+function itemLabels(html: string, id: string): string[] {
+  const at = indexOfId(html, id);
+  if (at < 0) return [];
+  const tag = html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1);
+  const raw = /data-items="([^"]*)"/.exec(tag)?.[1] ?? "";
+  return raw === "" ? [] : raw.split("|");
+}
+
+/** Opening tag of the type option with this value. */
+function optionTag(html: string, value: string): string {
+  return new RegExp(`<option[^>]*value="${value}"[^>]*>`).exec(html)?.[0] ?? "";
 }
 
 describe("EventForm layout", () => {
@@ -180,5 +222,101 @@ describe("EventForm birth parent slots", () => {
     const html = renderBirth(birth([father.id]));
     expect(inputValue(html, "event-parent-0")).toBe("Пётр");
     expect(inputValue(html, "event-parent-1")).toBe("");
+  });
+});
+
+describe("EventForm life-event person picker (issue #145)", () => {
+  const ivan = person("ivan", "Иван", "MALE");
+  const anna = person("anna", "Анна", "FEMALE");
+
+  function stored(id: string, personId: string, type: EventType): EventEntity {
+    return {
+      id,
+      personId,
+      type,
+      date: unknownDate,
+      place: null,
+      description: null,
+      sourceIds: [],
+      originalType: null,
+      participantIds: [],
+    };
+  }
+
+  function render(
+    options: {
+      initial?: EventEntity;
+      type?: EventType;
+      defaultPersonId?: string;
+      persons?: Person[];
+      events?: EventEntity[];
+    } = {},
+  ): string {
+    return renderToStaticMarkup(
+      <EventForm
+        initial={options.initial ?? null}
+        version={null}
+        persons={(options.persons ?? [ivan, anna]).map((entity) => ({ entity }))}
+        events={options.events ?? []}
+        defaultPersonId={options.defaultPersonId}
+        defaultType={options.type}
+        onSaved={noop}
+        onCancel={noop}
+        onReload={noop}
+      />,
+    );
+  }
+
+  it("type first: offers only people without the chosen life event", () => {
+    const html = render({
+      type: "BIRTH",
+      events: [stored("birth-ivan", ivan.id, "BIRTH")],
+    });
+    expect(itemLabels(html, "event-person")).toEqual(["Анна"]);
+  });
+
+  it("keeps the full person list for repeatable event types", () => {
+    const html = render({
+      type: "MARRIAGE",
+      defaultPersonId: ivan.id,
+      events: [stored("marriage-ivan", ivan.id, "MARRIAGE")],
+    });
+    expect(itemLabels(html, "event-person")).toEqual(["Иван", "Анна"]);
+    expect(itemLabels(html, "event-spouse")).toEqual(["Анна"]);
+  });
+
+  it("says so when nobody is left for the chosen life event", () => {
+    const html = render({
+      type: "DEATH",
+      events: [
+        stored("death-ivan", ivan.id, "DEATH"),
+        stored("death-anna", anna.id, "DEATH"),
+      ],
+    });
+    expect(itemLabels(html, "event-person")).toEqual([]);
+    expect(html).toContain("У всех людей уже есть событие этого типа");
+  });
+
+  it("person first: locks the type that person already has", () => {
+    const html = render({
+      type: "BIRTH",
+      defaultPersonId: ivan.id,
+      events: [stored("birth-ivan", ivan.id, "BIRTH")],
+    });
+    // The chosen person stays visible, but the type is offered as unavailable.
+    expect(itemLabels(html, "event-person")).toEqual(["Иван", "Анна"]);
+    expect(optionTag(html, "BIRTH")).toContain("disabled");
+    expect(html).toContain("Такой тип нельзя добавить повторно");
+  });
+
+  it("edit mode keeps the current person and type for a legacy duplicate", () => {
+    const edited = stored("birth-ivan", ivan.id, "BIRTH");
+    const html = render({
+      initial: edited,
+      events: [edited, stored("birth-ivan-2", ivan.id, "BIRTH")],
+    });
+    expect(inputValue(html, "event-person")).toBe("Иван");
+    expect(itemLabels(html, "event-person")).toEqual(["Иван", "Анна"]);
+    expect(optionTag(html, "BIRTH")).not.toContain("disabled");
   });
 });

@@ -44,6 +44,7 @@ import {
   EVENT_TYPES,
   buildEventInput,
   draftFromEvent,
+  eligibleLifeEventPersons,
   emptyEventDraft,
   eventDateLabel,
   eventTypeLabel,
@@ -82,9 +83,6 @@ const PRECISIONS: readonly DatePrecision[] = [
 /** Offered qualifiers; a stored legacy qualifier is appended while editing. */
 const QUALIFIERS: readonly DateQualifier[] = ["EXACT", "APPROXIMATE"];
 
-/** No stored birth/death event for the selected person (or not loaded yet). */
-const NO_LOCKED_TYPES: ReadonlySet<EventType> = new Set();
-
 /** Request to create an event of another type for the same person. */
 export type RelatedEventRequest = { type: EventType; personId: string };
 
@@ -94,6 +92,11 @@ type Props = {
   /** Dialog width; the card's maximize action asks for the full window. */
   size?: "lg" | "full";
   persons: readonly { entity: Person }[];
+  /**
+   * Every event of the open project. The type lock and the primary-person
+   * picker read this one list; omitted callers let the form load it itself.
+   */
+  events?: readonly EventEntity[];
   defaultPersonId?: string;
   /** Type of a new event, e.g. a burial created from a death event. */
   defaultType?: EventType;
@@ -115,6 +118,7 @@ export default function EventForm({
   version,
   size = "full",
   persons,
+  events,
   defaultPersonId,
   defaultType,
   onSaved,
@@ -165,40 +169,35 @@ export default function EventForm({
   // missing settings backend leaves built-in types and keys usable.
   const { customTypes, fieldGroups, geocoderEnabled, historicalEnabled } =
     useEventConfig();
-  // A person may own only one birth and one death. The stored events of the
-  // selected person tell the form which type options are already taken; a
-  // legacy duplicate stays editable through `initial`.
-  const [lockedTypes, setLockedTypes] =
-    useState<ReadonlySet<EventType>>(NO_LOCKED_TYPES);
-
+  // A person may own only one birth and one death. The open project's events
+  // feed both the type lock and the primary-person picker, so the same data
+  // decides both (issue #145). Callers that already hold the list pass it in;
+  // the others (person card, timeline popover) let the form load it itself.
+  const [fetchedEvents, setFetchedEvents] = useState<readonly EventEntity[]>([]);
   useEffect(() => {
-    const personId = draft.personId;
-    if (personId === "") {
-      setLockedTypes(NO_LOCKED_TYPES);
-      return undefined;
-    }
+    if (events !== undefined) return undefined;
     let active = true;
     eventsApi
-      .list({ personId })
+      .list({})
       .then((rows) => {
-        if (!active) return;
-        setLockedTypes(
-          lockedLifeEventTypes(
-            rows.map((row) => row.entity),
-            personId,
-            initial?.id,
-          ),
-        );
+        if (active) setFetchedEvents(rows.map((row) => row.entity));
       })
       // An unavailable list must not block the form: the backend still refuses
       // a duplicate, so the form stays usable without the local hint.
       .catch(() => {
-        if (active) setLockedTypes(NO_LOCKED_TYPES);
+        if (active) setFetchedEvents([]);
       });
     return () => {
       active = false;
     };
-  }, [draft.personId, initial?.id]);
+  }, [events]);
+  const projectEvents = events ?? fetchedEvents;
+
+  // A legacy duplicate stays editable through `initial`.
+  const lockedTypes = useMemo(
+    () => lockedLifeEventTypes(projectEvents, draft.personId, initial?.id),
+    [projectEvents, draft.personId, initial?.id],
+  );
 
   const update = (patch: Partial<EventDraft>) => {
     setDraft((current) => ({ ...current, ...patch }));
@@ -275,7 +274,7 @@ export default function EventForm({
     [persons],
   );
 
-  const personItems = useMemo(() => {
+  const personOptions = useMemo(() => {
     const items = persons.map((item) => ({
       id: item.entity.id,
       label: displayName(item.entity, t("person:unknownName")),
@@ -294,17 +293,41 @@ export default function EventForm({
     return items;
   }, [persons, draft.personId, t]);
 
+  // A new birth/death never offers a person who already owns one (issue #145).
+  // The draft person stays listed so an edited legacy duplicate remains
+  // selectable and the field can always show its own value.
+  const personItems = useMemo(
+    () =>
+      eligibleLifeEventPersons(personOptions, projectEvents, draft.eventType, {
+        keepPersonId: draft.personId,
+        editingId: initial?.id,
+      }),
+    [
+      personOptions,
+      projectEvents,
+      draft.eventType,
+      draft.personId,
+      initial?.id,
+    ],
+  );
+  // Every person already has this life event, so the picker has nothing left.
+  const noEligiblePersons = persons.length > 0 && personItems.length === 0;
+
   const spouseItems = useMemo(() => {
-    const items = personItems.filter((item) => item.id !== draft.personId);
+    // Built from the unfiltered list: the life-event filter only ever applies
+    // to BIRTH/DEATH, which have no second participant.
+    const items = personOptions.filter((item) => item.id !== draft.personId);
     if (
       draft.spouseId !== "" &&
       !items.some((item) => item.id === draft.spouseId)
     ) {
-      const source = personItems.find((item) => item.id === draft.spouseId);
+      const source = personOptions.find(
+        (item) => item.id === draft.spouseId,
+      );
       items.push(source ?? { id: draft.spouseId, label: t("person:unknownName") });
     }
     return items;
-  }, [personItems, draft.personId, draft.spouseId, t]);
+  }, [personOptions, draft.personId, draft.spouseId, t]);
 
   // Slot 0 is the father picker, slot 1 the mother picker. A preselected
   // person is kept visible even when their gender is UNKNOWN or mismatched.
@@ -730,6 +753,9 @@ export default function EventForm({
                 label={primaryRole}
                 htmlFor="event-person"
                 required
+                hint={
+                  noEligiblePersons ? t("event:noEligiblePersons") : undefined
+                }
                 error={
                   (touchedPerson || submitted) && personMissing
                     ? t("event:errors.personRequired")

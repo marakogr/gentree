@@ -823,6 +823,13 @@ export default function EventsPage({
     [persons],
   );
 
+  // The form filters its person picker by the project's life events, so it
+  // reads the already loaded list instead of loading it a second time.
+  const eventEntities = useMemo(
+    () => events.map((row) => row.entity),
+    [events],
+  );
+
   return (
     <>
       <PageShell
@@ -1214,6 +1221,7 @@ export default function EventsPage({
           initial={editing?.event ?? null}
           version={editing?.version ?? null}
           persons={persons}
+          events={eventEntities}
           defaultPersonId={createDefaults?.personId ?? filters.personId}
           defaultType={createDefaults?.type}
           onSaved={handleSaved}

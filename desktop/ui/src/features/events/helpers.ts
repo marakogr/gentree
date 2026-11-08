@@ -85,6 +85,48 @@ export function lockedLifeEventTypes(
 }
 
 /**
+ * People who already own a single life event of `type`, ignoring the event
+ * being edited. The primary-person picker of a new BIRTH/DEATH event hides
+ * them so the form cannot offer a duplicate (issue #145); the same stored list
+ * feeds `lockedLifeEventTypes`, so both rules agree.
+ */
+export function personsWithLifeEvent(
+  events: readonly Pick<EventEntity, "id" | "personId" | "type">[],
+  type: EventType,
+  editingId?: string | null,
+): ReadonlySet<string> {
+  const persons = new Set<string>();
+  if (!isSingleLifeEventType(type)) return persons;
+  for (const event of events) {
+    if (editingId != null && event.id === editingId) continue;
+    if (event.type === type && event.personId !== "") {
+      persons.add(event.personId);
+    }
+  }
+  return persons;
+}
+
+/**
+ * Primary-person options for the event form. A BIRTH/DEATH event hides people
+ * who already own one, matching the type lock built from the same list. The
+ * draft person stays offered (`keepPersonId`), so a legacy duplicate being
+ * edited remains selectable and the field can always display its own value.
+ * Every other type keeps the full list.
+ */
+export function eligibleLifeEventPersons<T extends { id: string }>(
+  items: readonly T[],
+  events: readonly Pick<EventEntity, "id" | "personId" | "type">[],
+  type: EventType,
+  options: { keepPersonId?: string; editingId?: string | null } = {},
+): T[] {
+  if (!isSingleLifeEventType(type)) return [...items];
+  const taken = personsWithLifeEvent(events, type, options.editingId);
+  if (taken.size === 0) return [...items];
+  const keep = options.keepPersonId ?? "";
+  return items.filter((item) => item.id === keep || !taken.has(item.id));
+}
+
+/**
  * Select values for custom names are prefixed so a user-defined name can never
  * collide with a built-in enum value such as `BIRTH`.
  */

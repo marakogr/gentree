@@ -107,6 +107,7 @@
   "clearSpouse": "Очистити вибір подружжя",
   "clearPerson": "Очистити особу",
   "noPersonMatches": "Нічого не знайдено",
+  "noEligiblePersons": "У всіх людей уже є подія цього типу",
   "participantsLinked": "Подія автоматично пов’яже обидва профілі в дереві",
   "deleteConfirm": "Видалити цю подію?",
   "deleteTitle": "Видалити подію?",

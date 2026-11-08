@@ -107,6 +107,7 @@
   "clearSpouse": "Ehepartner entfernen",
   "clearPerson": "Person entfernen",
   "noPersonMatches": "Nichts gefunden",
+  "noEligiblePersons": "Alle Personen haben bereits ein Ereignis dieses Typs",
   "participantsLinked": "Das Ereignis verknüpft beide Profile automatisch im Baum",
   "deleteConfirm": "Dieses Ereignis löschen?",
   "deleteTitle": "Ereignis löschen?",
