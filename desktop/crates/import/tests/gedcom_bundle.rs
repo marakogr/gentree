@@ -240,6 +240,74 @@ fn maps_individual_and_family_events() {
 }
 
 #[test]
+fn a_lone_from_on_a_non_residence_record_keeps_the_event() {
+    let dir = tempfile::tempdir().unwrap();
+    // `FROM x` is a legal GEDCOM period for any event or fact. The domain only
+    // has an ongoing form for a residence, so the others keep an unknown date
+    // with the original text instead of being dropped.
+    let source = "\
+0 HEAD
+1 GEDC
+2 VERS 5.5.1
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Ivan /Petrov/
+1 BIRT
+2 DATE FROM 1990
+1 OCCU Carpenter
+2 DATE FROM 1991
+1 RESI
+2 DATE FROM 1992
+2 ADDR 12 Main Street
+0 TRLR
+";
+    let path = write_text(dir.path(), "open-period.ged", source);
+    let bundle = parse(&path, &[]);
+
+    assert_eq!(bundle.events.len(), 3, "{:?}", bundle.events);
+    assert!(
+        !bundle
+            .report
+            .issues
+            .iter()
+            .any(|issue| issue.contains("event skipped")),
+        "{:?}",
+        bundle.report.issues
+    );
+    assert!(
+        bundle
+            .report
+            .issues
+            .iter()
+            .any(|issue| issue.contains("ongoing period outside a residence")),
+        "{:?}",
+        bundle.report.issues
+    );
+
+    let birth = event(&bundle, EventType::Birth);
+    assert_eq!(birth.date.precision, DatePrecision::Unknown);
+    assert_eq!(birth.date.qualifier, DateQualifier::Unknown);
+    assert_eq!(birth.date.start, None);
+    assert_eq!(birth.date.end, None);
+    assert_eq!(birth.date.original.as_deref(), Some("FROM 1990"));
+
+    let occupation = event(&bundle, EventType::Occupation);
+    assert_eq!(occupation.date.precision, DatePrecision::Unknown);
+    assert_eq!(occupation.date.original.as_deref(), Some("FROM 1991"));
+    assert_eq!(
+        occupation.details.get("position").map(String::as_str),
+        Some("Carpenter")
+    );
+
+    // A residence keeps the open period itself.
+    let residence = event(&bundle, EventType::Residence);
+    assert_eq!(residence.date.qualifier, DateQualifier::Range);
+    assert_eq!(residence.date.precision, DatePrecision::Year);
+    assert_eq!(residence.date.start.map(|date| date.year), Some(1992));
+    assert_eq!(residence.date.end, None);
+}
+
+#[test]
 fn details_note_merges_and_stays_out_of_description() {
     let dir = tempfile::tempdir().unwrap();
     let source = "\

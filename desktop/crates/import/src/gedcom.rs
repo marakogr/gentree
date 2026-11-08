@@ -2811,15 +2811,33 @@ fn event_date_value(raw: Option<&str>, tag: &str, report: &mut GEDCOMReport) -> 
     value
 }
 
-fn push_event(events: &mut Vec<Event>, event: Event, report: &mut GEDCOMReport) {
+fn push_event(events: &mut Vec<Event>, mut event: Event, report: &mut GEDCOMReport) {
     if let Err(err) = event.validate() {
-        report.issue(format!("event skipped ({})", err.code));
-        return;
+        if event.event_type == EventType::Residence || !is_open_range(&event.date) {
+            report.issue(format!("event skipped ({})", err.code));
+            return;
+        }
+        // GEDCOM allows `FROM x` on any fact or event, but only a residence has
+        // an ongoing form in the domain. Keep the record with an unknown date
+        // instead of dropping it; the original text still carries the bound.
+        let original = event.date.original.clone();
+        event.date = DateValue::unknown(original);
+        if let Err(err) = event.validate() {
+            report.issue(format!("event skipped ({})", err.code));
+            return;
+        }
+        report.issue("ongoing period outside a residence; kept as an unknown date");
     }
     if events.iter().any(|existing| same_event(existing, &event)) {
         return;
     }
     events.push(event);
+}
+
+/// `RANGE` with a start and no end: the "ongoing" shape only a residence may
+/// carry. Validation rejects it for every other event type.
+fn is_open_range(date: &DateValue) -> bool {
+    date.qualifier == DateQualifier::Range && date.start.is_some() && date.end.is_none()
 }
 
 /// Two events are the same when nothing but the id differs; a repeated
@@ -3072,8 +3090,9 @@ fn find_media_file(relative: &str, base_name: &str, roots: &[PathBuf]) -> Option
 /// same shape [`EventType::Residence`] permits with
 /// [`DateValue::validate_open_range`]. Parsing uses `validate_open_range` for
 /// that reason: whether an open range is legal depends on the event type, so
-/// the type-specific rule stays in [`Event::validate`] instead of being
-/// duplicated here.
+/// the type-specific rule stays in [`Event::validate`]. GEDCOM allows `FROM x`
+/// on other facts and events too, so the importer keeps such a record with an
+/// unknown date instead of dropping it.
 pub fn parse_gedcom_date(raw: &str) -> DateValue {
     let text = raw.trim();
     if text.is_empty() {
